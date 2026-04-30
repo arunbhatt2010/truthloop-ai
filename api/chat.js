@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     const lowerMsg = lastUserMessage.toLowerCase();
     const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
-    // DOMAIN FILTER
+    // ❌ DOMAIN FILTER
     const healthPatterns = ["दर्द","दांत","सर दर्द","pain","doctor","medicine","health","fever","treatment"];
     const relationshipPatterns = ["relationship","breakup","love","girlfriend","boyfriend","wife","husband","marriage","ex"];
 
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 🔥 KYC CHECK (Stage 1 only — but dynamic tone)
+    // 🔍 STAGE 1 KYC CHECK
     if (loopLevel === 1) {
 
       const hasDetail =
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // 🔥 SYSTEM PROMPT
+    // 🧠 SYSTEM PROMPT (7 LOOP ENGINE)
     const systemPrompt = `
 You are TruthLoop.
 
@@ -77,11 +77,11 @@ Action: ${userAction}
 ----------------------------------
 
 Rules:
-- Never repeat sentence patterns
 - No generic statements
 - No teaching tone
-- Keep it sharp and personal
-- Avoid words like: might, maybe, likely, could
+- No fluff
+- Avoid words like: might, maybe, could
+- Every line must add value
 
 ----------------------------------
 
@@ -89,86 +89,82 @@ STAGE: ${loopLevel}
 
 ----------------------------------
 
-Structure:
-
-1. Start with ONE observation about user behavior  
-2. State what they are actually doing  
-3. Expose what they are avoiding  
-
-----------------------------------
-
-Progression Rule:
-
-- Each stage MUST continue the SAME problem
-- Do NOT introduce new angles
-- Stage 3 must go deeper into Stage 2
-- Stage 4 must resolve Stage 2 + 3
+Flow Rules:
+- Continue SAME problem across stages
+- No new topics
+- Each stage must go deeper
 
 ----------------------------------
 
-STAGE 1:
-- Neutral tone
+Stage 1:
+- Detect vagueness
 - Ask ONE clear question
-- Example style (not fixed script)
-
-Example:
-"Not clear.
-You're mixing things.
-What exactly have you tried so far?"
 
 ----------------------------------
 
-STAGE 2:
+Stage 2:
+- Max 5 lines
+- Show ONE behavior pattern
+- Partial insight
+- End with ONE question
+
+----------------------------------
+
+Stage 3:
 - Max 6 lines
-- Identify ONE behavior pattern
-- Do NOT explain fully
-- No solution
-- Give one incomplete insight
-- End with ONE question
-
-----------------------------------
-
-STAGE 3:
-- Max 7 lines
-- Continue SAME pattern
-- Go deeper into WHY
+- Explain WHY user is stuck
 - Show consequence
-- Add partial direction (still incomplete)
+- No solution
 - End with ONE question
 
 ----------------------------------
 
-STAGE 4:
-- Max 8 lines
+Stage 4:
+- Max 6 lines
+- Expose uncomfortable truth
+- Break wrong belief
 - No question
-- Connect previous answers
-- Give 2–3 direct actionable steps
-- No fluff
 
 ----------------------------------
 
-Content Rules:
+Stage 5:
+- Define decision clearly
+- What to choose vs what to drop
+- No question
 
-- Every line must add value
-- No repetition
-- No long explanation
+----------------------------------
+
+Stage 6:
+- Give 2–3 direct actionable steps
+
+----------------------------------
+
+Stage 7:
+- Show outcome:
+  - If act
+  - If avoid
+- Close with pressure
 
 ----------------------------------
 
 Tone:
-
-Stage 1 → Neutral  
-Stage 2 → Slightly uncomfortable  
-Stage 3 → Confronting  
-Stage 4 → Clear + decisive  
+1 → Neutral  
+2 → Slight tension  
+3 → Deep  
+4 → Confronting  
+5 → Clear  
+6 → Practical  
+7 → Final push  
 `;
-// 🛑 STOP after Stage 4 (next request only)
-if (loopLevel > 4) {
-  return res.status(200).json({
-    reply: "",
-    paywall: true
-  });
-}
+
+    // 🚫 STOP AFTER LOOP 7
+    if (loopLevel > 7) {
+      return res.status(200).json({
+        reply: "",
+        paywall: true
+      });
+    }
+
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -196,8 +192,8 @@ if (loopLevel > 4) {
     const data = await response.json();
     let reply = data?.choices?.[0]?.message?.content || "No response";
 
-    // 🔥 SAFETY (Stage 1–3)
-    if (loopLevel < 4) {
+    // 🔒 SAFETY (NO ACTION BEFORE LOOP 5)
+    if (loopLevel < 5) {
       const forbidden = ["send","call","post","create","sell","build"];
       const hasAction = forbidden.some(word => reply.toLowerCase().includes(word));
 
@@ -206,19 +202,16 @@ if (loopLevel > 4) {
       }
     }
 
-    // 🔥 STAGE 4 CLEANUP
-    if (loopLevel >= 4) {
-
-      reply = reply.replace(/\?/g, "");
-
+    // 🔥 FINAL PRESSURE (ONLY AFTER LOOP 6)
+    if (loopLevel >= 6) {
       reply += isHindi
-        ? "\n\nअब करना है या नहीं — यही फर्क बनाएगा।"
-        : "\n\nNow it's on you to act or stay stuck.";
+        ? "\n\nअब फैसला टालोगे या करोगे — यही फर्क बनाएगा।"
+        : "\n\nNow you either act or stay stuck.";
     }
 
     return res.status(200).json({
       reply,
-      paywall: loopLevel >= 4
+      paywall: loopLevel >= 5
     });
 
   } catch (error) {
@@ -227,4 +220,4 @@ if (loopLevel > 4) {
       reply: "Server error"
     });
   }
-        }
+}
