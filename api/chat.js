@@ -67,6 +67,28 @@ export default async function handler(req, res) {
       }
     }
 
+    // 🔒 HARD BLOCK (REAL PAYWALL)
+
+    // 🚧 Loop 5 (₹49 required)
+    if (loopLevel >= 5 && !paid49) {
+      return res.status(200).json({
+        reply: isHindi
+          ? "यहीं लोग रुक जाते हैं।\n\nतुमने समस्या देख ली है… पर समाधान नहीं।"
+          : "Most people stop here.\n\nYou see the problem… but not the solution.",
+        paywall: true
+      });
+    }
+
+    // 🚧 Loop 7 (₹199 required)
+    if (loopLevel >= 7 && !paid199) {
+      return res.status(200).json({
+        reply: isHindi
+          ? "तुम अभी भी पूरी clarity से बच रहे हो।"
+          : "You're still avoiding full clarity.",
+        paywall: true
+      });
+    }
+
     // 🧠 PROMPT
     const systemPrompt = `
 You are TruthLoop.
@@ -98,7 +120,8 @@ Stage 3:
 
 Stage 4:
 - Expose uncomfortable truth
-- No question
+- BUT DO NOT COMPLETE IT
+- Leave curiosity gap
 
 Stage 5:
 - Define decision clearly
@@ -110,14 +133,6 @@ Stage 7:
 - Show outcome (act vs avoid)
 - Final push
 `;
-
-    // 🚫 STOP AFTER 7
-    if (loopLevel > 7) {
-      return res.status(200).json({
-        reply: "",
-        paywall: true
-      });
-    }
 
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -146,22 +161,9 @@ Stage 7:
     const data = await response.json();
     let reply = data?.choices?.[0]?.message?.content || "No response";
 
-    // 🔒 HARD PAYWALL (REAL FIX)
-
-    // 🚧 Loop 5 block (₹49)
-    if (loopLevel >= 5 && !paid49) {
-      reply = reply.slice(0, Math.floor(reply.length * 0.4));
-      reply += isHindi
-        ? "\n\nतुम देख रहे हो… पर साफ नहीं।"
-        : "\n\nYou see it… but not clearly.";
-    }
-
-    // 🚧 Loop 7 block (₹199)
-    if (loopLevel >= 7 && !paid199) {
-      reply = reply.slice(0, Math.floor(reply.length * 0.3));
-      reply += isHindi
-        ? "\n\nतुम अभी भी बच रहे हो।"
-        : "\n\nYou're still avoiding the real move.";
+    // 🔥 LOOP 4 TRIM (IMPORTANT)
+    if (loopLevel === 4) {
+      reply = reply.split(".").slice(0, 3).join(".") + "...";
     }
 
     // 🔥 FINAL PUSH
@@ -173,7 +175,7 @@ Stage 7:
 
     return res.status(200).json({
       reply,
-      paywall: (loopLevel >= 5 && !paid49) || (loopLevel >= 7 && !paid199)
+      paywall: false
     });
 
   } catch (error) {
@@ -182,4 +184,4 @@ Stage 7:
       reply: "Server error"
     });
   }
-                                                     }
+}
