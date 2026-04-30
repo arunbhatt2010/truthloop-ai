@@ -78,21 +78,21 @@ You need to face what you're avoiding.
 
 <script>
 
-// ✅ SAFE PAYMENT STATE
+// ✅ PAYMENT STATE
 let paid49 = localStorage.getItem("paid49") === "true";
 let paid199 = localStorage.getItem("paid199") === "true";
 
-let messages=[];
-let loopLevel=1;
+let messages = [];
+let loopLevel = 1;
 
-const outputBox=document.getElementById("outputBox");
-const mainInput=document.getElementById("mainInput");
-const reflectionInput=document.getElementById("reflectionInput");
+const outputBox = document.getElementById("outputBox");
+const mainInput = document.getElementById("mainInput");
+const reflectionInput = document.getElementById("reflectionInput");
 
-const paywallBox=document.getElementById("paywallBox");
-const payBtn=document.getElementById("payBtn");
-const payTitle=document.getElementById("payTitle");
-const paySub=document.getElementById("paySub");
+const paywallBox = document.getElementById("paywallBox");
+const payBtn = document.getElementById("payBtn");
+const payTitle = document.getElementById("payTitle");
+const paySub = document.getElementById("paySub");
 
 // LOOP UI
 function updateLoopUI(){
@@ -102,78 +102,78 @@ function updateLoopUI(){
 
 // TYPE EFFECT
 function typeEffect(text){
-  const div=document.createElement("div");
+  const div = document.createElement("div");
   outputBox.appendChild(div);
 
-  let i=0;
+  let i = 0;
   function typing(){
-    if(i<text.length){
-      div.innerHTML+=text.charAt(i);
+    if(i < text.length){
+      div.innerHTML += text.charAt(i);
       i++;
-      outputBox.scrollTop=outputBox.scrollHeight;
-      setTimeout(typing,12);
+      outputBox.scrollTop = outputBox.scrollHeight;
+      setTimeout(typing, 12);
     }
   }
   typing();
 }
 
-// API (🔥 FIXED)
+// ✅ FIXED API
 async function callAPI(){
-  const res = await fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      messages,
-      loopLevel,
-      paid49: localStorage.getItem("paid49") === "true",
-      paid199: localStorage.getItem("paid199") === "true"
-    })
-  });
+  try{
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages,
+        loopLevel,
+        paid49,
+        paid199
+      })
+    });
 
-  const data = await res.json();
-  let reply = data?.reply || "No reply";
+    const data = await res.json();
+    let reply = data?.reply || "No reply";
 
-  messages.push({ role: "assistant", content: reply });
-  return reply;
-  })
-  });
+    messages.push({ role: "assistant", content: reply });
+    return reply;
 
-  const data=await res.json();
-  let reply=data?.reply || "No reply";
-
-  messages.push({role:"assistant",content:reply});
-  return reply;
+  } catch (e){
+    console.error(e);
+    return "⚠️ Error";
+  }
 }
 
 // START
-getBtn.onclick=async ()=>{
-  const text=mainInput.value.trim();
+getBtn.onclick = async ()=>{
+  const text = mainInput.value.trim();
   if(!text) return;
 
-  messages=[{role:"user",content:text}];
-  outputBox.innerHTML=`<b>You:</b> ${text}<br><br>`;
+  messages = [{ role:"user", content:text }];
+  outputBox.innerHTML = `<b>You:</b> ${text}<br><br>`;
 
-  const reply=await callAPI();
+  const reply = await callAPI();
   typeEffect(reply);
 
-  mainInput.value="";
-  document.getElementById("reflectionInput").style.display = "block";
-document.getElementById("nextBtn").style.display = "block";
-document.getElementById("getBtn").style.display = "none";
+  mainInput.value = "";
+
+  // UX FIX
+  reflectionInput.style.display = "block";
+  nextBtn.style.display = "block";
+  getBtn.style.display = "none";
 };
 
-// NEXT (🔥 FIXED PAYWALL LOGIC)
-nextBtn.onclick=async ()=>{
-  const text=reflectionInput.value.trim();
+// NEXT
+nextBtn.onclick = async ()=>{
+  const text = reflectionInput.value.trim();
   if(!text) return;
 
-  // 🚧 LOOP 5 PAYWALL
+  // PAYWALL 49
   if(loopLevel === 4 && !paid49){
     showPaywall49();
     return;
   }
 
-  // 🚧 LOOP 7 PAYWALL
+  // PAYWALL 199
   if(loopLevel === 6 && !paid199){
     showPaywall199();
     return;
@@ -182,57 +182,51 @@ nextBtn.onclick=async ()=>{
   loopLevel++;
   updateLoopUI();
 
-  messages.push({role:"user",content:text});
-  outputBox.innerHTML+=`<br><b>You:</b> ${text}<br><br>`;
+  messages.push({ role:"user", content:text });
+  outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
 
-  const reply=await callAPI();
+  const reply = await callAPI();
   typeEffect(reply);
 
-  reflectionInput.value="";
+  reflectionInput.value = "";
 };
 
 // PAYWALL 49
 function showPaywall49(){
-  paywallBox.style.display="block";
+  paywallBox.style.display = "block";
 
-  payTitle.innerText="You’re stopping right before clarity.";
+  payTitle.innerText = "You’re stopping right before clarity.";
 
-  paySub.innerText=
+  paySub.innerText =
   "You already see the problem.\n\n" +
-  "But you still don’t know what to DO.\n\n" +
-  "This is where most people quit.\n" +
-  "And stay stuck.\n\n" +
-  "You can leave…\n\n" +
-  "Or finally see the exact move.";
+  "But you don’t know what to DO.\n\n" +
+  "Most people stop here.\n\n" +
+  "You can leave… or finally see it.";
 
-  payBtn.innerText="Show me what I’m missing (₹49)";
-  payBtn.onclick=()=>{
+  payBtn.innerText = "Unlock clarity (₹49)";
+  payBtn.onclick = ()=>{
     window.open("https://rzp.io/rzp/Gl9QDcVA","_blank");
 
-    // simulate success
     localStorage.setItem("paid49","true");
     paid49 = true;
 
-    paywallBox.style.display="none";
+    paywallBox.style.display = "none";
   };
 }
 
-
 // PAYWALL 199
 function showPaywall199(){
-  paywallBox.style.display="block";
+  paywallBox.style.display = "block";
 
-  payTitle.innerText="Now it gets real.";
+  payTitle.innerText = "Now it gets real.";
 
-  paySub.innerText=
-  "You know the direction now.\n\n" +
-  "But without exact steps, you’ll go in circles.\n\n" +
-  "Most people stop here.\n" +
-  "Few actually execute.\n\n" +
+  paySub.innerText =
+  "You know the direction.\n\n" +
+  "But without exact steps, you’ll loop forever.\n\n" +
   "Decide.";
 
-  payBtn.innerText="Show me exactly what to do (₹199)";
-  payBtn.onclick=()=>{
+  payBtn.innerText = "Unlock full clarity (₹199)";
+  payBtn.onclick = ()=>{
     window.open("https://rzp.io/rzp/qcjrdEgd","_blank");
 
     localStorage.setItem("paid49","true");
@@ -241,16 +235,16 @@ function showPaywall199(){
     paid49 = true;
     paid199 = true;
 
-    paywallBox.style.display="none";
+    paywallBox.style.display = "none";
   };
 }
 
-
 // SKIP
 function skipPaywall(){
-  paywallBox.style.display="none";
+  paywallBox.style.display = "none";
 }
+
 </script>
 
 </body>
-</html>
+  </html>
