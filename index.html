@@ -119,15 +119,23 @@ function typeEffect(text){
 
 // API (🔥 FIXED)
 async function callAPI(){
-  const res=await fetch("/api/chat",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       messages,
       loopLevel,
-      paid49,
-      paid199
+      paid49: localStorage.getItem("paid49") === "true",
+      paid199: localStorage.getItem("paid199") === "true"
     })
+  });
+
+  const data = await res.json();
+  let reply = data?.reply || "No reply";
+
+  messages.push({ role: "assistant", content: reply });
+  return reply;
+  })
   });
 
   const data=await res.json();
@@ -210,8 +218,8 @@ function showPaywall199(){
   payBtn.onclick=()=>{
     window.open("https://rzp.io/rzp/qcjrdEgd","_blank");
 
-    localStorage.setItem("paid199","true");
-    paid199=true;
+    localStorage.setItem("paid49","true");
+localStorage.setItem("paid199","true");
 
     paywallBox.style.display="none";
   };
