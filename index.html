@@ -5,29 +5,83 @@
 <title>TruthLoop</title>
 
 <style>
-body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
-.container { max-width:500px; margin:auto; padding:15px; }
+body {
+  background:#0f0f0f;
+  color:#fff;
+  font-family:Arial;
+  margin:0;
+}
+
+.container {
+  max-width:500px;
+  margin:auto;
+  padding:15px;
+}
 
 .output {
-  height:42vh; overflow-y:auto;
-  background:#000; padding:15px;
-  border-radius:12px; margin-bottom:10px;
+  height:45vh;
+  overflow-y:auto;
+  background:#000;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:10px;
   line-height:1.7;
+  font-size:14px;
 }
 
 input,button {
-  width:100%; padding:12px;
-  margin-top:10px; border-radius:8px; border:none;
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
 }
 
 button {
   background:linear-gradient(45deg, orange, #ff5e00);
-  font-weight:bold; cursor:pointer;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.small { font-size:12px; color:#aaa; text-align:center; }
-.links { text-align:center; margin-top:10px; }
-.links a { color:#4da6ff; margin:0 5px; font-size:12px; }
+.small {
+  font-size:12px;
+  color:#aaa;
+  text-align:center;
+}
+
+#loopIndicator {
+  text-align:center;
+  font-size:12px;
+  color:#ffae42;
+  margin-bottom:8px;
+}
+
+/* PAYWALL */
+#paywallBox {
+  display:none;
+  background:#111;
+  padding:18px;
+  border-radius:12px;
+  margin-top:12px;
+  text-align:center;
+  border:1px solid #222;
+}
+
+.pay-title {
+  font-size:16px;
+  margin-bottom:10px;
+}
+
+.pay-sub {
+  font-size:13px;
+  color:#bbb;
+  margin-bottom:15px;
+}
+
+.secondary-btn {
+  background:#222;
+  margin-top:8px;
+}
 </style>
 </head>
 
@@ -36,7 +90,13 @@ button {
 <div class="container">
 
 <h2 style="text-align:center;">TruthLoop</h2>
-<p class="small">Clarity hurts. But confusion costs more.</p>
+
+<p class="small">
+You don’t need more advice.<br>
+You need to face what you're avoiding.
+</p>
+
+<div id="loopIndicator">Loop 1 / 7</div>
 
 <div id="outputBox" class="output"></div>
 
@@ -46,8 +106,16 @@ button {
 <input id="reflectionInput" placeholder="Answer honestly..."/>
 <button id="nextBtn">Go deeper</button>
 
-<button id="pay49" style="display:none;">Unlock deeper (₹49)</button>
-<button id="pay199" style="display:none;">Unlock full clarity (₹199)</button>
+<!-- PAYWALL -->
+<div id="paywallBox">
+
+  <div class="pay-title" id="payTitle"></div>
+  <div class="pay-sub" id="paySub"></div>
+
+  <button id="payBtn"></button>
+  <button class="secondary-btn" onclick="skipPaywall()">Not now</button>
+
+</div>
 
 </div>
 
@@ -60,40 +128,36 @@ const outputBox=document.getElementById("outputBox");
 const mainInput=document.getElementById("mainInput");
 const reflectionInput=document.getElementById("reflectionInput");
 
-const pay49=document.getElementById("pay49");
-const pay199=document.getElementById("pay199");
+const paywallBox=document.getElementById("paywallBox");
+const payBtn=document.getElementById("payBtn");
+const payTitle=document.getElementById("payTitle");
+const paySub=document.getElementById("paySub");
 
 // 💰 PAYMENT STATE
-if(localStorage.getItem("paid49")){
-  pay49.style.display="none";
+let paid49 = localStorage.getItem("paid49");
+let paid199 = localStorage.getItem("paid199");
+
+// LOOP UI
+function updateLoopUI(){
+  document.getElementById("loopIndicator").innerText =
+    `Loop ${loopLevel} / 7`;
 }
-if(localStorage.getItem("paid199")){
-  pay199.style.display="none";
-}
 
-// ₹49
-pay49.onclick = ()=>{
-  if(!localStorage.getItem("paid49")){
-    window.open("https://rzp.io/rzp/Gl9QDcVA","_blank");
-    alert("Complete payment and click again");
-    localStorage.setItem("paid49","true");
-    pay49.style.display="none";
+// TYPE EFFECT
+function typeEffect(text){
+  const div=document.createElement("div");
+  outputBox.appendChild(div);
+
+  let i=0;
+  function typing(){
+    if(i<text.length){
+      div.innerHTML+=text.charAt(i);
+      i++;
+      outputBox.scrollTop=outputBox.scrollHeight;
+      setTimeout(typing,12);
+    }
   }
-};
-
-// ₹199
-pay199.onclick = ()=>{
-  if(!localStorage.getItem("paid199")){
-    window.open("https://rzp.io/rzp/qcjrdEgd","_blank");
-    alert("Complete payment and click again");
-    localStorage.setItem("paid199","true");
-    pay199.style.display="none";
-  }
-};
-
-// FORMAT
-function formatReply(text){
-  return text.split("\n").map(line=>`<div>${line}</div>`).join("");
+  typing();
 }
 
 // API
@@ -120,41 +184,78 @@ getBtn.onclick=async ()=>{
   outputBox.innerHTML=`<b>You:</b> ${text}<br><br>`;
 
   const reply=await callAPI();
-  outputBox.innerHTML+=formatReply(reply);
+  typeEffect(reply);
 
   mainInput.value="";
 };
 
-// NEXT LOOP
+// NEXT
 nextBtn.onclick=async ()=>{
   const text=reflectionInput.value.trim();
   if(!text) return;
 
-  // 🔒 PAYWALL LOGIC
-  if(loopLevel === 3 && !localStorage.getItem("paid49")){
-    pay49.style.display="block";
-    alert("Unlock deeper thinking first");
+  // 💰 LOOP 5 PAYWALL
+  if(loopLevel === 4 && !paid49){
+    showPaywall49();
     return;
   }
 
-  if(loopLevel === 5 && !localStorage.getItem("paid199")){
-    pay199.style.display="block";
-    alert("Unlock full clarity to continue");
+  // 💰 LOOP 7 PAYWALL
+  if(loopLevel === 6 && !paid199){
+    showPaywall199();
     return;
   }
 
   loopLevel++;
+  updateLoopUI();
 
   messages.push({role:"user",content:text});
   outputBox.innerHTML+=`<br><b>You:</b> ${text}<br><br>`;
 
   const reply=await callAPI();
-  outputBox.innerHTML+=formatReply(reply);
+  typeEffect(reply);
 
   reflectionInput.value="";
 };
 
+// PAYWALL 49
+function showPaywall49(){
+  paywallBox.style.display="block";
+
+  payTitle.innerText="You’re close.";
+  paySub.innerText="You can stop here. Or see what you're avoiding.";
+
+  payBtn.innerText="See it clearly (₹49)";
+  payBtn.onclick=()=>{
+    window.open("https://rzp.io/rzp/Gl9QDcVA","_blank");
+    localStorage.setItem("paid49","true");
+    paid49=true;
+    paywallBox.style.display="none";
+  };
+}
+
+// PAYWALL 199
+function showPaywall199(){
+  paywallBox.style.display="block";
+
+  payTitle.innerText="Now it gets real.";
+  paySub.innerText="You already know the direction. Now see exactly what to do.";
+
+  payBtn.innerText="Get full clarity (₹199)";
+  payBtn.onclick=()=>{
+    window.open("https://rzp.io/rzp/qcjrdEgd","_blank");
+    localStorage.setItem("paid199","true");
+    paid199=true;
+    paywallBox.style.display="none";
+  };
+}
+
+// SKIP
+function skipPaywall(){
+  paywallBox.style.display="none";
+}
+
 </script>
 
 </body>
-</html>
+  </html>
