@@ -22,6 +22,8 @@ export default async function handler(req, res) {
     const {
       messages,
       loopLevel = 1,
+      paid49 = false,
+      paid199 = false,
       userGoal = "",
       userProblem = "",
       userAction = ""
@@ -50,9 +52,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // 🔍 STAGE 1 KYC CHECK
+    // 🔍 STAGE 1 CHECK
     if (loopLevel === 1) {
-
       const hasDetail =
         lastUserMessage.split(" ").length > 6 &&
         (lowerMsg.includes("i ") || lowerMsg.includes("main") || lowerMsg.includes("मैं"));
@@ -60,13 +61,13 @@ export default async function handler(req, res) {
       if (!hasDetail) {
         return res.status(200).json({
           reply: isHindi
-            ? "स्पष्ट नहीं है।\n\nतुम बात घुमा रहे हो।\n\nएक लाइन में बताओ:\nतुम क्या करते हो + कहाँ करते हो + अभी क्या काम नहीं कर रहा"
-            : "Not clear.\n\nYou're speaking in circles.\n\nGive ONE line:\nWhat you do + where you do it + what exactly is failing right now"
+            ? "स्पष्ट नहीं है।\n\nएक लाइन में बताओ:\nतुम क्या करते हो + कहाँ करते हो + क्या काम नहीं कर रहा"
+            : "Not clear.\n\nGive ONE line:\nWhat you do + where you do it + what exactly is failing"
         });
       }
     }
 
-    // 🧠 SYSTEM PROMPT (7 LOOP ENGINE)
+    // 🧠 PROMPT
     const systemPrompt = `
 You are TruthLoop.
 
@@ -74,90 +75,43 @@ Goal: ${userGoal}
 Problem: ${userProblem}
 Action: ${userAction}
 
-----------------------------------
-
 Rules:
-- No generic statements
-- No teaching tone
 - No fluff
-- Avoid words like: might, maybe, could
-- Every line must add value
-
-----------------------------------
+- No generic advice
+- No teaching tone
+- Every line must hit directly
 
 STAGE: ${loopLevel}
 
-----------------------------------
-
-Flow Rules:
-- Continue SAME problem across stages
-- No new topics
-- Each stage must go deeper
-
-----------------------------------
-
 Stage 1:
-- Detect vagueness
-- Ask ONE clear question
-
-----------------------------------
+- Ask ONE question
 
 Stage 2:
-- Max 5 lines
-- Show ONE behavior pattern
+- Show behavior pattern
 - Partial insight
-- End with ONE question
-
-----------------------------------
+- Ask ONE question
 
 Stage 3:
-- Max 6 lines
-- Explain WHY user is stuck
+- Explain why stuck
 - Show consequence
-- No solution
-- End with ONE question
-
-----------------------------------
+- Ask ONE question
 
 Stage 4:
-- Max 6 lines
 - Expose uncomfortable truth
-- Break wrong belief
 - No question
-
-----------------------------------
 
 Stage 5:
 - Define decision clearly
-- What to choose vs what to drop
-- No question
-
-----------------------------------
 
 Stage 6:
-- Give 2–3 direct actionable steps
-
-----------------------------------
+- Give 2–3 direct steps
 
 Stage 7:
-- Show outcome:
-  - If act
-  - If avoid
-- Close with pressure
-
-----------------------------------
-
-Tone:
-1 → Neutral  
-2 → Slight tension  
-3 → Deep  
-4 → Confronting  
-5 → Clear  
-6 → Practical  
-7 → Final push  
+- Show outcome (act vs avoid)
+- Final push
 `;
 
-    // 🚫 STOP AFTER LOOP 7
+    // 🚫 STOP AFTER 7
     if (loopLevel > 7) {
       return res.status(200).json({
         reply: "",
@@ -192,26 +146,34 @@ Tone:
     const data = await response.json();
     let reply = data?.choices?.[0]?.message?.content || "No response";
 
-    // 🔒 SAFETY (NO ACTION BEFORE LOOP 5)
-    if (loopLevel < 5) {
-      const forbidden = ["send","call","post","create","sell","build"];
-      const hasAction = forbidden.some(word => reply.toLowerCase().includes(word));
+    // 🔒 HARD PAYWALL (REAL FIX)
 
-      if (hasAction) {
-        reply = reply.replace(/send|call|post|create|sell|build/gi, "");
-      }
+    // 🚧 Loop 5 block (₹49)
+    if (loopLevel >= 5 && !paid49) {
+      reply = reply.slice(0, Math.floor(reply.length * 0.4));
+      reply += isHindi
+        ? "\n\nतुम देख रहे हो… पर साफ नहीं।"
+        : "\n\nYou see it… but not clearly.";
     }
 
-    // 🔥 FINAL PRESSURE (ONLY AFTER LOOP 6)
+    // 🚧 Loop 7 block (₹199)
+    if (loopLevel >= 7 && !paid199) {
+      reply = reply.slice(0, Math.floor(reply.length * 0.3));
+      reply += isHindi
+        ? "\n\nतुम अभी भी बच रहे हो।"
+        : "\n\nYou're still avoiding the real move.";
+    }
+
+    // 🔥 FINAL PUSH
     if (loopLevel >= 6) {
       reply += isHindi
-        ? "\n\nअब फैसला टालोगे या करोगे — यही फर्क बनाएगा।"
+        ? "\n\nअब करना है या नहीं — यही फर्क बनाएगा।"
         : "\n\nNow you either act or stay stuck.";
     }
 
     return res.status(200).json({
       reply,
-      paywall: loopLevel >= 5
+      paywall: (loopLevel >= 5 && !paid49) || (loopLevel >= 7 && !paid199)
     });
 
   } catch (error) {
@@ -220,4 +182,4 @@ Tone:
       reply: "Server error"
     });
   }
-}
+                                                     }
