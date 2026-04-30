@@ -192,44 +192,61 @@ nextBtn.onclick=async ()=>{
 function showPaywall49(){
   paywallBox.style.display="block";
 
-  payTitle.innerText="You’re close.";
-  paySub.innerText="You see something. But not clearly.";
+  payTitle.innerText="You’re stopping right before clarity.";
 
-  payBtn.innerText="Unlock clarity (₹49)";
+  paySub.innerText=
+  "You already see the problem.\n\n" +
+  "But you still don’t know what to DO.\n\n" +
+  "This is where most people quit.\n" +
+  "And stay stuck.\n\n" +
+  "You can leave…\n\n" +
+  "Or finally see the exact move.";
+
+  payBtn.innerText="Show me what I’m missing (₹49)";
   payBtn.onclick=()=>{
     window.open("https://rzp.io/rzp/Gl9QDcVA","_blank");
 
     // simulate success
     localStorage.setItem("paid49","true");
-    paid49=true;
+    paid49 = true;
 
     paywallBox.style.display="none";
   };
 }
+
 
 // PAYWALL 199
 function showPaywall199(){
   paywallBox.style.display="block";
 
   payTitle.innerText="Now it gets real.";
-  paySub.innerText="Now you decide or stay stuck.";
 
-  payBtn.innerText="Unlock full clarity (₹199)";
+  paySub.innerText=
+  "You know the direction now.\n\n" +
+  "But without exact steps, you’ll go in circles.\n\n" +
+  "Most people stop here.\n" +
+  "Few actually execute.\n\n" +
+  "Decide.";
+
+  payBtn.innerText="Show me exactly what to do (₹199)";
   payBtn.onclick=()=>{
     window.open("https://rzp.io/rzp/qcjrdEgd","_blank");
 
     localStorage.setItem("paid49","true");
-localStorage.setItem("paid199","true");
+    localStorage.setItem("paid199","true");
+
+    paid49 = true;
+    paid199 = true;
 
     paywallBox.style.display="none";
   };
 }
 
+
 // SKIP
 function skipPaywall(){
   paywallBox.style.display="none";
 }
-
 </script>
 
 </body>
