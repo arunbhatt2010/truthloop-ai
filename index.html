@@ -123,12 +123,15 @@ You need to face what you're avoiding.
 const params = new URLSearchParams(window.location.search);
 const plan = params.get("plan");
 
+let paid49 = false;
+let paid199 = false;
+
 if(plan === "49"){
-  localStorage.setItem("paid49","true");
+  paid49 = true;
 }
 
 if(plan === "199"){
-  localStorage.setItem("paid199","true");
+  paid199 = true;
   }
 let messages=[];
 let loopLevel=1;
@@ -143,8 +146,8 @@ const payTitle=document.getElementById("payTitle");
 const paySub=document.getElementById("paySub");
 
 // 💰 PAYMENT STATE
-let paid49 = localStorage.getItem("paid49");
-let paid199 = localStorage.getItem("paid199");
+if(loopLevel === 4 && !paid49 && !localStorage.getItem("paid49"));
+if(loopLevel === 6 && !paid199 && !localStorage.getItem("paid199"));
 
 // LOOP UI
 function updateLoopUI(){
