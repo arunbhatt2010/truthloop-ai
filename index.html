@@ -64,8 +64,8 @@ You need to face what you're avoiding.
 <input id="mainInput" placeholder="Type what is real"/>
 <button id="getBtn">Start</button>
 
-<input id="reflectionInput" placeholder="Answer honestly..."/>
-<button id="nextBtn">Go deeper</button>
+<input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
+<button id="nextBtn" style="display:none;">Go deeper</button>
 
 <div id="paywallBox">
   <div id="payTitle"></div>
@@ -157,6 +157,9 @@ getBtn.onclick=async ()=>{
   typeEffect(reply);
 
   mainInput.value="";
+  document.getElementById("reflectionInput").style.display = "block";
+document.getElementById("nextBtn").style.display = "block";
+document.getElementById("getBtn").style.display = "none";
 };
 
 // NEXT (🔥 FIXED PAYWALL LOGIC)
