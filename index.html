@@ -120,7 +120,16 @@ You need to face what you're avoiding.
 </div>
 
 <script>
+const params = new URLSearchParams(window.location.search);
+const plan = params.get("plan");
 
+if(plan === "49"){
+  localStorage.setItem("paid49","true");
+}
+
+if(plan === "199"){
+  localStorage.setItem("paid199","true");
+  }
 let messages=[];
 let loopLevel=1;
 
