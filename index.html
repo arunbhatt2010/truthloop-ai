@@ -204,14 +204,12 @@ nextBtn.onclick=async ()=>{
   if(!text) return;
 
   // 💰 LOOP 5 PAYWALL
-  if(loopLevel === 4 && !paid49){
-    showPaywall49();
+  if(loopLevel === 4 && !localStorage.getItem("paid49"));
     return;
   }
 
   // 💰 LOOP 7 PAYWALL
-  if(loopLevel === 6 && !paid199){
-    showPaywall199();
+  if(loopLevel === 6 && !localStorage.getItem("paid199"));
     return;
   }
 
@@ -237,7 +235,7 @@ function showPaywall49(){
   payBtn.innerText="See it clearly (₹49)";
   payBtn.onclick=()=>{
     window.open("https://rzp.io/rzp/Gl9QDcVA","_blank");
-    localStorage.setItem("paid49","true");
+    // localStorage.setItem("paid49","true");
     paid49=true;
     paywallBox.style.display="none";
   };
