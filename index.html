@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TruthLoop</title>
 
-<!-- ✅ Google Analytics -->
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -14,8 +14,30 @@ gtag('config', 'G-RBMQ2F6P9Q');
 </script>
 
 <style>
-body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
-.container { max-width:500px; margin:auto; padding:15px; }
+body {
+  background:#0f0f0f;
+  color:#fff;
+  font-family:Arial;
+  margin:0;
+}
+
+.container {
+  max-width:500px;
+  margin:auto;
+  padding:18px;
+}
+
+h2 {
+  text-align:center;
+  margin-bottom:5px;
+}
+
+.tagline {
+  text-align:center;
+  font-size:13px;
+  color:#aaa;
+  margin-bottom:15px;
+}
 
 .output {
   height:45vh;
@@ -34,6 +56,12 @@ input,button {
   margin-top:10px;
   border-radius:8px;
   border:none;
+  font-size:14px;
+}
+
+input {
+  background:#111;
+  color:#fff;
 }
 
 button {
@@ -41,8 +69,6 @@ button {
   font-weight:bold;
   cursor:pointer;
 }
-
-.small { font-size:12px; color:#aaa; text-align:center; }
 
 #loopIndicator {
   text-align:center;
@@ -60,6 +86,13 @@ button {
   text-align:center;
   border:1px solid #222;
 }
+
+.trust {
+  font-size:11px;
+  text-align:center;
+  color:#666;
+  margin-top:8px;
+}
 </style>
 </head>
 
@@ -67,35 +100,37 @@ button {
 
 <div class="container">
 
-<h2 style="text-align:center;">TruthLoop</h2>
+<h2>TruthLoop</h2>
 
-<p class="small">
-You don’t need more advice.<br>
-You need to face what you're avoiding.
+<p class="tagline">
+Clarity doesn’t fail. Execution does.
 </p>
 
 <div id="loopIndicator">Loop 1 / 7</div>
 
 <div id="outputBox" class="output"></div>
 
-<input id="mainInput" placeholder="Type what is real"/>
+<input id="mainInput" placeholder="What are you avoiding right now?" />
 <button id="getBtn">Start</button>
 
 <input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
 <button id="nextBtn" style="display:none;">Go deeper</button>
 
+<div class="trust">
+No login. No fluff. Just clarity.
+</div>
+
 <div id="paywallBox">
-  <div id="payTitle"></div>
-  <div id="paySub"></div>
+  <div id="payTitle" style="font-weight:bold; margin-bottom:8px;"></div>
+  <div id="paySub" style="font-size:13px; color:#aaa; margin-bottom:12px;"></div>
   <button id="payBtn"></button>
-  <button onclick="skipPaywall()">Not now</button>
+  <button onclick="skipPaywall()" style="margin-top:8px; background:#222;">Not now</button>
 </div>
 
 </div>
 
 <script>
 
-// ✅ ELEMENTS FIXED
 const outputBox = document.getElementById("outputBox");
 const mainInput = document.getElementById("mainInput");
 const reflectionInput = document.getElementById("reflectionInput");
@@ -107,20 +142,17 @@ const payBtn = document.getElementById("payBtn");
 const payTitle = document.getElementById("payTitle");
 const paySub = document.getElementById("paySub");
 
-// STATE
 let paid49 = localStorage.getItem("paid49") === "true";
 let paid199 = localStorage.getItem("paid199") === "true";
 
 let messages = [];
 let loopLevel = 1;
 
-// LOOP UI
 function updateLoopUI(){
   document.getElementById("loopIndicator").innerText =
     `Loop ${loopLevel} / 7`;
 }
 
-// TYPE EFFECT
 function typeEffect(text){
   const div = document.createElement("div");
   outputBox.appendChild(div);
@@ -131,13 +163,12 @@ function typeEffect(text){
       div.innerHTML += text.charAt(i);
       i++;
       outputBox.scrollTop = outputBox.scrollHeight;
-      setTimeout(typing, 10);
+      setTimeout(typing, 8);
     }
   }
   typing();
 }
 
-// API
 async function callAPI(){
   try{
     const res = await fetch("/api/chat", {
@@ -158,12 +189,10 @@ async function callAPI(){
     return reply;
 
   } catch (e){
-    console.error(e);
-    return "⚠️ Error connecting server";
+    return "⚠️ Server error";
   }
 }
 
-// START
 getBtn.onclick = async ()=>{
   const text = mainInput.value.trim();
   if(!text) return;
@@ -183,18 +212,15 @@ getBtn.onclick = async ()=>{
   getBtn.style.display = "none";
 };
 
-// NEXT
 nextBtn.onclick = async ()=>{
   const text = reflectionInput.value.trim();
   if(!text) return;
 
-  // PAYWALL 49
   if(loopLevel === 4 && !paid49){
     showPaywall49();
     return;
   }
 
-  // PAYWALL 199
   if(loopLevel === 6 && !paid199){
     showPaywall199();
     return;
@@ -214,39 +240,35 @@ nextBtn.onclick = async ()=>{
   reflectionInput.value = "";
 };
 
-// PAYWALL 49
 function showPaywall49(){
   paywallBox.style.display = "block";
 
-  payTitle.innerText = "You’re stopping right before clarity.";
+  payTitle.innerText = "You paused at the exact point most people do.";
 
   paySub.innerText =
-  "You see the problem.\n\n" +
-  "But you don’t know what to DO.\n\n" +
-  "Most people stop here.\n\n" +
-  "You can leave… or see it clearly.";
+  "You understand the problem.\n\n" +
+  "But you still hesitate.\n\n" +
+  "This is where people loop forever.\n\n" +
+  "Break it or stay here.";
 
   payBtn.innerText = "Unlock clarity (₹49)";
   payBtn.onclick = ()=>{
     window.open("https://rzp.io/rzp/Gl9QDcVA","_blank");
-
     localStorage.setItem("paid49","true");
     paid49 = true;
-
     paywallBox.style.display = "none";
   };
 }
 
-// PAYWALL 199
 function showPaywall199(){
   paywallBox.style.display = "block";
 
-  payTitle.innerText = "Now it gets real.";
+  payTitle.innerText = "Now it’s about action.";
 
   paySub.innerText =
-  "You know the direction.\n\n" +
-  "But without exact steps, you’ll stay stuck.\n\n" +
-  "Decide.";
+  "You see it clearly now.\n\n" +
+  "But clarity without action = nothing.\n\n" +
+  "You either move… or stay stuck.";
 
   payBtn.innerText = "Unlock full clarity (₹199)";
   payBtn.onclick = ()=>{
@@ -262,7 +284,6 @@ function showPaywall199(){
   };
 }
 
-// SKIP
 function skipPaywall(){
   paywallBox.style.display = "none";
 }
@@ -270,4 +291,4 @@ function skipPaywall(){
 </script>
 
 </body>
-  </html>
+                                                                             </html>
