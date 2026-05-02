@@ -103,7 +103,10 @@ Rules:
 - Keep sentences short
 - Make it feel personal
 - Build tension gradually
-
+- No assumptions about user behavior
+- No suggestions like "you should"
+- No coaching tone
+- Only expose what is already visible
 STAGE: ${loopLevel}
 
 Stage 1:
@@ -112,11 +115,11 @@ Stage 1:
 - Friendly tone
 
 Stage 2:
-
-- Show pattern
-- Slight discomfort
-- Ask ONE question
-
+- DO NOT assume anything about user
+- DO NOT give advice
+- Identify contradiction in what user said
+- Point it out in 1–2 sharp lines
+- Ask ONE direct question
 Stage 3:
 
 - Show what's wrong clearly
