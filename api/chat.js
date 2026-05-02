@@ -51,7 +51,7 @@ reply: isHindi
 });
 }
 
-// 🔥 STAGE 1 FIX (SOFT ENTRY)
+// 🔥 STAGE 1 ENTRY
 if (loopLevel === 1) {
 const hasDetail =
 lastUserMessage.split(" ").length > 6 &&
@@ -60,96 +60,87 @@ lastUserMessage.split(" ").length > 6 &&
 if (!hasDetail) {
 return res.status(200).json({
 reply: isHindi
-? "थोड़ा और साफ करते हैं।\n\nएक लाइन में बताओ:\n→ तुम क्या करते हो\n→ कहाँ करते हो\n→ क्या काम नहीं कर रहा\n\nईमानदारी से लिखो।"
-: "Let’s make this clear.\n\nGive ONE line:\n→ What you do\n→ Where you do it\n→ What’s not working\n\nBe honest."
+? "एक लाइन में साफ बोलो:\n→ क्या करते हो\n→ कहाँ करते हो\n→ क्या काम नहीं कर रहा"
+: "One line:\n→ What you do\n→ Where\n→ What’s not working"
 });
 }
 }
 
 // 🚧 PAYWALLS
-
 if (loopLevel >= 5 && !paid49) {
 return res.status(200).json({
-reply: isHindi
-? "यहीं लोग रुक जाते हैं।\n\nतुमने समस्या देख ली है… पर आगे नहीं बढ़े।"
-: "This is where most people stop.\n\nYou see the problem… but don’t move.",
+reply: "You see the problem.\nBut you’re still holding back.",
 paywall: true
 });
 }
 
 if (loopLevel >= 7 && !paid199) {
 return res.status(200).json({
-reply: isHindi
-? "तुम अभी भी पूरी clarity से बच रहे हो।"
-: "You’re still avoiding full clarity.",
+reply: "You already know.\nYou’re just delaying.",
 paywall: true
 });
 }
 
-// 🧠 PROMPT
+// 🧠 HARD-CONTROL PROMPT
 const systemPrompt = `
-
 You are TruthLoop.
 
-Goal: ${userGoal}
-Problem: ${userProblem}
-Action: ${userAction}
-- Avoid "how do you" questions
-- Avoid explaining logic
-- Keep sentences under 12 words
-- Remove all filler words
-- Each line should feel like a punch
-Rules:
+STRICT RULES:
 
-- No fluff
-- No generic advice
-- No long paragraphs
-- Keep sentences short
-- Make it feel personal
-- Build tension gradually
-- No assumptions about user behavior
-- No suggestions like "you should"
-- No coaching tone
-- Only expose what is already visible
+- Stay inside user's exact problem
+- Only use user's words
+- Do NOT invent anything
+- Do NOT ask personal questions
+- Do NOT change topic
+
+STYLE:
+
+- Short lines
+- Max 10 words per line
+- No explanation
+- No advice
+- No coaching
+
+LOGIC:
+
+- Find mismatch in user's own words
+- Expose it
+- Ask ONE question only about last message
+
 STAGE: ${loopLevel}
 
 Stage 1:
 
 - Ask ONE simple question
-- Friendly tone
 
 Stage 2:
-- DO NOT assume anything about user
-- DO NOT give advice
-- Identify contradiction in what user said
-- Point it out in 1–2 sharp lines
-- Ask ONE direct question
+
+- Show contradiction
+- Ask ONE tight question
+
 Stage 3:
 
-- Identify exact mismatch in user's words
-- State it in 1–2 short lines
-- No explanation
-- Ask ONE sharp question (max 8 words)
+- Sharpen contradiction
+- Add pressure
+- Ask ONE question
 
 Stage 4:
 
-- Give ONE brutal truth line
-- Max 2–3 short sentences
-- Leave curiosity gap
-- Make it shareable
+- One brutal truth
+- 2 lines max
+- No question
 
 Stage 5:
 
-- Define decision clearly
+- Define decision
 
 Stage 6:
 
-- Give 2–3 sharp steps
+- 2 direct steps
 
 Stage 7:
 
-- Show outcome difference
-- Push action
+- Force choice
   `;
 
 const response = await fetch(
@@ -166,8 +157,8 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages
 ],
-temperature: 0.7,
-max_tokens: 200
+temperature: 0.5,
+max_tokens: 120
 })
 }
 );
@@ -179,16 +170,19 @@ return res.status(500).json({ reply: "API error" });
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "No response";
 
+// 🔥 HARD FILTER (STOP BAKCHODI)
+if (reply.toLowerCase().includes("name") || reply.toLowerCase().includes("who are you")) {
+reply = "Stay on the problem.\nWhat’s actually not working?";
+}
+
 // 🔥 LOOP 4 SHORT
 if (loopLevel === 4) {
-reply = reply.split(".").slice(0, 2).join(".") + ".";
+reply = reply.split("\n").slice(0,2).join("\n");
 }
 
 // 🔥 FINAL PUSH
 if (loopLevel >= 6) {
-reply += isHindi
-? "\n\nअब करना है या नहीं — यही फर्क बनाएगा।"
-: "\n\nNow decide: act or stay stuck.";
+reply += "\n\nDecide.";
 }
 
 return res.status(200).json({
