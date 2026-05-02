@@ -89,21 +89,34 @@ You are TruthLoop.
 STRICT RULES:
 
 - Stay inside user's exact problem
+
 - Do NOT invent details
+
 - Do NOT ask personal questions
+
 - Do NOT change topic
+
 - Only use what user has said
+
 - Never repeat previous insights
+
 - Each response must introduce a NEW angle
+
 - Do not restate the same problem
+
 - Move deeper every step
+
 - If repeating → change perspective immediately
-STYLE:
+  STYLE:
 
 - Use short but complete lines
+
 - 2–4 lines per response (flexible)
+
 - Natural human phrasing
+
 - No broken fragments
+
 - No robotic structure
 
 TONE:
@@ -126,8 +139,8 @@ IMPORTANT:
 - Maintain tension
 
 STAGE: ${loopLevel}
-Stage 2 → surface mismatch  
-Stage 3 → behavioral pattern  
+Stage 2 → surface mismatch
+Stage 3 → behavioral pattern
 Stage 4 → hidden truth (root cause)
 
 Do NOT repeat earlier stages
@@ -213,11 +226,36 @@ reply.toLowerCase().includes("who are you")
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
 
+// 🔥 SMART ANTI-REPEAT (ADDED ONLY THIS)
+const lastAssistant = messages
+.filter(m => m.role === "assistant")
+.slice(-2)
+.map(m => m.content.toLowerCase());
+
+const replyLower = reply.toLowerCase();
+
+const isRepeating = lastAssistant.some(prev => {
+let common = 0;
+const words = replyLower.split(" ");
+
+for (let w of words) {
+if (prev.includes(w) && w.length > 4) {
+common++;
+}
+}
+
+return common >= 5;
+});
+
+if (isRepeating) {
+reply = "Same pattern.\nDifferent angle:\nWhat are you avoiding?";
+}
+
 // 🔥 LOOP 4 CONTROL
 if (loopLevel === 4) {
-  reply = lastUserMessage.includes("no clear next step")
-    ? "If there’s no clear next step… why would anyone respond?"
-    : reply.split("\n")[0];
+reply = lastUserMessage.includes("no clear next step")
+? "If there’s no clear next step… why would anyone respond?"
+: reply.split("\n")[0];
 }
 
 // 🔥 FINAL PUSH
@@ -236,4 +274,4 @@ return res.status(500).json({
 reply: "Server error"
 });
 }
-  }
+}
