@@ -46,8 +46,8 @@ const isRelationship = relationshipPatterns.some(word => lowerMsg.includes(word)
 if (loopLevel === 1 && (isHealth || isRelationship)) {
 return res.status(200).json({
 reply: isHindi
-? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ तुम्हें कोई फैसला लेना हो।"
-: "This isn't a decision problem.\n\nAsk something where you need to make a decision."
+? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ तुम्हें फैसला लेना हो।"
+: "This isn't a decision problem.\n\nAsk something where a decision is required."
 });
 }
 
@@ -69,78 +69,105 @@ reply: isHindi
 // 🚧 PAYWALLS
 if (loopLevel >= 5 && !paid49) {
 return res.status(200).json({
-reply: "You see the problem.\nBut you’re still holding back.",
+reply: "You see the problem.\nBut you're still not moving.",
 paywall: true
 });
 }
 
 if (loopLevel >= 7 && !paid199) {
 return res.status(200).json({
-reply: "You already know.\nYou’re just delaying.",
+reply: "You already know the truth.\nYou're delaying it.",
 paywall: true
 });
 }
 
-// 🧠 HARD-CONTROL PROMPT
+// 🧠 UPDATED PROMPT (BALANCED CONTROL)
 const systemPrompt = `
+
 You are TruthLoop.
 
 STRICT RULES:
 
 - Stay inside user's exact problem
-- Only use user's words
-- Do NOT invent anything
+- Do NOT invent details
 - Do NOT ask personal questions
 - Do NOT change topic
+- Only use what user has said
 
 STYLE:
 
-- Short lines
-- Max 10 words per line
-- No explanation
-- No advice
+- Use short but complete lines
+- 2–4 lines per response (flexible)
+- Natural human phrasing
+- No broken fragments
+- No robotic structure
+
+TONE:
+
+- Direct
+- Slightly uncomfortable
 - No coaching
+- No advice
 
 LOGIC:
 
-- Find mismatch in user's own words
-- Expose it
-- Ask ONE question only about last message
+- Find contradiction in user's own words
+- Expose it clearly
+- Ask ONE relevant question only
+
+IMPORTANT:
+
+- Do NOT over-explain
+- Do NOT solve too early
+- Maintain tension
 
 STAGE: ${loopLevel}
 
 Stage 1:
 
+- 1–2 lines
 - Ask ONE simple question
 
 Stage 2:
 
-- Show contradiction
-- Ask ONE tight question
+- 2–3 lines
+- Show mismatch
+- Ask ONE question
 
 Stage 3:
 
+- 3–4 lines
 - Sharpen contradiction
 - Add pressure
 - Ask ONE question
 
 Stage 4:
 
-- One brutal truth
-- 2 lines max
-- No question
+- 2–3 lines ONLY
+- One uncomfortable truth
+- Do NOT solve
+- Leave curiosity gap
+- Make it shareable
+
+IMPORTANT:
+
+- Clarity here = only 30–40%
 
 Stage 5:
 
-- Define decision
+- 4–5 lines
+- Define real decision
 
 Stage 6:
 
-- 2 direct steps
+- 4–6 lines
+- Give practical steps
 
 Stage 7:
 
-- Force choice
+- 5–7 lines
+- Show outcome difference
+- Push action
   `;
 
 const response = await fetch(
@@ -157,8 +184,8 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages
 ],
-temperature: 0.5,
-max_tokens: 120
+temperature: 0.6,
+max_tokens: 180
 })
 }
 );
@@ -170,19 +197,22 @@ return res.status(500).json({ reply: "API error" });
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "No response";
 
-// 🔥 HARD FILTER (STOP BAKCHODI)
-if (reply.toLowerCase().includes("name") || reply.toLowerCase().includes("who are you")) {
+// 🔥 ANTI-RANDOM FILTER
+if (
+reply.toLowerCase().includes("name") ||
+reply.toLowerCase().includes("who are you")
+) {
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
 
-// 🔥 LOOP 4 SHORT
+// 🔥 LOOP 4 CONTROL
 if (loopLevel === 4) {
-reply = reply.split("\n").slice(0,2).join("\n");
+reply = reply.split("\n").slice(0,3).join("\n");
 }
 
 // 🔥 FINAL PUSH
 if (loopLevel >= 6) {
-reply += "\n\nDecide.";
+reply += "\n\nNow decide.";
 }
 
 return res.status(200).json({
@@ -196,4 +226,4 @@ return res.status(500).json({
 reply: "Server error"
 });
 }
-}
+  }
