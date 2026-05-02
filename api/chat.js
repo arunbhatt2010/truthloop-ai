@@ -215,7 +215,9 @@ reply = "Stay on the problem.\nWhat’s actually not working?";
 
 // 🔥 LOOP 4 CONTROL
 if (loopLevel === 4) {
-reply = reply.split("\n").slice(0,3).join("\n");
+  reply = lastUserMessage.includes("no clear next step")
+    ? "If there’s no clear next step… why would anyone respond?"
+    : reply.split("\n")[0];
 }
 
 // 🔥 FINAL PUSH
