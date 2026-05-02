@@ -11,19 +11,24 @@ body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
 .container { max-width:500px; margin:auto; padding:18px; }
 h2 { text-align:center; }
 .tagline { text-align:center; font-size:13px; color:#aaa; }
+
 .output {
   height:45vh; overflow-y:auto; background:#000;
   padding:15px; border-radius:12px; margin-bottom:10px;
+  line-height:1.6;
 }
+
 input,button {
   width:100%; padding:12px; margin-top:10px;
   border-radius:8px; border:none;
 }
+
 button {
   background:linear-gradient(45deg, orange, #ff5e00);
   font-weight:bold;
 }
-#shareBox {
+
+#shareBox, #paywallBox {
   display:none;
   background:#111;
   padding:15px;
@@ -32,26 +37,18 @@ button {
   text-align:center;
   border:1px solid #222;
 }
-#paywallBox {
-  display:none;
-  background:#111;
-  padding:18px;
-  border-radius:12px;
-  margin-top:12px;
-  text-align:center;
-  border:1px solid #222;
-}
 </style></head><body><div class="container"><h2>TruthLoop</h2>
-<p class="tagline">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div><div id="outputBox" class="output"></div><input id="mainInput" placeholder="What are you avoiding right now?" />
+<p class="tagline">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div>
+<div id="outputBox" class="output"></div><input id="mainInput" placeholder="What are you avoiding right now?" />
 <button id="getBtn">Start</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
-<button id="nextBtn" style="display:none;">Go deeper</button><!-- 🔥 SHARE BOX --><div id="shareBox">
+<button id="nextBtn" style="display:none;">Go deeper</button><!-- SHARE BOX --><div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
   <button onclick="whatsappShare()" style="margin-top:8px;">WhatsApp</button>
   <p style="font-size:11px; color:#777; margin-top:8px;">
-    Send this to someone who needs it.
+    Send this to someone who needs this.
   </p>
-</div><!-- 💰 PAYWALL --><div id="paywallBox">
+</div><!-- PAYWALL --><div id="paywallBox">
   <div id="payTitle"></div>
   <div id="paySub"></div>
   <button id="payBtn"></button>
@@ -75,6 +72,13 @@ let loopLevel = 1;
 let messages = [];
 let paid49 = false;
 let paid199 = false;
+
+// 🔥 REFERRAL CAPTURE
+const params = new URLSearchParams(window.location.search);
+const ref = params.get("ref");
+if(ref){
+  localStorage.setItem("referredBy", ref);
+}
 
 function updateLoopUI(){
   document.getElementById("loopIndicator").innerText =
@@ -105,15 +109,18 @@ async function callAPI(){
   return data.reply;
 }
 
+// 🔥 VIRAL SHARE FORMAT
 function showShareCard(text){
-  const clean = text.replace(/<[^>]*>?/gm, '');
+  const clean = text.replace(/<[^>]*>?/gm, '').trim();
+
   const finalText =
-`You’re avoiding:
+`This hit me harder than expected.
+
 ${clean}
 
 Most people never face this.
 
-https://truthloop.in`;
+https://truthloop.in${ref ? `?ref=${ref}` : ""}`;
 
   shareText.innerText = finalText;
   shareBox.style.display = "block";
@@ -168,7 +175,6 @@ nextBtn.onclick = async ()=>{
   const reply = await callAPI();
   typeEffect(reply);
 
-  // 🔥 VIRAL INJECTION
   if(loopLevel === 4){
     showShareCard(reply);
   }
@@ -176,11 +182,14 @@ nextBtn.onclick = async ()=>{
   reflectionInput.value = "";
 };
 
+// 🔥 BETTER PAYWALL COPY
 function showPaywall49(){
   paywallBox.style.display = "block";
-  payTitle.innerText = "You see the truth.";
-  paySub.innerText = "Now decide: stay stuck or move forward.";
-  payBtn.innerText = "Unlock clarity (₹49)";
+
+  payTitle.innerText = "You’re close.";
+  paySub.innerText = "Most people stop here.\n\nDo you want to see what to do next?";
+
+  payBtn.innerText = "See what to do next (₹49)";
   payBtn.onclick = ()=>{
     paid49 = true;
     paywallBox.style.display = "none";
@@ -189,8 +198,10 @@ function showPaywall49(){
 
 function showPaywall199(){
   paywallBox.style.display = "block";
-  payTitle.innerText = "Now take action.";
-  paySub.innerText = "Clarity without action = nothing.";
+
+  payTitle.innerText = "Now it’s about action.";
+  paySub.innerText = "You see it clearly.\n\nBut will you act?";
+
   payBtn.innerText = "Unlock full clarity (₹199)";
   payBtn.onclick = ()=>{
     paid199 = true;
