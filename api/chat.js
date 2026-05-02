@@ -68,9 +68,19 @@ reply: isHindi
 
 // 🚧 PAYWALLS
 if (loopLevel >= 5 && !paid49) {
+
+const loop5Lines = [
+  "You see the problem.\nBut you're still not moving.",
+  "Clarity is there.\nAction is missing.",
+  "You understand it.\nYou're not doing it.",
+  "Nothing new is needed.\nExecution is missing."
+];
+
+const randomLine = loop5Lines[Math.floor(Math.random() * loop5Lines.length)];
+
 return res.status(200).json({
-reply: "You see the problem.\nBut you're still not moving.",
-paywall: true
+  reply: randomLine,
+  paywall: true
 });
 }
 
