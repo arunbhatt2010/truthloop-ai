@@ -1,5 +1,4 @@
-<!DOCTYPE html><html>
-<head>
+<!DOCTYPE html><html><head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TruthLoop</title><script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script><script>
 window.dataLayer = window.dataLayer || [];
@@ -10,51 +9,49 @@ gtag('config', 'G-RBMQ2F6P9Q');
 body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
 .container { max-width:500px; margin:auto; padding:18px; }
 h2 { text-align:center; }
-.tagline { text-align:center; font-size:13px; color:#aaa; }
-
-.output {
-  height:45vh; overflow-y:auto; background:#000;
-  padding:15px; border-radius:12px; margin-bottom:10px;
-  line-height:1.6;
+.tagline { text-align:center; font-size:13px; color:#aaa; }.output {
+height:45vh; overflow-y:auto; background:#000;
+padding:15px; border-radius:12px; margin-bottom:10px;
+line-height:1.6;
 }
 
 input,button {
-  width:100%; padding:12px; margin-top:10px;
-  border-radius:8px; border:none;
+width:100%; padding:12px; margin-top:10px;
+border-radius:8px; border:none;
 }
 
 button {
-  background:linear-gradient(45deg, orange, #ff5e00);
-  font-weight:bold;
+background:linear-gradient(45deg, orange, #ff5e00);
+font-weight:bold;
 }
 
 #shareBox, #paywallBox {
-  display:none;
-  background:#111;
-  padding:15px;
-  border-radius:12px;
-  margin-top:10px;
-  text-align:center;
-  border:1px solid #222;
+display:none;
+background:#111;
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+text-align:center;
+border:1px solid #222;
 }
 </style></head><body><div class="container"><h2>TruthLoop</h2>
+
 <p class="tagline">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div>
 <div id="outputBox" class="output"></div><input id="mainInput" placeholder="What are you avoiding right now?" />
 <button id="getBtn">Start</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
 <button id="nextBtn" style="display:none;">Go deeper</button><!-- SHARE BOX --><div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
-  <button onclick="whatsappShare()" style="margin-top:8px;">WhatsApp</button>
+  <!-- 🔥 UPDATED BUTTON TEXT -->
+  <button onclick="whatsappShare()" style="margin-top:8px;">Send this to someone</button>
   <p style="font-size:11px; color:#777; margin-top:8px;">
-    Send this to someone who needs this.
+    Most people avoid this.
   </p>
 </div><!-- PAYWALL --><div id="paywallBox">
   <div id="payTitle"></div>
   <div id="paySub"></div>
   <button id="payBtn"></button>
-</div></div><script>
-
-const outputBox = document.getElementById("outputBox");
+</div></div><script>const outputBox = document.getElementById("outputBox");
 const mainInput = document.getElementById("mainInput");
 const reflectionInput = document.getElementById("reflectionInput");
 const getBtn = document.getElementById("getBtn");
@@ -73,141 +70,140 @@ let messages = [];
 let paid49 = false;
 let paid199 = false;
 
-// 🔥 REFERRAL CAPTURE
-const params = new URLSearchParams(window.location.search);
-const ref = params.get("ref");
-if(ref){
-  localStorage.setItem("referredBy", ref);
-}
-
 function updateLoopUI(){
-  document.getElementById("loopIndicator").innerText =
-    `Loop ${loopLevel} / 7`;
+document.getElementById("loopIndicator").innerText =
+"Loop ${loopLevel} / 7";
 }
 
 function typeEffect(text){
-  const div = document.createElement("div");
-  outputBox.appendChild(div);
-  let i = 0;
-  function typing(){
-    if(i < text.length){
-      div.innerHTML += text.charAt(i);
-      i++;
-      setTimeout(typing, 8);
-    }
-  }
-  typing();
+const div = document.createElement("div");
+outputBox.appendChild(div);
+let i = 0;
+function typing(){
+if(i < text.length){
+div.innerHTML += text.charAt(i);
+i++;
+setTimeout(typing, 8);
+}
+}
+typing();
 }
 
 async function callAPI(){
-  const res = await fetch("/api/chat", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ messages, loopLevel })
-  });
-  const data = await res.json();
-  return data.reply;
+const res = await fetch("/api/chat", {
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body: JSON.stringify({ messages, loopLevel })
+});
+const data = await res.json();
+return data.reply;
 }
 
-// 🔥 VIRAL SHARE FORMAT
+// 🔥 SHARE TEXT (UNCHANGED LOGIC, CLEANED COPY)
 function showShareCard(text){
-  const clean = text.replace(/<[^>]*>?/gm, '').trim();
+const clean = text.replace(/<[^>]*>?/gm, '').trim();
 
-  const finalText =
+const finalText =
 `This hit me harder than expected.
 
 ${clean}
 
-Most people never face this.
+Most people avoid this.
 
-https://truthloop.in${ref ? `?ref=${ref}` : ""}`;
+https://truthloop.in`;
 
-  shareText.innerText = finalText;
-  shareBox.style.display = "block";
+shareText.innerText = finalText;
+shareBox.style.display = "block";
 }
 
 function copyShare(){
-  navigator.clipboard.writeText(shareText.innerText);
-  alert("Copied");
+navigator.clipboard.writeText(shareText.innerText);
+alert("Copied");
 }
 
 function whatsappShare(){
-  const text = encodeURIComponent(shareText.innerText);
-  window.open(`https://wa.me/?text=${text}`);
+const text = encodeURIComponent(shareText.innerText);
+window.open("https://wa.me/?text=${text}");
 }
 
 getBtn.onclick = async ()=>{
-  const text = mainInput.value.trim();
-  if(!text) return;
+const text = mainInput.value.trim();
+if(!text) return;
 
-  messages = [{ role:"user", content:text }];
-  outputBox.innerHTML = `<b>You:</b> ${text}<br><br>`;
+messages = [{ role:"user", content:text }];
+outputBox.innerHTML = "<b>You:</b> ${text}<br><br>";
 
-  const reply = await callAPI();
-  typeEffect(reply);
+const reply = await callAPI();
+typeEffect(reply);
 
-  mainInput.value = "";
-  reflectionInput.style.display = "block";
-  nextBtn.style.display = "block";
-  getBtn.style.display = "none";
+mainInput.value = "";
+reflectionInput.style.display = "block";
+nextBtn.style.display = "block";
+getBtn.style.display = "none";
 };
 
 nextBtn.onclick = async ()=>{
-  const text = reflectionInput.value.trim();
-  if(!text) return;
+const text = reflectionInput.value.trim();
+if(!text) return;
 
-  if(loopLevel === 4 && !paid49){
-    showPaywall49();
-    return;
-  }
+if(loopLevel === 4 && !paid49){
+showPaywall49();
+return;
+}
 
-  if(loopLevel === 6 && !paid199){
-    showPaywall199();
-    return;
-  }
+if(loopLevel === 6 && !paid199){
+showPaywall199();
+return;
+}
 
-  loopLevel++;
-  updateLoopUI();
+loopLevel++;
+updateLoopUI();
 
-  messages.push({ role:"user", content:text });
-  outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
+messages.push({ role:"user", content:text });
+outputBox.innerHTML += "<br><b>You:</b> ${text}<br><br>";
 
-  const reply = await callAPI();
-  typeEffect(reply);
+const reply = await callAPI();
+typeEffect(reply);
 
-  if(loopLevel === 4){
-    showShareCard(reply);
-  }
+if(loopLevel === 4){
+showShareCard(reply);
+}
 
-  reflectionInput.value = "";
+reflectionInput.value = "";
 };
 
-// 🔥 BETTER PAYWALL COPY
+// 🔥 UPDATED LOOP 5 PAYWALL
 function showPaywall49(){
-  paywallBox.style.display = "block";
+paywallBox.style.display = "block";
 
-  payTitle.innerText = "You’re close.";
-  paySub.innerText = "Most people stop here.\n\nDo you want to see what to do next?";
+payTitle.innerText = "You’re close.";
 
-  payBtn.innerText = "See what to do next (₹49)";
-  payBtn.onclick = ()=>{
-    paid49 = true;
-    paywallBox.style.display = "none";
-  };
+paySub.innerText =
+"Most people stop here.\n\n" +
+"You can see the gap… but you’re still not fixing it.\n\n" +
+"This is exactly where your growth stops.";
+
+payBtn.innerText = "Break this loop (₹49)";
+
+payBtn.onclick = ()=>{
+paid49 = true;
+paywallBox.style.display = "none";
+};
 }
 
 function showPaywall199(){
-  paywallBox.style.display = "block";
+paywallBox.style.display = "block";
 
-  payTitle.innerText = "Now it’s about action.";
-  paySub.innerText = "You see it clearly.\n\nBut will you act?";
+payTitle.innerText = "Now it’s about action.";
+paySub.innerText = "You see it clearly.\n\nBut will you act?";
 
-  payBtn.innerText = "Unlock full clarity (₹199)";
-  payBtn.onclick = ()=>{
-    paid199 = true;
-    paywallBox.style.display = "none";
-  };
+payBtn.innerText = "Unlock full clarity (₹199)";
+payBtn.onclick = ()=>{
+paid199 = true;
+paywallBox.style.display = "none";
+};
 }
 
 </script></body>
+
   </html>
