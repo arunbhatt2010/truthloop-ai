@@ -215,6 +215,82 @@ function showShareCard(text){
   shareText.innerText =
 `This hit me harder than expected.
 
+<script>
+
+// CONFIG SAME
+const API_URL = "/api/chat";
+const RAZORPAY_KEY_ID = "rzp_live_SkoC6fqjfhi4WP";
+
+const outputBox = document.getElementById("outputBox");
+const mainInput = document.getElementById("mainInput");
+const reflectionInput = document.getElementById("reflectionInput");
+const getBtn = document.getElementById("getBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const shareBox = document.getElementById("shareBox");
+const shareText = document.getElementById("shareText");
+
+const paywallBox = document.getElementById("paywallBox");
+const payBtn = document.getElementById("payBtn");
+const payTitle = document.getElementById("payTitle");
+const paySub = document.getElementById("paySub");
+
+let loopLevel = 1;
+let messages = [];
+
+let payment49 = null;
+let payment199 = null;
+let shownLoop5 = [];
+
+function updateLoopUI(){
+  document.getElementById("loopIndicator").innerText =
+  `Loop ${loopLevel} / 7`;
+}
+
+// 🔥 FIXED TYPE EFFECT + SCROLL
+function typeEffect(text){
+  const div = document.createElement("div");
+  outputBox.appendChild(div);
+
+  let i = 0;
+  function typing(){
+    if(i < text.length){
+      div.innerHTML += text.charAt(i);
+      i++;
+      outputBox.scrollTop = outputBox.scrollHeight; // auto scroll
+      setTimeout(typing, 8);
+    }
+  }
+  typing();
+}
+
+// API SAME
+async function callAPI(){
+  const res = await fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      messages,
+      loopLevel,
+      paid49: payment49,
+      paid199: payment199,
+      shownLoop5
+    })
+  });
+
+  const data = await res.json();
+  shownLoop5 = data.shownLoop5 || shownLoop5;
+
+  return data;
+}
+
+// SHARE SAME
+function showShareCard(text){
+  const clean = text.replace(/<[^>]*>?/gm, '').trim();
+
+  shareText.innerText =
+`This hit me harder than expected.
+
 ${clean}
 
 Most people avoid this.
@@ -224,7 +300,7 @@ https://truthloop.in`;
   shareBox.style.display = "block";
 }
 
-// PAYWALL
+// PAYWALL SAME
 function showDynamicPaywall(message){
 
   paywallBox.style.display = "block";
@@ -267,13 +343,17 @@ function showDynamicPaywall(message){
   };
 }
 
-// START
+// 🔥 START FIXED
 getBtn.onclick = async ()=>{
   const text = mainInput.value.trim();
   if(!text) return;
 
   messages = [{ role:"user", content:text }];
-  outputBox.innerHTML = `<b>You:</b> ${text}<br><br>`;
+
+  // clear welcome properly
+  outputBox.innerHTML = "";
+
+  outputBox.innerHTML += `<b>You:</b> ${text}<br><br>`;
 
   const data = await callAPI();
 
@@ -290,7 +370,7 @@ getBtn.onclick = async ()=>{
   getBtn.style.display = "none";
 };
 
-// NEXT
+// NEXT SAME
 nextBtn.onclick = async ()=>{
   const text = reflectionInput.value.trim();
   if(!text) return;
