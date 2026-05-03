@@ -40,8 +40,8 @@ const healthPatterns = ["दर्द","दांत","सर दर्द","pai
 const relationshipPatterns = ["relationship","breakup","love","girlfriend","boyfriend","wife","husband","marriage","ex"];
 
 const isHealth = healthPatterns.some(word => lowerMsg.includes(word));
-const hasDetail =
-lastUserMessage.split(" ").length > 5;
+const isRelationship = relationshipPatterns.some(word => lowerMsg.includes(word));
+
 if (loopLevel === 1 && (isHealth || isRelationship)) {
 return res.status(200).json({
 reply: isHindi
@@ -50,19 +50,19 @@ reply: isHindi
 });
 }
 
-// 🔥 STAGE 1 ENTRY
+// 🔥 STAGE 1 ENTRY (FIXED SAFE VERSION)
 if (loopLevel === 1) {
-const hasDetail =
-lastUserMessage.split(" ").length > 6 &&
-(lowerMsg.includes("i ") || lowerMsg.includes("main") || lowerMsg.includes("मैं"));
 
-if (!hasDetail) {
-return res.status(200).json({
-reply: isHindi
-? "एक लाइन में साफ बोलो:\n→ क्या करते हो\n→ कहाँ करते हो\n→ क्या काम नहीं कर रहा"
-: "One line:\n→ What you do\n→ Where\n→ What’s not working"
-});
-}
+  const words = lastUserMessage.trim().split(/\s+/);
+  const hasDetail = words.length > 5;
+
+  if (!hasDetail) {
+    return res.status(200).json({
+      reply: isHindi
+        ? "एक लाइन में साफ बोलो:\n→ क्या करते हो\n→ कहाँ करते हो\n→ क्या काम नहीं कर रहा"
+        : "One line:\n→ What you do\n→ Where\n→ What’s not working"
+    });
+  }
 }
 
 // 🚧 PAYWALL LOOP 7
@@ -100,13 +100,11 @@ if (loopLevel === 5 && !paid49) {
   });
 }
 
-// 🧠 BALANCED AHA PROMPT
+// 🧠 SYSTEM PROMPT
 const systemPrompt = `
-
 You are TruthLoop.
 
 STRICT RULES:
-
 - Stay inside user's exact problem
 - Do NOT invent details
 - Do NOT change topic
@@ -115,56 +113,27 @@ STRICT RULES:
 - Never repeat same idea
 
 STYLE:
-
 - Short paragraphs
 - 3–6 lines
 - Each line must add meaning
 - No fluff
 
 TONE:
-
 - Direct
 - Slightly uncomfortable
 - No coaching
 - No advice
 
 LOGIC:
-
 - Start from user's situation
 - Show contradiction
-- Expand it slightly (1–2 lines)
+- Expand it slightly
 - End with ONE sharp question
 
-IMPORTANT:
-
-- Must feel like realization, not explanation
-- Avoid generic lines
-- Avoid safe responses
-
 STAGE: ${loopLevel}
-
-Stage 1:
-- Ask simple clarity question
-
-Stage 2:
-- Show mismatch + question
-
-Stage 3:
-- Sharpen contradiction + question
-
-Stage 4:
-- Hit uncomfortable truth + question
-
-Stage 5:
-- Force decision
-
-Stage 6:
-- Push action
-
-Stage 7:
-- Final push
 `;
 
+// 🔥 SAFE API CALL
 const response = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
@@ -177,7 +146,7 @@ body: JSON.stringify({
 model: "llama-3.3-70b-versatile",
 messages: [
 { role: "system", content: systemPrompt },
-...messages.slice(-6) // 🔥 repetition fix
+...(Array.isArray(messages) ? messages.slice(-6) : [])
 ],
 temperature: 0.75,
 max_tokens: 200
@@ -186,7 +155,8 @@ max_tokens: 200
 );
 
 if (!response.ok) {
-return res.status(500).json({ reply: "API error" });
+console.error("Groq API failed:", await response.text());
+return res.status(500).json({ reply: "Server error" });
 }
 
 const data = await response.json();
@@ -216,4 +186,4 @@ return res.status(500).json({
 reply: "Server error"
 });
 }
-}
+      }
