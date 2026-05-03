@@ -52,16 +52,13 @@ reply: isHindi
 
 // 🔥 STAGE 1 ENTRY (FIXED ONLY CONDITION)
 if (loopLevel === 1) {
-const hasDetail =
-lastUserMessage.trim().split(/\s+/).length > 5;  // ✅ FIXED
+  const hasDetail = lastUserMessage.trim().split(/\s+/).length > 3;
 
-if (!hasDetail) {
-return res.status(200).json({
-reply: isHindi
-? "एक लाइन में साफ बोलो:\n→ क्या करते हो\n→ कहाँ करते हो\n→ क्या काम नहीं कर रहा"
-: "One line:\n→ What you do\n→ Where\n→ What’s not working"
-});
-}
+  if (!hasDetail) {
+    return res.status(200).json({
+      reply: "Too vague.\nWhat exactly is not working?"
+    });
+  }
 }
 
 // 🚧 PAYWALL LOOP 7
