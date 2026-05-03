@@ -74,16 +74,18 @@ paywall: true
 }
 
 // 🚧 PAYWALL LOOP 5
-if (loopLevel === 5 && !paid49) {
+const base = lastUserMessage.slice(0, 60);
 
-  const loop5Lines = [
-    "You already know what's wrong.\nYou're just avoiding fixing it.",
-    "You don't need more thinking.\nYou need to act — but you're not.",
-    "You've seen the gap.\nYou're choosing to stay in it.",
-    "This isn't confusion.\nIt's hesitation.",
-    "You’re not stuck.\nYou’re delaying the obvious move."
-  ];
-
+const loop5Lines = [
+  `You said: "${base}"\nBut you're still not acting on it.`,
+  `You already described the problem.\nYou're just avoiding fixing it.`,
+  `You’re not confused.\nYou’re delaying what you already know.`,
+  `Nothing new is needed here.\nYou're just not executing.`,
+  `You're asking again.\nBut you already have the answer.`
+];
+if (loopLevel === 5 && lowerMsg.includes("nahi") || lowerMsg.includes("samajh")) {
+  loop5Lines.push("You understand it.\nYou're just resisting it.");
+}
   const available = loop5Lines.filter(l => !shownLoop5.includes(l));
   const finalPool = available.length ? available : loop5Lines;
 
@@ -125,9 +127,12 @@ TONE:
 
 LOGIC:
 
-- Find hidden contradiction
-- Expose it
-- Say something the user hasn't realised
+- Do NOT ask questions
+- Speak in statements only
+- Say it like a realization, not a suggestion
+- It should feel like: “I didn’t realise this”
+- Make it slightly uncomfortable
+- No "have you", no "why", no questions
 
 STAGE: ${loopLevel}
 
@@ -154,7 +159,7 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages
 ],
-temperature: 0.7,
+temperature: 0.9,
 max_tokens: 180
 })
 }
