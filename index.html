@@ -1,20 +1,12 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TruthLoop</title>
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>
-<script>
+<title>TruthLoop</title><script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script><script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-RBMQ2F6P9Q');
-</script>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<style>
+</script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><style>
 body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
 .container { max-width:500px; margin:auto; padding:18px; }
 h2 { text-align:center; }
@@ -45,39 +37,20 @@ button {
   text-align:center;
   border:1px solid #222;
 }
-</style>
-</head>
-
-<body>
-
-<div class="container">
+</style></head><body><div class="container">
 <h2>TruthLoop</h2>
-<p class="tagline">You don’t need advice. You need clarity.</p>
-
-<div id="loopIndicator">Loop 1 / 7</div>
-<div id="outputBox" class="output"></div>
-
-<input id="mainInput" placeholder="What are you avoiding right now?" />
-<button id="getBtn">Start</button>
-
-<input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
-<button id="nextBtn" style="display:none;">Go deeper</button>
-
-<div id="shareBox">
+<p class="tagline">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div>
+<div id="outputBox" class="output"></div><input id="mainInput" placeholder="What are you avoiding right now?" />
+<button id="getBtn">Start</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
+<button id="nextBtn" style="display:none;">Go deeper</button><div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
   <button onclick="whatsappShare()" style="margin-top:8px;">Send this to someone</button>
-</div>
-
-<div id="paywallBox">
+</div><div id="paywallBox">
   <div id="payTitle"></div>
   <div id="paySub"></div>
   <button id="payBtn"></button>
-</div>
-
-</div>
-
-<script>
+</div></div><script>
 
 const API_URL = "/api/chat";
 const RAZORPAY_KEY_ID = "rzp_live_SkoC6fqjfhi4WP";
@@ -100,7 +73,6 @@ let loopLevel = 1;
 let messages = [];
 
 let payment49 = null;
-let payment199 = null;
 let shownLoop5 = [];
 
 function updateLoopUI(){
@@ -131,7 +103,6 @@ async function callAPI(){
       messages,
       loopLevel,
       paid49: payment49,
-      paid199: payment199,
       shownLoop5
     })
   });
@@ -178,9 +149,10 @@ function showDynamicPaywall(message){
 
   payBtn.innerText = "Break this loop (₹49)";
 
-  payBtn.onclick = ()=>{
+  payBtn.onclick = function(){
+
     const options = {
-      key: rzp_live_SkoC6fqjfhi4WP,
+      key: RAZORPAY_KEY_ID,
       amount: 4900,
       currency: "INR",
       name: "TruthLoop",
@@ -224,6 +196,8 @@ nextBtn.onclick = async ()=>{
   const text = reflectionInput.value.trim();
   if(!text) return;
 
+  loopLevel++; // 🔥 पहले increment
+
   messages.push({ role:"user", content:text });
   outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
 
@@ -233,8 +207,6 @@ nextBtn.onclick = async ()=>{
     showDynamicPaywall(data.reply);
     return;
   }
-
-  loopLevel++;  // 🔥 FIX (अब सही जगह)
 
   updateLoopUI();
 
@@ -247,6 +219,5 @@ nextBtn.onclick = async ()=>{
   reflectionInput.value = "";
 };
 
-</script>
-</body>
-</html>
+</script></body>
+  </html>
