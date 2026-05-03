@@ -50,7 +50,7 @@ reply: isHindi
 });
 }
 
-// 🔥 STAGE 1 ENTRY FIX
+// 🔥 STAGE 1 ENTRY
 if (loopLevel === 1) {
 const hasDetail =
 lastUserMessage.split(" ").length > 6 &&
@@ -73,7 +73,7 @@ paywall: true
 });
 }
 
-// 🚧 PAYWALL LOOP 5 (FIXED PROPERLY)
+// 🚧 PAYWALL LOOP 5 (keep as is)
 if (loopLevel === 5 && !paid49) {
 
   const base = lastUserMessage.slice(0, 60);
@@ -85,13 +85,6 @@ if (loopLevel === 5 && !paid49) {
     `Nothing new is needed here.\nYou're just not executing.`,
     `You're asking again.\nBut you already have the answer.`
   ];
-
-  if (
-    lowerMsg.includes("nahi") ||
-    lowerMsg.includes("samajh")
-  ) {
-    loop5Lines.push("You understand it.\nYou're just resisting it.");
-  }
 
   const available = loop5Lines.filter(l => !shownLoop5.includes(l));
   const finalPool = available.length ? available : loop5Lines;
@@ -105,7 +98,7 @@ if (loopLevel === 5 && !paid49) {
   });
 }
 
-// 🧠 STRONG AHA PROMPT
+// 🧠 ORIGINAL STYLE PROMPT (RESTORED)
 const systemPrompt = `
 
 You are TruthLoop.
@@ -113,44 +106,53 @@ You are TruthLoop.
 STRICT RULES:
 
 - Stay inside user's exact problem
-- Do NOT repeat user's words
-- Do NOT give obvious statements
-- Every line must feel sharp and new
-- If it feels normal → rewrite it
+- Do NOT invent details
+- Do NOT change topic
+- Only use what user has said
+- Every step must go deeper
+- Never repeat same insight
 
 STYLE:
 
 - Short lines
-- 2–3 lines max
-- Punchy
-- Clear and simple language
+- 2–4 lines
+- Natural human phrasing
 
 TONE:
 
 - Direct
 - Slightly uncomfortable
+- No coaching
 - No advice
-- No explanation
 
 LOGIC:
 
-- No questions except Stage 1
-- Speak like realization
-- No "why", no "how", no coaching tone
+- Find contradiction in user's own words
+- Expose it clearly
+- Ask ONE sharp question
+
+IMPORTANT:
+
+- Each loop must feel deeper
+- No generic lines
+- No safe statements
 
 STAGE: ${loopLevel}
 
 Stage 1:
-- Ask 1 simple question
+- Ask simple question
 
 Stage 2:
 - Show mismatch
+- Ask question
 
 Stage 3:
-- Show pattern
+- Sharpen contradiction
+- Ask question
 
 Stage 4:
 - Hit uncomfortable truth
+- Ask question
 
 Stage 5:
 - Force decision
@@ -176,7 +178,7 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages
 ],
-temperature: 0.85,
+temperature: 0.7,
 max_tokens: 180
 })
 }
@@ -189,11 +191,6 @@ return res.status(500).json({ reply: "API error" });
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "No response";
 
-// 🔥 GUIDE OVERRIDE
-if (lowerMsg.includes("guide") || lowerMsg.includes("help")) {
-reply = "You already know what to do.\nYou're just not doing it.";
-}
-
 // 🔥 CLEAN FILTER
 if (
 reply.toLowerCase().includes("name") ||
@@ -202,10 +199,8 @@ reply.toLowerCase().includes("who are you")
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
 
-// 🔥 LOOP 4 (DON’T KILL INSIGHT)
-if (loopLevel === 4) {
-reply = reply.split("\n").slice(0,2).join("\n");
-}
+// ❌ NO CUTTING INSIGHT
+// (Loop 4 अब full रहेगा)
 
 // 🔥 FINAL PUSH
 if (loopLevel >= 6) {
