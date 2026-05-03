@@ -339,9 +339,8 @@ nextBtn.onclick = async ()=>{
   if (data.paywall) {
     showDynamicPaywall(data.reply);
     return;
-    loopLevel++;
   }
-
+loopLevel++;
   updateLoopUI();
   typeEffect(data.reply);
 
