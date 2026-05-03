@@ -260,16 +260,30 @@ getBtn.onclick = async ()=>{
   getBtn.style.display = "none";
 };
 
-// NEXT
-getBtn.onclick = async ()=>{
 
-  const text = mainInput.value.trim();
+// NEXT
+nextBtn.onclick = async () => {
+
+  const text = reflectionInput.value.trim(); // ✅ सही input
   if(!text) return;
 
-  messages = [{ role:"user", content:text }];
+  // 🔐 paywall checks (same रख)
+  if(loopLevel === 4 && !payment49){
+    showDynamicPaywall("This is where most people stop.");
+    return;
+  }
 
-  outputBox.innerHTML = "";
-  outputBox.innerHTML += `<b>You:</b> ${text}<br><br>`;
+  if(loopLevel === 6 && !payment199){
+    showDynamicPaywall("Now it's about action.");
+    return;
+  }
+
+  loopLevel++; // ✅ पहले increment
+
+  messages.push({ role:"user", content:text });
+
+  // ❌ history delete मत कर
+  outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
 
   const data = await callAPI();
 
@@ -278,22 +292,13 @@ getBtn.onclick = async ()=>{
     return;
   }
 
-  typeEffect(data.reply);
-
-  // ✅ IMPORTANT (context fix)
+  // ✅ context fix (MOST IMPORTANT)
   messages.push({ role:"assistant", content:data.reply });
 
-  mainInput.value = "";
+  updateLoopUI();
+  typeEffect(data.reply);
 
-  // 🔥 UI SWITCH FIX (YEHI MAIN CHEEZ HAI)
-  mainInput.style.display = "none";
-  document.getElementById("helperText").style.display = "none";
-
-  reflectionInput.style.display = "block";
-  reflectionInput.placeholder = "Answer the question above...";
-
-  nextBtn.style.display = "block";
-  getBtn.style.display = "none";
+  reflectionInput.value = ""; // ✅ clear only this input
 };
 </script>
 
