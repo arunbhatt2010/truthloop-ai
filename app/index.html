@@ -316,6 +316,7 @@ getBtn.onclick = async ()=>{
 
 // NEXT
 nextBtn.onclick = async ()=>{
+
   const text = reflectionInput.value.trim();
   if(!text) return;
 
@@ -329,9 +330,11 @@ nextBtn.onclick = async ()=>{
     return;
   }
 
-  
+  // ✅ FIX: increment BEFORE API
+  loopLevel++;
 
   messages.push({ role:"user", content:text });
+
   outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
 
   const data = await callAPI();
@@ -340,17 +343,12 @@ nextBtn.onclick = async ()=>{
     showDynamicPaywall(data.reply);
     return;
   }
-loopLevel++;
+
   updateLoopUI();
   typeEffect(data.reply);
 
-  if(loopLevel === 4){
-    showShareCard(data.reply);
-  }
-
   reflectionInput.value = "";
 };
-
 </script>
 
 </body>
