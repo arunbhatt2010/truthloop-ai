@@ -47,16 +47,9 @@ h2 { text-align:center; margin-bottom:5px; }
 }
 
 .welcome {
-  color:#ffffff;
   font-size:14px;
   line-height:1.6;
   opacity:0.95;
-}
-
-.welcome small {
-  display:block;
-  margin-top:10px;
-  color:#888;
 }
 
 .helper {
@@ -76,10 +69,6 @@ input,button {
 input {
   background:#111;
   color:#fff;
-}
-
-input::placeholder {
-  color:#777;
 }
 
 button {
@@ -111,7 +100,6 @@ button {
 <div id="outputBox" class="output">
   <div class="welcome">
   Hi, I am TruthLoop.<br><br>
-
   I won't give advice.<br>
   I’ll show you what you're avoiding.<br><br>
 
@@ -123,16 +111,10 @@ button {
   • I start things but don't finish<br><br>
 
   <b>Don't think. Just type.</b>
-
-  <small>
-    No one sees this. Be honest.<br>
-    (एक ही problem लिखो. ज्यादा मत सोचो.)
-  </small>
   </div>
 </div>
 
 <input id="mainInput" placeholder="Example: I post daily but get no clients" />
-
 <div class="helper">⚠️ Don’t explain. Just type ONE line.</div>
 
 <button id="getBtn">Show me the truth →</button>
@@ -143,7 +125,7 @@ button {
 <div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
-  <button onclick="whatsappShare()" style="margin-top:8px;">Send this to someone</button>
+  <button onclick="whatsappShare()">Send this</button>
 </div>
 
 <div id="paywallBox">
@@ -185,19 +167,24 @@ function updateLoopUI(){
   `Loop ${loopLevel} / 7`;
 }
 
+// 🔥 FIXED SMOOTH TYPE + SCROLL
 function typeEffect(text){
   const div = document.createElement("div");
   outputBox.appendChild(div);
 
   let i = 0;
+
   function typing(){
     if(i < text.length){
       div.innerHTML += text.charAt(i);
       i++;
+
       outputBox.scrollTop = outputBox.scrollHeight;
-      setTimeout(typing, 8);
+
+      requestAnimationFrame(typing);
     }
   }
+
   typing();
 }
 
@@ -220,71 +207,33 @@ async function callAPI(){
   return data;
 }
 
-// SHARE
 function showShareCard(text){
-  const clean = text.replace(/<[^>]*>?/gm, '').trim();
-
-  shareText.innerText =
-`This hit me harder than expected.
-
-${clean}
-
-Most people avoid this.
-
-https://truthloop.in`;
-
+  shareText.innerText = text;
   shareBox.style.display = "block";
 }
 
 function copyShare(){
   navigator.clipboard.writeText(shareText.innerText);
-  alert("Copied");
 }
 
 function whatsappShare(){
-  const text = encodeURIComponent(shareText.innerText);
-  window.open(`https://wa.me/?text=${text}`);
+  window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 }
 
-// PAYWALL
 function showDynamicPaywall(message){
-
   paywallBox.style.display = "block";
-
-  payTitle.innerText = "You're not stuck.";
   paySub.innerText = message;
 
-  let amount = 4900;
-  let label = "Break this loop (₹49)";
-
-  if(loopLevel === 6){
-    amount = 19900;
-    label = "Unlock full clarity (₹199)";
-  }
-
-  payBtn.innerText = label;
-
   payBtn.onclick = function(){
-
-    const options = {
+    const rzp = new Razorpay({
       key: RAZORPAY_KEY_ID,
-      amount: amount,
+      amount: 4900,
       currency: "INR",
-      name: "TruthLoop",
-      description: "Unlock",
       handler: function (response) {
-
-        if(loopLevel === 6){
-          payment199 = response.razorpay_payment_id;
-        } else {
-          payment49 = response.razorpay_payment_id;
-        }
-
+        payment49 = response.razorpay_payment_id;
         paywallBox.style.display = "none";
       }
-    };
-
-    const rzp = new Razorpay(options);
+    });
     rzp.open();
   };
 }
@@ -296,17 +245,14 @@ getBtn.onclick = async ()=>{
 
   messages = [{ role:"user", content:text }];
 
-  outputBox.innerHTML = "";
-  outputBox.innerHTML += `<b>You:</b> ${text}<br><br>`;
+  outputBox.innerHTML = `<b>You:</b> ${text}<br><br>`;
 
   const data = await callAPI();
 
-  if (data.paywall) {
-    showDynamicPaywall(data.reply);
-    return;
-  }
-
   typeEffect(data.reply);
+
+  // 🔥 IMPORTANT
+  messages.push({ role:"assistant", content:data.reply });
 
   mainInput.value = "";
   reflectionInput.style.display = "block";
@@ -316,19 +262,8 @@ getBtn.onclick = async ()=>{
 
 // NEXT
 nextBtn.onclick = async ()=>{
-
   const text = reflectionInput.value.trim();
   if(!text) return;
-
-  if(loopLevel === 4 && !payment49){
-    showDynamicPaywall("This is where most people stop.");
-    return;
-  }
-
-  if(loopLevel === 6 && !payment199){
-    showDynamicPaywall("Now it's about action.");
-    return;
-  }
 
   loopLevel++;
 
@@ -338,19 +273,15 @@ nextBtn.onclick = async ()=>{
 
   const data = await callAPI();
 
-  if (data.paywall) {
-    showDynamicPaywall(data.reply);
-    return;
-  }
-
-  // 🔥 THIS WAS MISSING
-  messages.push({ role:"assistant", content: data.reply });
+  // 🔥 THIS FIXES LOOP 2
+  messages.push({ role:"assistant", content:data.reply });
 
   updateLoopUI();
   typeEffect(data.reply);
 
   reflectionInput.value = "";
 };
+
 </script>
 
 </body>
