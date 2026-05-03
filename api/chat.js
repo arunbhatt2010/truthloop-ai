@@ -73,7 +73,7 @@ paywall: true
 });
 }
 
-// 🚧 PAYWALL LOOP 5 (keep as is)
+// 🚧 PAYWALL LOOP 5
 if (loopLevel === 5 && !paid49) {
 
   const base = lastUserMessage.slice(0, 60);
@@ -83,7 +83,9 @@ if (loopLevel === 5 && !paid49) {
     `You already described the problem.\nYou're just avoiding fixing it.`,
     `You’re not confused.\nYou’re delaying what you already know.`,
     `Nothing new is needed here.\nYou're just not executing.`,
-    `You're asking again.\nBut you already have the answer.`
+    `You're asking again.\nBut you already have the answer.`,
+    `Clarity isn't your issue.\nAction is.`,
+    `You saw the gap.\nYou're choosing comfort instead.`
   ];
 
   const available = loop5Lines.filter(l => !shownLoop5.includes(l));
@@ -98,7 +100,7 @@ if (loopLevel === 5 && !paid49) {
   });
 }
 
-// 🧠 ORIGINAL STYLE PROMPT (RESTORED)
+// 🧠 BALANCED AHA PROMPT
 const systemPrompt = `
 
 You are TruthLoop.
@@ -109,14 +111,15 @@ STRICT RULES:
 - Do NOT invent details
 - Do NOT change topic
 - Only use what user has said
-- Every step must go deeper
-- Never repeat same insight
+- Each response must go deeper
+- Never repeat same idea
 
 STYLE:
 
-- Short lines
-- 2–4 lines
-- Natural human phrasing
+- Short paragraphs
+- 3–6 lines
+- Each line must add meaning
+- No fluff
 
 TONE:
 
@@ -127,32 +130,30 @@ TONE:
 
 LOGIC:
 
-- Find contradiction in user's own words
-- Expose it clearly
-- Ask ONE sharp question
+- Start from user's situation
+- Show contradiction
+- Expand it slightly (1–2 lines)
+- End with ONE sharp question
 
 IMPORTANT:
 
-- Each loop must feel deeper
-- No generic lines
-- No safe statements
+- Must feel like realization, not explanation
+- Avoid generic lines
+- Avoid safe responses
 
 STAGE: ${loopLevel}
 
 Stage 1:
-- Ask simple question
+- Ask simple clarity question
 
 Stage 2:
-- Show mismatch
-- Ask question
+- Show mismatch + question
 
 Stage 3:
-- Sharpen contradiction
-- Ask question
+- Sharpen contradiction + question
 
 Stage 4:
-- Hit uncomfortable truth
-- Ask question
+- Hit uncomfortable truth + question
 
 Stage 5:
 - Force decision
@@ -176,10 +177,10 @@ body: JSON.stringify({
 model: "llama-3.3-70b-versatile",
 messages: [
 { role: "system", content: systemPrompt },
-...messages
+...messages.slice(-6) // 🔥 repetition fix
 ],
-temperature: 0.7,
-max_tokens: 180
+temperature: 0.75,
+max_tokens: 200
 })
 }
 );
@@ -198,9 +199,6 @@ reply.toLowerCase().includes("who are you")
 ) {
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
-
-// ❌ NO CUTTING INSIGHT
-// (Loop 4 अब full रहेगा)
 
 // 🔥 FINAL PUSH
 if (loopLevel >= 6) {
