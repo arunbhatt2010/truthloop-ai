@@ -4,7 +4,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TruthLoop</title>
 
-<!-- GOOGLE TAG -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -13,7 +12,6 @@ gtag('js', new Date());
 gtag('config', 'G-RBMQ2F6P9Q');
 </script>
 
-<!-- Razorpay -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
@@ -65,14 +63,12 @@ button {
 <input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
 <button id="nextBtn" style="display:none;">Go deeper</button>
 
-<!-- SHARE -->
 <div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
   <button onclick="whatsappShare()" style="margin-top:8px;">Send this to someone</button>
 </div>
 
-<!-- PAYWALL -->
 <div id="paywallBox">
   <div id="payTitle"></div>
   <div id="paySub"></div>
@@ -83,7 +79,6 @@ button {
 
 <script>
 
-// CONFIG
 const API_URL = "/api/chat";
 const RAZORPAY_KEY_ID = "rzp_live_SkoC6fqjfhi4WP";
 
@@ -108,7 +103,6 @@ let payment49 = null;
 let payment199 = null;
 let shownLoop5 = [];
 
-// UI
 function updateLoopUI(){
   document.getElementById("loopIndicator").innerText =
   `Loop ${loopLevel} / 7`;
@@ -129,7 +123,6 @@ function typeEffect(text){
   typing();
 }
 
-// API
 async function callAPI(){
   const res = await fetch(API_URL, {
     method:"POST",
@@ -175,7 +168,7 @@ function whatsappShare(){
   window.open(`https://wa.me/?text=${text}`);
 }
 
-// 🔥 DYNAMIC PAYWALL
+// PAYWALL
 function showDynamicPaywall(message){
 
   paywallBox.style.display = "block";
@@ -197,7 +190,9 @@ function showDynamicPaywall(message){
         paywallBox.style.display = "none";
       }
     };
-    new Razorpay(options).open();
+
+    const rzp = new Razorpay(options);
+    rzp.open();
   };
 }
 
@@ -229,9 +224,6 @@ nextBtn.onclick = async ()=>{
   const text = reflectionInput.value.trim();
   if(!text) return;
 
-  loopLevel++;
-  updateLoopUI();
-
   messages.push({ role:"user", content:text });
   outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
 
@@ -241,6 +233,10 @@ nextBtn.onclick = async ()=>{
     showDynamicPaywall(data.reply);
     return;
   }
+
+  loopLevel++;  // 🔥 FIX (अब सही जगह)
+
+  updateLoopUI();
 
   typeEffect(data.reply);
 
@@ -253,4 +249,4 @@ nextBtn.onclick = async ()=>{
 
 </script>
 </body>
-  </html>
+</html>
