@@ -25,9 +25,10 @@ paid49 = false,
 paid199 = false,
 userGoal = "",
 userProblem = "",
-userAction = "",
-shownLoop5 = []
+userAction = ""
 } = body;
+
+const { shownLoop5 = [] } = body;
 
 if (!messages || !messages.length) {
 return res.status(400).json({ reply: "No input provided" });
@@ -37,7 +38,7 @@ const lastUserMessage = messages[messages.length - 1]?.content || "";
 const lowerMsg = lastUserMessage.toLowerCase();
 const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
-// ❌ DOMAIN FILTER (ONLY LOOP 1)
+// ❌ DOMAIN FILTER
 const healthPatterns = ["दर्द","दांत","सर दर्द","pain","doctor","medicine","health","fever","treatment"];
 const relationshipPatterns = ["relationship","breakup","love","girlfriend","boyfriend","wife","husband","marriage","ex"];
 
@@ -67,8 +68,16 @@ reply: isHindi
 }
 }
 
-// 🚧 PAYWALL LOOP 5 (FIXED CLEAN)
-if (loopLevel === 5 && !paid49) {
+// 🚧 PAYWALL LOOP 7 (पहले check होगा)
+if (loopLevel >= 7 && !paid199) {
+return res.status(200).json({
+reply: "You already know the truth.\nYou're delaying it.",
+paywall: true
+});
+}
+
+// 🚧 PAYWALL LOOP 5
+if (loopLevel >= 5 && !paid49) {
 
 const loop5Lines = [
   "You see the problem.\nBut you're still not moving.",
@@ -89,15 +98,7 @@ return res.status(200).json({
 });
 }
 
-// 🚧 PAYWALL LOOP 7 (STRICT)
-if (loopLevel === 7 && !paid199) {
-return res.status(200).json({
-reply: "You already know the truth.\nYou're delaying it.",
-paywall: true
-});
-}
-
-// 🧠 SYSTEM PROMPT
+// 🧠 PROMPT (UNCHANGED)
 const systemPrompt = `
 
 You are TruthLoop.
@@ -111,50 +112,38 @@ STRICT RULES:
 - Only use what user has said
 - Never repeat previous insights
 - Each response must introduce a NEW angle
+- Do not restate the same problem
 - Move deeper every step
+- If repeating → change perspective immediately
 
 STYLE:
 
-- Short clean lines
-- Natural phrasing
-- No robotic tone
+- Use short but complete lines
+- 2–4 lines per response
+- Natural human phrasing
 
 TONE:
 
 - Direct
 - Slightly uncomfortable
+- No coaching
 - No advice
 
 LOGIC:
 
 - Find contradiction
 - Expose it
-- Ask ONE question (except stage 4)
+- Ask ONE question
 
 STAGE: ${loopLevel}
 
-Stage 1:
-- Ask ONE simple question
-
-Stage 2:
-- Show mismatch + ask question
-
-Stage 3:
-- Add pressure + ask question
-
-Stage 4:
-- 2 lines only
-- One hard truth
-- No question
-
-Stage 5:
-- Define decision
-
-Stage 6:
-- Steps
-
-Stage 7:
-- Force action
+Stage 1: question  
+Stage 2: mismatch  
+Stage 3: pattern  
+Stage 4: truth  
+Stage 5: decision  
+Stage 6: action  
+Stage 7: push
 `;
 
 const response = await fetch(
@@ -192,9 +181,11 @@ reply.toLowerCase().includes("who are you")
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
 
-// 🔥 LOOP 4 HARD CONTROL
+// 🔥 LOOP 4 CONTROL
 if (loopLevel === 4) {
-reply = reply.split("\n").slice(0,2).join("\n");
+reply = lastUserMessage.includes("no clear next step")
+? "If there’s no clear next step… why would anyone respond?"
+: reply.split("\n")[0];
 }
 
 // 🔥 FINAL PUSH
@@ -204,8 +195,7 @@ reply += "\n\nNow decide.";
 
 return res.status(200).json({
 reply,
-paywall: false,
-shownLoop5
+paywall: false
 });
 
 } catch (error) {
