@@ -59,6 +59,12 @@ h2 { text-align:center; margin-bottom:5px; }
   color:#888;
 }
 
+.helper {
+  font-size:12px;
+  color:#aaa;
+  margin-top:6px;
+}
+
 input,button {
   width:100%;
   padding:12px;
@@ -116,15 +122,20 @@ button {
   • I don't know what to focus on<br>
   • I start things but don't finish<br><br>
 
-  <small style="color:#aaa;">
+  <b>Don't think. Just type.</b>
+
+  <small>
     No one sees this. Be honest.<br>
     (एक ही problem लिखो. ज्यादा मत सोचो.)
   </small>
   </div>
 </div>
 
-<input id="mainInput" placeholder="Type your real problem here..." />
-<button id="getBtn">Start Loop 1 → 4 Free</button>
+<input id="mainInput" placeholder="Example: I post daily but get no clients" />
+
+<div class="helper">⚠️ Don’t explain. Just type ONE line.</div>
+
+<button id="getBtn">Show me the truth →</button>
 
 <input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
 <button id="nextBtn" style="display:none;">Go deeper</button>
@@ -183,6 +194,7 @@ function typeEffect(text){
     if(i < text.length){
       div.innerHTML += text.charAt(i);
       i++;
+      outputBox.scrollTop = outputBox.scrollHeight;
       setTimeout(typing, 8);
     }
   }
@@ -215,82 +227,6 @@ function showShareCard(text){
   shareText.innerText =
 `This hit me harder than expected.
 
-<script>
-
-// CONFIG SAME
-const API_URL = "/api/chat";
-const RAZORPAY_KEY_ID = "rzp_live_SkoC6fqjfhi4WP";
-
-const outputBox = document.getElementById("outputBox");
-const mainInput = document.getElementById("mainInput");
-const reflectionInput = document.getElementById("reflectionInput");
-const getBtn = document.getElementById("getBtn");
-const nextBtn = document.getElementById("nextBtn");
-
-const shareBox = document.getElementById("shareBox");
-const shareText = document.getElementById("shareText");
-
-const paywallBox = document.getElementById("paywallBox");
-const payBtn = document.getElementById("payBtn");
-const payTitle = document.getElementById("payTitle");
-const paySub = document.getElementById("paySub");
-
-let loopLevel = 1;
-let messages = [];
-
-let payment49 = null;
-let payment199 = null;
-let shownLoop5 = [];
-
-function updateLoopUI(){
-  document.getElementById("loopIndicator").innerText =
-  `Loop ${loopLevel} / 7`;
-}
-
-// 🔥 FIXED TYPE EFFECT + SCROLL
-function typeEffect(text){
-  const div = document.createElement("div");
-  outputBox.appendChild(div);
-
-  let i = 0;
-  function typing(){
-    if(i < text.length){
-      div.innerHTML += text.charAt(i);
-      i++;
-      outputBox.scrollTop = outputBox.scrollHeight; // auto scroll
-      setTimeout(typing, 8);
-    }
-  }
-  typing();
-}
-
-// API SAME
-async function callAPI(){
-  const res = await fetch(API_URL, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({
-      messages,
-      loopLevel,
-      paid49: payment49,
-      paid199: payment199,
-      shownLoop5
-    })
-  });
-
-  const data = await res.json();
-  shownLoop5 = data.shownLoop5 || shownLoop5;
-
-  return data;
-}
-
-// SHARE SAME
-function showShareCard(text){
-  const clean = text.replace(/<[^>]*>?/gm, '').trim();
-
-  shareText.innerText =
-`This hit me harder than expected.
-
 ${clean}
 
 Most people avoid this.
@@ -300,7 +236,17 @@ https://truthloop.in`;
   shareBox.style.display = "block";
 }
 
-// PAYWALL SAME
+function copyShare(){
+  navigator.clipboard.writeText(shareText.innerText);
+  alert("Copied");
+}
+
+function whatsappShare(){
+  const text = encodeURIComponent(shareText.innerText);
+  window.open(`https://wa.me/?text=${text}`);
+}
+
+// PAYWALL
 function showDynamicPaywall(message){
 
   paywallBox.style.display = "block";
@@ -343,16 +289,14 @@ function showDynamicPaywall(message){
   };
 }
 
-// 🔥 START FIXED
+// START
 getBtn.onclick = async ()=>{
   const text = mainInput.value.trim();
   if(!text) return;
 
   messages = [{ role:"user", content:text }];
 
-  // clear welcome properly
   outputBox.innerHTML = "";
-
   outputBox.innerHTML += `<b>You:</b> ${text}<br><br>`;
 
   const data = await callAPI();
@@ -370,7 +314,7 @@ getBtn.onclick = async ()=>{
   getBtn.style.display = "none";
 };
 
-// NEXT SAME
+// NEXT
 nextBtn.onclick = async ()=>{
   const text = reflectionInput.value.trim();
   if(!text) return;
