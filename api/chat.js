@@ -66,7 +66,7 @@ reply: isHindi
 }
 
 // 🚧 PAYWALL LOOP 7
-if (loopLevel === 7 && !paid199) {
+if (loopLevel === 6 && !paid199) {
 return res.status(200).json({
 reply: "You already know the truth.\nYou're delaying it.",
 paywall: true
