@@ -9,8 +9,27 @@ gtag('config', 'G-RBMQ2F6P9Q');
 </script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><style>
 body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
 .container { max-width:500px; margin:auto; padding:18px; }
-h2 { text-align:center; }
-.tagline { text-align:center; font-size:13px; color:#aaa; }
+
+h2 { text-align:center; margin-bottom:5px; }
+.tagline { text-align:center; font-size:13px; color:#aaa; margin-bottom:15px; }
+
+.intro {
+  background:#111;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+  font-size:13px;
+  color:#ccc;
+  border:1px solid #222;
+  line-height:1.5;
+}
+
+.social-proof {
+  text-align:center;
+  font-size:12px;
+  color:#888;
+  margin-bottom:8px;
+}
 
 .output {
   height:45vh; overflow-y:auto; background:#000;
@@ -22,6 +41,9 @@ input,button {
   width:100%; padding:12px; margin-top:10px;
   border-radius:8px; border:none;
 }
+
+input { background:#111; color:#fff; }
+input::placeholder { color:#777; }
 
 button {
   background:linear-gradient(45deg, orange, #ff5e00);
@@ -37,11 +59,15 @@ button {
   text-align:center;
   border:1px solid #222;
 }
-</style></head><body><div class="container">
-<h2>TruthLoop</h2>
-<p class="tagline">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div>
-<div id="outputBox" class="output"></div><input id="mainInput" placeholder="What are you avoiding right now?" />
-<button id="getBtn">Start</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
+</style></head><body><div class="container"><h2>TruthLoop</h2>
+<p class="tagline">You don’t need advice. You need clarity.</p><div class="social-proof">Today 17 people faced this loop</div><div class="intro">
+Hi, I am TruthLoop.<br>
+I won’t give advice.<br>
+I’ll show you what you’re avoiding.<br><br>
+Type your real problem below.
+</div><div id="loopIndicator">Loop 1 / 7</div>
+<div id="outputBox" class="output"></div><input id="mainInput" placeholder="I’m posting daily but getting no clients..." />
+<button id="getBtn">Face the Truth</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
 <button id="nextBtn" style="display:none;">Go deeper</button><div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
@@ -73,6 +99,7 @@ let loopLevel = 1;
 let messages = [];
 
 let payment49 = null;
+let payment199 = null;
 let shownLoop5 = [];
 
 function updateLoopUI(){
@@ -103,6 +130,7 @@ async function callAPI(){
       messages,
       loopLevel,
       paid49: payment49,
+      paid199: payment199,
       shownLoop5
     })
   });
@@ -129,16 +157,6 @@ https://truthloop.in`;
   shareBox.style.display = "block";
 }
 
-function copyShare(){
-  navigator.clipboard.writeText(shareText.innerText);
-  alert("Copied");
-}
-
-function whatsappShare(){
-  const text = encodeURIComponent(shareText.innerText);
-  window.open(`https://wa.me/?text=${text}`);
-}
-
 // PAYWALL
 function showDynamicPaywall(message){
 
@@ -147,18 +165,32 @@ function showDynamicPaywall(message){
   payTitle.innerText = "You're not stuck.";
   paySub.innerText = message;
 
-  payBtn.innerText = "Break this loop (₹49)";
+  let amount = 4900;
+  let label = "Break this loop (₹49)";
+
+  if(loopLevel === 6){
+    amount = 19900;
+    label = "Unlock full clarity (₹199)";
+  }
+
+  payBtn.innerText = label;
 
   payBtn.onclick = function(){
 
     const options = {
       key: RAZORPAY_KEY_ID,
-      amount: 4900,
+      amount: amount,
       currency: "INR",
       name: "TruthLoop",
-      description: "Unlock Loop 5",
+      description: "Unlock",
       handler: function (response) {
-        payment49 = response.razorpay_payment_id;
+
+        if(loopLevel === 6){
+          payment199 = response.razorpay_payment_id;
+        } else {
+          payment49 = response.razorpay_payment_id;
+        }
+
         paywallBox.style.display = "none";
       }
     };
@@ -196,7 +228,19 @@ nextBtn.onclick = async ()=>{
   const text = reflectionInput.value.trim();
   if(!text) return;
 
-  loopLevel++; // 🔥 पहले increment
+  // 🔥 ₹49 gate (Loop 5)
+  if(loopLevel === 4 && !payment49){
+    showDynamicPaywall("This is where most people stop.");
+    return;
+  }
+
+  // 🔥 ₹199 gate (Loop 7)
+  if(loopLevel === 6 && !payment199){
+    showDynamicPaywall("Now it's about action.");
+    return;
+  }
+
+  loopLevel++;
 
   messages.push({ role:"user", content:text });
   outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
@@ -209,7 +253,6 @@ nextBtn.onclick = async ()=>{
   }
 
   updateLoopUI();
-
   typeEffect(data.reply);
 
   if(loopLevel === 4){
