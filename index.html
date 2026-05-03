@@ -1,44 +1,80 @@
-<!DOCTYPE html><html><head>
+<!DOCTYPE html>
+<html>
+<head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TruthLoop</title><script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script><script>
+<title>TruthLoop</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>
+<script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-RBMQ2F6P9Q');
-</script><script src="https://checkout.razorpay.com/v1/checkout.js"></script><style>
-body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
-.container { max-width:500px; margin:auto; padding:18px; }
+</script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+body {
+  background:#0f0f0f;
+  color:#fff;
+  font-family:Arial;
+  margin:0;
+}
+
+.container {
+  max-width:500px;
+  margin:auto;
+  padding:18px;
+}
 
 h2 { text-align:center; margin-bottom:5px; }
-.tagline { text-align:center; font-size:13px; color:#aaa; margin-bottom:15px; }
+.tagline {
+  text-align:center;
+  font-size:13px;
+  color:#aaa;
+  margin-bottom:15px;
+}
 
 .output {
   height:45vh;
   overflow-y:auto;
   background:#000;
-  padding:20px;
+  padding:18px;
   border-radius:12px;
   margin-bottom:10px;
   line-height:1.6;
-  display:flex;
-  align-items:center;
 }
 
 .welcome {
-  color:#e5e5e5;   /* 🔥 high contrast */
+  color:#ffffff;
   font-size:14px;
   line-height:1.6;
-  width:100%;
-  text-align:left;
+  opacity:0.95;
+}
+
+.welcome small {
+  display:block;
+  margin-top:10px;
+  color:#888;
 }
 
 input,button {
-  width:100%; padding:12px; margin-top:10px;
-  border-radius:8px; border:none;
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
 }
 
-input { background:#111; color:#fff; }
-input::placeholder { color:#777; }
+input {
+  background:#111;
+  color:#fff;
+}
+
+input::placeholder {
+  color:#777;
+}
 
 button {
   background:linear-gradient(45deg, orange, #ff5e00);
@@ -54,25 +90,48 @@ button {
   text-align:center;
   border:1px solid #222;
 }
-</style></head><body><div class="container"><h2>TruthLoop</h2>
-<p class="tagline">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div<div id="outputBox" class="output">
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>TruthLoop</h2>
+<p class="tagline">You don’t need advice. You need clarity.</p>
+
+<div id="loopIndicator">Loop 1 / 7</div>
+
+<div id="outputBox" class="output">
   <div class="welcome">
     Hi, I am TruthLoop.<br><br>
     I won’t give advice.<br>
     I’ll show you what you’re avoiding.<br><br>
-    Type your real problem below to start Loop 1.
+    <small>Type your real problem below to start Loop 1.</small>
   </div>
-</div><input id="mainInput" placeholder="I’m posting daily but getting no clients..." />
-<button id="getBtn">Start Loop 1 → 4 Free</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
-<button id="nextBtn" style="display:none;">Go deeper</button><div id="shareBox">
+</div>
+
+<input id="mainInput" placeholder="I’m posting daily but getting no clients..." />
+<button id="getBtn">Start Loop 1 → 4 Free</button>
+
+<input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
+<button id="nextBtn" style="display:none;">Go deeper</button>
+
+<div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
   <button onclick="whatsappShare()" style="margin-top:8px;">Send this to someone</button>
-</div><div id="paywallBox">
+</div>
+
+<div id="paywallBox">
   <div id="payTitle"></div>
   <div id="paySub"></div>
   <button id="payBtn"></button>
-</div></div><script>
+</div>
+
+</div>
+
+<script>
 
 const API_URL = "/api/chat";
 const RAZORPAY_KEY_ID = "rzp_live_SkoC6fqjfhi4WP";
@@ -256,5 +315,7 @@ nextBtn.onclick = async ()=>{
   reflectionInput.value = "";
 };
 
-</script></body>
+</script>
+
+</body>
   </html>
