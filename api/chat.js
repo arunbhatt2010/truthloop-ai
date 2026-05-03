@@ -50,19 +50,18 @@ reply: isHindi
 });
 }
 
-// 🔥 STAGE 1 ENTRY (FIXED SAFE VERSION)
+// 🔥 STAGE 1 ENTRY (FIXED ONLY CONDITION)
 if (loopLevel === 1) {
+const hasDetail =
+lastUserMessage.trim().split(/\s+/).length > 5;  // ✅ FIXED
 
-  const words = lastUserMessage.trim().split(/\s+/);
-  const hasDetail = words.length > 5;
-
-  if (!hasDetail) {
-    return res.status(200).json({
-      reply: isHindi
-        ? "एक लाइन में साफ बोलो:\n→ क्या करते हो\n→ कहाँ करते हो\n→ क्या काम नहीं कर रहा"
-        : "One line:\n→ What you do\n→ Where\n→ What’s not working"
-    });
-  }
+if (!hasDetail) {
+return res.status(200).json({
+reply: isHindi
+? "एक लाइन में साफ बोलो:\n→ क्या करते हो\n→ कहाँ करते हो\n→ क्या काम नहीं कर रहा"
+: "One line:\n→ What you do\n→ Where\n→ What’s not working"
+});
+}
 }
 
 // 🚧 PAYWALL LOOP 7
@@ -73,67 +72,132 @@ paywall: true
 });
 }
 
-// 🚧 PAYWALL LOOP 5
+// 🚧 PAYWALL LOOP 5 (FIXED STRINGS)
 if (loopLevel === 5 && !paid49) {
 
-  const base = lastUserMessage.slice(0, 60);
+const base = lastUserMessage.slice(0, 60);
 
-  const loop5Lines = [
-    `You said: "${base}"\nBut you're still not acting on it.`,
-    `You already described the problem.\nYou're just avoiding fixing it.`,
-    `You’re not confused.\nYou’re delaying what you already know.`,
-    `Nothing new is needed here.\nYou're just not executing.`,
-    `You're asking again.\nBut you already have the answer.`,
-    `Clarity isn't your issue.\nAction is.`,
-    `You saw the gap.\nYou're choosing comfort instead.`
-  ];
+const loop5Lines = [
+`You said: "${base}"\nBut you're still not acting on it.`,
+`You already described the problem.\nYou're just avoiding fixing it.`,
+`You’re not confused.\nYou’re delaying what you already know.`,
+`Nothing new is needed here.\nYou're just not executing.`,
+`You're asking again.\nBut you already have the answer.`,
+`Clarity isn't your issue.\nAction is.`,
+`You saw the gap.\nYou're choosing comfort instead.`
+];
 
-  const available = loop5Lines.filter(l => !shownLoop5.includes(l));
-  const finalPool = available.length ? available : loop5Lines;
+const available = loop5Lines.filter(l => !shownLoop5.includes(l));
+const finalPool = available.length ? available : loop5Lines;
 
-  const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
+const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-  return res.status(200).json({
-    reply: randomLine,
-    paywall: true,
-    shownLoop5: [...shownLoop5, randomLine]
-  });
+return res.status(200).json({
+reply: randomLine,
+paywall: true,
+shownLoop5: [...shownLoop5, randomLine]
+});
 }
 
-// 🧠 SYSTEM PROMPT
+// 🧠 BALANCED AHA PROMPT (UNCHANGED)
 const systemPrompt = `
+
 You are TruthLoop.
 
 STRICT RULES:
-- Stay inside user's exact problem
-- Do NOT invent details
-- Do NOT change topic
-- Only use what user has said
-- Each response must go deeper
-- Never repeat same idea
+
+Stay inside user's exact problem
+
+Do NOT invent details
+
+Do NOT change topic
+
+Only use what user has said
+
+Each response must go deeper
+
+Never repeat same idea
+
 
 STYLE:
-- Short paragraphs
-- 3–6 lines
-- Each line must add meaning
-- No fluff
+
+Short paragraphs
+
+3–6 lines
+
+Each line must add meaning
+
+No fluff
+
 
 TONE:
-- Direct
-- Slightly uncomfortable
-- No coaching
-- No advice
+
+Direct
+
+Slightly uncomfortable
+
+No coaching
+
+No advice
+
 
 LOGIC:
-- Start from user's situation
-- Show contradiction
-- Expand it slightly
-- End with ONE sharp question
+
+Start from user's situation
+
+Show contradiction
+
+Expand it slightly (1–2 lines)
+
+End with ONE sharp question
+
+
+IMPORTANT:
+
+Must feel like realization, not explanation
+
+Avoid generic lines
+
+Avoid safe responses
+
 
 STAGE: ${loopLevel}
+
+Stage 1:
+
+Ask simple clarity question
+
+
+Stage 2:
+
+Show mismatch + question
+
+
+Stage 3:
+
+Sharpen contradiction + question
+
+
+Stage 4:
+
+Hit uncomfortable truth + question
+
+
+Stage 5:
+
+Force decision
+
+
+Stage 6:
+
+Push action
+
+
+Stage 7:
+
+Final push
 `;
 
-// 🔥 SAFE API CALL
 const response = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
@@ -146,7 +210,7 @@ body: JSON.stringify({
 model: "llama-3.3-70b-versatile",
 messages: [
 { role: "system", content: systemPrompt },
-...(Array.isArray(messages) ? messages.slice(-6) : [])
+...messages.slice(-6)
 ],
 temperature: 0.75,
 max_tokens: 200
@@ -155,8 +219,7 @@ max_tokens: 200
 );
 
 if (!response.ok) {
-console.error("Groq API failed:", await response.text());
-return res.status(500).json({ reply: "Server error" });
+return res.status(500).json({ reply: "API error" });
 }
 
 const data = await response.json();
@@ -186,4 +249,4 @@ return res.status(500).json({
 reply: "Server error"
 });
 }
-      }
+  }
