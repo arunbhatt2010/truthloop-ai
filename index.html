@@ -1,5 +1,4 @@
-<!DOCTYPE html><html>
-<head>
+<!DOCTYPE html><html><head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TruthLoop</title><script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script><script>
 window.dataLayer = window.dataLayer || [];
@@ -13,28 +12,16 @@ body { background:#0f0f0f; color:#fff; font-family:Arial; margin:0; }
 h2 { text-align:center; margin-bottom:5px; }
 .tagline { text-align:center; font-size:13px; color:#aaa; margin-bottom:15px; }
 
-.intro {
-  background:#111;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:10px;
-  font-size:13px;
-  color:#ccc;
-  border:1px solid #222;
-  line-height:1.5;
-}
-
-.social-proof {
-  text-align:center;
-  font-size:12px;
-  color:#888;
-  margin-bottom:8px;
-}
-
 .output {
   height:45vh; overflow-y:auto; background:#000;
   padding:15px; border-radius:12px; margin-bottom:10px;
   line-height:1.6;
+}
+
+.welcome {
+  color:#aaa;
+  font-size:13px;
+  line-height:1.5;
 }
 
 input,button {
@@ -60,14 +47,15 @@ button {
   border:1px solid #222;
 }
 </style></head><body><div class="container"><h2>TruthLoop</h2>
-<p class="tagline">You don’t need advice. You need clarity.</p><div class="social-proof">Today 17 people faced this loop</div><div class="intro">
-Hi, I am TruthLoop.<br>
-I won’t give advice.<br>
-I’ll show you what you’re avoiding.<br><br>
-Type your real problem below.
-</div><div id="loopIndicator">Loop 1 / 7</div>
-<div id="outputBox" class="output"></div><input id="mainInput" placeholder="I’m posting daily but getting no clients..." />
-<button id="getBtn">Face the Truth</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
+<p class="tagline">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div><div id="outputBox" class="output">
+  <div class="welcome">
+    Hi, I am TruthLoop.<br>
+    I won’t give advice.<br>
+    I’ll show you what you’re avoiding.<br><br>
+    Type your real problem below to start Loop 1.
+  </div>
+</div><input id="mainInput" placeholder="I’m posting daily but getting no clients..." />
+<button id="getBtn">Start Loop 1 → 4 Free</button><input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
 <button id="nextBtn" style="display:none;">Go deeper</button><div id="shareBox">
   <div id="shareText"></div>
   <button onclick="copyShare()">Copy</button>
@@ -228,13 +216,11 @@ nextBtn.onclick = async ()=>{
   const text = reflectionInput.value.trim();
   if(!text) return;
 
-  // 🔥 ₹49 gate (Loop 5)
   if(loopLevel === 4 && !payment49){
     showDynamicPaywall("This is where most people stop.");
     return;
   }
 
-  // 🔥 ₹199 gate (Loop 7)
   if(loopLevel === 6 && !payment199){
     showDynamicPaywall("Now it's about action.");
     return;
