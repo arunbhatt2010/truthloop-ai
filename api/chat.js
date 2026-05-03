@@ -40,8 +40,8 @@ const healthPatterns = ["दर्द","दांत","सर दर्द","pai
 const relationshipPatterns = ["relationship","breakup","love","girlfriend","boyfriend","wife","husband","marriage","ex"];
 
 const isHealth = healthPatterns.some(word => lowerMsg.includes(word));
-const isRelationship = relationshipPatterns.some(word => lowerMsg.includes(word));
-
+const hasDetail =
+lastUserMessage.split(" ").length > 5;
 if (loopLevel === 1 && (isHealth || isRelationship)) {
 return res.status(200).json({
 reply: isHindi
