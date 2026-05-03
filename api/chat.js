@@ -22,10 +22,9 @@ const {
 messages,
 loopLevel = 1,
 paid49 = false,
-paid199 = false
+paid199 = false,
+shownLoop5 = []
 } = body;
-
-const { shownLoop5 = [] } = body;
 
 if (!messages || !messages.length) {
 return res.status(400).json({ reply: "No input provided" });
@@ -33,171 +32,117 @@ return res.status(400).json({ reply: "No input provided" });
 
 const lastUserMessage = messages[messages.length - 1]?.content || "";
 const lowerMsg = lastUserMessage.toLowerCase();
-const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
-// ❌ DOMAIN FILTER
-const healthPatterns = ["दर्द","दांत","सर दर्द","pain","doctor","medicine","health","fever","treatment"];
-const relationshipPatterns = ["relationship","breakup","love","girlfriend","boyfriend","wife","husband","marriage","ex"];
-
-const isHealth = healthPatterns.some(word => lowerMsg.includes(word));
-const isRelationship = relationshipPatterns.some(word => lowerMsg.includes(word));
-
-if (loopLevel === 1 && (isHealth || isRelationship)) {
+/* ❌ FILTER */
+const blocked = ["doctor","medicine","pain","relationship","breakup"];
+if (loopLevel === 1 && blocked.some(w => lowerMsg.includes(w))) {
 return res.status(200).json({
-reply: isHindi
-? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ तुम्हें फैसला लेना हो।"
-: "This isn't a decision problem.\n\nAsk something where a decision is required."
+reply: "This isn't a decision problem.\n\nAsk something where a decision is required."
 });
 }
 
-// 🔥 STAGE 1 ENTRY (FIXED ONLY CONDITION)
+/* 🔥 LOOP 1 STRICT */
 if (loopLevel === 1) {
-  const hasDetail = lastUserMessage.trim().split(/\s+/).length > 3;
+const words = lastUserMessage.trim().split(/\s+/).length;
 
-  if (!hasDetail) {
-    return res.status(200).json({
-      reply: "Too vague.\nWhat exactly is not working?"
-    });
-  }
+if (words < 4) {
+return res.status(200).json({
+reply: "Too vague.\n\nWhat exactly is not working?"
+});
+}
 }
 
-// 🚧 PAYWALL LOOP 7
-if (loopLevel === 6 && !paid199) {
+/* 🔒 HARD PAYWALL LOOP 5 */
+if (loopLevel === 5 && !paid49) {
+
+const base = lastUserMessage.slice(0,60);
+
+const lines = [
+`You said: "${base}"\n\nYou already know what to do.\nYou're just not doing it.`,
+`Nothing new is missing.\nYou're avoiding execution.`,
+`You’re not confused.\nYou’re hesitating.`,
+`You saw the gap.\nYou're choosing comfort.`,
+`You're asking again.\nBut the answer hasn't changed.`,
+`Clarity isn't your issue.\nAction is.`
+];
+
+const pick = lines[Math.floor(Math.random()*lines.length)];
+
 return res.status(200).json({
-reply: "You already know the truth.\nYou're delaying it.",
+reply: pick,
+paywall: true,
+shownLoop5: [...shownLoop5, pick]
+});
+}
+
+/* 🔒 HARD PAYWALL LOOP 7 */
+if (loopLevel === 7 && !paid199) {
+return res.status(200).json({
+reply: "You already know the truth.\n\nYou're delaying action.",
 paywall: true
 });
 }
 
-// 🚧 PAYWALL LOOP 5 (FIXED STRINGS)
-if (loopLevel === 5 && !paid49) {
-
-const base = lastUserMessage.slice(0, 60);
-
-const loop5Lines = [
-`You said: "${base}"\nBut you're still not acting on it.`,
-`You already described the problem.\nYou're just avoiding fixing it.`,
-`You’re not confused.\nYou’re delaying what you already know.`,
-`Nothing new is needed here.\nYou're just not executing.`,
-`You're asking again.\nBut you already have the answer.`,
-`Clarity isn't your issue.\nAction is.`,
-`You saw the gap.\nYou're choosing comfort instead.`
-];
-
-const available = loop5Lines.filter(l => !shownLoop5.includes(l));
-const finalPool = available.length ? available : loop5Lines;
-
-const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
-
-return res.status(200).json({
-reply: randomLine,
-paywall: true,
-shownLoop5: [...shownLoop5, randomLine]
-});
-}
-
-// 🧠 BALANCED AHA PROMPT (UNCHANGED)
+/* 🧠 CORE SYSTEM PROMPT (SHARP, NON-GENERIC) */
 const systemPrompt = `
 
 You are TruthLoop.
 
-Your job is NOT to help.
-Your job is to expose.
+You expose the user's real block.
 
----
-
-STRICT RULES:
+RULES:
 
 - Stay inside user's exact words
-- Do NOT add assumptions
+- Do NOT add new context
 - Do NOT give advice
-- Do NOT explain broadly
-- Every response must feel like a realization
-- No motivational tone
-- No generic questions
-
----
+- Do NOT suggest steps
+- No generic coaching language
+- No explanations
+- No motivation talk
 
 STYLE:
 
-- 3–6 short lines
-- Each line sharp and meaningful
-- No paragraphs of explanation
-- Use pauses and breaks
+- 3 to 5 lines only
+- Each line must hit harder than previous
+- No fluff
+- No repetition
+- Short sentences
 
----
+LOGIC:
 
-TONE:
+- Identify contradiction in user's behavior
+- Expose hidden avoidance
+- Shift from surface problem → real problem
+- End with ONE uncomfortable question
 
-- Direct
-- Slightly uncomfortable
-- Observational, not instructional
+IMPORTANT:
 
----
-
-CORE LOGIC:
-
-- Reflect what user said
-- Show contradiction or gap
-- Push discomfort slightly deeper
-- End with ONE sharp question
-
----
+- This must feel like a mirror, not help
+- The user should feel slightly exposed
+- No safe answers
 
 STAGE: ${loopLevel}
 
----
+Stage 1:
+Ask simple but sharp clarity question
 
-Stage 1 (Clarity entry):
-- Do NOT explain the problem
-- Ask ONE simple, direct question
-- Force specificity
+Stage 2:
+Show mismatch between effort and outcome
 
----
+Stage 3:
+Expose pattern or repeated behavior
 
-Stage 2 (Mismatch exposure):
-- Use user’s own words
-- Show what they say vs what they do
-- Point out the gap
-- End with a sharp question
+Stage 4:
+Reveal avoidance or hidden fear
 
----
+Stage 5:
+Force realization (no solution)
 
-Stage 3 (Pattern reveal):
-- Show repeating behavior
-- Highlight hidden pattern
-- Make it feel uncomfortable but true
-- End with a sharp question
+Stage 6:
+Push toward action tension
 
----
-
-Stage 4 (Uncomfortable truth):
-- State what they are avoiding
-- Remove excuses
-- Make it direct
-- End with a sharp question
-
----
-
-Stage 5 (Decision pressure):
-- No analysis
-- Force a binary choice
-- Make delay feel costly
-
----
-
-Stage 6 (Action trigger):
-- Push immediate action
-- No theory
-- One line: what they must do now
-
----
-
-Stage 7 (Final mirror):
-- Reflect full truth
-- No softness
-- Close with impact
-
+Stage 7:
+Final confrontation
 `;
 
 const response = await fetch(
@@ -214,8 +159,8 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages.slice(-6)
 ],
-temperature: 0.75,
-max_tokens: 200
+temperature: 0.7,
+max_tokens: 180
 })
 }
 );
@@ -227,17 +172,17 @@ return res.status(500).json({ reply: "API error" });
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "No response";
 
-// 🔥 CLEAN FILTER
+/* 🔥 CLEAN FILTER */
 if (
-reply.toLowerCase().includes("name") ||
-reply.toLowerCase().includes("who are you")
+reply.toLowerCase().includes("i am") ||
+reply.toLowerCase().includes("as an ai")
 ) {
-reply = "Stay on the problem.\nWhat’s actually not working?";
+reply = "Stay on the problem.\n\nWhat’s actually not working?";
 }
 
-// 🔥 FINAL PUSH
+/* 🔥 FINAL PUSH */
 if (loopLevel >= 6) {
-reply += "\n\nNow decide.";
+reply += "\n\nNow act.";
 }
 
 return res.status(200).json({
@@ -251,4 +196,5 @@ return res.status(500).json({
 reply: "Server error"
 });
 }
-  }
+
+}
