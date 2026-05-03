@@ -22,10 +22,7 @@ const {
 messages,
 loopLevel = 1,
 paid49 = false,
-paid199 = false,
-userGoal = "",
-userProblem = "",
-userAction = ""
+paid199 = false
 } = body;
 
 const { shownLoop5 = [] } = body;
@@ -68,7 +65,7 @@ reply: isHindi
 }
 }
 
-// 🚧 PAYWALL LOOP 7 (पहले check होगा)
+// 🚧 PAYWALL LOOP 7
 if (loopLevel === 7 && !paid199) {
 return res.status(200).json({
 reply: "You already know the truth.\nYou're delaying it.",
@@ -98,7 +95,8 @@ if (loopLevel === 5 && !paid49) {
     shownLoop5: [...shownLoop5, randomLine]
   });
 }
-// 🧠 PROMPT (UNCHANGED)
+
+// 🧠 STRONG PROMPT (FIXED)
 const systemPrompt = `
 
 You are TruthLoop.
@@ -106,43 +104,37 @@ You are TruthLoop.
 STRICT RULES:
 
 - Stay inside user's exact problem
-- Do NOT invent details
-- Do NOT ask personal questions
-- Do NOT change topic
-- Only use what user has said
-- Never repeat previous insights
-- Each response must introduce a NEW angle
-- Do not restate the same problem
-- Move deeper every step
-- If repeating → change perspective immediately
+- Do NOT repeat user's words
+- Do NOT give obvious statements
+- Every line must feel new or uncomfortable
+- If it's obvious → rewrite it
 
 STYLE:
 
-- Use short but complete lines
-- 2–4 lines per response
-- Natural human phrasing
-- Keep language simple and easy to understand
-- Avoid abstract sentences
-- Speak like real human, not philosophical
+- Short lines
+- 2–3 lines max
+- Punchy and sharp
+- Natural human tone
+
 TONE:
 
 - Direct
 - Slightly uncomfortable
-- No coaching
 - No advice
+- No explaining
 
 LOGIC:
 
-- Find contradiction
+- Find hidden contradiction
 - Expose it
-- Ask ONE question
+- Say something the user hasn't realised
 
 STAGE: ${loopLevel}
 
-Stage 1: question  
+Stage 1: simple question  
 Stage 2: mismatch  
 Stage 3: pattern  
-Stage 4: truth  
+Stage 4: uncomfortable truth  
 Stage 5: decision  
 Stage 6: action  
 Stage 7: push
@@ -162,7 +154,7 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages
 ],
-temperature: 0.6,
+temperature: 0.7,
 max_tokens: 180
 })
 }
@@ -174,10 +166,13 @@ return res.status(500).json({ reply: "API error" });
 
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "No response";
+
+// 🔥 GUIDE OVERRIDE (SHARPER)
 if (lowerMsg.includes("guide") || lowerMsg.includes("help")) {
-  reply = "You don't need guidance.\nYou already know what to do.\nWhy aren't you doing it?";
+  reply = "You already know what to do.\nYou're just not doing it.\nWhy?";
 }
-// 🔥 ANTI-RANDOM FILTER
+
+// 🔥 CLEAN FILTER
 if (
 reply.toLowerCase().includes("name") ||
 reply.toLowerCase().includes("who are you")
@@ -185,11 +180,9 @@ reply.toLowerCase().includes("who are you")
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
 
-// 🔥 LOOP 4 CONTROL
+// 🔥 LOOP 4 FIX (NO CUTTING INSIGHT)
 if (loopLevel === 4) {
-reply = lastUserMessage.includes("no clear next step")
-? "If there’s no clear next step… why would anyone respond?"
-: reply.split("\n")[0];
+reply = reply.split("\n").slice(0,2).join("\n");
 }
 
 // 🔥 FINAL PUSH
