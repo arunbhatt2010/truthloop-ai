@@ -69,7 +69,7 @@ reply: isHindi
 }
 
 // 🚧 PAYWALL LOOP 7 (पहले check होगा)
-if (loopLevel >= 7 && !paid199) {
+if (loopLevel === 7 && !paid199) {
 return res.status(200).json({
 reply: "You already know the truth.\nYou're delaying it.",
 paywall: true
@@ -77,13 +77,14 @@ paywall: true
 }
 
 // 🚧 PAYWALL LOOP 5
-if (loopLevel >= 5 && !paid49) {
+if (loopLevel === 5 && !paid49)
 
 const loop5Lines = [
-  "You see the problem.\nBut you're still not moving.",
-  "Clarity is there.\nAction is missing.",
-  "You understand it.\nYou're not doing it.",
-  "Nothing new is needed.\nExecution is missing."
+"You already know what's wrong.\nYou're just avoiding fixing it.",
+"You don't need more thinking.\nYou need to act — but you're not.",
+"You've seen the gap.\nYou're choosing to stay in it.",
+"This isn't confusion.\nIt's hesitation.",
+"You’re not stuck.\nYou’re delaying the obvious move."
 ];
 
 const available = loop5Lines.filter(l => !shownLoop5.includes(l));
@@ -121,7 +122,9 @@ STYLE:
 - Use short but complete lines
 - 2–4 lines per response
 - Natural human phrasing
-
+- Keep language simple and easy to understand
+- Avoid abstract sentences
+- Speak like real human, not philosophical
 TONE:
 
 - Direct
@@ -172,7 +175,9 @@ return res.status(500).json({ reply: "API error" });
 
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "No response";
-
+if (lowerMsg.includes("guide") || lowerMsg.includes("help")) {
+  reply = "You don't need guidance.\nYou already know what to do.\nWhy aren't you doing it?";
+}
 // 🔥 ANTI-RANDOM FILTER
 if (
 reply.toLowerCase().includes("name") ||
