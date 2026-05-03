@@ -23,7 +23,7 @@ body {
 }
 
 .container {
-  max-width:500px;
+  max-width:520px; /* 🔥 slight fix */
   margin:auto;
   padding:18px;
 }
@@ -37,8 +37,7 @@ h2 { text-align:center; margin-bottom:5px; }
 }
 
 .output {
-  height:45vh;
-  overflow-y:auto;
+  min-height:50vh; /* 🔥 height हटाया */
   background:#000;
   padding:18px;
   border-radius:12px;
@@ -48,8 +47,9 @@ h2 { text-align:center; margin-bottom:5px; }
 
 .welcome {
   font-size:14px;
-  line-height:1.6;
+  line-height:1.7;
   opacity:0.95;
+  word-break:break-word;
 }
 
 .helper {
@@ -167,24 +167,19 @@ function updateLoopUI(){
   `Loop ${loopLevel} / 7`;
 }
 
-// 🔥 FIXED SMOOTH TYPE + SCROLL
 function typeEffect(text){
   const div = document.createElement("div");
   outputBox.appendChild(div);
 
   let i = 0;
-
   function typing(){
     if(i < text.length){
       div.innerHTML += text.charAt(i);
       i++;
-
       outputBox.scrollTop = outputBox.scrollHeight;
-
       requestAnimationFrame(typing);
     }
   }
-
   typing();
 }
 
@@ -205,19 +200,6 @@ async function callAPI(){
   shownLoop5 = data.shownLoop5 || shownLoop5;
 
   return data;
-}
-
-function showShareCard(text){
-  shareText.innerText = text;
-  shareBox.style.display = "block";
-}
-
-function copyShare(){
-  navigator.clipboard.writeText(shareText.innerText);
-}
-
-function whatsappShare(){
-  window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 }
 
 function showDynamicPaywall(message){
@@ -250,24 +232,27 @@ getBtn.onclick = async ()=>{
   const data = await callAPI();
 
   typeEffect(data.reply);
-
-  // 🔥 IMPORTANT
   messages.push({ role:"assistant", content:data.reply });
 
   mainInput.value = "";
+
+  // 🔥 UI FIX (MAIN THING)
+  mainInput.style.display = "none";
+  document.getElementById("helperText").style.display = "none";
+
   reflectionInput.style.display = "block";
+  reflectionInput.placeholder = "Answer the question above...";
+
   nextBtn.style.display = "block";
   getBtn.style.display = "none";
 };
 
-
 // NEXT
 nextBtn.onclick = async () => {
 
-  const text = reflectionInput.value.trim(); // ✅ सही input
+  const text = reflectionInput.value.trim();
   if(!text) return;
 
-  // 🔐 paywall checks (same रख)
   if(loopLevel === 4 && !payment49){
     showDynamicPaywall("This is where most people stop.");
     return;
@@ -278,11 +263,10 @@ nextBtn.onclick = async () => {
     return;
   }
 
-  loopLevel++; // ✅ पहले increment
+  loopLevel++;
 
   messages.push({ role:"user", content:text });
 
-  // ❌ history delete मत कर
   outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
 
   const data = await callAPI();
@@ -292,15 +276,14 @@ nextBtn.onclick = async () => {
     return;
   }
 
-  // ✅ context fix (MOST IMPORTANT)
   messages.push({ role:"assistant", content:data.reply });
 
   updateLoopUI();
   typeEffect(data.reply);
 
-  reflectionInput.value = ""; // ✅ clear only this input
+  reflectionInput.value = "";
 };
 </script>
 
 </body>
-  </html>
+    </html>
