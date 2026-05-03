@@ -27,7 +27,9 @@ userGoal = "",
 userProblem = "",
 userAction = ""
 } = body;
+
 const { shownLoop5 = [] } = body;
+
 if (!messages || !messages.length) {
 return res.status(400).json({ reply: "No input provided" });
 }
@@ -66,8 +68,9 @@ reply: isHindi
 }
 }
 
-// 🚧 PAYWALLS
+// 🚧 PAYWALL LOOP 5
 if (loopLevel >= 5 && !paid49) {
+
 const loop5Lines = [
   "You see the problem.\nBut you're still not moving.",
   "Clarity is there.\nAction is missing.",
@@ -82,11 +85,15 @@ const available = loop5Lines.filter(l => !shownLoop5.includes(l));
 const finalPool = available.length ? available : loop5Lines;
 
 const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
+
 return res.status(200).json({
   reply: randomLine,
   paywall: true,
   shownLoop5: [...shownLoop5, randomLine]
 });
+}
+
+// 🚧 PAYWALL LOOP 7 (FIXED POSITION)
 if (loopLevel >= 7 && !paid199) {
 return res.status(200).json({
 reply: "You already know the truth.\nYou're delaying it.",
@@ -94,7 +101,7 @@ paywall: true
 });
 }
 
-// 🧠 UPDATED PROMPT (BALANCED CONTROL)
+// 🧠 UPDATED PROMPT
 const systemPrompt = `
 
 You are TruthLoop.
@@ -102,34 +109,22 @@ You are TruthLoop.
 STRICT RULES:
 
 - Stay inside user's exact problem
-
 - Do NOT invent details
-
 - Do NOT ask personal questions
-
 - Do NOT change topic
-
 - Only use what user has said
-
 - Never repeat previous insights
-
 - Each response must introduce a NEW angle
-
 - Do not restate the same problem
-
 - Move deeper every step
-
 - If repeating → change perspective immediately
-  STYLE:
+
+STYLE:
 
 - Use short but complete lines
-
 - 2–4 lines per response (flexible)
-
 - Natural human phrasing
-
 - No broken fragments
-
 - No robotic structure
 
 TONE:
@@ -152,57 +147,41 @@ IMPORTANT:
 - Maintain tension
 
 STAGE: ${loopLevel}
-Stage 2 → surface mismatch
-Stage 3 → behavioral pattern
-Stage 4 → hidden truth (root cause)
 
-Do NOT repeat earlier stages
 Stage 1:
-
 - 1–2 lines
 - Ask ONE simple question
 
 Stage 2:
-
 - 2–3 lines
 - Show mismatch
 - Ask ONE question
 
 Stage 3:
-
 - 3–4 lines
 - Sharpen contradiction
 - Add pressure
 - Ask ONE question
 
 Stage 4:
-
 - 2–3 lines ONLY
 - One uncomfortable truth
 - Do NOT solve
 - Leave curiosity gap
-- Make it shareable
-
-IMPORTANT:
-
-- Clarity here = only 30–40%
 
 Stage 5:
-
 - 4–5 lines
 - Define real decision
 
 Stage 6:
-
 - 4–6 lines
 - Give practical steps
 
 Stage 7:
-
 - 5–7 lines
 - Show outcome difference
 - Push action
-  `;
+`;
 
 const response = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
@@ -239,31 +218,6 @@ reply.toLowerCase().includes("who are you")
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
 
-// 🔥 SMART ANTI-REPEAT (ADDED ONLY THIS)
-const lastAssistant = messages
-.filter(m => m.role === "assistant")
-.slice(-2)
-.map(m => m.content.toLowerCase());
-
-const replyLower = reply.toLowerCase();
-
-const isRepeating = lastAssistant.some(prev => {
-let common = 0;
-const words = replyLower.split(" ");
-
-for (let w of words) {
-if (prev.includes(w) && w.length > 4) {
-common++;
-}
-}
-
-return common >= 5;
-});
-
-if (isRepeating) {
-reply = "Same pattern.\nDifferent angle:\nWhat are you avoiding?";
-}
-
 // 🔥 LOOP 4 CONTROL
 if (loopLevel === 4) {
 reply = lastUserMessage.includes("no clear next step")
@@ -287,4 +241,4 @@ return res.status(500).json({
 reply: "Server error"
 });
 }
-}
+  }
