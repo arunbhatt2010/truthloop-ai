@@ -115,7 +115,7 @@ button {
 </div>
 
 <input id="mainInput" placeholder="Example: I post daily but get no clients" />
-<div class="helper">⚠️ Don’t explain. Just type ONE line.</div>
+<div class="helper" id="helperText">⚠️ Don’t explain. Just type ONE line.</div>
 
 <button id="getBtn">Show me the truth →</button>
 
@@ -261,27 +261,40 @@ getBtn.onclick = async ()=>{
 };
 
 // NEXT
-nextBtn.onclick = async ()=>{
-  const text = reflectionInput.value.trim();
+getBtn.onclick = async ()=>{
+
+  const text = mainInput.value.trim();
   if(!text) return;
 
-  loopLevel++;
+  messages = [{ role:"user", content:text }];
 
-  messages.push({ role:"user", content:text });
-
-  outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
+  outputBox.innerHTML = "";
+  outputBox.innerHTML += `<b>You:</b> ${text}<br><br>`;
 
   const data = await callAPI();
 
-  // 🔥 THIS FIXES LOOP 2
-  messages.push({ role:"assistant", content:data.reply });
+  if (data.paywall) {
+    showDynamicPaywall(data.reply);
+    return;
+  }
 
-  updateLoopUI();
   typeEffect(data.reply);
 
-  reflectionInput.value = "";
-};
+  // ✅ IMPORTANT (context fix)
+  messages.push({ role:"assistant", content:data.reply });
 
+  mainInput.value = "";
+
+  // 🔥 UI SWITCH FIX (YEHI MAIN CHEEZ HAI)
+  mainInput.style.display = "none";
+  document.getElementById("helperText").style.display = "none";
+
+  reflectionInput.style.display = "block";
+  reflectionInput.placeholder = "Answer the question above...";
+
+  nextBtn.style.display = "block";
+  getBtn.style.display = "none";
+};
 </script>
 
 </body>
