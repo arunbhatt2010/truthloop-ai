@@ -25,10 +25,9 @@ paid49 = false,
 paid199 = false,
 userGoal = "",
 userProblem = "",
-userAction = ""
+userAction = "",
+shownLoop5 = []
 } = body;
-
-const { shownLoop5 = [] } = body;
 
 if (!messages || !messages.length) {
 return res.status(400).json({ reply: "No input provided" });
@@ -68,8 +67,8 @@ reply: isHindi
 }
 }
 
-// 🚧 PAYWALL LOOP 5
-if (loopLevel >= 5 && !paid49) {
+// 🚧 PAYWALL LOOP 5 (FIXED CLEAN)
+if (loopLevel === 5 && !paid49) {
 
 const loop5Lines = [
   "You see the problem.\nBut you're still not moving.",
@@ -78,10 +77,7 @@ const loop5Lines = [
   "Nothing new is needed.\nExecution is missing."
 ];
 
-// filter already shown
 const available = loop5Lines.filter(l => !shownLoop5.includes(l));
-
-// fallback if all used
 const finalPool = available.length ? available : loop5Lines;
 
 const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
@@ -93,15 +89,15 @@ return res.status(200).json({
 });
 }
 
-// 🚧 PAYWALL LOOP 7 (FIXED POSITION)
-if (loopLevel >= 7 && !paid199) {
+// 🚧 PAYWALL LOOP 7 (STRICT)
+if (loopLevel === 7 && !paid199) {
 return res.status(200).json({
 reply: "You already know the truth.\nYou're delaying it.",
 paywall: true
 });
 }
 
-// 🧠 UPDATED PROMPT
+// 🧠 SYSTEM PROMPT
 const systemPrompt = `
 
 You are TruthLoop.
@@ -115,72 +111,50 @@ STRICT RULES:
 - Only use what user has said
 - Never repeat previous insights
 - Each response must introduce a NEW angle
-- Do not restate the same problem
 - Move deeper every step
-- If repeating → change perspective immediately
 
 STYLE:
 
-- Use short but complete lines
-- 2–4 lines per response (flexible)
-- Natural human phrasing
-- No broken fragments
-- No robotic structure
+- Short clean lines
+- Natural phrasing
+- No robotic tone
 
 TONE:
 
 - Direct
 - Slightly uncomfortable
-- No coaching
 - No advice
 
 LOGIC:
 
-- Find contradiction in user's own words
-- Expose it clearly
-- Ask ONE relevant question only
-
-IMPORTANT:
-
-- Do NOT over-explain
-- Do NOT solve too early
-- Maintain tension
+- Find contradiction
+- Expose it
+- Ask ONE question (except stage 4)
 
 STAGE: ${loopLevel}
 
 Stage 1:
-- 1–2 lines
 - Ask ONE simple question
 
 Stage 2:
-- 2–3 lines
-- Show mismatch
-- Ask ONE question
+- Show mismatch + ask question
 
 Stage 3:
-- 3–4 lines
-- Sharpen contradiction
-- Add pressure
-- Ask ONE question
+- Add pressure + ask question
 
 Stage 4:
-- 2–3 lines ONLY
-- One uncomfortable truth
-- Do NOT solve
-- Leave curiosity gap
+- 2 lines only
+- One hard truth
+- No question
 
 Stage 5:
-- 4–5 lines
-- Define real decision
+- Define decision
 
 Stage 6:
-- 4–6 lines
-- Give practical steps
+- Steps
 
 Stage 7:
-- 5–7 lines
-- Show outcome difference
-- Push action
+- Force action
 `;
 
 const response = await fetch(
@@ -218,11 +192,9 @@ reply.toLowerCase().includes("who are you")
 reply = "Stay on the problem.\nWhat’s actually not working?";
 }
 
-// 🔥 LOOP 4 CONTROL
+// 🔥 LOOP 4 HARD CONTROL
 if (loopLevel === 4) {
-reply = lastUserMessage.includes("no clear next step")
-? "If there’s no clear next step… why would anyone respond?"
-: reply.split("\n")[0];
+reply = reply.split("\n").slice(0,2).join("\n");
 }
 
 // 🔥 FINAL PUSH
@@ -232,7 +204,8 @@ reply += "\n\nNow decide.";
 
 return res.status(200).json({
 reply,
-paywall: false
+paywall: false,
+shownLoop5
 });
 
 } catch (error) {
@@ -241,4 +214,4 @@ return res.status(500).json({
 reply: "Server error"
 });
 }
-  }
+}
