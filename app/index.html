@@ -329,7 +329,7 @@ nextBtn.onclick = async ()=>{
     return;
   }
 
-  loopLevel++;
+  
 
   messages.push({ role:"user", content:text });
   outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
@@ -339,6 +339,7 @@ nextBtn.onclick = async ()=>{
   if (data.paywall) {
     showDynamicPaywall(data.reply);
     return;
+    loopLevel++;
   }
 
   updateLoopUI();
