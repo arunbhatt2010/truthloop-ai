@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TruthLoop</title>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RBMQ2F6P9Q');
+</script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+body {
+  background:#0f0f0f;
+  color:#fff;
+  font-family:Arial;
+  margin:0;
+}
+
+.container {
+  max-width:500px;
+  margin:auto;
+  padding:18px;
+}
+
+h2 { text-align:center; margin-bottom:5px; }
+.tagline {
+  text-align:center;
+  font-size:13px;
+  color:#aaa;
+  margin-bottom:15px;
+}
+
+.output {
+  height:45vh;
+  overflow-y:auto;
+  background:#000;
+  padding:18px;
+  border-radius:12px;
+  margin-bottom:10px;
+  line-height:1.6;
+}
+
+.welcome {
+  color:#ffffff;
+  font-size:14px;
+  line-height:1.6;
+  opacity:0.95;
+}
+
+.welcome small {
+  display:block;
+  margin-top:10px;
+  color:#888;
+}
+
+input,button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
+
+input {
+  background:#111;
+  color:#fff;
+}
+
+input::placeholder {
+  color:#777;
+}
+
+button {
+  background:linear-gradient(45deg, orange, #ff5e00);
+  font-weight:bold;
+}
+
+#shareBox, #paywallBox {
+  display:none;
+  background:#111;
+  padding:15px;
+  border-radius:12px;
+  margin-top:10px;
+  text-align:center;
+  border:1px solid #222;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>TruthLoop</h2>
+<p class="tagline">You don’t need advice. You need clarity.</p>
+
+<div id="loopIndicator">Loop 1 / 7</div>
+
+<div id="outputBox" class="output">
+  <div class="welcome">
+  Hi, I am TruthLoop.<br><br>
+
+  I won't give advice.<br>
+  I’ll show you what you're avoiding.<br><br>
+
+  <b>Type ONE real problem:</b><br><br>
+
+  • I'm working hard but nothing is growing<br>
+  • I'm posting but getting no clients<br>
+  • I don't know what to focus on<br>
+  • I start things but don't finish<br><br>
+
+  <small style="color:#aaa;">
+    No one sees this. Be honest.<br>
+    (एक ही problem लिखो. ज्यादा मत सोचो.)
+  </small>
+  </div>
+</div>
+
+<input id="mainInput" placeholder="Type your real problem here..." />
+<button id="getBtn">Start Loop 1 → 4 Free</button>
+
+<input id="reflectionInput" placeholder="Answer honestly..." style="display:none;"/>
+<button id="nextBtn" style="display:none;">Go deeper</button>
+
+<div id="shareBox">
+  <div id="shareText"></div>
+  <button onclick="copyShare()">Copy</button>
+  <button onclick="whatsappShare()" style="margin-top:8px;">Send this to someone</button>
+</div>
+
+<div id="paywallBox">
+  <div id="payTitle"></div>
+  <div id="paySub"></div>
+  <button id="payBtn"></button>
+</div>
+
+</div>
+
+<script>
+
+const API_URL = "/api/chat";
+const RAZORPAY_KEY_ID = "rzp_live_SkoC6fqjfhi4WP";
+
+const outputBox = document.getElementById("outputBox");
+const mainInput = document.getElementById("mainInput");
+const reflectionInput = document.getElementById("reflectionInput");
+const getBtn = document.getElementById("getBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const shareBox = document.getElementById("shareBox");
+const shareText = document.getElementById("shareText");
+
+const paywallBox = document.getElementById("paywallBox");
+const payBtn = document.getElementById("payBtn");
+const payTitle = document.getElementById("payTitle");
+const paySub = document.getElementById("paySub");
+
+let loopLevel = 1;
+let messages = [];
+
+let payment49 = null;
+let payment199 = null;
+let shownLoop5 = [];
+
+function updateLoopUI(){
+  document.getElementById("loopIndicator").innerText =
+  `Loop ${loopLevel} / 7`;
+}
+
+function typeEffect(text){
+  const div = document.createElement("div");
+  outputBox.appendChild(div);
+
+  let i = 0;
+  function typing(){
+    if(i < text.length){
+      div.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typing, 8);
+    }
+  }
+  typing();
+}
+
+async function callAPI(){
+  const res = await fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      messages,
+      loopLevel,
+      paid49: payment49,
+      paid199: payment199,
+      shownLoop5
+    })
+  });
+
+  const data = await res.json();
+  shownLoop5 = data.shownLoop5 || shownLoop5;
+
+  return data;
+}
+
+// SHARE
+function showShareCard(text){
+  const clean = text.replace(/<[^>]*>?/gm, '').trim();
+
+  shareText.innerText =
+`This hit me harder than expected.
+
+<script>
+
+// CONFIG SAME
+const API_URL = "/api/chat";
+const RAZORPAY_KEY_ID = "rzp_live_SkoC6fqjfhi4WP";
+
+const outputBox = document.getElementById("outputBox");
+const mainInput = document.getElementById("mainInput");
+const reflectionInput = document.getElementById("reflectionInput");
+const getBtn = document.getElementById("getBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const shareBox = document.getElementById("shareBox");
+const shareText = document.getElementById("shareText");
+
+const paywallBox = document.getElementById("paywallBox");
+const payBtn = document.getElementById("payBtn");
+const payTitle = document.getElementById("payTitle");
+const paySub = document.getElementById("paySub");
+
+let loopLevel = 1;
+let messages = [];
+
+let payment49 = null;
+let payment199 = null;
+let shownLoop5 = [];
+
+function updateLoopUI(){
+  document.getElementById("loopIndicator").innerText =
+  `Loop ${loopLevel} / 7`;
+}
+
+// 🔥 FIXED TYPE EFFECT + SCROLL
+function typeEffect(text){
+  const div = document.createElement("div");
+  outputBox.appendChild(div);
+
+  let i = 0;
+  function typing(){
+    if(i < text.length){
+      div.innerHTML += text.charAt(i);
+      i++;
+      outputBox.scrollTop = outputBox.scrollHeight; // auto scroll
+      setTimeout(typing, 8);
+    }
+  }
+  typing();
+}
+
+// API SAME
+async function callAPI(){
+  const res = await fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      messages,
+      loopLevel,
+      paid49: payment49,
+      paid199: payment199,
+      shownLoop5
+    })
+  });
+
+  const data = await res.json();
+  shownLoop5 = data.shownLoop5 || shownLoop5;
+
+  return data;
+}
+
+// SHARE SAME
+function showShareCard(text){
+  const clean = text.replace(/<[^>]*>?/gm, '').trim();
+
+  shareText.innerText =
+`This hit me harder than expected.
+
+${clean}
+
+Most people avoid this.
+
+https://truthloop.in`;
+
+  shareBox.style.display = "block";
+}
+
+// PAYWALL SAME
+function showDynamicPaywall(message){
+
+  paywallBox.style.display = "block";
+
+  payTitle.innerText = "You're not stuck.";
+  paySub.innerText = message;
+
+  let amount = 4900;
+  let label = "Break this loop (₹49)";
+
+  if(loopLevel === 6){
+    amount = 19900;
+    label = "Unlock full clarity (₹199)";
+  }
+
+  payBtn.innerText = label;
+
+  payBtn.onclick = function(){
+
+    const options = {
+      key: RAZORPAY_KEY_ID,
+      amount: amount,
+      currency: "INR",
+      name: "TruthLoop",
+      description: "Unlock",
+      handler: function (response) {
+
+        if(loopLevel === 6){
+          payment199 = response.razorpay_payment_id;
+        } else {
+          payment49 = response.razorpay_payment_id;
+        }
+
+        paywallBox.style.display = "none";
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+  };
+}
+
+// 🔥 START FIXED
+getBtn.onclick = async ()=>{
+  const text = mainInput.value.trim();
+  if(!text) return;
+
+  messages = [{ role:"user", content:text }];
+
+  // clear welcome properly
+  outputBox.innerHTML = "";
+
+  outputBox.innerHTML += `<b>You:</b> ${text}<br><br>`;
+
+  const data = await callAPI();
+
+  if (data.paywall) {
+    showDynamicPaywall(data.reply);
+    return;
+  }
+
+  typeEffect(data.reply);
+
+  mainInput.value = "";
+  reflectionInput.style.display = "block";
+  nextBtn.style.display = "block";
+  getBtn.style.display = "none";
+};
+
+// NEXT SAME
+nextBtn.onclick = async ()=>{
+  const text = reflectionInput.value.trim();
+  if(!text) return;
+
+  if(loopLevel === 4 && !payment49){
+    showDynamicPaywall("This is where most people stop.");
+    return;
+  }
+
+  if(loopLevel === 6 && !payment199){
+    showDynamicPaywall("Now it's about action.");
+    return;
+  }
+
+  loopLevel++;
+
+  messages.push({ role:"user", content:text });
+  outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
+
+  const data = await callAPI();
+
+  if (data.paywall) {
+    showDynamicPaywall(data.reply);
+    return;
+  }
+
+  updateLoopUI();
+  typeEffect(data.reply);
+
+  if(loopLevel === 4){
+    showShareCard(data.reply);
+  }
+
+  reflectionInput.value = "";
+};
+
+</script>
+
+</body>
+  </html>
