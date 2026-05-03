@@ -27,7 +27,7 @@ userGoal = "",
 userProblem = "",
 userAction = ""
 } = body;
-
+const { shownLoop5 = [] } = body;
 if (!messages || !messages.length) {
 return res.status(400).json({ reply: "No input provided" });
 }
@@ -68,7 +68,6 @@ reply: isHindi
 
 // 🚧 PAYWALLS
 if (loopLevel >= 5 && !paid49) {
-
 const loop5Lines = [
   "You see the problem.\nBut you're still not moving.",
   "Clarity is there.\nAction is missing.",
@@ -76,14 +75,18 @@ const loop5Lines = [
   "Nothing new is needed.\nExecution is missing."
 ];
 
-const randomLine = loop5Lines[Math.floor(Math.random() * loop5Lines.length)];
+// filter already shown
+const available = loop5Lines.filter(l => !shownLoop5.includes(l));
 
+// fallback if all used
+const finalPool = available.length ? available : loop5Lines;
+
+const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
 return res.status(200).json({
   reply: randomLine,
-  paywall: true
+  paywall: true,
+  shownLoop5: [...shownLoop5, randomLine]
 });
-}
-
 if (loopLevel >= 7 && !paid199) {
 return res.status(200).json({
 reply: "You already know the truth.\nYou're delaying it.",
