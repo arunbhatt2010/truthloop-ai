@@ -77,28 +77,27 @@ paywall: true
 }
 
 // 🚧 PAYWALL LOOP 5
-if (loopLevel === 5 && !paid49)
+if (loopLevel === 5 && !paid49) {
 
-const loop5Lines = [
-"You already know what's wrong.\nYou're just avoiding fixing it.",
-"You don't need more thinking.\nYou need to act — but you're not.",
-"You've seen the gap.\nYou're choosing to stay in it.",
-"This isn't confusion.\nIt's hesitation.",
-"You’re not stuck.\nYou’re delaying the obvious move."
-];
+  const loop5Lines = [
+    "You already know what's wrong.\nYou're just avoiding fixing it.",
+    "You don't need more thinking.\nYou need to act — but you're not.",
+    "You've seen the gap.\nYou're choosing to stay in it.",
+    "This isn't confusion.\nIt's hesitation.",
+    "You’re not stuck.\nYou’re delaying the obvious move."
+  ];
 
-const available = loop5Lines.filter(l => !shownLoop5.includes(l));
-const finalPool = available.length ? available : loop5Lines;
+  const available = loop5Lines.filter(l => !shownLoop5.includes(l));
+  const finalPool = available.length ? available : loop5Lines;
 
-const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
+  const randomLine = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-return res.status(200).json({
-  reply: randomLine,
-  paywall: true,
-  shownLoop5: [...shownLoop5, randomLine]
-});
+  return res.status(200).json({
+    reply: randomLine,
+    paywall: true,
+    shownLoop5: [...shownLoop5, randomLine]
+  });
 }
-
 // 🧠 PROMPT (UNCHANGED)
 const systemPrompt = `
 
