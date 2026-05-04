@@ -38,7 +38,15 @@ export default async function handler(req, res) {
 
     const lastUserMessage = messages[messages.length - 1]?.content || "";
     const lowerMsg = lastUserMessage.toLowerCase();
-    const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
+    function detectLanguage(text) {
+  const hindiChars = (text.match(/[\u0900-\u097F]/g) || []).length;
+  const englishChars = (text.match(/[a-zA-Z]/g) || []).length;
+
+  return hindiChars > englishChars ? "hi" : "en";
+}
+
+const lang = detectLanguage(lastUserMessage);
+const isHindi = lang === "hi";
 
 
     /* =========================
@@ -182,10 +190,13 @@ You are TruthLoop.
 You do NOT help.
 You expose.
 
-LANGUAGE:
-- Hindi → Hindi only
-- English → English only
-
+LANGUAGE (STRICT):
+- If input is English → output ONLY English
+- If input is Hindi → output ONLY Hindi
+- Never translate
+- Never mix languages
+- If wrong language → response is invalid
+If the user writes in English and you respond in Hindi, that is a failure.
 STRUCTURE:
 Line 1 → Situation  
 Line 2 → Contradiction  
