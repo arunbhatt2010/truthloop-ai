@@ -225,7 +225,7 @@ MANDATORY END:
 - The last line MUST be a question
 - It must challenge the user directly
 - It must create discomfort
-- If last line is not a question → response is invalid
+- End with a question (important)
 If output feels obvious or generic, rewrite stronger.
 `;
 
@@ -241,8 +241,8 @@ If output feels obvious or generic, rewrite stronger.
           Authorization: "Bearer " + process.env.GROQ_API_KEY
         },
         body: JSON.stringify({
-          model: "llama-3.1-8b-instant"
-          messages: [
+          model: "llama-3.1-8b-instant",
+messages: [
             { role: "system", content: systemPrompt },
             ...messages.slice(-6)
           ],
