@@ -259,50 +259,56 @@ getBtn.style.display="none";
 };
 
 /* NEXT */
-nextBtn.onclick=async()=>{
+nextBtn.onclick = async () => {
 
-const text=reflectionInput.value.trim();
-if(!text)return;
+  const text = reflectionInput.value.trim();
+  if(!text) return;
 
-/* BLOCK LOOP 5 */
-if(loopLevel===4 && !payment49){
-showPaywall(
-"You saw the truth.\n\nMost people stop here.\n\nThey go back to comfort.\n\nNothing changes.",
-49
-);
-return;
-}
+  // ❗ पहले increment करो (MOST IMPORTANT)
+  loopLevel++;
 
-/* BLOCK LOOP 7 */
-if(loopLevel===6 && !payment199){
-showPaywall(
-"You already know what to do.\n\nYou're still delaying it.\n\nThis is where action begins.",
-199
-);
-return;
-}
-
-loopLevel++;
-messages.push({role:"user",content:text});
-
-outputBox.innerHTML+=`<br><b>You:</b> ${text}<br><br>`;
-
-const data=await callAPI();
-
-messages.push({role:"assistant",content:data.reply});
-
-updateLoopUI();
-typeEffect(data.reply);
-setTimeout(()=>{
-  if(currentLoop === 4){
-    showShareCard(data.reply);
+  // 🔒 अब paywall check करो (correct stage)
+  if(loopLevel === 5 && !payment49){
+    showPaywall(
+      "You saw the truth.\n\nMost people stop here.\n\nThey go back to comfort.\n\nNothing changes.",
+      49
+    );
+    return;
   }
-}, 300);
 
+  if(loopLevel === 7 && !payment199){
+    showPaywall(
+      "You already know what to do.\n\nYou're just delaying it.",
+      199
+    );
+    return;
+  }
 
-reflectionInput.value="";
+  messages.push({ role:"user", content:text });
+
+  outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
+
+  const data = await callAPI();
+
+  if (data.paywall) {
+    showPaywall(data.reply);
+    return;
+  }
+
+  messages.push({ role:"assistant", content:data.reply });
+
+  updateLoopUI();
+  typeEffect(data.reply);
+
+  // 🔥 share trigger only at loop 4
+  if(loopLevel === 4){
+    setTimeout(()=>{
+      showShareCard(data.reply);
+    }, 300);
+  }
+
+  reflectionInput.value = "";
 };
-
 </script>
 
 </body>
