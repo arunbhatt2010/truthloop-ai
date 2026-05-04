@@ -33,11 +33,19 @@ return res.status(400).json({ reply: "No input provided" });
 const lastUserMessage = messages[messages.length - 1]?.content || "";
 const lowerMsg = lastUserMessage.toLowerCase();
 
-/* ❌ FILTER */
-const blocked = ["doctor","medicine","pain","relationship","breakup"];
-if (loopLevel === 1 && blocked.some(w => lowerMsg.includes(w))) {
+/* ❌ STRONG DOMAIN FILTER (EN + HINDI + INTENT) */
+const blockedPatterns = [
+"doctor","medicine","pain","fever","treatment",
+"relationship","breakup","girlfriend","boyfriend","marriage",
+"दर्द","बुखार","इलाज","डॉक्टर",
+"रिलेशनशिप","ब्रेकअप","प्यार","शादी"
+];
+
+const isBlocked = blockedPatterns.some(w => lowerMsg.includes(w));
+
+if (loopLevel === 1 && isBlocked) {
 return res.status(200).json({
-reply: "This isn't a decision problem.\n\nAsk something where a decision is required."
+reply: "This isn't a decision problem.\n\nAsk something where you're stuck making a decision."
 });
 }
 
@@ -71,16 +79,19 @@ const pick = lines[Math.floor(Math.random()*lines.length)];
 const urgencyMessage = `
 You said: "${base}"
 
-So this isn't confusion anymore.
+You saw it.
 
-If you leave now,
-you’ll repeat the same pattern.
+Not the problem.
+The pattern.
 
-Same actions.
-Same excuse.
+You've seen this before.
+
+You didn't act then.
+You're not acting now.
+
+Same effort.
+Same loop.
 Same result.
-
-And you’ll call it effort.
 
 Nothing changes.
 `;
@@ -90,75 +101,165 @@ reply: pick + "\n\n" + urgencyMessage,
 paywall: true,
 shownLoop5: [...shownLoop5, pick]
 });
-  }
+}
+
 /* 🔒 HARD PAYWALL LOOP 7 */
 if (loopLevel === 6 && !paid199) {
 return res.status(200).json({
-reply: "You already know the truth.\n\nYou're delaying action.",
+reply: "You already see it.\n\nYou're just avoiding action.",
 paywall: true
 });
 }
 
-/* 🧠 CORE SYSTEM PROMPT (SHARP, NON-GENERIC) */
+/* 🧠 CONTEXT COMPRESSION (🔥 IMPORTANT) */
+const contextSummary = messages
+.slice(-6)
+.map(m => `${m.role}: ${m.content}`)
+.join("\n");
+/* 💣 NUCLEAR LOOP 4 */
+if (loopLevel === 4) {
+
+const base = lastUserMessage.slice(0,80);
+
+const nuclearLines = [
+
+`You said: "${base}"
+
+You're doing something.
+
+But you're not checking if it works.
+
+So you're not building anything.
+You're just repeating.
+
+Is this progress or just movement?`,
+
+`You think you're trying.
+
+But you're doing what feels productive.
+
+Not what produces results.
+
+So you stay busy.
+
+Is that effort… or avoidance?`,
+
+`You're showing up every day.
+
+But nothing is changing.
+
+So it's not consistency.
+
+It's direction.
+
+Why are you repeating something that isn't working?`,
+
+`You believe you're doing the right things.
+
+But you haven't questioned them.
+
+So you're protecting your process.
+
+Not your result.
+
+What are you avoiding admitting?`,
+
+`You're working.
+
+You're posting.
+
+You're active.
+
+But you're not moving forward.
+
+So what's real here?
+
+Growth… or comfort disguised as effort?`
+];
+
+const pick = nuclearLines[Math.floor(Math.random()*nuclearLines.length)];
+
+return res.status(200).json({
+reply: pick,
+paywall: false
+});
+  }
+/* 🧠 CORE SYSTEM PROMPT (NOW CONTEXT-AWARE) */
 const systemPrompt = `
 
 You are TruthLoop.
 
-You expose the user's real block.
+You do NOT help.
+You expose.
+
+You ONLY use user's words.
+
+---
+
+STRUCTURE (MANDATORY):
+
+Line 1: Repeat user's situation in sharper words  
+Line 2: Show contradiction  
+Line 3: Expose hidden pattern  
+Line 4: Shift to real problem  
+Line 5: ONE uncomfortable question
+
+---
 
 RULES:
 
-- Stay inside user's exact words
-- Do NOT add new context
-- Do NOT give advice
-- Do NOT suggest steps
-- No generic coaching language
+- No advice
+- No suggestions
+- No general statements
 - No explanations
-- No motivation talk
+- Every line must connect to user input
+- Short sentences only
 
-STYLE:
+---
 
-- 3 to 5 lines only
-- Each line must hit harder than previous
-- No fluff
-- No repetition
-- Short sentences
+TONE:
 
-LOGIC:
+- Direct
+- Slightly uncomfortable
+- Personal
 
-- Identify contradiction in user's behavior
-- Expose hidden avoidance
-- Shift from surface problem → real problem
-- End with ONE uncomfortable question
-
-IMPORTANT:
-
-- This must feel like a mirror, not help
-- The user should feel slightly exposed
-- No safe answers
+---
 
 STAGE: ${loopLevel}
 
 Stage 1:
-Ask simple but sharp clarity question
+- Ask sharp clarity question
 
 Stage 2:
-Show mismatch between effort and outcome
+- Show effort vs result gap
 
 Stage 3:
-Expose pattern or repeated behavior
+- Expose repetition pattern
 
 Stage 4:
-Reveal avoidance or hidden fear
+- Reveal avoidance
 
 Stage 5:
-Force realization (no solution)
+- Force realization (no solution)
 
 Stage 6:
-Push toward action tension
+- Create tension (action vs delay)
 
 Stage 7:
-Final confrontation
+- Final confrontation
+
+---
+
+EXAMPLE STYLE:
+
+"You say you're posting daily.
+
+But nothing is changing.
+
+So it's not effort.
+It's direction.
+
+Are you building or just repeating?"
 `;
 
 const response = await fetch(
@@ -175,7 +276,7 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages.slice(-6)
 ],
-temperature: 0.7,
+temperature: 0.65,
 max_tokens: 180
 })
 }
@@ -186,7 +287,21 @@ return res.status(500).json({ reply: "API error" });
 }
 
 const data = await response.json();
-let reply = data?.choices?.[0]?.message?.content || "No response";
+let reply = data?.choices?.[0]?.message?.content || "";
+
+/* 🔥 EMPTY / GENERIC RESPONSE FIX */
+if (!reply || reply.length < 20) {
+reply = "You're avoiding something.\n\nWhat are you not facing directly?";
+}
+
+/* 🔥 GENERIC DETECTOR (IMPORTANT) */
+const genericSignals = [
+"it depends","you should","try to","consider","improve","focus on"
+];
+
+if (genericSignals.some(w => reply.toLowerCase().includes(w))) {
+reply = "You're slipping into general thinking.\n\nWhat exactly are you avoiding here?";
+}
 
 /* 🔥 CLEAN FILTER */
 if (
