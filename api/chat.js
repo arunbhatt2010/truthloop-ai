@@ -208,7 +208,8 @@ LANGUAGE:
 - Hindi → Hindi only
 - English → English only
 - Never mix
-
+- Do NOT use HTML tags like <br>
+- Use plain text line breaks only
 STYLE:
 - Short lines
 - Sharp
@@ -284,7 +285,6 @@ if (!reply.includes("?")) {
 }
 
 /* 🔥 UI FIX */
-reply = reply.replace(/\n/g, "<br>");
 
 return res.status(200).json({
   reply,
