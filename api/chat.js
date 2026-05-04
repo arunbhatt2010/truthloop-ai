@@ -27,7 +27,7 @@ if (!messages || !messages.length) {
 const lastUserMessage = messages[messages.length - 1]?.content || "";
 const lowerMsg = lastUserMessage.toLowerCase();
 
-/* ✅ LANGUAGE DETECTION */
+/* 🔥 LANGUAGE DETECTION */
 const hindiChars = (lastUserMessage.match(/[\u0900-\u097F]/g) || []).length;
 const englishChars = (lastUserMessage.match(/[a-zA-Z]/g) || []).length;
 const isHindi = hindiChars > englishChars;
@@ -60,31 +60,90 @@ if (loopLevel === 1) {
   }
 }
 
+/* 🔐 PAYPAL CONFIG */
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
+const PAYPAL_API = process.env.PAYPAL_ENV === "sandbox"
+  ? "https://api-m.sandbox.paypal.com"
+  : "https://api-m.paypal.com";
+
+/* 🔐 VERIFY PAYPAL */
+async function verifyPayPal(orderID){
+  try{
+    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString("base64");
+
+    const tokenRes = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "grant_type=client_credentials"
+    });
+
+    const tokenData = await tokenRes.json();
+    const accessToken = tokenData.access_token;
+
+    const orderRes = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderID}`, {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+
+    const orderData = await orderRes.json();
+
+    return orderData.status === "COMPLETED";
+  } catch {
+    return false;
+  }
+}
+
+/* 🔐 VERIFY RAZORPAY */
+async function verifyRazorpay(paymentId){
+  try{
+    const auth = Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_SECRET}`).toString("base64");
+
+    const r = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}`, {
+      headers: { "Authorization": `Basic ${auth}` }
+    });
+
+    const data = await r.json();
+    return data.status === "captured";
+  } catch {
+    return false;
+  }
+}
+
 /* 🔒 LOOP 5 PAYWALL */
 if (loopLevel === 5) {
+
+let verified = false;
+
+if (paypalOrderID) verified = await verifyPayPal(paypalOrderID);
+if (razorpayPaymentId) verified = await verifyRazorpay(razorpayPaymentId);
+
+if (!verified) {
   return res.status(200).json({
     reply: isHindi
-      ? "तुम bypass कर रहे हो.\n\nपहले unlock करो."
-      : "You're trying to bypass.\n\nUnlock first.",
+      ? "तुमने देख लिया है.\nAction नहीं.\nSame pattern repeat.\nक्यों?"
+      : "You saw the gap.\nNo action.\nSame pattern repeats.\nWhy?",
     paywall: true
   });
+}
+
 }
 
 /* 🔒 LOOP LOCKS */
 if (loopLevel >= 6 && !paid49) {
   return res.status(200).json({
-    reply: isHindi
-      ? "पहले unlock करो."
-      : "Unlock previous step first.",
+    reply: isHindi ? "पहले unlock करो." : "Unlock previous step first.",
     paywall: true
   });
 }
 
 if (loopLevel === 7 && !paid199) {
   return res.status(200).json({
-    reply: isHindi
-      ? "अब commit करो."
-      : "Now commit.",
+    reply: isHindi ? "अब commit करो." : "Now commit.",
     paywall: true
   });
 }
@@ -99,46 +158,30 @@ const systemPrompt = `
 You are TruthLoop.
 
 You do NOT help.
-You reveal.
-- Each line must connect to previous conversation
-- Avoid repeating generic phrases
+You expose.
+
 LANGUAGE:
-- Reply ONLY in user's language
-- Never mix languages
+Reply only in user's language.
 
 STYLE:
-- EXACTLY 4 lines
-- Max 10 words per line
-- No filler
-- No advice
-- No explanation
-- No insults
-- No guessing words
-
-TONE:
-- Calm certainty
-- Observational
-- Not aggressive
+4 lines only.
+Max 10 words each.
+No filler.
 
 FLOW:
-1 Mirror user situation
-2 Show contradiction
-3 Reveal pattern
-4 Expose real problem + question
+1 Mirror situation
+2 Contradiction
+3 Pattern
+4 Real problem + question
 
-RULES:
-- Use user's context
-- No identity attack
-- Focus on behavior
-- Make it undeniable
+CONTEXT:
+${context}
 
-messages: [
-{ role: "system", content: systemPrompt },
-...messages.slice(-6)
-]
+USER:
+${lastUserMessage}
 `;
 
-/* 🔥 AI CALL (FIXED) */
+/* 🔥 AI CALL */
 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
 method: "POST",
 headers: {
@@ -147,9 +190,7 @@ Authorization: "Bearer " + process.env.GROQ_API_KEY
 },
 body: JSON.stringify({
 model: "llama-3.3-70b-versatile",
-messages: [
-{ role: "system", content: systemPrompt }
-],
+messages: [{ role: "system", content: systemPrompt }],
 temperature: 0.6,
 max_tokens: 120
 })
@@ -158,28 +199,25 @@ max_tokens: 120
 let reply = "";
 
 if (!response.ok) {
-  const text = await response.text();
-  console.error("Groq error:", text);
-
   reply = isHindi
-    ? "AI fail हुआ.\n\nफिर try करो."
-    : "AI failed.\n\nTry again.";
+    ? "AI fail हुआ.\nफिर try करो."
+    : "AI failed.\nTry again.";
 } else {
   const data = await response.json();
   reply = data?.choices?.[0]?.message?.content || "";
 }
 
-/* 🔥 HARD FORMAT ENFORCE (CRITICAL FIX) */
+/* 🔥 HARD FORMAT FIX */
 if (reply) {
   const lines = reply.split("\n").filter(l => l.trim());
-reply = lines.slice(0, 4).join("\n");
+  reply = lines.slice(0, 4).join("\n");
 }
 
 /* 🔥 FALLBACK */
 if (!reply || reply.length < 20) {
   reply = isHindi
-    ? "तुम कर रहे हो.\nपर बदल कुछ नहीं रहा.\npattern repeat हो रहा है.\nक्यों?"
-    : "You're doing it.\nNothing is changing.\nSame pattern repeating.\nWhy?";
+    ? "तुम कर रहे हो.\nकुछ बदल नहीं रहा.\npattern repeat.\nक्यों?"
+    : "You're doing it.\nNothing changes.\nSame pattern.\nWhy?";
 }
 
 return res.status(200).json({
@@ -188,7 +226,7 @@ return res.status(200).json({
 });
 
 } catch (error) {
-console.error("SERVER ERROR:", error);
+console.error(error);
 return res.status(500).json({ reply: "Server error" });
 }
 
