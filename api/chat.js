@@ -4,26 +4,21 @@ res.setHeader("Access-Control-Allow-Origin", "*");
 res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
 res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-if (req.method === "OPTIONS") {
-  return res.status(200).end();
-}
-
-if (req.method !== "POST") {
-  return res.status(405).json({ reply: "Method not allowed" });
-}
+if (req.method === "OPTIONS") return res.status(200).end();
+if (req.method !== "POST") return res.status(405).json({ reply: "Method not allowed" });
 
 try {
 
-const body = typeof req.body === "string"
-? JSON.parse(req.body)
-: req.body;
+const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
 const {
 messages,
 loopLevel = 1,
 paid49 = false,
 paid199 = false,
-shownLoop5 = []
+shownLoop5 = [],
+paypalOrderID,
+razorpayPaymentId
 } = body;
 
 if (!messages || !messages.length) {
@@ -31,108 +26,98 @@ if (!messages || !messages.length) {
 }
 
 const lastUserMessage = messages[messages.length - 1]?.content || "";
-const lowerMsg = lastUserMessage.toLowerCase();
+
+/* 🔥 LANGUAGE FIX (STRONG) */
 const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
-/* 🔐 PAYPAL PLACEHOLDER (DO NOT REMOVE) */
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1";
-const PAYPAL_SECRET = process.env.PAYPAL_SECRET || "EMPw4J1Wpf1aJxiROhpzi-ZJ6Cc1YusXErHqxvlFYRqoFT8E5aE_3cMvjaPPDfNJejtQtfvnPE2e_TZr";
+/* 🔐 PAYPAL CONFIG */
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
 const PAYPAL_API = process.env.PAYPAL_ENV === "sandbox"
   ? "https://api-m.sandbox.paypal.com"
   : "https://api-m.paypal.com";
 
-/*
-⚠️ IMPORTANT:
-- अभी ये use नहीं हो रहा (MVP mode)
-- future में verification यहीं से होगा
-- कभी भी secret frontend में मत डालना
-*/
+/* 🔐 VERIFY PAYPAL */
+async function verifyPayPal(orderID){
+  try{
+    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_SECRET}`).toString("base64");
 
-/* ❌ DOMAIN FILTER */
-const blockedPatterns = [
-"doctor","medicine","pain","fever","treatment",
-"relationship","breakup","girlfriend","boyfriend","marriage",
-"दर्द","बुखार","इलाज","डॉक्टर",
-"रिलेशनशिप","ब्रेकअप","प्यार","शादी"
-];
+    const tokenRes = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "grant_type=client_credentials"
+    });
 
-if (loopLevel === 1 && blockedPatterns.some(w => lowerMsg.includes(w))) {
-  return res.status(200).json({
-    reply: isHindi
-      ? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ फैसला लेना हो।"
-      : "This isn't a decision problem.\n\nAsk something where a decision is required."
-  });
+    const tokenData = await tokenRes.json();
+    const accessToken = tokenData.access_token;
+
+    const orderRes = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderID}`, {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+
+    const orderData = await orderRes.json();
+
+    return orderData.status === "COMPLETED";
+
+  } catch {
+    return false;
+  }
 }
 
-/* 🔥 LOOP 1 STRICT */
-if (loopLevel === 1) {
-  const words = lastUserMessage.trim().split(/\s+/).length;
+/* 🔐 VERIFY RAZORPAY */
+async function verifyRazorpay(paymentId){
+  try{
+    const auth = Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_SECRET}`).toString("base64");
 
-  if (words < 4) {
-    return res.status(200).json({
-      reply: isHindi
-        ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
-        : "Too vague.\n\nWhat exactly is not working?"
+    const res = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}`, {
+      headers: {
+        "Authorization": `Basic ${auth}`
+      }
     });
+
+    const data = await res.json();
+    return data.status === "captured";
+
+  } catch {
+    return false;
   }
 }
 
 /* 🔒 LOOP 5 PAYWALL */
-if (loopLevel === 5 && !paid49) {
+if (loopLevel === 5) {
 
-const base = lastUserMessage.slice(0,60);
+let verified = false;
 
-const lines = [
-`You said: "${base}"\n\nYou already know what to do.\nYou're just not doing it.`,
-`Nothing new is missing.\nYou're avoiding execution.`,
-`You’re not confused.\nYou’re hesitating.`,
-`You saw the gap.\nYou're choosing comfort.`,
-`You're asking again.\nBut the answer hasn't changed.`,
-`Clarity isn't your issue.\nAction is.`
-];
-
-const pick = lines[Math.floor(Math.random()*lines.length)];
-
-const urgency = isHindi
-? `आपने खुद देखा है।
-
-समस्या नहीं।
-pattern।
-
-पहले भी यही किया।
-अब भी वही कर रहे हो।
-
-Same effort.
-Same loop.
-Same result.
-
-कुछ नहीं बदलेगा।`
-: `You saw it.
-
-Not the problem.
-The pattern.
-
-You've seen this before.
-
-Same effort.
-Same loop.
-Same result.
-
-Nothing changes.`;
-
-return res.status(200).json({
-  reply: pick + "\n\n" + urgency,
-  paywall: true,
-  shownLoop5: [...shownLoop5, pick]
-});
+if(paypalOrderID){
+  verified = await verifyPayPal(paypalOrderID);
 }
 
-/* 🔒 FIX: LOOP 6 LOCK */
+if(razorpayPaymentId){
+  verified = await verifyRazorpay(razorpayPaymentId);
+}
+
+if(!verified){
+  return res.status(200).json({
+    reply: isHindi
+      ? "तुम bypass करने की कोशिश कर रहे हो।"
+      : "You’re trying to bypass.",
+    paywall: true
+  });
+}
+
+}
+
+/* 🔒 LOOP 6 LOCK */
 if (loopLevel >= 6 && !paid49) {
   return res.status(200).json({
     reply: isHindi
-      ? "तुम skip कर रहे हो.\n\nपहले ये पूरा करो।"
-      : "You can't skip this.\n\nFinish what you started.",
+      ? "पहले previous unlock करो।"
+      : "Unlock previous step first.",
     paywall: true
   });
 }
@@ -141,50 +126,33 @@ if (loopLevel >= 6 && !paid49) {
 if (loopLevel === 7 && !paid199) {
   return res.status(200).json({
     reply: isHindi
-      ? "तुम्हें सच पता है.\n\nअब commit करो।"
-      : "You already see it.\n\nNow commit.",
+      ? "अब commitment दिखाओ।"
+      : "Now show commitment.",
     paywall: true
   });
 }
 
-/* 💣 LOOP 4 */
-let stageOverride = "";
-
-if (loopLevel === 4) {
-  stageOverride = `
-STAGE 4 OVERRIDE:
-- Use user's exact words
-- No general lines
-- No reused patterns
-- Attack the real avoidance
-- Make it feel personal
-- 5 lines only
-`;
-}
-
-/* 🧠 SYSTEM PROMPT */
+/* 🧠 SYSTEM PROMPT (FIXED LANGUAGE) */
 const systemPrompt = `
 You are TruthLoop.
-You do NOT help. You expose.
 
-LANGUAGE:
-- Hindi → Hindi only
-- English → English only
+LANGUAGE RULE:
+- If user writes Hindi → reply ONLY Hindi
+- If user writes English → reply ONLY English
+- NEVER mix
 
-STRUCTURE:
-1 → Situation  
-2 → Contradiction  
-3 → Pattern  
-4 → Real problem  
-5 → Question
+FORMAT:
+1 Situation
+2 Contradiction
+3 Pattern
+4 Real problem
+5 One question
 
-STAGE: ${loopLevel}
-${stageOverride}
+NO advice. NO suggestions.
 `;
 
-const response = await fetch(
-"https://api.groq.com/openai/v1/chat/completions",
-{
+/* 🔥 AI CALL */
+const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
 method: "POST",
 headers: {
 "Content-Type": "application/json",
@@ -199,21 +167,16 @@ messages: [
 temperature: 0.6,
 max_tokens: 160
 })
-}
-);
+});
 
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "";
 
-/* fallback */
+/* 🔥 LANGUAGE FALLBACK */
 if (!reply || reply.length < 20) {
   reply = isHindi
-    ? "आप घुमा रहे हैं.\n\nअसल में क्या काम नहीं कर रहा?"
-    : "You're avoiding something.\n\nWhat exactly is not working?";
-}
-
-if (loopLevel >= 6) {
-  reply += isHindi ? "\n\nअब करो।" : "\n\nNow act.";
+    ? "सीधे बोलो — असली समस्या क्या है?"
+    : "Be direct — what’s actually wrong?";
 }
 
 return res.status(200).json({
@@ -225,4 +188,4 @@ return res.status(200).json({
 return res.status(500).json({ reply: "Server error" });
 }
 
-}
+      }
