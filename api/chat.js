@@ -31,24 +31,27 @@ export default async function handler(req, res) {
       paid199 = false,
       shownLoop5 = []
     } = body;
-    let userKnown = messages.length > 1;
-    const userContext = messages[1]?.content || "";
+
     if (!messages || !messages.length) {
       return res.status(400).json({ reply: "No input provided" });
     }
 
     const lastUserMessage = messages[messages.length - 1]?.content || "";
     const lowerMsg = lastUserMessage.toLowerCase();
+
+    const userKnown = messages.length > 1;
+    const userContext = messages[1]?.content || "";
+
+    /* =========================
+       🌐 LANGUAGE DETECT
+    ========================= */
     function detectLanguage(text) {
-  const hindiChars = (text.match(/[\u0900-\u097F]/g) || []).length;
-  const englishChars = (text.match(/[a-zA-Z]/g) || []).length;
+      const hindiChars = (text.match(/[\u0900-\u097F]/g) || []).length;
+      const englishChars = (text.match(/[a-zA-Z]/g) || []).length;
+      return hindiChars > englishChars ? "hi" : "en";
+    }
 
-  return hindiChars > englishChars ? "hi" : "en";
-}
-
-const lang = detectLanguage(lastUserMessage);
-const isHindi = lang === "hi";
-
+    const isHindi = detectLanguage(lastUserMessage) === "hi";
 
     /* =========================
        ❌ DOMAIN FILTER
@@ -63,90 +66,49 @@ const isHindi = lang === "hi";
     if (loopLevel === 1 && blockedPatterns.some(w => lowerMsg.includes(w))) {
       return res.status(200).json({
         reply: isHindi
-          ? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ फैसला लेना हो।"
+          ? "यह decision problem नहीं है.\n\nऐसा सवाल पूछो जहाँ फैसला लेना हो।"
           : "This isn't a decision problem.\n\nAsk something where a decision is required."
       });
     }
 
-
     /* =========================
-       🔥 LOOP 1 STRICT
+       🔥 LOOP 1
     ========================= */
     if (loopLevel === 1) {
-  const words = lastUserMessage.trim().split(/\s+/).length;
 
-  if (!userKnown) {
-    return res.status(200).json({
-      reply: isHindi
-        ? "पहले ये साफ करो — तुम करते क्या हो?\n\nऔर अभी क्या काम नहीं कर रहा?"
-        : "Before we go deeper — what do you actually do?\n\nAnd what is not working right now?"
-    });
-  }
-
-  if (words < 4) {
-    return res.status(200).json({
-      reply: isHindi
-        ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
-        : "Too vague.\n\nWhat exactly is not working?"
-    });
-  }
+      if (!userKnown) {
+        return res.status(200).json({
+          reply: isHindi
+            ? "पहले ये साफ करो — तुम करते क्या हो?\n\nऔर अभी क्या काम नहीं कर रहा?"
+            : "Before we go deeper — what do you actually do?\n\nWhat is not working right now?"
+        });
       }
+
+      const words = lastUserMessage.trim().split(/\s+/).length;
+
+      if (words < 4) {
+        return res.status(200).json({
+          reply: isHindi
+            ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
+            : "Too vague.\n\nWhat exactly is not working?"
+        });
+      }
+    }
 
     /* =========================
        🔒 LOOP 5 PAYWALL
     ========================= */
     if (loopLevel === 5 && !paid49) {
-
-      const base = lastUserMessage.slice(0,60);
-
-      const lines = [
-        `You said: "${base}"\n\nYou already know what to do.\nYou're just not doing it.`,
-        `Nothing new is missing.\nYou're avoiding execution.`,
-        `You’re not confused.\nYou’re hesitating.`,
-        `You saw the gap.\nYou're choosing comfort.`,
-        `You're asking again.\nBut the answer hasn't changed.`,
-        `Clarity isn't your issue.\nAction is.`
-      ];
-
-      const pick = lines[Math.floor(Math.random()*lines.length)];
-
-      const urgency = isHindi
-        ? `आपने खुद देखा है।
-
-समस्या नहीं।
-pattern।
-
-पहले भी यही किया।
-अब भी वही कर रहे हो।
-
-Same effort.
-Same loop.
-Same result.
-
-कुछ नहीं बदलेगा।`
-        : `You saw it.
-
-Not the problem.
-The pattern.
-
-You've seen this before.
-
-Same effort.
-Same loop.
-Same result.
-
-Nothing changes.`;
-
       return res.status(200).json({
-        reply: pick + "\n\n" + urgency,
-        paywall: true,
-        shownLoop5: [...shownLoop5, pick]
+        reply: isHindi
+          ? "तुम देख चुके हो.\n\nअब action नहीं ले रहे।"
+          : "You already see it.\n\nYou're not acting.",
+        paywall: true
       });
     }
 
-
     /* =========================
-       🔒 LOOP 6 LOCK
+       🔒 LOOP 6+
     ========================= */
     if (loopLevel >= 6 && !paid49) {
       return res.status(200).json({
@@ -157,106 +119,22 @@ Nothing changes.`;
       });
     }
 
-
     /* =========================
        🔒 LOOP 7 PAYWALL
     ========================= */
     if (loopLevel === 7 && !paid199) {
       return res.status(200).json({
         reply: isHindi
-          ? "तुम्हें सच पता है.\n\nअब commit करो।"
-          : "You already see it.\n\nNow commit.",
+          ? "अब commit करो।"
+          : "Now commit.",
         paywall: true
       });
     }
 
-
-    /* =========================
-       💣 LOOP 4 OVERRIDE
-    ========================= */
-    let stageOverride = "";
-
-    if (loopLevel === 4) {
-      stageOverride = `
-STAGE 4 OVERRIDE:
-- Use user's exact words
-- No general lines
-- No reused patterns
-- Attack the real avoidance
-- Make it feel personal
-- 5 lines only
-`;
-    }
-
-
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
-const systemPrompt = `
-You are TruthLoop.
-USER CONTEXT:
-${userContext}
-You are not here to guide.
-You are here to expose and trap.
-
----
-
-STAGE: LOOP 2-3
-
----
-
-OUTPUT RULES:
-
-- 5 to 6 lines ONLY
-- Each line under 12 words
-- No paragraphs
-- No fluff
-- No labels
-- No explanations
-LINK HANDLING MODE:
-
-- If user provides a link:
-  DO NOT verify
-  DO NOT assume facts
-  DO NOT claim anything about content, traffic, or results
-
-- Instead:
-  Focus on the gap between what user claims and what is happening
-  Force user to define what the link is supposed to achieve
-  Ask what is not working
-
-- Never explain limitations
-- Never say "I can't verify"
----
-TRUTH CONSTRAINT:
-
-- Only use what user has explicitly said
-- Do NOT assume facts about identity, income, or intent
-- Do NOT label (fake, fraud, scam, etc.)
-- If unsure → question, not accusation
-- Attack behavior, not identity
-STRUCTURE:
-
-1. Mirror user's exact situation (use their words)
-2. Break their belief sharply
-3. Show repeating behavior pattern
-4. Expose what they are avoiding
-5. Force a small immediate action
-6. End with ONE uncomfortable question
-
----
-ANTI-REPETITION RULE:
-
-- Do NOT repeat the same question twice
-- Do NOT ask what user has already answered
-- Track what user has already said
-- Every response must move deeper, not repeat
-
-If repeating → response is invalid
-ACTION RULE:
-
-- Give ONE small, real-world action
-const systemPrompt = `
+    const systemPrompt = `
 You are TruthLoop.
 
 USER CONTEXT:
@@ -264,60 +142,37 @@ ${userContext}
 
 You expose, not guide.
 
----
-
 OUTPUT:
-
 - 5 lines only
 - Each line under 12 words
-- No fluff, no repetition
-
----
+- No fluff
 
 CORE:
-
-1. Use only user's words (no assumptions)
-2. Each line goes deeper than previous
-3. Attack behavior, not identity
-4. No repeating questions or ideas
-5. Build only on last user input
-
----
+- Use only user's words
+- No assumptions
+- Go deeper each line
+- No repetition
 
 ACTION:
+- One uncomfortable action
+- Doable today
 
-- Give ONE uncomfortable, real action
-- Must be doable today
-- No advice, no options
-
----
-
-LINK MODE:
-
-- Do not verify or assume
-- Focus on gap between claim vs result
-- Ask what is not working
-
----
+LINK:
+- No verify
+- No assume
+- Focus on gap
 
 STYLE:
-
-- Direct, personal, uncomfortable
-- Use "you" in every line
-- No teaching, no storytelling
-
----
+- Direct
+- Personal
+- Use "you"
 
 END:
+- Last line must be a question
 
-- Last line must be a sharp question
-
----
-
-If generic → rewrite  
-If repeated → rewrite  
 If weak → go sharper
 `;
+
     /* =========================
        🤖 AI CALL
     ========================= */
@@ -331,12 +186,12 @@ If weak → go sharper
         },
         body: JSON.stringify({
           model: "llama-3.1-8b-instant",
-messages: [
+          messages: [
             { role: "system", content: systemPrompt },
             ...messages.slice(-6)
           ],
           temperature: 0.6,
-          max_tokens: 120
+          max_tokens: 100
         })
       }
     );
@@ -345,68 +200,30 @@ messages: [
       return res.status(500).json({ reply: "API error" });
     }
 
-
     /* =========================
-       📤 RESPONSE PARSE
+       📤 RESPONSE
     ========================= */
     const data = await response.json();
     let reply = data?.choices?.[0]?.message?.content || "";
 
-
-    /* =========================
-       🔧 FALLBACKS
-    ========================= */
-    if (!reply || reply.length < 20) {
+    if (!reply || reply.length < 10) {
       reply = isHindi
-        ? "आप घुमा रहे हैं.\n\nअसल में क्या काम नहीं कर रहा?"
-        : "You're avoiding something.\n\nWhat exactly is not working?";
+        ? "सीधे बोलो — क्या काम नहीं कर रहा?"
+        : "Be direct — what's not working?";
     }
 
-    if (reply.toLowerCase().includes("you should")) {
-      reply = isHindi
-        ? "आप general बात कर रहे हैं.\n\nअसल में issue क्या है?"
-        : "You're being generic.\n\nWhat's actually the issue?";
-    }
-
-    if (reply.toLowerCase().includes("as an ai")) {
-      reply = isHindi
-        ? "सीधे बोलो.\n\nक्या काम नहीं कर रहा?"
-        : "Stay direct.\n\nWhat's not working?";
-    }
     if (!reply.includes("\n")) {
-  reply = reply.replace(/\. /g, "\n");
-    }
-    if (reply.split("\n").length < 5) {
-  reply += "\nThink again.";
-    }
-    const questions = isHindi
-  ? [
-      "अब सच बताओ — असली समस्या क्या है?",
-      "तुम किस बात से बच रहे हो?",
-      "अगर ये काम नहीं कर रहा तो फिर क्यों कर रहे हो?",
-      "क्या तुम सच में जानते हो क्या गलत है?"
-    ]
-  : [
-      "Be honest — what's the real problem you're avoiding?",
-      "What are you not admitting here?",
-      "If this isn't working, why are you repeating it?",
-      "Do you actually know what's not working?"
-    ];
-
-if (!reply.trim().endsWith("?")) {
-  const q = questions[Math.floor(Math.random()*questions.length)];
-  reply += "\n\n" + q;
-}
-    /* =========================
-       🔥 FINAL PUSH
-    ========================= */
-    if (loopLevel >= 6) {
-      reply += isHindi ? "\n\nअब करो।" : "\n\nNow act.";
+      reply = reply.replace(/\. /g, "\n");
     }
 
+    if (!reply.trim().endsWith("?")) {
+      reply += isHindi
+        ? "\n\nतुम किस बात से बच रहे हो?"
+        : "\n\nWhat are you avoiding?";
+    }
 
     /* =========================
-       ✅ FINAL RESPONSE
+       ✅ FINAL
     ========================= */
     return res.status(200).json({
       reply,
@@ -414,11 +231,9 @@ if (!reply.trim().endsWith("?")) {
     });
 
   } catch (error) {
-
     console.error("Server error:", error);
-
     return res.status(500).json({
       reply: "Server error"
     });
   }
-        }
+      }
