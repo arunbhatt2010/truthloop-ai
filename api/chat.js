@@ -34,6 +34,20 @@ const lastUserMessage = messages[messages.length - 1]?.content || "";
 const lowerMsg = lastUserMessage.toLowerCase();
 const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
+/* 🔐 PAYPAL PLACEHOLDER (DO NOT REMOVE) */
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1";
+const PAYPAL_SECRET = process.env.PAYPAL_SECRET || "EMPw4J1Wpf1aJxiROhpzi-ZJ6Cc1YusXErHqxvlFYRqoFT8E5aE_3cMvjaPPDfNJejtQtfvnPE2e_TZr";
+const PAYPAL_API = process.env.PAYPAL_ENV === "sandbox"
+  ? "https://api-m.sandbox.paypal.com"
+  : "https://api-m.paypal.com";
+
+/*
+⚠️ IMPORTANT:
+- अभी ये use नहीं हो रहा (MVP mode)
+- future में verification यहीं से होगा
+- कभी भी secret frontend में मत डालना
+*/
+
 /* ❌ DOMAIN FILTER */
 const blockedPatterns = [
 "doctor","medicine","pain","fever","treatment",
@@ -113,7 +127,7 @@ return res.status(200).json({
 });
 }
 
-/* 🔒 FIX: LOOP 6 LOCK (must pay 49 first) */
+/* 🔒 FIX: LOOP 6 LOCK */
 if (loopLevel >= 6 && !paid49) {
   return res.status(200).json({
     reply: isHindi
@@ -123,7 +137,7 @@ if (loopLevel >= 6 && !paid49) {
   });
 }
 
-/* 🔒 LOOP 7 PAYWALL (₹199) */
+/* 🔒 LOOP 7 PAYWALL */
 if (loopLevel === 7 && !paid199) {
   return res.status(200).json({
     reply: isHindi
@@ -133,14 +147,12 @@ if (loopLevel === 7 && !paid199) {
   });
 }
 
-/* 💣 LOOP 4 (FIXED) */
+/* 💣 LOOP 4 */
 let stageOverride = "";
 
 if (loopLevel === 4) {
   stageOverride = `
-
 STAGE 4 OVERRIDE:
-
 - Use user's exact words
 - No general lines
 - No reused patterns
@@ -153,42 +165,21 @@ STAGE 4 OVERRIDE:
 /* 🧠 SYSTEM PROMPT */
 const systemPrompt = `
 You are TruthLoop.
-
-You do NOT help.
-You expose.
+You do NOT help. You expose.
 
 LANGUAGE:
 - Hindi → Hindi only
 - English → English only
-- Never mix
 
----
-
-STRUCTURE (STRICT):
-
-Line 1 → User situation  
-Line 2 → Contradiction  
-Line 3 → Pattern  
-Line 4 → Real problem  
-Line 5 → ONE uncomfortable question
-
----
-
-RULES:
-
-- No advice
-- No suggestions
-- No motivational tone
-- No general statements
-- No explanations
-- Use ONLY user's context
-
----
+STRUCTURE:
+1 → Situation  
+2 → Contradiction  
+3 → Pattern  
+4 → Real problem  
+5 → Question
 
 STAGE: ${loopLevel}
-
 ${stageOverride}
-
 `;
 
 const response = await fetch(
@@ -211,35 +202,16 @@ max_tokens: 160
 }
 );
 
-if (!response.ok) {
-  return res.status(500).json({ reply: "API error" });
-}
-
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "";
 
-/* 🔥 FALLBACK */
+/* fallback */
 if (!reply || reply.length < 20) {
   reply = isHindi
     ? "आप घुमा रहे हैं.\n\nअसल में क्या काम नहीं कर रहा?"
     : "You're avoiding something.\n\nWhat exactly is not working?";
 }
 
-/* 🔥 GENERIC FIX */
-if (reply.toLowerCase().includes("you should")) {
-  reply = isHindi
-    ? "आप general बात कर रहे हैं.\n\nअसल में issue क्या है?"
-    : "You're being generic.\n\nWhat's actually the issue?";
-}
-
-/* 🔥 CLEAN */
-if (reply.toLowerCase().includes("as an ai")) {
-  reply = isHindi
-    ? "सीधे बोलो.\n\nक्या काम नहीं कर रहा?"
-    : "Stay direct.\n\nWhat's not working?";
-}
-
-/* 🔥 FINAL PUSH */
 if (loopLevel >= 6) {
   reply += isHindi ? "\n\nअब करो।" : "\n\nNow act.";
 }
@@ -250,10 +222,7 @@ return res.status(200).json({
 });
 
 } catch (error) {
-console.error("Server error:", error);
-return res.status(500).json({
-  reply: "Server error"
-});
+return res.status(500).json({ reply: "Server error" });
 }
 
-      }
+}
