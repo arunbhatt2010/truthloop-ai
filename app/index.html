@@ -44,7 +44,8 @@ button{background:linear-gradient(45deg,orange,#ff5e00);font-weight:bold;}
 display:none;background:#111;padding:15px;border-radius:12px;
 margin-top:10px;text-align:center;border:1px solid #222;
 }
-</style>
+</style> 
+  <script src="https://www.paypal.com/sdk/js?client-idAbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>
 </head>
 
 <body>
@@ -79,7 +80,7 @@ I’ll show you what you're avoiding.<br><br>
 
 <div id="paywallBox">
   <div id="paySub"></div>
-  <button id="payBtn"></button>
+  <div id="paypal-button"></div>
 </div>
 
 </div>
@@ -226,6 +227,32 @@ reflectionInput.value="";
 };
 
 </script>
+<script>
+paypal.Buttons({
 
+  createOrder: function(data, actions) {
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: "3.00"
+        }
+      }]
+    });
+  },
+
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+
+      // 🔓 Unlock Loop
+      localStorage.setItem("paid49", true);
+
+      alert("Payment successful 😄");
+      location.reload();
+
+    });
+  }
+
+}).render('#paypal-button');
+</script>
 </body>
   </html>
