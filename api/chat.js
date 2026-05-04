@@ -123,7 +123,7 @@ if (loopLevel === 6 && !paid199) {
   });
 }
 
-/* 💣 LOOP 4 (FIXED — NO BREAK) */
+/* 💣 LOOP 4 (FIXED) */
 if (loopLevel === 4) {
 
 let reply;
@@ -153,35 +153,7 @@ return res.status(200).json({
   paywall: false
 });
 }
-OUTPUT FORMAT (STRICT — MUST FOLLOW):
 
-- Exactly 5 lines only
-- Each line = one short sentence
-- No headings
-- No labels
-- No explanations
-- No paragraphs
-- No extra text
-
-FLOW:
-
-Line 1 → user's situation (simple)
-Line 2 → contradiction
-Line 3 → repeated pattern
-Line 4 → real problem
-Line 5 → ONE uncomfortable question
-
----
-
-IF YOU BREAK THIS FORMAT:
-Response is wrong.
-  STYLE:
-
-- Talk directly (you / तुम / आप)
-- No formal tone
-- No teaching tone
-- No analysis words (जैसे: स्थिति, समस्या, विश्लेषण)
-- Write like a mirror, not a teacher
 /* 🧠 SYSTEM PROMPT */
 const systemPrompt = `
 
