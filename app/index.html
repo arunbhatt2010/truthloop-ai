@@ -192,10 +192,24 @@ return await res.json();
 
 /* SHARE */
 function showShareCard(text){
-const clean=text.replace(/<[^>]*>?/gm,'').trim();
-shareText.innerText=`This hit me harder than expected.\n\n${clean}\n\nMost people avoid this.\n\nhttps://truthloop.in`;
-shareBox.style.display="block";
-}
+
+  const clean = text.replace(/<[^>]*>?/gm,'').trim();
+
+  shareText.innerText =
+`This hit me harder than expected.
+
+${clean}
+
+I thought I was working.
+
+I was just repeating.
+
+Most people never see this.
+
+https://truthloop.in`;
+
+  shareBox.style.display = "block";
+  }
 function copyShare(){navigator.clipboard.writeText(shareText.innerText);}
 function whatsappShare(){window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);}
 
