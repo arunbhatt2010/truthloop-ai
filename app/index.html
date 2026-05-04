@@ -14,6 +14,9 @@ gtag('config', 'G-RBMQ2F6P9Q');
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+<!-- ✅ FIXED PAYPAL SCRIPT -->
+<script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>
+
 <style>
 body{background:#0f0f0f;color:#fff;font-family:Arial;margin:0;}
 .container{max-width:520px;margin:auto;padding:18px;padding-bottom:90px;}
@@ -44,8 +47,7 @@ button{background:linear-gradient(45deg,orange,#ff5e00);font-weight:bold;}
 display:none;background:#111;padding:15px;border-radius:12px;
 margin-top:10px;text-align:center;border:1px solid #222;
 }
-</style> 
-  <script src="https://www.paypal.com/sdk/js?client-idAbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>
+</style>
 </head>
 
 <body>
@@ -88,7 +90,6 @@ I’ll show you what you're avoiding.<br><br>
 <script>
 
 const API_URL="/api/chat";
-const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";
 
 const outputBox=document.getElementById("outputBox");
 const mainInput=document.getElementById("mainInput");
@@ -100,7 +101,6 @@ const shareBox=document.getElementById("shareBox");
 const shareText=document.getElementById("shareText");
 
 const paywallBox=document.getElementById("paywallBox");
-const payBtn=document.getElementById("payBtn");
 const paySub=document.getElementById("paySub");
 
 let loopLevel=1;
@@ -128,7 +128,6 @@ requestAnimationFrame(typing);
 typing();
 }
 
-/* SAFE API */
 async function callAPI(){
 try{
 const res=await fetch(API_URL,{
@@ -136,44 +135,47 @@ method:"POST",
 headers:{ "Content-Type":"application/json" },
 body:JSON.stringify({messages,loopLevel,paid49:payment49,paid199:payment199,shownLoop5})
 });
-if(!res.ok) throw new Error("API fail");
 const data=await res.json();
 shownLoop5=data.shownLoop5||shownLoop5;
 return data;
 }catch(e){
-console.error(e);
 return {reply:"Something broke.\n\nTry again."};
 }
 }
 
-/* SHARE */
-function showShareCard(text){
-const clean=text.replace(/<[^>]*>?/gm,'').trim();
-shareText.innerText=`This hit me harder than expected.\n\n${clean}\n\nMost people avoid this.\n\nhttps://truthloop.in`;
-shareBox.style.display="block";
-}
-function copyShare(){navigator.clipboard.writeText(shareText.innerText);}
-function whatsappShare(){window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);}
-
-/* PAYWALL */
+/* PAYPAL PAYWALL */
 function showPaywall(message,amount){
+
 paywallBox.style.display="block";
 paySub.innerText=message;
-payBtn.innerText=amount===49?"Break this loop (₹49)":"Unlock (₹199)";
 
-payBtn.onclick=function(){
-const rzp=new Razorpay({
-key:RAZORPAY_KEY_ID,
-amount:amount*100,
-currency:"INR",
-handler:function(){
+document.getElementById("paypal-button").innerHTML="";
+
+paypal.Buttons({
+
+createOrder: function(data, actions){
+return actions.order.create({
+purchase_units: [{
+amount: {
+value: amount===49 ? "3.00" : "10.00"
+}
+}]
+});
+},
+
+onApprove: function(data, actions){
+return actions.order.capture().then(function(){
+
 if(amount===49) payment49=true;
 if(amount===199) payment199=true;
+
+alert("Payment successful 😄");
 paywallBox.style.display="none";
-}
+
 });
-rzp.open();
-};
+}
+
+}).render("#paypal-button");
 }
 
 /* START */
@@ -201,7 +203,6 @@ nextBtn.onclick = async () => {
 const text = reflectionInput.value.trim();
 if(!text) return;
 
-/* ✅ पहले increment */
 loopLevel++;
 
 messages.push({role:"user",content:text});
@@ -209,7 +210,6 @@ outputBox.innerHTML+=`<br><b>You:</b> ${text}<br><br>`;
 
 const data = await callAPI();
 
-/* ✅ backend decides */
 if(data.paywall){
 showPaywall(data.reply, loopLevel===5 ? 49 : 199);
 return;
@@ -226,33 +226,16 @@ setTimeout(()=>showShareCard(data.reply),300);
 reflectionInput.value="";
 };
 
+function showShareCard(text){
+const clean=text.replace(/<[^>]*>?/gm,'').trim();
+shareText.innerText=`This hit me harder than expected.\n\n${clean}\n\nMost people avoid this.\n\nhttps://truthloop.in`;
+shareBox.style.display="block";
+}
+
+function copyShare(){navigator.clipboard.writeText(shareText.innerText);}
+function whatsappShare(){window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);}
+
 </script>
-<script>
-paypal.Buttons({
 
-  createOrder: function(data, actions) {
-    return actions.order.create({
-      purchase_units: [{
-        amount: {
-          value: "3.00"
-        }
-      }]
-    });
-  },
-
-  onApprove: function(data, actions) {
-    return actions.order.capture().then(function(details) {
-
-      // 🔓 Unlock Loop
-      localStorage.setItem("paid49", true);
-
-      alert("Payment successful 😄");
-      location.reload();
-
-    });
-  }
-
-}).render('#paypal-button');
-</script>
 </body>
   </html>
