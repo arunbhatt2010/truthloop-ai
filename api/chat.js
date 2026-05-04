@@ -170,7 +170,10 @@ return res.status(200).json({
 }
 
 }
+const hindiChars = (lastUserMessage.match(/[\u0900-\u097F]/g) || []).length;
+const englishChars = (lastUserMessage.match(/[a-zA-Z]/g) || []).length;
 
+const isHindi = hindiChars > englishChars;
 /* 🔒 LOOP 6 LOCK */
 if (loopLevel >= 6 && !paid49) {
   return res.status(200).json({
@@ -202,7 +205,9 @@ You are TruthLoop.
 
 You do NOT help.
 You expose.
-
+- Detect user's dominant language from last message
+- Reply ONLY in that language
+- Do NOT translate or mix
 LANGUAGE:
 - Hindi → Hindi only
 - English → English only
