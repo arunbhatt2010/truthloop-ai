@@ -293,11 +293,12 @@ messages.push({role:"assistant",content:data.reply});
 
 updateLoopUI();
 typeEffect(data.reply);
+setTimeout(()=>{
+  if(currentLoop === 4){
+    showShareCard(data.reply);
+  }
+}, 300);
 
-/* SHARE TRIGGER */
-if(loopLevel===4){
-showShareCard(data.reply);
-}
 
 reflectionInput.value="";
 };
