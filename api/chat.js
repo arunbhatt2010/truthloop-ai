@@ -32,7 +32,7 @@ return res.status(400).json({ reply: "No input provided" });
 
 const lastUserMessage = messages[messages.length - 1]?.content || "";
 const lowerMsg = lastUserMessage.toLowerCase();
-
+const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 /* ❌ STRONG DOMAIN FILTER (EN + HINDI + INTENT) */
 const blockedPatterns = [
 "doctor","medicine","pain","fever","treatment",
@@ -177,13 +177,12 @@ So what's real here?
 Growth… or comfort disguised as effort?`
 ];
 
-const pick = nuclearLines[Math.floor(Math.random()*nuclearLines.length)];
+let pick = nuclearLines[Math.floor(Math.random()*nuclearLines.length)];
 
-return res.status(200).json({
-reply: pick,
-paywall: false
-});
-  }
+if(isHindi){
+  pick = "आप काम कर रहे हैं.\n\nपर परिणाम नहीं आ रहा.\n\nतो समस्या मेहनत नहीं है.\nदिशा है.\n\nआप वही दोहरा क्यों रहे हैं जो काम नहीं कर रहा?";
+}
+  
 /* 🧠 CORE SYSTEM PROMPT (NOW CONTEXT-AWARE) */
 const systemPrompt = `
 
@@ -193,7 +192,11 @@ You do NOT help.
 You expose.
 
 You ONLY use user's words.
+LANGUAGE RULE:
 
+- If user writes in Hindi → respond ONLY in Hindi
+- If user writes in English → respond ONLY in English
+- NEVER mix languages
 ---
 
 STRUCTURE (MANDATORY):
@@ -288,7 +291,13 @@ return res.status(500).json({ reply: "API error" });
 
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "";
-
+// 🔥 FORCE LANGUAGE CONSISTENCY
+if (isHindi) {
+  // अगर English leak हो रहा है तो basic fallback
+  if (!/[\u0900-\u097F]/.test(reply)) {
+    reply = "आप बात घुमा रहे हैं.\n\nअसल में क्या काम नहीं कर रहा?";
+  }
+}
 /* 🔥 EMPTY / GENERIC RESPONSE FIX */
 if (!reply || reply.length < 20) {
 reply = "You're avoiding something.\n\nWhat are you not facing directly?";
