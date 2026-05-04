@@ -162,20 +162,14 @@ return true;
 }
 
 /* 🔥 HYBRID PAYWALL */
-async function showPaywall(message,amount){
+function showPaywall(message, amount){
 
 paywallBox.style.display="block";
 paySub.innerText=message;
 
-const indian = await isIndianUser();
-
-/* 🇮🇳 Razorpay */
-if(indian){
-
-document.getElementById("paypal-button").innerHTML="";
+/* Razorpay ALWAYS */
 razorpayBtn.style.display="block";
-
-razorpayBtn.innerText = amount===49 ? "Break this loop (₹49)" : "Unlock (₹199)";
+razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";
 
 razorpayBtn.onclick=function(){
 
@@ -183,13 +177,18 @@ const rzp=new Razorpay({
 key:RAZORPAY_KEY_ID,
 amount:amount*100,
 currency:"INR",
-handler:function(){
 
-if(amount===49) payment49=true;
-if(amount===199) payment199=true;
+handler: async function(resp){
 
-alert("Payment successful 😄");
+const verify = await callAPI({
+razorpayPaymentId: resp.razorpay_payment_id
+});
+
+if(!verify.paywall){
 paywallBox.style.display="none";
+type(verify.reply);
+messages.push({role:"assistant",content:verify.reply});
+}
 
 }
 });
@@ -197,8 +196,38 @@ paywallBox.style.display="none";
 rzp.open();
 };
 
+/* PayPal ALWAYS */
+document.getElementById("paypal-button").innerHTML="";
+
+paypal.Buttons({
+
+createOrder: function(data, actions){
+return actions.order.create({
+purchase_units:[{
+amount:{ value: amount===49 ? "3.00" : "9.00" }
+}]
+});
+},
+
+onApprove: function(data, actions){
+return actions.order.capture().then(async function(){
+
+const verify = await callAPI({
+paypalOrderID: data.orderID
+});
+
+if(!verify.paywall){
+paywallBox.style.display="none";
+type(verify.reply);
+messages.push({role:"assistant",content:verify.reply});
 }
 
+});
+}
+
+}).render("#paypal-button");
+
+  }
 /* 🌍 PayPal */
 else{
 
