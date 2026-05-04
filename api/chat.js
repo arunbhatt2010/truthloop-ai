@@ -1,70 +1,282 @@
-// TruthLoop Backend Engine (Final Production Version) // 7 Loop System + Dynamic Input + Paid Locks + Hindi/English Support
+export default async function handler(req, res) {
 
-export default async function handler(req, res) { const { userInput, language = "en", loopRequest = 1, isPaid = false } = req.body;
+  /* =========================
+     🌐 HEADERS
+  ========================= */
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-// 🔐 Topic Restriction const allowedTopics = ["finance", "business", "growth", "money", "startup", "sales", "linkedin"]; const isAllowed = allowedTopics.some(topic => userInput.toLowerCase().includes(topic) );
-
-if (!isAllowed) { return res.json({ error: language === "hi" ? "TruthLoop sirf business, growth aur finance decisions ke liye hai." : "TruthLoop only works for business, growth, and finance decisions." }); }
-
-const isHindi = language === "hi";
-
-const T = (en, hi) => (isHindi ? hi : en);
-
-// 🧠 Dynamic Loop Generator (User Input Injected) function generateLoops(input) { return { 1: T( You said: "${input}"\nBut this is not your real problem., Aapne kaha: "${input}"\nPar ye aapki asli problem nahi hai. ),
-
-2: T(
-    `You think more effort will fix this.\nReality: your direction is unclear.`,
-    `Aap sochte ho zyada mehnat se solve hoga.\nReality: direction clear nahi hai.`
-  ),
-
-  3: T(
-    `You try → no result → you change again\nThis is not growth\nThis is a loop.`,
-    `Aap try karte ho → result nahi → fir change karte ho\nYe growth nahi hai\nYe loop hai.`
-  ),
-
-  4: T(
-    `The real problem:\nYou are targeting everyone\nSo no one responds.`,
-    `Asli problem:\nAap sabko target kar rahe ho\nIsliye koi respond nahi karta.`
-  ),
-
-  5: T(
-    `You already know what to do.\nYou are delaying it.\n\nMost people stop here.\nUnlock if you won’t.`,
-    `Aapko already pata hai kya karna hai.\nAap bas delay kar rahe ho.\n\nZyadatar log yahi ruk jaate hain.\nAgar nahi rukna, unlock karo.`
-  ),
-
-  6: T(
-    `Pick one audience\nOne problem\nWrite only for them for 7 days`,
-    `Ek audience choose karo\nEk problem choose karo\n7 din sirf unke liye likho`
-  ),
-
-  7: T(
-    `You saw the pattern.\nYou will repeat it again.\n\nSame effort\nSame loop\nSame result.\n\nUnlock or stay stuck.`,
-    `Aapne pattern dekh liya.\nAap fir repeat karoge.\n\nSame mehnat\nSame loop\nSame result.\n\nUnlock karo ya stuck raho.`
-  )
-};
-
-}
-
-const loops = generateLoops(userInput);
-
-// 🔐 Paid Loop Handling (5 & 7) if ((loopRequest === 5 || loopRequest === 7) && !isPaid) { return res.json({ locked: true, message: T( "You are at the decision point. Most people stop here.", "Aap decision point par ho. Zyada log yahi ruk jaate hain." ), payment: { razorpay: "https://rzp.io/l/your-payment-link", paypal: "https://paypal.me/yourlink" } }); }
-
-// 🔁 Share Trigger (After Loop 4) if (loopRequest === 4) { return res.json({ loop: loops[4], share: true, shareMessage: T( This hit you because it's true.\n\nMost people will ignore this.\nFew will act.\n\nhttps://truthloop.in, Ye isliye laga kyunki ye sach hai.\n\nZyadatar log ignore karenge.\nKuch log action lenge.\n\nhttps://truthloop.in ) }); }
-
-// ✅ Normal Loop Response return res.json({ loop: loops[loopRequest] || loops[1] });
-
-/* 💳 PAYPAL PAYMENT HANDLER (SECURE) */ async function createPayPalOrder(amount) { const auth = Buffer.from( process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET ).toString("base64");
-
-const res = await fetch("https://api-m.paypal.com/v2/checkout/orders", { method: "POST", headers: { "Content-Type": "application/json", Authorization: Basic ${auth} }, body: JSON.stringify({ intent: "CAPTURE", purchase_units: [ { amount: { currency_code: "USD", value: amount } } ] }) });
-
-const data = await res.json(); return data?.links?.find(l => l.rel === "approve")?.href || ""; }
-
-/* 🔒 MODIFY PAYWALL RESPONSES WITH PAYPAL */ if (loopLevel === 5 && !paid49) { const paypalLink = await createPayPalOrder("0.99");
-
-return res.status(200).json({ reply: "Unlock required to continue.", paywall: true, paypal: paypalLink }); }
-
-if (loopLevel === 7 && !paid199) { const paypalLink = await createPayPalOrder("2.99");
-
-return res.status(200).json({ reply: "Final unlock required.", paywall: true, paypal: paypalLink }); }
-
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ reply: "Method not allowed" });
+  }
+
+  try {
+
+    /* =========================
+       📥 BODY PARSE
+    ========================= */
+    const body = typeof req.body === "string"
+      ? JSON.parse(req.body)
+      : req.body;
+
+    const {
+      messages,
+      loopLevel = 1,
+      paid49 = false,
+      paid199 = false,
+      shownLoop5 = []
+    } = body;
+
+    if (!messages || !messages.length) {
+      return res.status(400).json({ reply: "No input provided" });
+    }
+
+    const lastUserMessage = messages[messages.length - 1]?.content || "";
+    const lowerMsg = lastUserMessage.toLowerCase();
+    const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
+
+
+    /* =========================
+       ❌ DOMAIN FILTER
+    ========================= */
+    const blockedPatterns = [
+      "doctor","medicine","pain","fever","treatment",
+      "relationship","breakup","girlfriend","boyfriend","marriage",
+      "दर्द","बुखार","इलाज","डॉक्टर",
+      "रिलेशनशिप","ब्रेकअप","प्यार","शादी"
+    ];
+
+    if (loopLevel === 1 && blockedPatterns.some(w => lowerMsg.includes(w))) {
+      return res.status(200).json({
+        reply: isHindi
+          ? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ फैसला लेना हो।"
+          : "This isn't a decision problem.\n\nAsk something where a decision is required."
+      });
+    }
+
+
+    /* =========================
+       🔥 LOOP 1 STRICT
+    ========================= */
+    if (loopLevel === 1) {
+      const words = lastUserMessage.trim().split(/\s+/).length;
+
+      if (words < 4) {
+        return res.status(200).json({
+          reply: isHindi
+            ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
+            : "Too vague.\n\nWhat exactly is not working?"
+        });
+      }
+    }
+
+
+    /* =========================
+       🔒 LOOP 5 PAYWALL
+    ========================= */
+    if (loopLevel === 5 && !paid49) {
+
+      const base = lastUserMessage.slice(0,60);
+
+      const lines = [
+        `You said: "${base}"\n\nYou already know what to do.\nYou're just not doing it.`,
+        `Nothing new is missing.\nYou're avoiding execution.`,
+        `You’re not confused.\nYou’re hesitating.`,
+        `You saw the gap.\nYou're choosing comfort.`,
+        `You're asking again.\nBut the answer hasn't changed.`,
+        `Clarity isn't your issue.\nAction is.`
+      ];
+
+      const pick = lines[Math.floor(Math.random()*lines.length)];
+
+      const urgency = isHindi
+        ? `आपने खुद देखा है।
+
+समस्या नहीं।
+pattern।
+
+पहले भी यही किया।
+अब भी वही कर रहे हो।
+
+Same effort.
+Same loop.
+Same result.
+
+कुछ नहीं बदलेगा।`
+        : `You saw it.
+
+Not the problem.
+The pattern.
+
+You've seen this before.
+
+Same effort.
+Same loop.
+Same result.
+
+Nothing changes.`;
+
+      return res.status(200).json({
+        reply: pick + "\n\n" + urgency,
+        paywall: true,
+        shownLoop5: [...shownLoop5, pick]
+      });
+    }
+
+
+    /* =========================
+       🔒 LOOP 6 LOCK
+    ========================= */
+    if (loopLevel >= 6 && !paid49) {
+      return res.status(200).json({
+        reply: isHindi
+          ? "तुम skip कर रहे हो.\n\nपहले ये पूरा करो।"
+          : "You can't skip this.\n\nFinish what you started.",
+        paywall: true
+      });
+    }
+
+
+    /* =========================
+       🔒 LOOP 7 PAYWALL
+    ========================= */
+    if (loopLevel === 7 && !paid199) {
+      return res.status(200).json({
+        reply: isHindi
+          ? "तुम्हें सच पता है.\n\nअब commit करो।"
+          : "You already see it.\n\nNow commit.",
+        paywall: true
+      });
+    }
+
+
+    /* =========================
+       💣 LOOP 4 OVERRIDE
+    ========================= */
+    let stageOverride = "";
+
+    if (loopLevel === 4) {
+      stageOverride = `
+STAGE 4 OVERRIDE:
+- Use user's exact words
+- No general lines
+- No reused patterns
+- Attack the real avoidance
+- Make it feel personal
+- 5 lines only
+`;
+    }
+
+
+    /* =========================
+       🧠 SYSTEM PROMPT
+    ========================= */
+    const systemPrompt = `
+You are TruthLoop.
+
+You do NOT help.
+You expose.
+
+LANGUAGE:
+- Hindi → Hindi only
+- English → English only
+
+STRUCTURE:
+Line 1 → Situation  
+Line 2 → Contradiction  
+Line 3 → Pattern  
+Line 4 → Real problem  
+Line 5 → One uncomfortable question
+
+STAGE: ${loopLevel}
+${stageOverride}
+`;
+
+
+    /* =========================
+       🤖 AI CALL
+    ========================= */
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + process.env.GROQ_API_KEY
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...messages.slice(-6)
+          ],
+          temperature: 0.6,
+          max_tokens: 160
+        })
+      }
+    );
+
+    if (!response.ok) {
+      return res.status(500).json({ reply: "API error" });
+    }
+
+
+    /* =========================
+       📤 RESPONSE PARSE
+    ========================= */
+    const data = await response.json();
+    let reply = data?.choices?.[0]?.message?.content || "";
+
+
+    /* =========================
+       🔧 FALLBACKS
+    ========================= */
+    if (!reply || reply.length < 20) {
+      reply = isHindi
+        ? "आप घुमा रहे हैं.\n\nअसल में क्या काम नहीं कर रहा?"
+        : "You're avoiding something.\n\nWhat exactly is not working?";
+    }
+
+    if (reply.toLowerCase().includes("you should")) {
+      reply = isHindi
+        ? "आप general बात कर रहे हैं.\n\nअसल में issue क्या है?"
+        : "You're being generic.\n\nWhat's actually the issue?";
+    }
+
+    if (reply.toLowerCase().includes("as an ai")) {
+      reply = isHindi
+        ? "सीधे बोलो.\n\nक्या काम नहीं कर रहा?"
+        : "Stay direct.\n\nWhat's not working?";
+    }
+
+
+    /* =========================
+       🔥 FINAL PUSH
+    ========================= */
+    if (loopLevel >= 6) {
+      reply += isHindi ? "\n\nअब करो।" : "\n\nNow act.";
+    }
+
+
+    /* =========================
+       ✅ FINAL RESPONSE
+    ========================= */
+    return res.status(200).json({
+      reply,
+      paywall: false
+    });
+
+  } catch (error) {
+
+    console.error("Server error:", error);
+
+    return res.status(500).json({
+      reply: "Server error"
+    });
+  }
+        }
