@@ -205,10 +205,15 @@ STRUCTURE:
 6. Ask one sharp uncomfortable question
 
 DEPTH RULE:
+- Do NOT list obvious problems
+- Do NOT behave like SEO checklist
+- Speak directly to the user, not about the topic
+- Every line must feel like calling them out
+- Avoid generic phrases like "lack", "problem", "issue"
 - Avoid surface-level observations
 - Avoid common advice patterns
 - Each line must feel like a realization, not a summary
-
+- Use "you" in every line
 LANGUAGE:
 - Match user's language exactly
 
