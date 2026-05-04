@@ -113,12 +113,22 @@ return res.status(200).json({
 });
 }
 
-/* 🔒 LOOP 7 PAYWALL */
-if (loopLevel === 6 && !paid199) {
+/* 🔒 FIX: LOOP 6 LOCK (must pay 49 first) */
+if (loopLevel >= 6 && !paid49) {
   return res.status(200).json({
     reply: isHindi
-      ? "तुम्हें सच पता है.\n\nतुम बस action टाल रहे हो।"
-      : "You already see it.\n\nYou're avoiding action.",
+      ? "तुम skip कर रहे हो.\n\nपहले ये पूरा करो।"
+      : "You can't skip this.\n\nFinish what you started.",
+    paywall: true
+  });
+}
+
+/* 🔒 LOOP 7 PAYWALL (₹199) */
+if (loopLevel === 7 && !paid199) {
+  return res.status(200).json({
+    reply: isHindi
+      ? "तुम्हें सच पता है.\n\nअब commit करो।"
+      : "You already see it.\n\nNow commit.",
     paywall: true
   });
 }
