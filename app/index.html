@@ -205,7 +205,9 @@ reflectionInput.style.display="block";
 nextBtn.style.display="block";
 getBtn.style.display="none";
 };
-
+function updateLoopUI() {
+  document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} / 7`;
+}
 /* NEXT */
 nextBtn.onclick=async()=>{
 
@@ -213,7 +215,7 @@ const text=reflectionInput.value.trim();
 if(!text)return;
 
 loopLevel++;
-
+updateLoopUI();
 track("loop_progress",{loop:loopLevel});
 
 messages.push({role:"user",content:text});
