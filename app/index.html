@@ -1,68 +1,38 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TruthLoop</title>
-
-<!-- ✅ Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>
-<script>
+<title>TruthLoop</title><!-- ✅ Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script><script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-RBMQ2F6P9Q');
-</script>
-
-<!-- Razorpay -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<!-- PayPal -->
-<script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>
-
-<style>
+</script><!-- Razorpay --><script src="https://checkout.razorpay.com/v1/checkout.js"></script><!-- PayPal --><script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script><style>
 body{background:#0f0f0f;color:#fff;font-family:Arial;margin:0;}
 .container{max-width:520px;margin:auto;padding:18px;padding-bottom:90px;}
-.output{min-height:50vh;background:#000;padding:18px;border-radius:12px;margin-bottom:10px;}
+.output{min-height:50vh;background:#000;padding:18px;border-radius:12px;margin-bottom:10px;line-height:1.6;}
 input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;}
 input{background:#111;color:#fff;}
 button{background:linear-gradient(45deg,orange,#ff5e00);font-weight:bold;}
-#paywallBox{display:none;background:#111;padding:15px;border-radius:12px;margin-top:10px;text-align:center;}
-</style>
-</head>
 
-<body>
-
-<div class="container">
-
-<h2>TruthLoop</h2>
-<p style="text-align:center;color:#aaa;">You don’t need advice. You need clarity.</p>
-
-<div id="loopIndicator">Loop 1 / 7</div>
-
-<div id="outputBox" class="output">
+#shareBox,#paywallBox{
+display:none;background:#111;padding:15px;border-radius:12px;
+margin-top:10px;text-align:center;border:1px solid #222;
+}
+</style></head><body><div class="container"><h2>TruthLoop</h2>
+<p style="text-align:center;color:#aaa;">You don’t need advice. You need clarity.</p><div id="loopIndicator">Loop 1 / 7</div><div id="outputBox" class="output">
 Hi, I am TruthLoop.<br><br>
 Type ONE real problem:
-</div>
+</div><input id="mainInput" placeholder="Example: I post daily but get no clients"/>
+<button id="getBtn">Show me the truth →</button><input id="reflectionInput" style="display:none;" placeholder="Answer honestly..."/>
+<button id="nextBtn" style="display:none;">Go deeper</button><!-- 🔥 SHARE BOX --><div id="shareBox">
+  <div id="shareText"></div>
+  <button onclick="copyShare()">Copy</button>
+  <button onclick="whatsappShare()">WhatsApp</button>
+</div><!-- 🔥 PAYWALL --><div id="paywallBox">
+  <div id="paySub"></div>  <!-- Razorpay --><button id="razorpayBtn"></button>
 
-<input id="mainInput" placeholder="Example: I post daily but get no clients"/>
-<button id="getBtn">Show me the truth →</button>
-
-<input id="reflectionInput" style="display:none;" placeholder="Answer honestly..."/>
-<button id="nextBtn" style="display:none;">Go deeper</button>
-
-<div id="paywallBox">
-  <div id="paySub"></div>
-
-  <!-- Razorpay -->
-  <button id="razorpayBtn"></button>
-
-  <!-- PayPal -->
-  <div id="paypal-button"></div>
-</div>
-
-</div>
-
-<script>
+  <!-- PayPal -->  <div id="paypal-button"></div>
+</div></div><script>
 
 const API_URL="/api/chat";
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";
@@ -73,6 +43,9 @@ const reflectionInput=document.getElementById("reflectionInput");
 const getBtn=document.getElementById("getBtn");
 const nextBtn=document.getElementById("nextBtn");
 
+const shareBox=document.getElementById("shareBox");
+const shareText=document.getElementById("shareText");
+
 const paywallBox=document.getElementById("paywallBox");
 const paySub=document.getElementById("paySub");
 const razorpayBtn=document.getElementById("razorpayBtn");
@@ -82,10 +55,10 @@ let messages=[];
 let payment49=false;
 let payment199=false;
 
-/* 🔥 Analytics helper */
-function track(event, data={}){
+/* 🔥 Analytics */
+function track(event,data={}){
 if(typeof gtag!=="undefined"){
-gtag('event', event, data);
+gtag('event',event,data);
 }
 }
 
@@ -108,13 +81,31 @@ function typing(){
 if(i<text.length){
 div.innerHTML+=text.charAt(i);
 i++;
+outputBox.scrollTop=outputBox.scrollHeight;
 requestAnimationFrame(typing);
 }
 }
 typing();
 }
 
-/* 🔥 HYBRID PAYWALL */
+/* 🔥 SHARE */
+function showShareCard(text){
+const clean=text.replace(/<[^>]*>?/gm,'').trim();
+shareText.innerText=
+`This hit me harder than expected.
+
+${clean}
+
+Most people avoid this.
+
+https://truthloop.in`;
+shareBox.style.display="block";
+}
+
+function copyShare(){navigator.clipboard.writeText(shareText.innerText);}
+function whatsappShare(){window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);}
+
+/* 🔥 PAYWALL */
 function showPaywall(message, amount){
 
 track("paywall_shown",{loop:loopLevel,amount});
@@ -123,10 +114,10 @@ paywallBox.style.display="block";
 paySub.innerText=message;
 
 /* Razorpay */
+razorpayBtn.style.display="block";
 razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";
 
 razorpayBtn.onclick=function(){
-
 const rzp=new Razorpay({
 key:RAZORPAY_KEY_ID,
 amount:amount*100,
@@ -140,10 +131,8 @@ track("payment_success",{method:"razorpay",value:amount});
 
 alert("Payment successful 😄");
 paywallBox.style.display="none";
-
 }
 });
-
 rzp.open();
 };
 
@@ -152,7 +141,7 @@ document.getElementById("paypal-button").innerHTML="";
 
 paypal.Buttons({
 
-createOrder: function(data, actions){
+createOrder:function(data,actions){
 return actions.order.create({
 purchase_units:[{
 amount:{ value: amount===49 ? "3.00" : "9.00" }
@@ -160,7 +149,7 @@ amount:{ value: amount===49 ? "3.00" : "9.00" }
 });
 },
 
-onApprove: function(data, actions){
+onApprove:function(data,actions){
 return actions.order.capture().then(function(){
 
 if(amount===49) payment49=true;
@@ -222,10 +211,13 @@ return;
 messages.push({role:"assistant",content:data.reply});
 typeEffect(data.reply);
 
+/* 🔥 SHARE TRIGGER */
+if(loopLevel===4){
+setTimeout(()=>showShareCard(data.reply),300);
+}
+
 reflectionInput.value="";
 };
 
-</script>
-
-</body>
+</script></body>
   </html>
