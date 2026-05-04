@@ -31,7 +31,8 @@ export default async function handler(req, res) {
       paid199 = false,
       shownLoop5 = []
     } = body;
-
+    let userKnown = messages.length > 1;
+    const userContext = messages[1]?.content || "";
     if (!messages || !messages.length) {
       return res.status(400).json({ reply: "No input provided" });
     }
@@ -74,14 +75,13 @@ const isHindi = lang === "hi";
     if (loopLevel === 1) {
       const words = lastUserMessage.trim().split(/\s+/).length;
 
-      if (words < 4) {
-        return res.status(200).json({
-          reply: isHindi
-            ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
-            : "Too vague.\n\nWhat exactly is not working?"
-        });
-      }
-    }
+      if (!userKnown) {
+  return res.status(200).json({
+    reply: isHindi
+      ? "पहले ये साफ करो — तुम करते क्या हो?\n\nऔर अभी क्या काम नहीं कर रहा?"
+      : "Before we go deeper — what do you actually do?\n\nAnd what is not working right now?"
+  });
+}
 
 
     /* =========================
@@ -269,7 +269,8 @@ MANDATORY END:
 - It must force self-confrontation
 
 ---
-
+USER CONTEXT:
+${userContext}
 If response feels safe, rewrite stronger.
 If response feels generic, rewrite sharper.
 If no action is present, response is invalid.
