@@ -14,7 +14,7 @@ gtag('config', 'G-RBMQ2F6P9Q');
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<!-- ✅ FIXED PAYPAL SCRIPT -->
+<!-- ✅ PayPal -->
 <script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>
 
 <style>
@@ -82,6 +82,11 @@ I’ll show you what you're avoiding.<br><br>
 
 <div id="paywallBox">
   <div id="paySub"></div>
+
+  <!-- Razorpay -->
+  <button id="razorpayBtn" style="display:none;"></button>
+
+  <!-- PayPal -->
   <div id="paypal-button"></div>
 </div>
 
@@ -90,6 +95,7 @@ I’ll show you what you're avoiding.<br><br>
 <script>
 
 const API_URL="/api/chat";
+const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";
 
 const outputBox=document.getElementById("outputBox");
 const mainInput=document.getElementById("mainInput");
@@ -102,6 +108,7 @@ const shareText=document.getElementById("shareText");
 
 const paywallBox=document.getElementById("paywallBox");
 const paySub=document.getElementById("paySub");
+const razorpayBtn=document.getElementById("razorpayBtn");
 
 let loopLevel=1;
 let messages=[];
@@ -143,11 +150,59 @@ return {reply:"Something broke.\n\nTry again."};
 }
 }
 
-/* PAYPAL PAYWALL */
-function showPaywall(message,amount){
+/* 🌍 Detect India vs Global */
+async function isIndianUser(){
+try{
+const res = await fetch("https://ipapi.co/json/");
+const data = await res.json();
+return data.country === "IN";
+}catch{
+return true;
+}
+}
+
+/* 🔥 HYBRID PAYWALL */
+async function showPaywall(message,amount){
 
 paywallBox.style.display="block";
 paySub.innerText=message;
+
+const indian = await isIndianUser();
+
+/* 🇮🇳 Razorpay */
+if(indian){
+
+document.getElementById("paypal-button").innerHTML="";
+razorpayBtn.style.display="block";
+
+razorpayBtn.innerText = amount===49 ? "Break this loop (₹49)" : "Unlock (₹199)";
+
+razorpayBtn.onclick=function(){
+
+const rzp=new Razorpay({
+key:RAZORPAY_KEY_ID,
+amount:amount*100,
+currency:"INR",
+handler:function(){
+
+if(amount===49) payment49=true;
+if(amount===199) payment199=true;
+
+alert("Payment successful 😄");
+paywallBox.style.display="none";
+
+}
+});
+
+rzp.open();
+};
+
+}
+
+/* 🌍 PayPal */
+else{
+
+razorpayBtn.style.display="none";
 
 document.getElementById("paypal-button").innerHTML="";
 
@@ -176,6 +231,8 @@ paywallBox.style.display="none";
 }
 
 }).render("#paypal-button");
+
+}
 }
 
 /* START */
@@ -238,4 +295,4 @@ function whatsappShare(){window.open(`https://wa.me/?text=${encodeURIComponent(s
 </script>
 
 </body>
-  </html>
+</html>
