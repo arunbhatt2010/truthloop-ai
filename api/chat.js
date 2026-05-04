@@ -195,7 +195,12 @@ OUTPUT RULES:
 - No generic statements
 - No obvious observations
 - Each line must hit deeper than previous
+HARD LIMIT:
+- Max 6 lines only
+- Each line max 10 words
+- Total response under 60 words
 
+If exceeded → response invalid
 STRUCTURE:
 1. Mirror their situation using their words
 2. Break their belief
@@ -232,7 +237,7 @@ If output feels obvious or generic, rewrite stronger.
           Authorization: "Bearer " + process.env.GROQ_API_KEY
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
+          model: "llama-3.1-8b-instant"
           messages: [
             { role: "system", content: systemPrompt },
             ...messages.slice(-6)
