@@ -74,19 +74,33 @@ return await res.json();
 
 /* TYPE EFFECT */
 function typeEffect(text){
-const div=document.createElement("div");
-outputBox.appendChild(div);
-let i=0;
-function typing(){
-if(i<text.length){
-div.innerHTML+=text.charAt(i);
-i++;
-outputBox.scrollTop=outputBox.scrollHeight;
-requestAnimationFrame(typing);
-}
-}
-typing();
-}
+  const div=document.createElement("div");
+  outputBox.appendChild(div);
+
+  let i=0;
+
+  function typing(){
+    if(i<text.length){
+
+      const char = text.charAt(i);
+
+      if(char === "<"){
+        // handle <br> properly
+        const end = text.indexOf(">", i);
+        div.innerHTML += text.substring(i, end+1);
+        i = end+1;
+      } else {
+        div.innerHTML += char;
+        i++;
+      }
+
+      outputBox.scrollTop = outputBox.scrollHeight;
+      requestAnimationFrame(typing);
+    }
+  }
+
+  typing();
+  }
 
 /* 🔥 SHARE */
 function showShareCard(text){
