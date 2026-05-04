@@ -124,39 +124,24 @@ if (loopLevel === 6 && !paid199) {
 }
 
 /* 💣 LOOP 4 (FIXED) */
+let stageOverride = "";
+
 if (loopLevel === 4) {
+  stageOverride = `
 
-let reply;
+STAGE 4 OVERRIDE:
 
-if(isHindi){
-  reply = `तुम रोज़ कर रहे हो।
-
-लेकिन कुछ बदल नहीं रहा।
-
-तो समस्या consistency नहीं है।
-direction है।
-
-तुम वही क्यों दोहरा रहे हो जो काम नहीं कर रहा?`;
-} else {
-  reply = `You're showing up daily.
-
-But nothing is changing.
-
-So it's not consistency.
-It's direction.
-
-Why are you repeating what isn't working?`;
-}
-
-return res.status(200).json({
-  reply,
-  paywall: false
-});
+- Use user's exact words
+- No general lines
+- No reused patterns
+- Attack the real avoidance
+- Make it feel personal
+- 5 lines only
+`;
 }
 
 /* 🧠 SYSTEM PROMPT */
 const systemPrompt = `
-
 You are TruthLoop.
 
 You do NOT help.
@@ -171,10 +156,10 @@ LANGUAGE:
 
 STRUCTURE (STRICT):
 
-Line 1 → User situation (sharp)
-Line 2 → Contradiction
-Line 3 → Pattern
-Line 4 → Real problem
+Line 1 → User situation  
+Line 2 → Contradiction  
+Line 3 → Pattern  
+Line 4 → Real problem  
 Line 5 → ONE uncomfortable question
 
 ---
@@ -186,41 +171,14 @@ RULES:
 - No motivational tone
 - No general statements
 - No explanations
-- Every line must come from user's context
-- Short sentences only
-
----
-
-TONE:
-
-Direct.
-Uncomfortable.
-Personal.
+- Use ONLY user's context
 
 ---
 
 STAGE: ${loopLevel}
 
-1 → clarity  
-2 → mismatch  
-3 → repetition  
-4 → avoidance  
-5 → realization  
-6 → tension  
-7 → confrontation
+${stageOverride}
 
----
-
-EXAMPLE:
-
-"You say you're posting daily.
-
-But nothing is changing.
-
-So it's not effort.
-It's direction.
-
-Why are you repeating what isn't working?"
 `;
 
 const response = await fetch(
