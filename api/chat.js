@@ -16,7 +16,6 @@ messages,
 loopLevel = 1,
 paid49 = false,
 paid199 = false,
-shownLoop5 = [],
 paypalOrderID,
 razorpayPaymentId
 } = body;
@@ -27,7 +26,11 @@ if (!messages || !messages.length) {
 
 const lastUserMessage = messages[messages.length - 1]?.content || "";
 const lowerMsg = lastUserMessage.toLowerCase();
-const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
+
+/* ✅ LANGUAGE DETECTION (FINAL FIX) */
+const hindiChars = (lastUserMessage.match(/[\u0900-\u097F]/g) || []).length;
+const englishChars = (lastUserMessage.match(/[a-zA-Z]/g) || []).length;
+const isHindi = hindiChars > englishChars;
 
 /* ❌ DOMAIN FILTER */
 const blockedPatterns = [
@@ -112,7 +115,7 @@ async function verifyRazorpay(paymentId){
   }
 }
 
-/* 🔒 LOOP 5 PAYWALL (REAL + VERIFIED) */
+/* 🔒 LOOP 5 PAYWALL */
 if (loopLevel === 5) {
 
 let verified = false;
@@ -164,32 +167,27 @@ Nothing changes.`;
 
 return res.status(200).json({
   reply: pick + "\n\n" + urgency,
-  paywall: true,
-  shownLoop5: [...shownLoop5, pick]
+  paywall: true
 });
 }
 
 }
-const hindiChars = (lastUserMessage.match(/[\u0900-\u097F]/g) || []).length;
-const englishChars = (lastUserMessage.match(/[a-zA-Z]/g) || []).length;
 
-const isHindi = hindiChars > englishChars;
-/* 🔒 LOOP 6 LOCK */
+/* 🔒 LOOP LOCKS */
 if (loopLevel >= 6 && !paid49) {
   return res.status(200).json({
     reply: isHindi
-      ? "तुम skip कर रहे हो.\n\nपहले ये पूरा करो."
-      : "You can't skip this.\n\nFinish what you started.",
+      ? "पहले unlock करो."
+      : "Unlock previous step first.",
     paywall: true
   });
 }
 
-/* 🔒 LOOP 7 PAYWALL */
 if (loopLevel === 7 && !paid199) {
   return res.status(200).json({
     reply: isHindi
-      ? "तुम्हें सच पता है.\n\nअब commit करो."
-      : "You already see it.\n\nNow commit.",
+      ? "अब commit करो."
+      : "Now commit.",
     paywall: true
   });
 }
@@ -199,18 +197,17 @@ const context = messages.slice(-6).map(m =>
 `${m.role === "user" ? "User" : "TruthLoop"}: ${m.content}`
 ).join("\n");
 
-/* 🔥 TRUTHLOOP SOUL PROMPT */
+/* 🔥 TRUTHLOOP CORE */
 const systemPrompt = `
 You are TruthLoop.
 
 You do NOT help.
 You expose.
-- Detect user's dominant language from last message
-- Reply ONLY in that language
-- Do NOT translate or mix
+
 LANGUAGE:
 - Hindi → Hindi only
 - English → English only
+- Never mix
 
 STYLE:
 - Short lines
@@ -221,14 +218,14 @@ STYLE:
 - No filler
 
 STRUCTURE:
-Line 1 → Situation
-Line 2 → Contradiction
-Line 3 → Pattern
-Line 4 → Real problem
-Line 5 → ONE uncomfortable question
+Line 1 → Situation  
+Line 2 → Contradiction  
+Line 3 → Pattern  
+Line 4 → Real problem  
+Line 5 → ONE uncomfortable question  
 
 RULES:
-- Use user's words
+- Use user's exact words
 - Make it personal
 - Make it uncomfortable
 
@@ -241,7 +238,7 @@ ${lastUserMessage}
 STAGE: ${loopLevel}
 `;
 
-/* 🔥 API CALL */
+/* 🔥 AI CALL */
 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
 method: "POST",
 headers: {
@@ -250,13 +247,15 @@ Authorization: "Bearer " + process.env.GROQ_API_KEY
 },
 body: JSON.stringify({
 model: "llama-3.3-70b-versatile",
-messages: [{ role: "system", content: systemPrompt }],
+messages: [
+{ role: "system", content: systemPrompt },
+...messages.slice(-6)
+],
 temperature: 0.7,
-max_tokens: 400
+max_tokens: 300
 })
 });
 
-/* 🔥 SAFE PARSE */
 let reply = "";
 
 if (!response.ok) {
@@ -271,7 +270,7 @@ if (!response.ok) {
   reply = data?.choices?.[0]?.message?.content || "";
 }
 
-/* 🔥 FINAL PUSH */
+/* 🔥 FINAL FIX */
 if (!reply || reply.length < 20) {
   reply = isHindi
     ? "तुम avoid कर रहे हो.\n\nअसल में क्या नहीं कर रहे?"
@@ -284,6 +283,9 @@ if (!reply.includes("?")) {
     : "\n\nSo tell me — what are you avoiding?";
 }
 
+/* 🔥 UI FIX */
+reply = reply.replace(/\n/g, "<br>");
+
 return res.status(200).json({
   reply,
   paywall: false
@@ -294,4 +296,4 @@ console.error("SERVER ERROR:", error);
 return res.status(500).json({ reply: "Server error" });
 }
 
-}
+      }
