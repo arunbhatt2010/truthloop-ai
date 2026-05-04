@@ -210,7 +210,7 @@ function updateLoopUI() {
 }
 /* NEXT */
 nextBtn.onclick=async()=>{
-
+console.log("Loop Level:", loopLevel);
 const text=reflectionInput.value.trim();
 if(!text)return;
 
@@ -222,7 +222,7 @@ messages.push({role:"user",content:text});
 outputBox.innerHTML+=`<br><b>You:</b> ${text}<br><br>`;
 
 const data=await callAPI();
-
+console.log("Loop Level:", loopLevel);
 if(data.paywall){
 showPaywall(data.reply, loopLevel===5 ? 49 : 199);
 return;
