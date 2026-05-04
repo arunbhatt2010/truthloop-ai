@@ -1,8 +1,5 @@
 // TruthLoop Backend Engine (Final Production Version) // 7 Loop System + Dynamic Input + Paid Locks + Hindi/English Support
-export default async function handler(req, res) {
-  console.log("API HIT 🔥");
-  return res.json({ test: "working" });
-}
+
 export default async function handler(req, res) { const { userInput, language = "en", loopRequest = 1, isPaid = false } = req.body;
 
 // 🔐 Topic Restriction const allowedTopics = ["finance", "business", "growth", "money", "startup", "sales", "linkedin"]; const isAllowed = allowedTopics.some(topic => userInput.toLowerCase().includes(topic) );
@@ -54,4 +51,20 @@ const loops = generateLoops(userInput);
 
 // 🔁 Share Trigger (After Loop 4) if (loopRequest === 4) { return res.json({ loop: loops[4], share: true, shareMessage: T( This hit you because it's true.\n\nMost people will ignore this.\nFew will act.\n\nhttps://truthloop.in, Ye isliye laga kyunki ye sach hai.\n\nZyadatar log ignore karenge.\nKuch log action lenge.\n\nhttps://truthloop.in ) }); }
 
-// ✅ Normal Loop Response return res.json({ loop: loops[loopRequest] || loops[1] }); }
+// ✅ Normal Loop Response return res.json({ loop: loops[loopRequest] || loops[1] });
+
+/* 💳 PAYPAL PAYMENT HANDLER (SECURE) */ async function createPayPalOrder(amount) { const auth = Buffer.from( process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET ).toString("base64");
+
+const res = await fetch("https://api-m.paypal.com/v2/checkout/orders", { method: "POST", headers: { "Content-Type": "application/json", Authorization: Basic ${auth} }, body: JSON.stringify({ intent: "CAPTURE", purchase_units: [ { amount: { currency_code: "USD", value: amount } } ] }) });
+
+const data = await res.json(); return data?.links?.find(l => l.rel === "approve")?.href || ""; }
+
+/* 🔒 MODIFY PAYWALL RESPONSES WITH PAYPAL */ if (loopLevel === 5 && !paid49) { const paypalLink = await createPayPalOrder("0.99");
+
+return res.status(200).json({ reply: "Unlock required to continue.", paywall: true, paypal: paypalLink }); }
+
+if (loopLevel === 7 && !paid199) { const paypalLink = await createPayPalOrder("2.99");
+
+return res.status(200).json({ reply: "Final unlock required.", paywall: true, paypal: paypalLink }); }
+
+  }
