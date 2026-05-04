@@ -9,13 +9,7 @@ if (req.method !== "POST") return res.status(405).json({ reply: "Method not allo
 
 try {
 
-/* 🔥 BODY SAFE PARSE */
-let body;
-try{
-body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-}catch{
-return res.status(200).json({ reply:"Invalid request" });
-}
+const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
 const {
 messages,
@@ -25,83 +19,43 @@ paid199 = false
 } = body;
 
 if (!messages || !messages.length) {
-return res.status(200).json({ reply: "No input provided" });
+  return res.status(400).json({ reply: "No input provided" });
 }
 
 const lastUserMessage = messages[messages.length - 1]?.content || "";
 const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
-/* 🔥 CRASH GUARD */
-if(!process.env.GROQ_API_KEY){
-return res.status(200).json({
-reply:"Server not configured properly."
-});
-}
-
-/* 🔒 LOOP 5 PAYWALL (STABLE) */
+/* 🔒 LOOP 5 PAYWALL */
 if (loopLevel === 5 && !paid49) {
-
-const base = lastUserMessage.slice(0,60);
-
-const lines = [
-"You said: "${base}"\n\nYou already know what to do.\nYou're just not doing it.",
-"Nothing new is missing.\nYou're avoiding execution.",
-"You’re not confused.\nYou’re hesitating.",
-"You saw the gap.\nYou're choosing comfort.",
-"You're asking again.\nBut the answer hasn't changed.",
-"Clarity isn't your issue.\nAction is."
-];
-
-const pick = lines[Math.floor(Math.random()*lines.length)];
-
-const urgency = isHindi
-? `तुमने देख लिया है।
-
-समस्या नहीं।
-pattern।
-
-Same effort.
-Same loop.
-Same result.
-
-कुछ नहीं बदलेगा।":"You saw it.
-
-Not the problem.
-The pattern.
-
-Same effort.
-Same loop.
-Same result.
-
-Nothing changes.`;
-
-return res.status(200).json({
-reply: pick + "\n\n" + urgency,
-paywall: true
-});
+  return res.status(200).json({
+    reply: isHindi
+      ? "तुम bypass करने की कोशिश कर रहे हो।"
+      : "You’re trying to bypass.",
+    paywall: true
+  });
 }
 
 /* 🔒 LOOP 6 LOCK */
 if (loopLevel >= 6 && !paid49) {
-return res.status(200).json({
-reply: isHindi
-? "पहले unlock करो।"
-: "Unlock previous step first.",
-paywall: true
-});
+  return res.status(200).json({
+    reply: isHindi
+      ? "पहले unlock करो।"
+      : "Unlock previous step first.",
+    paywall: true
+  });
 }
 
 /* 🔒 LOOP 7 PAYWALL */
 if (loopLevel === 7 && !paid199) {
-return res.status(200).json({
-reply: isHindi
-? "अब commit करो।"
-: "Now commit.",
-paywall: true
-});
+  return res.status(200).json({
+    reply: isHindi
+      ? "अब commitment दिखाओ।"
+      : "Now show commitment.",
+    paywall: true
+  });
 }
 
-/* 🔥 AHA MODE PROMPT */
+/* 🔥 PROMPT */
 const systemPrompt = `
 You are TruthLoop.
 
@@ -109,92 +63,84 @@ You do NOT help.
 You expose.
 
 LANGUAGE:
-
 - Hindi → Hindi only
 - English → English only
 - Never mix
 
 STYLE:
-
 - Short lines
 - Sharp
 - Emotional hit
 - No numbering
 - No headings
+- No explanation
+- No advice
+- No suggestions
 
-FLOW:
-Line 1 → Mirror user
+FLOW (STRICT):
+Line 1 → Mirror user situation
 Line 2 → Contradiction
 Line 3 → Pattern
 Line 4 → Real problem
 Line 5 → ONE uncomfortable question
 
 RULES:
-
-- No advice
-- No suggestions
-- No explanation
+- Use user's exact words
 - No generic lines
-- Use user's exact context
+- Every line must hit personally
+- Make it feel uncomfortable but true
 
 STAGE: ${loopLevel}
 `;
 
-/* 🔥 AI CALL SAFE */
-let data;
-try{
+/* 🔥 API CALL */
 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-method: "POST",
-headers: {
-"Content-Type": "application/json",
-Authorization: "Bearer " + process.env.GROQ_API_KEY
-},
-body: JSON.stringify({
-model: "llama-3.3-70b-versatile",
-messages: [
-{ role: "system", content: systemPrompt },
-...messages.slice(-6)
-],
-temperature: 0.7,
-max_tokens: 220
-})
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + process.env.GROQ_API_KEY
+  },
+  body: JSON.stringify({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...messages.slice(-6)
+    ],
+    temperature: 0.7,
+    max_tokens: 200
+  })
 });
 
-data = await response.json();
+/* 🔥 SAFE RESPONSE HANDLING */
+let reply = "";
 
-}catch(e){
+if (!response.ok) {
+  const text = await response.text();
+  console.error("Groq error:", text);
+
+  reply = isHindi
+    ? "AI response fail ho गया.\n\nफिर try करो."
+    : "AI response failed.\n\nTry again.";
+} else {
+  const data = await response.json();
+  reply = data?.choices?.[0]?.message?.content || "";
+}
+
+/* fallback */
+if (!reply || reply.length < 10) {
+  reply = isHindi
+    ? "तुम avoid कर रहे हो।\n\nक्या?"
+    : "You're avoiding something.\n\nWhat?";
+}
+
 return res.status(200).json({
-reply:"System stuck.\n\nTry again."
-});
-}
-
-let reply = data?.choices?.[0]?.message?.content || "";
-
-/* 🔥 FORCE RESPONSE */
-if(!reply || reply.length < 20){
-reply = isHindi
-? "तुम avoid कर रहे हो।\n\nअसल में क्या नहीं कर रहे?"
-: "You're avoiding something.\n\nWhat are you not doing?";
-}
-
-if(!reply.includes("?")){
-reply += isHindi
-? "\n\nअब बताओ — तुम क्या avoid कर रहे हो?"
-: "\n\nSo tell me — what are you avoiding?";
-}
-
-return res.status(200).json({
-reply,
-paywall: false
+  reply,
+  paywall: false
 });
 
 } catch (error) {
-
-console.error("SERVER ERROR:",error);
-
-return res.status(200).json({
-reply:"Temporary issue.\n\nTry again."
-});
+console.error("SERVER ERROR:", error);
+return res.status(500).json({ reply: "Server error" });
 }
 
-}
+    }
