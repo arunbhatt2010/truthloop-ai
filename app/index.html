@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TruthLoop</title>
 
+<!-- ✅ Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -12,41 +13,20 @@ gtag('js', new Date());
 gtag('config', 'G-RBMQ2F6P9Q');
 </script>
 
+<!-- Razorpay -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<!-- ✅ PayPal -->
+<!-- PayPal -->
 <script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>
 
 <style>
 body{background:#0f0f0f;color:#fff;font-family:Arial;margin:0;}
 .container{max-width:520px;margin:auto;padding:18px;padding-bottom:90px;}
-h2{text-align:center;margin-bottom:5px;}
-.tagline{text-align:center;font-size:13px;color:#aaa;margin-bottom:15px;}
-
-.output{
-  min-height:50vh;
-  background:#000;
-  padding:18px;
-  border-radius:12px;
-  margin-bottom:10px;
-  line-height:1.6;
-}
-
-input,button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:8px;
-  border:none;
-}
-
+.output{min-height:50vh;background:#000;padding:18px;border-radius:12px;margin-bottom:10px;}
+input,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:none;}
 input{background:#111;color:#fff;}
 button{background:linear-gradient(45deg,orange,#ff5e00);font-weight:bold;}
-
-#shareBox,#paywallBox{
-display:none;background:#111;padding:15px;border-radius:12px;
-margin-top:10px;text-align:center;border:1px solid #222;
-}
+#paywallBox{display:none;background:#111;padding:15px;border-radius:12px;margin-top:10px;text-align:center;}
 </style>
 </head>
 
@@ -55,17 +35,13 @@ margin-top:10px;text-align:center;border:1px solid #222;
 <div class="container">
 
 <h2>TruthLoop</h2>
-<p class="tagline">You don’t need advice. You need clarity.</p>
+<p style="text-align:center;color:#aaa;">You don’t need advice. You need clarity.</p>
 
 <div id="loopIndicator">Loop 1 / 7</div>
 
 <div id="outputBox" class="output">
-<div>
 Hi, I am TruthLoop.<br><br>
-I won't give advice.<br>
-I’ll show you what you're avoiding.<br><br>
-<b>Type ONE real problem:</b><br><br>
-</div>
+Type ONE real problem:
 </div>
 
 <input id="mainInput" placeholder="Example: I post daily but get no clients"/>
@@ -74,17 +50,11 @@ I’ll show you what you're avoiding.<br><br>
 <input id="reflectionInput" style="display:none;" placeholder="Answer honestly..."/>
 <button id="nextBtn" style="display:none;">Go deeper</button>
 
-<div id="shareBox">
-  <div id="shareText"></div>
-  <button onclick="copyShare()">Copy</button>
-  <button onclick="whatsappShare()">WhatsApp</button>
-</div>
-
 <div id="paywallBox">
   <div id="paySub"></div>
 
   <!-- Razorpay -->
-  <button id="razorpayBtn" style="display:none;"></button>
+  <button id="razorpayBtn"></button>
 
   <!-- PayPal -->
   <div id="paypal-button"></div>
@@ -103,9 +73,6 @@ const reflectionInput=document.getElementById("reflectionInput");
 const getBtn=document.getElementById("getBtn");
 const nextBtn=document.getElementById("nextBtn");
 
-const shareBox=document.getElementById("shareBox");
-const shareText=document.getElementById("shareText");
-
 const paywallBox=document.getElementById("paywallBox");
 const paySub=document.getElementById("paySub");
 const razorpayBtn=document.getElementById("razorpayBtn");
@@ -114,12 +81,25 @@ let loopLevel=1;
 let messages=[];
 let payment49=false;
 let payment199=false;
-let shownLoop5=[];
 
-function updateLoopUI(){
-document.getElementById("loopIndicator").innerText=`Loop ${loopLevel} / 7`;
+/* 🔥 Analytics helper */
+function track(event, data={}){
+if(typeof gtag!=="undefined"){
+gtag('event', event, data);
+}
 }
 
+/* API */
+async function callAPI(){
+const res=await fetch(API_URL,{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({messages,loopLevel,paid49:payment49,paid199:payment199})
+});
+return await res.json();
+}
+
+/* TYPE EFFECT */
 function typeEffect(text){
 const div=document.createElement("div");
 outputBox.appendChild(div);
@@ -128,47 +108,21 @@ function typing(){
 if(i<text.length){
 div.innerHTML+=text.charAt(i);
 i++;
-outputBox.scrollTop=outputBox.scrollHeight;
 requestAnimationFrame(typing);
 }
 }
 typing();
 }
 
-async function callAPI(){
-try{
-const res=await fetch(API_URL,{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({messages,loopLevel,paid49:payment49,paid199:payment199,shownLoop5})
-});
-const data=await res.json();
-shownLoop5=data.shownLoop5||shownLoop5;
-return data;
-}catch(e){
-return {reply:"Something broke.\n\nTry again."};
-}
-}
-
-/* 🌍 Detect India vs Global */
-async function isIndianUser(){
-try{
-const res = await fetch("https://ipapi.co/json/");
-const data = await res.json();
-return data.country === "IN";
-}catch{
-return true;
-}
-}
-
 /* 🔥 HYBRID PAYWALL */
 function showPaywall(message, amount){
+
+track("paywall_shown",{loop:loopLevel,amount});
 
 paywallBox.style.display="block";
 paySub.innerText=message;
 
-/* Razorpay ALWAYS */
-razorpayBtn.style.display="block";
+/* Razorpay */
 razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";
 
 razorpayBtn.onclick=function(){
@@ -177,18 +131,15 @@ const rzp=new Razorpay({
 key:RAZORPAY_KEY_ID,
 amount:amount*100,
 currency:"INR",
+handler:function(){
 
-handler: async function(resp){
+if(amount===49) payment49=true;
+if(amount===199) payment199=true;
 
-const verify = await callAPI({
-razorpayPaymentId: resp.razorpay_payment_id
-});
+track("payment_success",{method:"razorpay",value:amount});
 
-if(!verify.paywall){
+alert("Payment successful 😄");
 paywallBox.style.display="none";
-type(verify.reply);
-messages.push({role:"assistant",content:verify.reply});
-}
 
 }
 });
@@ -196,7 +147,7 @@ messages.push({role:"assistant",content:verify.reply});
 rzp.open();
 };
 
-/* PayPal ALWAYS */
+/* PayPal */
 document.getElementById("paypal-button").innerHTML="";
 
 paypal.Buttons({
@@ -210,48 +161,12 @@ amount:{ value: amount===49 ? "3.00" : "9.00" }
 },
 
 onApprove: function(data, actions){
-return actions.order.capture().then(async function(){
-
-const verify = await callAPI({
-paypalOrderID: data.orderID
-});
-
-if(!verify.paywall){
-paywallBox.style.display="none";
-type(verify.reply);
-messages.push({role:"assistant",content:verify.reply});
-}
-
-});
-}
-
-}).render("#paypal-button");
-
-  }
-/* 🌍 PayPal */
-else{
-
-razorpayBtn.style.display="none";
-
-document.getElementById("paypal-button").innerHTML="";
-
-paypal.Buttons({
-
-createOrder: function(data, actions){
-return actions.order.create({
-purchase_units: [{
-amount: {
-value: amount===49 ? "3.00" : "10.00"
-}
-}]
-});
-},
-
-onApprove: function(data, actions){
 return actions.order.capture().then(function(){
 
 if(amount===49) payment49=true;
 if(amount===199) payment199=true;
+
+track("payment_success",{method:"paypal",value:amount});
 
 alert("Payment successful 😄");
 paywallBox.style.display="none";
@@ -262,12 +177,13 @@ paywallBox.style.display="none";
 }).render("#paypal-button");
 
 }
-}
 
 /* START */
 getBtn.onclick=async()=>{
 const text=mainInput.value.trim();
 if(!text)return;
+
+track("start_clicked");
 
 messages=[{role:"user",content:text}];
 outputBox.innerHTML=`<b>You:</b> ${text}<br><br>`;
@@ -284,17 +200,19 @@ getBtn.style.display="none";
 };
 
 /* NEXT */
-nextBtn.onclick = async () => {
+nextBtn.onclick=async()=>{
 
-const text = reflectionInput.value.trim();
-if(!text) return;
+const text=reflectionInput.value.trim();
+if(!text)return;
 
 loopLevel++;
+
+track("loop_progress",{loop:loopLevel});
 
 messages.push({role:"user",content:text});
 outputBox.innerHTML+=`<br><b>You:</b> ${text}<br><br>`;
 
-const data = await callAPI();
+const data=await callAPI();
 
 if(data.paywall){
 showPaywall(data.reply, loopLevel===5 ? 49 : 199);
@@ -302,26 +220,12 @@ return;
 }
 
 messages.push({role:"assistant",content:data.reply});
-updateLoopUI();
 typeEffect(data.reply);
-
-if(loopLevel===4){
-setTimeout(()=>showShareCard(data.reply),300);
-}
 
 reflectionInput.value="";
 };
 
-function showShareCard(text){
-const clean=text.replace(/<[^>]*>?/gm,'').trim();
-shareText.innerText=`This hit me harder than expected.\n\n${clean}\n\nMost people avoid this.\n\nhttps://truthloop.in`;
-shareBox.style.display="block";
-}
-
-function copyShare(){navigator.clipboard.writeText(shareText.innerText);}
-function whatsappShare(){window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);}
-
 </script>
 
 </body>
-</html>
+  </html>
