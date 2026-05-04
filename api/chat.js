@@ -99,14 +99,51 @@ if(razorpayPaymentId){
 }
 
 if(!verified){
-  return res.status(200).json({
-    reply: isHindi
-      ? "तुम bypass करने की कोशिश कर रहे हो।"
-      : "You're trying to bypass.",
-    paywall: true
-  });
-}
 
+const base = lastUserMessage.slice(0,60);
+
+const lines = [
+`You said: "${base}"\n\nYou already know what to do.\nYou're just not doing it.`,
+`Nothing new is missing.\nYou're avoiding execution.`,
+`You’re not confused.\nYou’re hesitating.`,
+`You saw the gap.\nYou're choosing comfort.`,
+`You're asking again.\nBut the answer hasn't changed.`,
+`Clarity isn't your issue.\nAction is.`
+];
+
+const pick = lines[Math.floor(Math.random()*lines.length)];
+
+const urgency = isHindi
+? `तुमने देख लिया है।
+
+समस्या नहीं।
+pattern।
+
+पहले भी यही किया।
+अब भी वही कर रहे हो।
+
+Same effort.
+Same loop.
+Same result.
+
+कुछ नहीं बदलेगा।`
+: `You saw it.
+
+Not the problem.
+The pattern.
+
+You've seen this before.
+
+Same effort.
+Same loop.
+Same result.
+
+Nothing changes.`;
+
+return res.status(200).json({
+  reply: pick + "\n\n" + urgency,
+  paywall: true
+});
 }
 
 /* 🔒 LOOP 6 LOCK */
