@@ -182,7 +182,7 @@ let pick = nuclearLines[Math.floor(Math.random()*nuclearLines.length)];
 if(isHindi){
   pick = "आप काम कर रहे हैं.\n\nपर परिणाम नहीं आ रहा.\n\nतो समस्या मेहनत नहीं है.\nदिशा है.\n\nआप वही दोहरा क्यों रहे हैं जो काम नहीं कर रहा?";
 }
-  
+}
 /* 🧠 CORE SYSTEM PROMPT (NOW CONTEXT-AWARE) */
 const systemPrompt = `
 
