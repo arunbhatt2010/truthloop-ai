@@ -1,5 +1,8 @@
 // TruthLoop Backend Engine (Final Production Version) // 7 Loop System + Dynamic Input + Paid Locks + Hindi/English Support
-
+export default async function handler(req, res) {
+  console.log("API HIT 🔥");
+  return res.json({ test: "working" });
+}
 export default async function handler(req, res) { const { userInput, language = "en", loopRequest = 1, isPaid = false } = req.body;
 
 // 🔐 Topic Restriction const allowedTopics = ["finance", "business", "growth", "money", "startup", "sales", "linkedin"]; const isAllowed = allowedTopics.some(topic => userInput.toLowerCase().includes(topic) );
