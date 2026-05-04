@@ -16,7 +16,6 @@ messages,
 loopLevel = 1,
 paid49 = false,
 paid199 = false,
-shownLoop5 = [],
 paypalOrderID,
 razorpayPaymentId
 } = body;
@@ -26,11 +25,9 @@ if (!messages || !messages.length) {
 }
 
 const lastUserMessage = messages[messages.length - 1]?.content || "";
-
-/* 🔥 LANGUAGE FIX (STRONG) */
 const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
-/* 🔐 PAYPAL CONFIG */
+/* 🔐 PAYPAL CONFIG (UNCHANGED) */
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
 const PAYPAL_API = process.env.PAYPAL_ENV === "sandbox"
@@ -105,7 +102,7 @@ if(!verified){
   return res.status(200).json({
     reply: isHindi
       ? "तुम bypass करने की कोशिश कर रहे हो।"
-      : "You’re trying to bypass.",
+      : "You're trying to bypass.",
     paywall: true
   });
 }
@@ -116,7 +113,7 @@ if(!verified){
 if (loopLevel >= 6 && !paid49) {
   return res.status(200).json({
     reply: isHindi
-      ? "पहले previous unlock करो।"
+      ? "पहले unlock करो।"
       : "Unlock previous step first.",
     paywall: true
   });
@@ -126,29 +123,47 @@ if (loopLevel >= 6 && !paid49) {
 if (loopLevel === 7 && !paid199) {
   return res.status(200).json({
     reply: isHindi
-      ? "अब commitment दिखाओ।"
-      : "Now show commitment.",
+      ? "अब commit करो।"
+      : "Now commit.",
     paywall: true
   });
 }
 
-/* 🧠 SYSTEM PROMPT (FIXED LANGUAGE) */
+/* 🔥 TRUTHLOOP PROMPT (AHA MODE RESTORED) */
 const systemPrompt = `
 You are TruthLoop.
 
-LANGUAGE RULE:
-- If user writes Hindi → reply ONLY Hindi
-- If user writes English → reply ONLY English
-- NEVER mix
+You do NOT help.
+You expose.
 
-FORMAT:
-1 Situation
-2 Contradiction
-3 Pattern
-4 Real problem
-5 One question
+LANGUAGE:
+- Hindi → Hindi only
+- English → English only
+- Never mix
 
-NO advice. NO suggestions.
+STYLE:
+- Short lines
+- Sharp
+- Emotional hit
+- No numbering
+- No headings
+
+FLOW:
+Line 1 → Mirror user
+Line 2 → Contradiction
+Line 3 → Pattern
+Line 4 → Real problem
+Line 5 → ONE uncomfortable question
+
+RULES:
+- No advice
+- No suggestions
+- No explanation
+- No generic lines
+- Use user's exact context
+- Every line must hit
+
+STAGE: ${loopLevel}
 `;
 
 /* 🔥 AI CALL */
@@ -164,19 +179,25 @@ messages: [
 { role: "system", content: systemPrompt },
 ...messages.slice(-6)
 ],
-temperature: 0.6,
-max_tokens: 160
+temperature: 0.7,
+max_tokens: 220
 })
 });
 
 const data = await response.json();
 let reply = data?.choices?.[0]?.message?.content || "";
 
-/* 🔥 LANGUAGE FALLBACK */
-if (!reply || reply.length < 20) {
-  reply = isHindi
-    ? "सीधे बोलो — असली समस्या क्या है?"
-    : "Be direct — what’s actually wrong?";
+/* 🔥 FORCE COMPLETE */
+if(!reply || reply.length < 20){
+reply = isHindi
+? "तुम avoid कर रहे हो।\n\nअसल में क्या नहीं कर रहे?"
+: "You're avoiding something.\n\nWhat are you not doing?";
+}
+
+if(!reply.includes("?")){
+reply += isHindi
+? "\n\nअब बताओ — तुम क्या avoid कर रहे हो?"
+: "\n\nSo tell me — what are you avoiding?";
 }
 
 return res.status(200).json({
@@ -188,4 +209,4 @@ return res.status(200).json({
 return res.status(500).json({ reply: "Server error" });
 }
 
-      }
+        }
