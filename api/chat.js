@@ -99,12 +99,30 @@ export default async function handler(req, res) {
        🔒 LOOP 5 PAYWALL
     ========================= */
     if (loopLevel === 5 && !paid49) {
-      return res.status(200).json({
-        reply: isHindi
-          ? "तुम देख चुके हो.\n\nअब action नहीं ले रहे।"
-          : "You already see it.\n\nYou're not acting.",
-        paywall: true
-      });
+
+  const base = lastUserMessage.slice(0, 40).replace(/\n/g, " ");
+
+  const hooks = [
+    `You said: "${base}"\nAnd still nothing changed.`,
+    `You said: "${base}"\nBut you're repeating the same pattern.`,
+    `You said: "${base}"\nYou already saw this before.`,
+    `You said: "${base}"\nSo why are you still stuck?`
+  ];
+
+  const pick = hooks[Math.floor(Math.random() * hooks.length)];
+
+  return res.status(200).json({
+    reply:
+`${pick}
+
+Same effort.
+Same loop.
+Same result.
+
+Pay to continue.`,
+    
+    paywall: true
+  });
     }
 
     /* =========================
