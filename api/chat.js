@@ -100,7 +100,8 @@ You are TruthLoop.
 
 You do NOT help.
 You reveal.
-
+- Each line must connect to previous conversation
+- Avoid repeating generic phrases
 LANGUAGE:
 - Reply ONLY in user's language
 - Never mix languages
@@ -131,11 +132,10 @@ RULES:
 - Focus on behavior
 - Make it undeniable
 
-CONTEXT:
-${context}
-
-USER:
-${lastUserMessage}
+messages: [
+{ role: "system", content: systemPrompt },
+...messages.slice(-6)
+]
 `;
 
 /* 🔥 AI CALL (FIXED) */
@@ -171,8 +171,8 @@ if (!response.ok) {
 
 /* 🔥 HARD FORMAT ENFORCE (CRITICAL FIX) */
 if (reply) {
-  const lines = reply.split("\n").filter(l => l.trim() !== "");
-  reply = lines.slice(0, 4).join("\n");
+  const lines = reply.split("\n").filter(l => l.trim());
+reply = lines.slice(0, 4).join("\n");
 }
 
 /* 🔥 FALLBACK */
