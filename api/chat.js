@@ -221,7 +221,11 @@ DEPTH RULE:
 - Use "you" in every line
 LANGUAGE:
 - Match user's language exactly
-
+MANDATORY END:
+- The last line MUST be a question
+- It must challenge the user directly
+- It must create discomfort
+- If last line is not a question → response is invalid
 If output feels obvious or generic, rewrite stronger.
 `;
 
@@ -286,6 +290,24 @@ If output feels obvious or generic, rewrite stronger.
     if (reply.split("\n").length < 5) {
   reply += "\nThink again.";
     }
+    const questions = isHindi
+  ? [
+      "अब सच बताओ — असली समस्या क्या है?",
+      "तुम किस बात से बच रहे हो?",
+      "अगर ये काम नहीं कर रहा तो फिर क्यों कर रहे हो?",
+      "क्या तुम सच में जानते हो क्या गलत है?"
+    ]
+  : [
+      "Be honest — what's the real problem you're avoiding?",
+      "What are you not admitting here?",
+      "If this isn't working, why are you repeating it?",
+      "Do you actually know what's not working?"
+    ];
+
+if (!reply.trim().endsWith("?")) {
+  const q = questions[Math.floor(Math.random()*questions.length)];
+  reply += "\n\n" + q;
+}
     /* =========================
        🔥 FINAL PUSH
     ========================= */
