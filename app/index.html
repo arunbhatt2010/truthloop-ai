@@ -195,30 +195,29 @@ getBtn.style.display="none";
 };
 
 /* NEXT */
-nextBtn.onclick=async()=>{
+nextBtn.onclick = async () => {
 
-const text=reflectionInput.value.trim();
-if(!text)return;
+const text = reflectionInput.value.trim();
+if(!text) return;
+
+/* ✅ पहले increment */
+loopLevel++;
 
 messages.push({role:"user",content:text});
 outputBox.innerHTML+=`<br><b>You:</b> ${text}<br><br>`;
 
-const data=await callAPI();
+const data = await callAPI();
 
-/* ✅ PAYWALL ONLY FROM BACKEND */
+/* ✅ backend decides */
 if(data.paywall){
-showPaywall(data.reply, loopLevel===4?49:199);
+showPaywall(data.reply, loopLevel===5 ? 49 : 199);
 return;
 }
-
-/* ✅ increment AFTER response */
-loopLevel++;
 
 messages.push({role:"assistant",content:data.reply});
 updateLoopUI();
 typeEffect(data.reply);
 
-/* SHARE LOOP 4 */
 if(loopLevel===4){
 setTimeout(()=>showShareCard(data.reply),300);
 }
