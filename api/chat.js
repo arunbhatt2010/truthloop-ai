@@ -73,16 +73,24 @@ const isHindi = lang === "hi";
        🔥 LOOP 1 STRICT
     ========================= */
     if (loopLevel === 1) {
-      const words = lastUserMessage.trim().split(/\s+/).length;
+  const words = lastUserMessage.trim().split(/\s+/).length;
 
-      if (!userKnown) {
-  return res.status(200).json({
-    reply: isHindi
-      ? "पहले ये साफ करो — तुम करते क्या हो?\n\nऔर अभी क्या काम नहीं कर रहा?"
-      : "Before we go deeper — what do you actually do?\n\nAnd what is not working right now?"
-  });
-}
+  if (!userKnown) {
+    return res.status(200).json({
+      reply: isHindi
+        ? "पहले ये साफ करो — तुम करते क्या हो?\n\nऔर अभी क्या काम नहीं कर रहा?"
+        : "Before we go deeper — what do you actually do?\n\nAnd what is not working right now?"
+    });
+  }
 
+  if (words < 4) {
+    return res.status(200).json({
+      reply: isHindi
+        ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
+        : "Too vague.\n\nWhat exactly is not working?"
+    });
+  }
+      }
 
     /* =========================
        🔒 LOOP 5 PAYWALL
@@ -186,7 +194,8 @@ STAGE 4 OVERRIDE:
     ========================= */
 const systemPrompt = `
 You are TruthLoop.
-
+USER CONTEXT:
+${userContext}
 You are not here to guide.
 You are here to expose and trap.
 
@@ -269,8 +278,7 @@ MANDATORY END:
 - It must force self-confrontation
 
 ---
-USER CONTEXT:
-${userContext}
+
 If response feels safe, rewrite stronger.
 If response feels generic, rewrite sharper.
 If no action is present, response is invalid.
