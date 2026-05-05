@@ -1,7 +1,6 @@
 console.log("🔥 CHAT FILE RUNNING");
 
-import { buildPrompt } from "../../lib/promptBuilder.js";
-
+import { buildPrompt } from "../lib/promptBuilder.js";
 export default async function handler(req, res) {
 
   /* 🌐 HEADERS */
