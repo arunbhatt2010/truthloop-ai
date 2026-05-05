@@ -28,8 +28,7 @@ export default async function handler(req, res) {
       messages,
       loopLevel = 1,
       paid49 = false,
-      paid199 = false,
-      shownLoop5 = []
+      paid199 = false
     } = body;
 
     if (!messages || !messages.length) {
@@ -43,7 +42,7 @@ export default async function handler(req, res) {
     const userContext = messages[1]?.content || "";
 
     /* =========================
-       🌐 LANGUAGE DETECT
+       🌐 LANGUAGE
     ========================= */
     function detectLanguage(text) {
       const hindiChars = (text.match(/[\u0900-\u097F]/g) || []).length;
@@ -100,19 +99,19 @@ export default async function handler(req, res) {
     ========================= */
     if (loopLevel === 5 && !paid49) {
 
-  const base = lastUserMessage.slice(0, 40).replace(/\n/g, " ");
+      const base = lastUserMessage.slice(0, 50).replace(/\n/g, " ");
 
-  const hooks = [
-    `You said: "${base}"\nAnd still nothing changed.`,
-    `You said: "${base}"\nBut you're repeating the same pattern.`,
-    `You said: "${base}"\nYou already saw this before.`,
-    `You said: "${base}"\nSo why are you still stuck?`
-  ];
+      const hooks = [
+        `You said: "${base}"\nBut nothing changed.`,
+        `You said: "${base}"\nStill same pattern.`,
+        `You said: "${base}"\nSo why repeat it?`,
+        `You said: "${base}"\nYou already saw this.`
+      ];
 
-  const pick = hooks[Math.floor(Math.random() * hooks.length)];
+      const pick = hooks[Math.floor(Math.random() * hooks.length)];
 
-  return res.status(200).json({
-    reply:
+      return res.status(200).json({
+        reply:
 `${pick}
 
 Same effort.
@@ -120,9 +119,8 @@ Same loop.
 Same result.
 
 Pay to continue.`,
-    
-    paywall: true
-  });
+        paywall: true
+      });
     }
 
     /* =========================
@@ -138,13 +136,11 @@ Pay to continue.`,
     }
 
     /* =========================
-       🔒 LOOP 7 PAYWALL
+       🔒 LOOP 7
     ========================= */
     if (loopLevel === 7 && !paid199) {
       return res.status(200).json({
-        reply: isHindi
-          ? "अब commit करो।"
-          : "Now commit.",
+        reply: isHindi ? "अब commit करो।" : "Now commit.",
         paywall: true
       });
     }
@@ -159,72 +155,31 @@ USER CONTEXT:
 ${userContext}
 
 You expose, not guide.
-FLOW RULE:
-- Avoid extreme actions (delete, quit, stop everything)
-- Action must be small, reversible, and testable
-- Do NOT ask multiple questions
-- Only ONE question at the end
-- Before question:
-  → expose pattern
-  → give 1 uncomfortable action
-  - Do NOT generalize behavior
-- Stay specific to user's situation
-- If line cannot be proven → remove it
- - Do NOT label behavior (validation-seeking, overcommitting, etc.)
-- Only use what user has explicitly said
-- If unsure → convert into question
-If response is only questions → invalid
-QUESTION MEMORY RULE:
 
-- Do NOT repeat the same question
-- If a question was already asked → go one level deeper
-- Build on user's last answer
-DEPTH PROGRESSION:
-
-- Each question must be more specific than previous
-- Move from general → specific → measurable → personal
 OUTPUT:
-- 6 lines only
-- Each line under 15 words
-- No fluff
-- If user gives vague answer → force specificity
-- Convert vague words into measurable terms
-CORE:
-- Use only user's words
-- No assumptions
-- Go deeper each line
-- No repetition
-If response feels safe → rewrite harsher
-If response feels like coaching → reject
+- 7 to 9 lines
+- Each line under 18 words
+- Each line deeper than previous
+
+FLOW:
+1. Mirror user's exact situation
+2. Break belief
+3. Show pattern
+4. Expose avoidance
+5. Apply pressure
+6. Give 1 uncomfortable action
+7. End with sharp question
+
+RULES:
+- Use only user input (no assumptions)
+- Do not repeat questions
+- Do not generalize
+- No teaching, no advice
+- No tools or strategy suggestions
+
 ACTION:
-- One uncomfortable action
-- Doable today
-- Every response must include ONE action
-- If no action → response invalid
-- Action must come BEFORE the question
-- Action must be small and realistic
-- No extreme actions (delete account, stop everything)
-- Action must relate directly to user's last statement
-ACTION TYPE RULE:
-
-- Do NOT give improvement steps
-- Do NOT suggest tools, setup, or strategy
-
-- Only give actions that:
-  → reveal truth
-  → expose gap
-  → force user to confront reality
-  METRIC RULE:
-
-- If user mentions numbers
-→ force them to compare
-
-Example:
-"40 sec" → "What happens after 40 sec?"
-LINK:
-- No verify
-- No assume
-- Focus on gap
+- Must reveal truth, not fix it
+- Small, real, uncomfortable
 
 STYLE:
 - Direct
@@ -234,7 +189,8 @@ STYLE:
 END:
 - Last line must be a question
 
-If weak → go sharper
+If weak → go deeper
+If generic → rewrite
 `;
 
     /* =========================
@@ -254,8 +210,8 @@ If weak → go sharper
             { role: "system", content: systemPrompt },
             ...messages.slice(-6)
           ],
-          temperature: 0.6,
-          max_tokens: 100
+          temperature: 0.7,
+          max_tokens: 180
         })
       }
     );
@@ -270,16 +226,18 @@ If weak → go sharper
     const data = await response.json();
     let reply = data?.choices?.[0]?.message?.content || "";
 
-    if (!reply || reply.length < 10) {
+    if (!reply || reply.length < 20) {
       reply = isHindi
         ? "सीधे बोलो — क्या काम नहीं कर रहा?"
         : "Be direct — what's not working?";
     }
 
-    if (!reply.includes("\n")) {
+    // safe formatting (no breaking short replies)
+    if (reply.length > 120 && !reply.includes("\n")) {
       reply = reply.replace(/\. /g, "\n");
     }
 
+    // ensure ending question
     if (!reply.trim().endsWith("?")) {
       reply += isHindi
         ? "\n\nतुम किस बात से बच रहे हो?"
