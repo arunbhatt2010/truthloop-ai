@@ -1,5 +1,6 @@
 console.log("🔥 CHAT FILE RUNNING");
-import { buildPrompt } from "../../lib/promptBuilder";// 👉 अगर error आए तो "../lib/..." try करो
+
+import { buildPrompt } from "../../lib/promptBuilder.js";
 
 export default async function handler(req, res) {
 
@@ -142,28 +143,28 @@ Pay to continue.`,
           ...(messages || []).slice(-6)
         ],
         temperature: 0.7,
-        max_tokens: 180
+        max_tokens: 220
       })
     });
 
     if (!response.ok) {
-      console.error("❌ API FAIL:", await response.text());
+      const err = await response.text();
+      console.error("❌ API FAIL:", err);
       return res.status(500).json({ reply: "API error" });
     }
 
     const data = await response.json();
-    console.log("📦 RAW:", JSON.stringify(data));
 
     let reply = data?.choices?.[0]?.message?.content || "";
 
-    /* 🔧 SAFE FALLBACK */
+    /* 🔧 FALLBACK */
     if (!reply || reply.length < 20) {
       reply = isHindi
         ? "सीधे बोलो — क्या काम नहीं कर रहा?"
         : "Be direct — what's not working?";
     }
 
-    /* ✂️ FORMAT FIX */
+    /* ✂️ FORMAT */
     if (reply.length > 120 && !reply.includes("\n")) {
       reply = reply.replace(/\. /g, "\n");
     }
@@ -188,4 +189,4 @@ Pay to continue.`,
       reply: "Server error"
     });
   }
-        }
+      }
