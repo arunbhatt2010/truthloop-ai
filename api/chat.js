@@ -160,7 +160,8 @@ ${userContext}
 
 You expose, not guide.
 FLOW RULE:
-
+- Avoid extreme actions (delete, quit, stop everything)
+- Action must be small, reversible, and testable
 - Do NOT ask multiple questions
 - Only ONE question at the end
 - Before question:
