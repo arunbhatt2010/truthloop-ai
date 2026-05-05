@@ -177,7 +177,8 @@ OUTPUT:
 - 5 lines only
 - Each line under 15 words
 - No fluff
-
+- If user gives vague answer → force specificity
+- Convert vague words into measurable terms
 CORE:
 - Use only user's words
 - No assumptions
