@@ -34,7 +34,7 @@ Type ONE real problem:
   <!-- PayPal -->  <div id="paypal-button"></div>
 </div></div><script>
 
-const API_URL="/api/chat";
+const API_URL="https://gita-decision-engine.vercel.app/api/chat";
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";
 
 const outputBox=document.getElementById("outputBox");
@@ -64,13 +64,31 @@ gtag('event',event,data);
 
 /* API */
 async function callAPI(){
-const res=await fetch(API_URL,{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({messages,loopLevel,paid49:payment49,paid199:payment199})
-});
-return await res.json();
-}
+  try {
+    const res = await fetch(API_URL,{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        messages,
+        loopLevel,
+        paid49:payment49,
+        paid199:payment199
+      })
+    });
+
+    if(!res.ok){
+      const errorText = await res.text();
+      console.error("API ERROR:", errorText);
+      return { reply: "Server error 😃" };
+    }
+
+    return await res.json();
+
+  } catch (err) {
+    console.error("FETCH FAIL:", err);
+    return { reply: "Network error 😃" };
+  }
+  }
 
 /* TYPE EFFECT */
 function typeEffect(text){
