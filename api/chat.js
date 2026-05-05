@@ -1,4 +1,4 @@
-import { buildPrompt } from "../lib/promptBuilder";
+import { buildPrompt } from "../../lib/promptBuilder"; // 👉 अगर error आए तो "../lib/..." try करो
 
 export default async function handler(req, res) {
 
@@ -12,17 +12,19 @@ export default async function handler(req, res) {
 
   try {
 
+    console.log("✅ API HIT");
+
     /* 📥 BODY */
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
     const {
-      messages,
+      messages = [],
       loopLevel = 1,
       paid49 = false,
       paid199 = false
     } = body;
 
-    if (!messages || !messages.length) {
+    if (!messages.length) {
       return res.status(400).json({ reply: "No input provided" });
     }
 
@@ -32,7 +34,6 @@ export default async function handler(req, res) {
     const userContext = messages[1]?.content || "";
     const userKnown = messages.length > 1;
 
-    /* 🌐 LANGUAGE */
     const isHindi = /[\u0900-\u097F]/.test(lastUserMessage);
 
     /* ❌ DOMAIN FILTER */
@@ -116,8 +117,15 @@ Pay to continue.`,
       });
     }
 
-    /* 🧠 PROMPT (अब modular) */
+    /* 🧠 PROMPT */
     const systemPrompt = buildPrompt(loopLevel, userContext);
+    console.log("🧠 PROMPT READY");
+
+    /* 🔑 API KEY CHECK */
+    if (!process.env.GROQ_API_KEY) {
+      console.error("❌ Missing GROQ API KEY");
+      return res.status(500).json({ reply: "Missing API key" });
+    }
 
     /* 🤖 AI CALL */
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -130,7 +138,7 @@ Pay to continue.`,
         model: "llama-3.1-8b-instant",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages.slice(-6)
+          ...(messages || []).slice(-6)
         ],
         temperature: 0.7,
         max_tokens: 180
@@ -138,23 +146,28 @@ Pay to continue.`,
     });
 
     if (!response.ok) {
+      console.error("❌ API FAIL:", await response.text());
       return res.status(500).json({ reply: "API error" });
     }
 
     const data = await response.json();
+    console.log("📦 RAW:", JSON.stringify(data));
+
     let reply = data?.choices?.[0]?.message?.content || "";
 
-    /* 🔧 SAFE RESPONSE FIX */
+    /* 🔧 SAFE FALLBACK */
     if (!reply || reply.length < 20) {
       reply = isHindi
         ? "सीधे बोलो — क्या काम नहीं कर रहा?"
         : "Be direct — what's not working?";
     }
 
+    /* ✂️ FORMAT FIX */
     if (reply.length > 120 && !reply.includes("\n")) {
       reply = reply.replace(/\. /g, "\n");
     }
 
+    /* ❓ ENSURE QUESTION */
     if (!reply.trim().endsWith("?")) {
       reply += isHindi
         ? "\n\nतुम किस बात से बच रहे हो?"
@@ -167,9 +180,11 @@ Pay to continue.`,
     });
 
   } catch (error) {
-    console.error("Server error:", error);
+
+    console.error("🔥 SERVER ERROR:", error);
+
     return res.status(500).json({
       reply: "Server error"
     });
   }
-      }
+        }
