@@ -1,5 +1,7 @@
 {
-  "name": "truthloop",
-  "version": "1.0.0",
-  "type": "module"
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
 }
