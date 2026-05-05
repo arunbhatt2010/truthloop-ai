@@ -1,4 +1,4 @@
-import { buildPrompt } from "../../lib/promptBuilder"; // 👉 अगर error आए तो "../lib/..." try करो
+import { buildPrompt } from "../lib/promptBuilder"; // 👉 अगर error आए तो "../lib/..." try करो
 
 export default async function handler(req, res) {
 
