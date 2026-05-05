@@ -174,8 +174,17 @@ FLOW RULE:
 - Only use what user has explicitly said
 - If unsure → convert into question
 If response is only questions → invalid
+QUESTION MEMORY RULE:
+
+- Do NOT repeat the same question
+- If a question was already asked → go one level deeper
+- Build on user's last answer
+DEPTH PROGRESSION:
+
+- Each question must be more specific than previous
+- Move from general → specific → measurable → personal
 OUTPUT:
-- 5 lines only
+- 6 lines only
 - Each line under 15 words
 - No fluff
 - If user gives vague answer → force specificity
