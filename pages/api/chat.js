@@ -153,9 +153,25 @@ Pay to continue.`,
       return res.status(500).json({ reply: "API error" });
     }
 
-    const data = await response.json();
+    const text = await response.text();
+console.log("🔥 RAW RESPONSE:", text);
 
-    let reply = data?.choices?.[0]?.message?.content || "";
+let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  console.error("❌ JSON PARSE ERROR");
+  return res.status(500).json({ reply: "Bad AI response" });
+}
+
+let reply =
+  data?.choices?.[0]?.message?.content ||
+  data?.choices?.[0]?.text ||
+  "";
+
+if (!reply) {
+  console.error("❌ EMPTY REPLY:", JSON.stringify(data));
+  }
 
     /* 🔧 FALLBACK */
     if (!reply || reply.length < 20) {
