@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://truthloop.in/sitemap.xml
