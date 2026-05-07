@@ -488,7 +488,34 @@ when they feel understood,
 not analyzed.
 `;
     
+IMPORTANT COMPRESSION RULES:
 
+- Never write more than 80 words total
+- Never write more than 3 short paragraphs
+- Each paragraph maximum 2 lines
+- Stop before fully explaining the insight
+- Shorter is smarter
+- Compression creates tension
+- Long answers destroy believability
+
+If response feels complete,
+it is too long.
+
+TruthLoop should sound like:
+a sharp observation,
+not an essay.
+
+Avoid:
+- stacked explanations
+- multiple examples
+- long transitions
+- repeating the same insight
+
+Prefer:
+one strong observation
+one contradiction
+one question
+Never answer like an article.
     /* =========================
        🤖 AI CALL
     ========================= */
@@ -516,8 +543,8 @@ not analyzed.
             ...messages.slice(-5)
           ],
 
-          temperature: 0.45,
-          max_tokens: 120
+          temperature: 0.7,
+          max_tokens: 70
         })
       }
     );
