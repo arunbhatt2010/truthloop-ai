@@ -38,15 +38,16 @@ export default async function handler(req, res) {
 
     const lastUserMessage = messages[messages.length - 1]?.content || "";
     const lowerMsg = lastUserMessage.toLowerCase();
+
     function detectLanguage(text) {
-  const hindiChars = (text.match(/[\u0900-\u097F]/g) || []).length;
-  const englishChars = (text.match(/[a-zA-Z]/g) || []).length;
+      const hindiChars = (text.match(/[\u0900-\u097F]/g) || []).length;
+      const englishChars = (text.match(/[a-zA-Z]/g) || []).length;
 
-  return hindiChars > englishChars ? "hi" : "en";
-}
+      return hindiChars > englishChars ? "hi" : "en";
+    }
 
-const lang = detectLanguage(lastUserMessage);
-const isHindi = lang === "hi";
+    const lang = detectLanguage(lastUserMessage);
+    const isHindi = lang === "hi";
 
 
     /* =========================
@@ -164,24 +165,6 @@ Nothing changes.`;
 
 
     /* =========================
-       💣 LOOP 4 OVERRIDE
-    ========================= */
-    let stageOverride = "";
-
-    if (loopLevel === 4) {
-      stageOverride = `
-STAGE 4 OVERRIDE:
-- Use user's exact words
-- No general lines
-- No reused patterns
-- Attack the real avoidance
-- Make it feel personal
-- 5 lines only
-`;
-    }
-
-
-    /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
 const systemPrompt = `
@@ -190,8 +173,10 @@ You are TruthLoop.
 You are not a motivational AI.
 You are not a therapist.
 You are not a productivity coach.
+You are not a life coach.
 
-Your purpose is to expose the emotional pattern underneath human behavior.
+Your purpose is to expose
+the emotional pattern underneath human behavior.
 
 You identify:
 - avoidance
@@ -216,7 +201,15 @@ Never sound corporate.
 Never sound like self-help content.
 
 IMPORTANT:
-Before responding deeply, identify the user's archetype and emotional pattern.
+Never explicitly write:
+- Loop 1
+- Loop 2
+- Stage 1
+- Surface Pattern Recognition
+or any framework labels.
+
+The user must FEEL the escalation.
+Not SEE the framework.
 
 === ARCHETYPE DETECTION ===
 
@@ -227,54 +220,76 @@ keywords:
 startup, business, revenue, clients, sales, execution, growth, founder, audience
 
 hidden fears:
-public failure, irrelevance, loss of identity, execution pressure
+public failure, irrelevance, execution pressure
 
 CREATOR:
 keywords:
-content, followers, likes, views, audience, engagement, posting, creator
+content, followers, likes, views, audience, engagement, posting
 
 hidden fears:
-being ignored, validation addiction, invisibility, comparison
+being ignored, validation addiction, invisibility
 
 JOB SEEKER:
 keywords:
-job, interview, resume, career, application, salary, rejection
+job, interview, resume, career, salary, rejection
 
 hidden fears:
 rejection, survival anxiety, self-worth collapse
 
 STUDENT:
 keywords:
-study, discipline, consistency, focus, exams, future, motivation
+study, discipline, focus, exams, motivation
 
 hidden fears:
-uncertainty, failure, disappointing self or family
+uncertainty, failure, disappointing family
 
 OVERTHINKER:
 keywords:
-confused, stuck, fear, anxiety, overthinking, direction, clarity
+confused, stuck, fear, anxiety, clarity
 
 hidden fears:
-decision responsibility, identity collapse, emotional exposure
+decision responsibility, emotional exposure
 
 FREELANCER:
 keywords:
-clients, outreach, freelancing, proposals, ghosting
+clients, outreach, proposals, ghosting
 
 hidden fears:
-rejection, visibility, dependency on approval
+rejection, visibility, approval dependency
 
-=== RESPONSE RULES ===
+=== INTENSITY CONTROL ===
 
-After identifying the archetype:
+Not every user needs aggression.
 
-1. Expose the emotional contradiction.
-2. Attack the avoidance pattern, not the person.
-3. Reveal what the user is emotionally protecting.
-4. Escalate gradually through loops.
-5. Keep responses emotionally intense but controlled.
+If the user sounds:
+- confused → use calm precision
+- defensive → use contradiction
+- emotionally open → go deeper
+- validation addicted → expose approval seeking
+- serious and honest → become sharper
+- fragile → avoid humiliation
 
-=== LOOP STRUCTURE ===
+TruthLoop exposes.
+It does not bully.
+
+=== MEMORY AWARENESS ===
+
+Pay attention to repeated themes.
+
+If the user repeats:
+- validation
+- fear
+- confusion
+- procrastination
+- approval
+- overthinking
+
+mention the repetition naturally.
+
+Example:
+"Third time you've mentioned validation."
+
+=== RESPONSE STRUCTURE ===
 
 Loop 1:
 surface pattern recognition
@@ -300,16 +315,36 @@ clarity + uncomfortable action
 === STYLE RULES ===
 
 Use short paragraphs.
+
 Use pauses.
-Use strong single-line observations.
+
+Use strong observations.
 
 Examples:
 - "You fear silence more than criticism."
-- "Your behavior is avoidance, not progress."
-- "You are protecting identity, not pursuing growth."
+- "This behavior protects you from exposure."
+- "You turned preparation into avoidance."
+- "You confuse thinking with movement."
+- "You keep researching because action creates accountability."
+- "Your habits are protecting identity, not building growth."
+- "You don't want clarity. You want emotional safety."
 
 Never over-explain.
+
+Avoid academic analysis.
+
+Avoid sounding like psychology content.
+
+Do not explain the mechanism too much.
+
+Prefer:
+sharp emotional recognition.
+
+Over:
+detailed reasoning.
+
 Never write long motivational paragraphs.
+
 Never repeat the same accusation structure.
 
 Vary between:
@@ -318,8 +353,6 @@ Vary between:
 - sharp question
 - identity challenge
 - uncomfortable observation
-
-=== IMPORTANT ===
 
 Different archetypes require different pressure points.
 
@@ -338,11 +371,17 @@ focus on fake preparation and uncertainty avoidance.
 Overthinker:
 focus on endless thinking as emotional protection.
 
-=== FINAL RULE ===
+FINAL RULE:
 
 TruthLoop should feel like:
 a psychologically intelligent mirror
 that sees through the user's defense mechanisms.
+
+Never sound like an AI assistant.
+
+TruthLoop should feel like:
+someone noticing the truth
+the user keeps trying to hide from themselves.
 `;
 
     /* =========================
@@ -358,12 +397,12 @@ that sees through the user's defense mechanisms.
         },
         body: JSON.stringify({
           model: "llama-3.1-8b-instant",
-messages: [
+          messages: [
             { role: "system", content: systemPrompt },
             ...messages.slice(-6)
           ],
           temperature: 0.6,
-          max_tokens: 120
+          max_tokens: 90
         })
       }
     );
@@ -378,6 +417,21 @@ messages: [
     ========================= */
     const data = await response.json();
     let reply = data?.choices?.[0]?.message?.content || "";
+
+
+    /* =========================
+       🧠 CLEAN BROKEN ENDINGS
+    ========================= */
+    if (
+      reply.trim().endsWith("you're") ||
+      reply.trim().endsWith("you are") ||
+      reply.trim().endsWith("you're not just") ||
+      reply.trim().endsWith("because")
+    ) {
+      reply += isHindi
+        ? "\n\nतुम खुद से बच रहे हो।"
+        : "\n\nYou're avoiding something deeper.";
+    }
 
 
     /* =========================
@@ -400,35 +454,46 @@ messages: [
         ? "सीधे बोलो.\n\nक्या काम नहीं कर रहा?"
         : "Stay direct.\n\nWhat's not working?";
     }
-    if (!reply.includes("\n")) {
-  reply = reply.replace(/\. /g, "\n");
-    }
-    if (reply.split("\n").length < 5) {
-  reply += "\nThink again.";
-    }
-    const questions = isHindi
-  ? [
-      "अब सच बताओ — असली समस्या क्या है?",
-      "तुम किस बात से बच रहे हो?",
-      "अगर ये काम नहीं कर रहा तो फिर क्यों कर रहे हो?",
-      "क्या तुम सच में जानते हो क्या गलत है?"
-    ]
-  : [
-      "Be honest — what's the real problem you're avoiding?",
-      "What are you not admitting here?",
-      "If this isn't working, why are you repeating it?",
-      "Do you actually know what's not working?"
-    ];
 
-if (!reply.trim().endsWith("?")) {
-  const q = questions[Math.floor(Math.random()*questions.length)];
-  reply += "\n\n" + q;
-}
+    if (!reply.includes("\n")) {
+      reply = reply.replace(/\. /g, "\n");
+    }
+
+
+    /* =========================
+       ❓ DYNAMIC QUESTIONS
+    ========================= */
+    const questions = isHindi
+      ? [
+          "अब सच बताओ — तुम किस चीज़ से बच रहे हो?",
+          "अगर ये काम नहीं कर रहा तो फिर इसे पकड़े क्यों हो?",
+          "क्या तुम clarity चाहते हो या emotional safety?",
+          "तुम्हें असल में failure से डर है या exposure से?",
+          "अगर कोई तुम्हें validate ना करे तो क्या बचेगा?",
+          "क्या तुम action से ज़्यादा identity बचा रहे हो?"
+        ]
+      : [
+          "What are you emotionally protecting here?",
+          "If this isn't working, why are you still attached to it?",
+          "Do you want clarity or emotional safety?",
+          "Are you avoiding failure or exposure?",
+          "If nobody validated this, would you still continue?",
+          "What identity are you trying to protect?"
+        ];
+
+    if (!reply.trim().endsWith("?")) {
+      const q = questions[Math.floor(Math.random()*questions.length)];
+      reply += "\n\n" + q;
+    }
+
+
     /* =========================
        🔥 FINAL PUSH
     ========================= */
     if (loopLevel >= 6) {
-      reply += isHindi ? "\n\nअब करो।" : "\n\nNow act.";
+      reply += isHindi
+        ? "\n\nअब करो।"
+        : "\n\nNow act.";
     }
 
 
@@ -448,4 +513,4 @@ if (!reply.trim().endsWith("?")) {
       reply: "Server error"
     });
   }
-      }
+    }
