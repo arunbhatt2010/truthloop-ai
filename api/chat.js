@@ -385,157 +385,241 @@ Never sound like an AI assistant.
 
 LOOPS 1–4 RULES:
 - Maximum 5 short paragraphs
-- Each paragraph = one meaningful emotional idea
-- Keep responses emotionally compressed
-- Leave emotional gaps
-- Let the user mentally complete the meaning
-- End with ONE psychologically sharp question
-- Stop immediately after the final question
+/* =========================
+   🧠 SYSTEM PROMPT
+========================= */
+const systemPrompt = `
+You are TruthLoop.
 
-STRICT FLOW:
+You are not a motivational AI.
+You are not a therapist.
+You are not a life coach.
+
+Your purpose is to expose
+the emotional pattern underneath behavior.
+
+You identify:
+- avoidance
+- validation addiction
+- fear
+- emotional contradiction
+- identity protection
+- fake productivity
+- insecurity
+
+Never sound:
+- corporate
+- motivational
+- academic
+- philosophical
+- therapeutic
+
+Never explain psychology in detail.
+
+Avoid words like:
+- paradox
+- mechanism
+- framework
+- complexity
+- dynamic
+- perpetual
+
+Every sentence should sound natural when spoken out loud.
+
+=== ARCHETYPE DETECTION ===
+
+FOUNDER:
+fears:
+- public failure
+- losing identity
+- execution pressure
+
+CREATOR:
+fears:
+- invisibility
+- validation addiction
+- being ignored
+
+JOB SEEKER:
+fears:
+- rejection
+- survival anxiety
+- self-worth collapse
+
+STUDENT:
+fears:
+- discovering limitations
+- uncertainty
+- fake preparation
+
+OVERTHINKER:
+fears:
+- accountability
+- emotional exposure
+- irreversible action
+
+FREELANCER:
+fears:
+- rejection
+- approval dependency
+- visibility
+
+=== RESPONSE STYLE ===
+
+Use:
+- sharp emotional recognition
+- contradiction exposure
+- emotional mirror
+- identity challenge
+- uncomfortable observation
+
+Avoid:
+- filler explanations
+- repeated accusations
+- long analysis
+- unfinished sentences
+- overexplaining
+
+TruthLoop should feel like:
+someone noticing the truth
+the user keeps hiding from themselves.
+
+=== LOOPS 1-4 RULES ===
+
+Maximum 5 short paragraphs.
+
+Structure:
 1. Sharp observation
 2. Emotional contradiction
 3. Identity exposure
 4. Short tension line
-5. Sharp psychological question
+5. One sharp psychological question
 
-If the response becomes long:
-compress instead of explaining.
+Each paragraph:
+- maximum 2 lines
+- emotionally compressed
+- direct
+- human sounding
+
+Do not continue after the final question.
 
 Never say:
 - "you're not alone"
 - "many people"
-- "it's understandable"
 - "that's normal"
+- "it's understandable"
+
+Never mention:
+- loops
+- stages
+- frameworks
 `;
 
-    /* =========================
-       🤖 AI CALL
-    ========================= */
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + process.env.GROQ_API_KEY
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...messages.slice(-6)
-          ],
-          temperature: 0.45,
-          max_tokens: 80
-        })
-      }
-    );
-
-    if (!response.ok) {
-      return res.status(500).json({ reply: "API error" });
-    }
-
-
-    /* =========================
-       📤 RESPONSE PARSE
-    ========================= */
-    const data = await response.json();
-    let reply = data?.choices?.[0]?.message?.content || "";
-
-
-    /* =========================
-       🧠 CLEAN BROKEN ENDINGS
-    ========================= */
-    if (
-      reply.trim().endsWith("you're") ||
-      reply.trim().endsWith("you are") ||
-      reply.trim().endsWith("you're not just") ||
-      reply.trim().endsWith("because")
-    ) {
-      reply += isHindi
-        ? "\n\nतुम खुद से बच रहे हो।"
-        : "\n\nYou're avoiding something deeper.";
-    }
-
-
-    /* =========================
-       🔧 FALLBACKS
-    ========================= */
-    if (!reply || reply.length < 20) {
-      reply = isHindi
-        ? "आप घुमा रहे हैं.\n\nअसल में क्या काम नहीं कर रहा?"
-        : "You're avoiding something.\n\nWhat exactly is not working?";
-    }
-
-    if (reply.toLowerCase().includes("you should")) {
-      reply = isHindi
-        ? "आप general बात कर रहे हैं.\n\nअसल में issue क्या है?"
-        : "You're being generic.\n\nWhat's actually the issue?";
-    }
-
-    if (reply.toLowerCase().includes("as an ai")) {
-      reply = isHindi
-        ? "सीधे बोलो.\n\nक्या काम नहीं कर रहा?"
-        : "Stay direct.\n\nWhat's not working?";
-    }
-
-    if (!reply.includes("\n")) {
-      reply = reply.replace(/\. /g, "\n");
-    }
-
-
-    /* =========================
-       ❓ DYNAMIC QUESTIONS
-    ========================= */
-    const questions = isHindi
-      ? [
-          "अब सच बताओ — तुम किस चीज़ से बच रहे हो?",
-          "अगर ये काम नहीं कर रहा तो फिर इसे पकड़े क्यों हो?",
-          "क्या तुम clarity चाहते हो या emotional safety?",
-          "तुम्हें असल में failure से डर है या exposure से?",
-          "अगर कोई तुम्हें validate ना करे तो क्या बचेगा?",
-          "क्या तुम action से ज़्यादा identity बचा रहे हो?"
-        ]
-      : [
-          "What are you emotionally protecting here?",
-          "If this isn't working, why are you still attached to it?",
-          "Do you want clarity or emotional safety?",
-          "Are you avoiding failure or exposure?",
-          "If nobody validated this, would you still continue?",
-          "What identity are you trying to protect?"
-        ];
-
-    if (!reply.trim().endsWith("?")) {
-      const q = questions[Math.floor(Math.random()*questions.length)];
-      reply += "\n\n" + q;
-    }
-
-
-    /* =========================
-       🔥 FINAL PUSH
-    ========================= */
-    if (loopLevel >= 6) {
-      reply += isHindi
-        ? "\n\nअब करो।"
-        : "\n\nNow act.";
-    }
-
-
-    /* =========================
-       ✅ FINAL RESPONSE
-    ========================= */
-    return res.status(200).json({
-      reply,
-      paywall: false
-    });
-
-  } catch (error) {
-
-    console.error("Server error:", error);
-
-    return res.status(500).json({
-      reply: "Server error"
-    });
+/* =========================
+   🤖 AI CALL
+========================= */
+const response = await fetch(
+  "https://api.groq.com/openai/v1/chat/completions",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + process.env.GROQ_API_KEY
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages.slice(-5)
+      ],
+      temperature: 0.35,
+      max_tokens: 65
+    })
   }
-    }
+);
+
+if (!response.ok) {
+  return res.status(500).json({ reply: "API error" });
+}
+
+/* =========================
+   📤 RESPONSE PARSE
+========================= */
+const data = await response.json();
+let reply = data?.choices?.[0]?.message?.content || "";
+
+/* =========================
+   🧹 CLEANUP
+========================= */
+
+/* Remove broken endings */
+const brokenEndings = [
+  "because",
+  "you're",
+  "you are",
+  "but",
+  "and",
+  "that",
+  "your",
+  "you're not",
+  "if",
+  "so"
+];
+
+const trimmed = reply.trim().toLowerCase();
+
+if (brokenEndings.some(end => trimmed.endsWith(end))) {
+  reply = reply.trim() + (
+    isHindi
+      ? "\n\nतुम खुद से बच रहे हो।"
+      : "\n\nYou're avoiding something deeper."
+  );
+}
+
+/* Remove AI style filler */
+const bannedPhrases = [
+  "as an ai",
+  "many people",
+  "you're not alone",
+  "it's understandable",
+  "that's normal"
+];
+
+for (const phrase of bannedPhrases) {
+  if (reply.toLowerCase().includes(phrase)) {
+    reply = isHindi
+      ? "तुम घुमा रहे हो।\n\nअसल मुद्दा क्या है?"
+      : "You're avoiding the real issue.\n\nWhat's actually happening?";
+  }
+}
+
+/* Compress long responses */
+const lines = reply
+  .split("\n")
+  .map(l => l.trim())
+  .filter(Boolean);
+
+reply = lines.slice(0,5).join("\n\n");
+
+/* Ensure final question */
+if (!reply.trim().endsWith("?")) {
+
+  const questions = isHindi
+    ? [
+        "तुम असल में क्या बचा रहे हो?",
+        "तुम्हें clarity चाहिए या safety?",
+        "अगर ये काम नहीं कर रहा तो पकड़े क्यों हो?",
+        "तुम failure से डरते हो या exposure से?"
+      ]
+    : [
+        "What are you emotionally protecting?",
+        "Do you want clarity or emotional safety?",
+        "If this isn't working, why are you attached to it?",
+        "Are you afraid of failure or exposure?"
+      ];
+
+  const q =
+    questions[Math.floor(Math.random() * questions.length)];
+
+  reply += "\n\n" + q;
+  }
