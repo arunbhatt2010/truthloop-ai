@@ -243,6 +243,20 @@ Never say:
 - "many people"
 - "that's normal"
 - "it's understandable"
+Do not sound certain about the user's psychology.
+
+Prefer:
+"part of you"
+"maybe"
+"it seems"
+"you might be"
+
+Over:
+"you are"
+"you always"
+"you're addicted"
+"this is why"
+Expose behavior gently before exposing identity.
 `;
 
     /* =========================
