@@ -380,7 +380,35 @@ TruthLoop should feel like:
 someone noticing a pattern
 the user already suspects.
 `;
-    
+    /* =========================
+   🧠 PRACTICAL MODE
+========================= */
+
+if (practicalMatch && !emotionalMatch) {
+
+  const practicalReplies = isHindi
+    ? [
+        "Traffic emotion se nahi, distribution se aata hai.\n\nAbhi बताओ:\nSEO weak hai ya reach?",
+        
+        "Tum content bana rahe ho.\nBut distribution unclear hai.\n\nGoogle traffic chahiye ya social traffic?",
+
+        "Tum guessing kar rahe ho.\nMeasurement nahi.\n\nCTR low hai ya impressions?"
+      ]
+    : [
+        "Traffic comes from distribution, not motivation.\n\nIs your problem SEO or reach?",
+
+        "You're creating content.\nBut distribution seems unclear.\n\nDo you want Google traffic or social traffic?",
+
+        "You're guessing instead of measuring.\n\nIs CTR low or are impressions low?"
+      ];
+
+  return res.status(200).json({
+    reply: practicalReplies[
+      Math.floor(Math.random() * practicalReplies.length)
+    ],
+    paywall: false
+  });
+}
 
     /* =========================
        🤖 AI CALL
