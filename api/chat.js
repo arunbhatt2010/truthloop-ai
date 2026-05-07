@@ -269,11 +269,11 @@ Never say:
               role: "system",
               content: systemPrompt
             },
-            ...messages.slice(-5)
+            ...messages.slice(-4)
           ],
 
-          temperature: 0.35,
-          max_tokens: 65
+          temperature: 0.4,
+          max_tokens: 95
         })
       }
     );
@@ -388,6 +388,20 @@ Never say:
       reply += isHindi
         ? "\n\nअब करो।"
         : "\n\nNow act.";
+    }
+    /* Fix incomplete ending */
+if (
+  reply.trim().endsWith("a") ||
+  reply.trim().endsWith("an") ||
+  reply.trim().endsWith("the") ||
+  reply.trim().endsWith("to")
+) {
+
+  reply = reply.replace(/[a-zA-Z]+$/, "").trim();
+
+  reply += isHindi
+    ? "\n\nतुम action नहीं, safety बचा रहे हो।"
+    : "\n\nYou're protecting safety, not progress.";
     }
 
     /* =========================
