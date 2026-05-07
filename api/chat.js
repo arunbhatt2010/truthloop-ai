@@ -48,74 +48,7 @@ export default async function handler(req, res) {
 const lang = detectLanguage(lastUserMessage);
 const isHindi = lang === "hi";
 
-/* =========================
-   🧠 USER TYPE DETECTION
-========================= */
 
-const practicalPatterns = [
-  "seo","traffic","website","marketing",
-  "sales","clients","growth","followers",
-  "views","business","strategy","ads",
-  "content plan","how can","how do",
-  "how to","increase","improve","get more"
-];
-
-const emotionalPatterns = [
-  "stuck","afraid","confused","avoid",
-  "fear","validation","overthinking",
-  "failure","anxiety","lost","pressure"
-];
-
-const practicalMatch =
-  practicalPatterns.some(w =>
-    lowerMsg.includes(w)
-  );
-
-const emotionalMatch =
-  emotionalPatterns.some(w =>
-    lowerMsg.includes(w)
-  );
-
-/* =========================
-   🎯 ARCHETYPE DETECTION
-========================= */
-
-let archetype = "general";
-
-if (
-  /(startup|business|revenue|clients|sales|founder|growth)/i
-    .test(lowerMsg)
-) {
-  archetype = "founder";
-}
-
-else if (
-  /(content|followers|likes|views|audience|posting)/i
-    .test(lowerMsg)
-) {
-  archetype = "creator";
-}
-
-else if (
-  /(job|interview|resume|career|salary|rejection)/i
-    .test(lowerMsg)
-) {
-  archetype = "jobseeker";
-}
-
-else if (
-  /(study|exam|discipline|focus|motivation)/i
-    .test(lowerMsg)
-) {
-  archetype = "student";
-}
-
-else if (
-  /(confused|stuck|overthinking|clarity|direction)/i
-    .test(lowerMsg)
-) {
-  archetype = "overthinker";
-}
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
@@ -247,176 +180,100 @@ STAGE 4 OVERRIDE:
 `;
     }
 
+
+    /* =========================
+       🧠 SYSTEM PROMPT
+    ========================= */
 const systemPrompt = `
 You are TruthLoop.
 
-You expose emotional patterns behind behavior.
-
-You are sharp.
-But never theatrical.
-
-You are direct.
-But never dramatic.
-
-CURRENT ARCHETYPE:
-${archetype}
-
-IMPORTANT:
-
-If the user's message is practical
-without emotional signals,
-do NOT force emotional depth.
-
-Do not invent trauma.
-
-PRACTICAL QUESTIONS:
-
-If the user asks:
-- SEO
-- traffic
-- marketing
-- growth
-- sales
-- strategy
-- website
-
-Do NOT psychoanalyze immediately.
-
-First clarify the real bottleneck.
-
-Bad:
-"You fear failure."
-
-Good:
-"Your traffic problem sounds more distribution-related."
-
-TruthLoop escalates only after emotional signals appear.
+You are not here to guide.
+You are here to expose and trap.
 
 ---
 
-STYLE RULES:
+STAGE: LOOP 2-3
 
-- Maximum 5 short lines
-- Each line short
+---
+
+OUTPUT RULES:
+
+- 5 to 6 lines ONLY
+- Each line under 12 words
+- No paragraphs
 - No fluff
-- No philosophy
-- No therapy tone
-- No long explanations
-
-Never sound:
-- motivational
-- corporate
-- like a psychologist
-- like an AI assistant
+- No labels
+- No explanations
 
 ---
 
-DEPTH RULE:
+STRUCTURE:
 
-Start with observation.
-
-Escalate slowly.
-
-Never jump immediately into:
-- ego
-- self-worth
-- trauma
-- addiction
-
-Prefer:
-- "part of you"
-- "maybe"
-- "it seems"
-
-Over:
-- "you are"
-- "this proves"
-- "you're addicted"
-
----
-
-ARCHETYPE RULES:
-
-Founder:
-focus on execution avoidance.
-
-Creator:
-focus on validation and visibility.
-
-Job seeker:
-focus on rejection fear.
-
-Student:
-focus on fake preparation.
-
-Overthinker:
-focus on thinking used as protection.
+1. Mirror user's exact situation (use their words)
+2. Break their belief sharply
+3. Show repeating behavior pattern
+4. Expose what they are avoiding
+5. Force a small immediate action
+6. End with ONE uncomfortable question
 
 ---
 
 ACTION RULE:
 
-Only suggest action
-when avoidance is obvious.
+- Give ONE small, real-world action
+- Must be doable today
+- Must feel uncomfortable
+- No generic advice
+- No motivation
+- No multiple options
 
-Avoid forced actions.
-
----
-
-OUTPUT STRUCTURE:
-
-1. Mirror situation
-2. Expose contradiction
-3. Reveal avoidance
-4. Create tension
-5. Ask one uncomfortable question
+Example actions:
+- "Send 1 real message"
+- "Show 1 actual result"
+- "Ask 1 honest question"
+- "Remove 1 fake layer"
 
 ---
 
-Keep every line under 10 words.
+DEPTH RULE:
 
-Prefer:
-short impact lines.
+- Speak TO the user, not ABOUT the topic
+- Use "you" in every line
+- Each line must hit harder than the previous
+- No generic phrases like:
+  "lack", "problem", "issue", "improve", "try"
 
-Avoid:
-long combined sentences
-rambling
-over-analysis
-fake depth
+---
 
-TruthLoop should feel like:
-someone noticing a pattern
-the user already suspects.
+LANGUAGE:
+
+- Match user's language EXACTLY
+- No mixing Hindi + English
+
+---
+
+FORBIDDEN:
+
+- No long explanations
+- No storytelling
+- No teaching
+- No SEO-style thinking
+- No safe answers
+
+---
+
+MANDATORY END:
+
+- Last line MUST be a question
+- It must create discomfort
+- It must force self-confrontation
+
+---
+
+If response feels safe, rewrite stronger.
+If response feels generic, rewrite sharper.
+If no action is present, response is invalid.
 `;
-    /* =========================
-   🧠 PRACTICAL MODE
-========================= */
-
-if (practicalMatch && !emotionalMatch) {
-
-  const practicalReplies = isHindi
-    ? [
-        "Traffic emotion se nahi, distribution se aata hai.\n\nAbhi बताओ:\nSEO weak hai ya reach?",
-        
-        "Tum content bana rahe ho.\nBut distribution unclear hai.\n\nGoogle traffic chahiye ya social traffic?",
-
-        "Tum guessing kar rahe ho.\nMeasurement nahi.\n\nCTR low hai ya impressions?"
-      ]
-    : [
-        "Traffic comes from distribution, not motivation.\n\nIs your problem SEO or reach?",
-
-        "You're creating content.\nBut distribution seems unclear.\n\nDo you want Google traffic or social traffic?",
-
-        "You're guessing instead of measuring.\n\nIs CTR low or are impressions low?"
-      ];
-
-  return res.status(200).json({
-    reply: practicalReplies[
-      Math.floor(Math.random() * practicalReplies.length)
-    ],
-    paywall: false
-  });
-}
 
     /* =========================
        🤖 AI CALL
@@ -476,34 +333,9 @@ messages: [
     if (!reply.includes("\n")) {
   reply = reply.replace(/\. /g, "\n");
     }
-    let reply = data?.choices?.[0]?.message?.content || "";
-    /* =========================
-   ✂️ RESPONSE CLEANER
-========================= */
-
-reply = reply
-  .replace(/Maybe you/gi, "Part of you")
-  .replace(/Think again\./gi, "")
-  .replace(/As an AI/gi, "")
-  .replace(/you should/gi, "")
-  .trim();
-
-/* remove broken endings */
-
-const brokenEndings = [
-  "because",
-  "but",
-  "maybe",
-  "perhaps",
-  "so",
-  "and"
-];
-
-for (const end of brokenEndings) {
-  if (reply.toLowerCase().endsWith(end)) {
-    reply = reply.slice(0, -end.length).trim();
-  }
-}
+    if (reply.split("\n").length < 5) {
+  reply += "\nThink again.";
+    }
     const questions = isHindi
   ? [
       "अब सच बताओ — असली समस्या क्या है?",
@@ -546,4 +378,4 @@ if (!reply.trim().endsWith("?")) {
       reply: "Server error"
     });
   }
-}
+      }
