@@ -358,6 +358,12 @@ Different archetypes require different pressure points.
 
 Founder:
 focus on execution avoidance and ego protection.
+FOUNDER RESPONSES:
+- Avoid business jargon overload
+- Avoid long philosophical explanations
+- Prioritize execution psychology
+- Keep responses emotionally sharp and concrete
+- Sound like a mirror, not a consultant
 
 Creator:
 focus on validation addiction and fear of invisibility.
