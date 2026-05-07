@@ -486,8 +486,9 @@ MOST IMPORTANT RULE:
 Users stay engaged
 when they feel understood,
 not analyzed.
-`;
-    
+
+---
+
 IMPORTANT COMPRESSION RULES:
 
 - Never write more than 80 words total
@@ -512,10 +513,12 @@ Avoid:
 - repeating the same insight
 
 Prefer:
-one strong observation
-one contradiction
-one question
+- one strong observation
+- one contradiction
+- one question
+
 Never answer like an article.
+`;
     /* =========================
        🤖 AI CALL
     ========================= */
