@@ -286,7 +286,7 @@ These are not automatically emotional problems.
 
 STYLE RULES:
 
-- 5 to 6 lines ONLY
+- Maximum 5 short lines.
 - Each line short
 - No paragraphs
 - No fluff
@@ -362,6 +362,13 @@ OUTPUT STRUCTURE:
 5. Ask one uncomfortable question
 
 ---
+Keep every line under 10 words.
+
+Prefer:
+short impact lines.
+
+Avoid:
+long combined sentences.
 
 Never:
 - over-explain
@@ -393,7 +400,7 @@ messages: [
             ...messages.slice(-6)
           ],
           temperature: 0.6,
-          max_tokens: 120
+          max_tokens: 170
         })
       }
     );
