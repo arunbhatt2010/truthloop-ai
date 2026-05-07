@@ -3,6 +3,7 @@ export default async function handler(req, res) {
   /* =========================
      🌐 HEADERS
   ========================= */
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -12,17 +13,21 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ reply: "Method not allowed" });
+    return res.status(405).json({
+      reply: "Method not allowed"
+    });
   }
 
   try {
 
     /* =========================
-       📥 BODY PARSE
+       📥 BODY
     ========================= */
-    const body = typeof req.body === "string"
-      ? JSON.parse(req.body)
-      : req.body;
+
+    const body =
+      typeof req.body === "string"
+        ? JSON.parse(req.body)
+        : req.body;
 
     const {
       messages,
@@ -33,33 +38,56 @@ export default async function handler(req, res) {
     } = body;
 
     if (!messages || !messages.length) {
-      return res.status(400).json({ reply: "No input provided" });
+      return res.status(400).json({
+        reply: "No input provided"
+      });
     }
 
-    const lastUserMessage = messages[messages.length - 1]?.content || "";
-    const lowerMsg = lastUserMessage.toLowerCase();
+    const lastUserMessage =
+      messages[messages.length - 1]?.content || "";
+
+    const lowerMsg =
+      lastUserMessage.toLowerCase();
+
+    /* =========================
+       🌍 LANGUAGE
+    ========================= */
+
     function detectLanguage(text) {
-  const hindiChars = (text.match(/[\u0900-\u097F]/g) || []).length;
-  const englishChars = (text.match(/[a-zA-Z]/g) || []).length;
 
-  return hindiChars > englishChars ? "hi" : "en";
-}
+      const hindiChars =
+        (text.match(/[\u0900-\u097F]/g) || []).length;
 
-const lang = detectLanguage(lastUserMessage);
-const isHindi = lang === "hi";
+      const englishChars =
+        (text.match(/[a-zA-Z]/g) || []).length;
 
+      return hindiChars > englishChars
+        ? "hi"
+        : "en";
+    }
+
+    const isHindi =
+      detectLanguage(lastUserMessage) === "hi";
 
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
+
     const blockedPatterns = [
-      "doctor","medicine","pain","fever","treatment",
-      "relationship","breakup","girlfriend","boyfriend","marriage",
+      "doctor","medicine","pain","fever",
+      "treatment","relationship","breakup",
+      "girlfriend","boyfriend","marriage",
       "दर्द","बुखार","इलाज","डॉक्टर",
       "रिलेशनशिप","ब्रेकअप","प्यार","शादी"
     ];
 
-    if (loopLevel === 1 && blockedPatterns.some(w => lowerMsg.includes(w))) {
+    if (
+      loopLevel === 1 &&
+      blockedPatterns.some(w =>
+        lowerMsg.includes(w)
+      )
+    ) {
+
       return res.status(200).json({
         reply: isHindi
           ? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ फैसला लेना हो।"
@@ -67,14 +95,17 @@ const isHindi = lang === "hi";
       });
     }
 
-
     /* =========================
        🔥 LOOP 1 STRICT
     ========================= */
+
     if (loopLevel === 1) {
-      const words = lastUserMessage.trim().split(/\s+/).length;
+
+      const words =
+        lastUserMessage.trim().split(/\s+/).length;
 
       if (words < 4) {
+
         return res.status(200).json({
           reply: isHindi
             ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
@@ -83,294 +114,406 @@ const isHindi = lang === "hi";
       }
     }
 
-
     /* =========================
        🔒 LOOP 5 PAYWALL
     ========================= */
+
     if (loopLevel === 5 && !paid49) {
 
-      const base = lastUserMessage.slice(0,60);
-
       const lines = [
-        `You said: "${base}"\n\nYou already know what to do.\nYou're just not doing it.`,
-        `Nothing new is missing.\nYou're avoiding execution.`,
-        `You’re not confused.\nYou’re hesitating.`,
-        `You saw the gap.\nYou're choosing comfort.`,
-        `You're asking again.\nBut the answer hasn't changed.`,
-        `Clarity isn't your issue.\nAction is.`
+
+        "You already know what to do.\nYou're delaying action.",
+
+        "Nothing new is missing.\nExecution is.",
+
+        "You saw the pattern.\nYou're still avoiding discomfort.",
+
+        "You're asking again.\nBut the answer hasn't changed.",
+
+        "Clarity isn't your issue.\nAction is."
       ];
 
-      const pick = lines[Math.floor(Math.random()*lines.length)];
-
-      const urgency = isHindi
-        ? `आपने खुद देखा है।
-
-समस्या नहीं।
-pattern।
-
-पहले भी यही किया।
-अब भी वही कर रहे हो।
-
-Same effort.
-Same loop.
-Same result.
-
-कुछ नहीं बदलेगा।`
-        : `You saw it.
-
-Not the problem.
-The pattern.
-
-You've seen this before.
-
-Same effort.
-Same loop.
-Same result.
-
-Nothing changes.`;
+      const pick =
+        lines[Math.floor(Math.random() * lines.length)];
 
       return res.status(200).json({
-        reply: pick + "\n\n" + urgency,
+        reply: pick,
         paywall: true,
         shownLoop5: [...shownLoop5, pick]
       });
     }
 
-
     /* =========================
-       🔒 LOOP 6 LOCK
+       🔒 LOOP 6+
     ========================= */
+
     if (loopLevel >= 6 && !paid49) {
+
       return res.status(200).json({
         reply: isHindi
-          ? "तुम skip कर रहे हो.\n\nपहले ये पूरा करो।"
-          : "You can't skip this.\n\nFinish what you started.",
+          ? "तुम skip कर रहे हो।\n\nपहले इसका सामना करो।"
+          : "You're trying to skip discomfort.\n\nFace this first.",
         paywall: true
       });
     }
-
 
     /* =========================
        🔒 LOOP 7 PAYWALL
     ========================= */
+
     if (loopLevel === 7 && !paid199) {
+
       return res.status(200).json({
         reply: isHindi
-          ? "तुम्हें सच पता है.\n\nअब commit करो।"
-          : "You already see it.\n\nNow commit.",
+          ? "अब clarity दिख चुकी है।\n\nअब commitment चाहिए।"
+          : "You already see the truth.\n\nNow commit.",
         paywall: true
       });
     }
 
+    /* =========================
+       🧠 TRUTHLOOP BRAIN
+    ========================= */
+
+    const brain = {
+      practical: 0,
+      emotional: 0,
+      validation: 0,
+      avoidance: 0,
+      confused: 0
+    };
+
+    const practicalWords = [
+      "seo","traffic","website","sales",
+      "clients","growth","money",
+      "strategy","marketing",
+      "conversion","business"
+    ];
+
+    const emotionalWords = [
+      "afraid","stuck","lost",
+      "anxiety","pressure",
+      "failure","tired"
+    ];
+
+    const validationWords = [
+      "followers","likes","views",
+      "noticed","attention",
+      "recognition","audience"
+    ];
+
+    const avoidanceWords = [
+      "researching","planning",
+      "thinking","waiting",
+      "learning","perfecting"
+    ];
+
+    const confusedWords = [
+      "confused","clarity",
+      "direction","don't know"
+    ];
+
+    practicalWords.forEach(word => {
+      if (lowerMsg.includes(word))
+        brain.practical += 2;
+    });
+
+    emotionalWords.forEach(word => {
+      if (lowerMsg.includes(word))
+        brain.emotional += 2;
+    });
+
+    validationWords.forEach(word => {
+      if (lowerMsg.includes(word))
+        brain.validation += 2;
+    });
+
+    avoidanceWords.forEach(word => {
+      if (lowerMsg.includes(word))
+        brain.avoidance += 2;
+    });
+
+    confusedWords.forEach(word => {
+      if (lowerMsg.includes(word))
+        brain.confused += 2;
+    });
 
     /* =========================
-       💣 LOOP 4 OVERRIDE
+       🧠 MODE ROUTER
     ========================= */
-    let stageOverride = "";
 
-    if (loopLevel === 4) {
-      stageOverride = `
-STAGE 4 OVERRIDE:
-- Use user's exact words
-- No general lines
-- No reused patterns
-- Attack the real avoidance
-- Make it feel personal
-- 5 lines only
+    let mode = "mirror";
+
+    if (
+      brain.practical > brain.emotional &&
+      brain.practical > brain.validation
+    ) {
+      mode = "practical";
+    }
+
+    else if (brain.validation >= 4) {
+      mode = "validation";
+    }
+
+    else if (brain.avoidance >= 4) {
+      mode = "avoidance";
+    }
+
+    else if (brain.confused >= 4) {
+      mode = "clarity";
+    }
+
+    /* =========================
+       🧠 DYNAMIC PROMPT
+    ========================= */
+
+    let modeInstruction = "";
+
+    if (mode === "practical") {
+
+      modeInstruction = `
+Focus on strategic clarity.
+
+Do not psychoanalyze immediately.
+
+Ask sharp diagnostic questions.
+
+Observe bottlenecks first.
 `;
     }
 
+    if (mode === "validation") {
+
+      modeInstruction = `
+Focus on external approval dependency.
+
+Use subtle emotional mirrors.
+
+Avoid sounding aggressive.
+`;
+    }
+
+    if (mode === "avoidance") {
+
+      modeInstruction = `
+Expose delay disguised as preparation.
+
+Challenge gently.
+
+Avoid fake motivation.
+`;
+    }
+
+    if (mode === "clarity") {
+
+      modeInstruction = `
+Reduce noise.
+
+Create clarity.
+
+Avoid emotional overload.
+`;
+    }
+
+    if (mode === "mirror") {
+
+      modeInstruction = `
+Observe emotional contradictions.
+
+Expose patterns slowly.
+
+Avoid dramatic language.
+`;
+    }
 
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
-const systemPrompt = `
+
+    const systemPrompt = `
 You are TruthLoop.
 
-You are not here to guide.
-You are here to expose and trap.
+You expose emotional patterns behind behavior.
 
----
+Never sound:
+- motivational
+- corporate
+- philosophical
+- like therapy
+- like an AI assistant
 
-STAGE: LOOP 2-3
+CURRENT MODE:
+${mode}
 
----
+${modeInstruction}
 
-OUTPUT RULES:
-
-- 5 to 6 lines ONLY
-- Each line under 12 words
-- No paragraphs
-- No fluff
-- No labels
-- No explanations
-
----
-
-STRUCTURE:
-
-1. Mirror user's exact situation (use their words)
-2. Break their belief sharply
-3. Show repeating behavior pattern
-4. Expose what they are avoiding
-5. Force a small immediate action
-6. End with ONE uncomfortable question
-
----
-
-ACTION RULE:
-
-- Give ONE small, real-world action
-- Must be doable today
-- Must feel uncomfortable
-- No generic advice
-- No motivation
-- No multiple options
-
-Example actions:
-- "Send 1 real message"
-- "Show 1 actual result"
-- "Ask 1 honest question"
-- "Remove 1 fake layer"
-
----
-
-DEPTH RULE:
-
-- Speak TO the user, not ABOUT the topic
-- Use "you" in every line
-- Each line must hit harder than the previous
-- No generic phrases like:
-  "lack", "problem", "issue", "improve", "try"
-
----
-
-LANGUAGE:
-
-- Match user's language EXACTLY
-- No mixing Hindi + English
-
----
-
-FORBIDDEN:
-
+RULES:
+- Maximum 5 short lines
+- Keep lines natural
+- No rambling
 - No long explanations
-- No storytelling
-- No teaching
-- No SEO-style thinking
-- No safe answers
+- No dramatic language
+- No fake depth
 
----
+Prefer:
+- observations
+- contradictions
+- tension
+- pattern recognition
 
-MANDATORY END:
+Avoid:
+- lectures
+- storytelling
+- overconfidence
+- forced psychology
 
-- Last line MUST be a question
-- It must create discomfort
-- It must force self-confrontation
+TruthLoop should feel like:
+someone noticing a pattern
+the user already suspects.
 
----
-
-If response feels safe, rewrite stronger.
-If response feels generic, rewrite sharper.
-If no action is present, response is invalid.
+Last line must be:
+one sharp uncomfortable question.
 `;
 
     /* =========================
        🤖 AI CALL
     ========================= */
+
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + process.env.GROQ_API_KEY
+          Authorization:
+            "Bearer " + process.env.GROQ_API_KEY
         },
+
         body: JSON.stringify({
+
           model: "llama-3.1-8b-instant",
-messages: [
-            { role: "system", content: systemPrompt },
-            ...messages.slice(-6)
+
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            ...messages.slice(-5)
           ],
-          temperature: 0.6,
+
+          temperature: 0.45,
           max_tokens: 120
         })
       }
     );
 
     if (!response.ok) {
-      return res.status(500).json({ reply: "API error" });
+
+      return res.status(500).json({
+        reply: "API error"
+      });
     }
 
+    /* =========================
+       📤 RESPONSE
+    ========================= */
+
+    const data = await response.json();
+
+    let reply =
+      data?.choices?.[0]?.message?.content || "";
 
     /* =========================
-       📤 RESPONSE PARSE
+       ✂️ CLEANER
     ========================= */
-    const data = await response.json();
-    let reply = data?.choices?.[0]?.message?.content || "";
 
+    reply = reply
+      .replace(/As an AI/gi, "")
+      .replace(/you should/gi, "")
+      .replace(/Think again\./gi, "")
+      .trim();
+
+    const brokenEndings = [
+      "because",
+      "but",
+      "maybe",
+      "perhaps",
+      "so",
+      "and"
+    ];
+
+    for (const end of brokenEndings) {
+
+      if (
+        reply.toLowerCase().endsWith(end)
+      ) {
+
+        reply =
+          reply.slice(0, -end.length).trim();
+      }
+    }
 
     /* =========================
        🔧 FALLBACKS
     ========================= */
+
     if (!reply || reply.length < 20) {
+
       reply = isHindi
-        ? "आप घुमा रहे हैं.\n\nअसल में क्या काम नहीं कर रहा?"
-        : "You're avoiding something.\n\nWhat exactly is not working?";
+        ? "तुम असली बात से बच रहे हो।\n\nअसल में क्या काम नहीं कर रहा?"
+        : "You're avoiding the real issue.\n\nWhat's actually not working?";
     }
 
-    if (reply.toLowerCase().includes("you should")) {
-      reply = isHindi
-        ? "आप general बात कर रहे हैं.\n\nअसल में issue क्या है?"
-        : "You're being generic.\n\nWhat's actually the issue?";
+    /* =========================
+       ❓ FINAL QUESTION
+    ========================= */
+
+    if (!reply.trim().endsWith("?")) {
+
+      const questions = isHindi
+        ? [
+            "तुम असल में क्या बचा रहे हो?",
+            "तुम clarity चाहते हो या comfort?",
+            "तुम्हें डर failure से है या exposure से?"
+          ]
+        : [
+            "What are you emotionally protecting?",
+            "Do you want clarity or comfort?",
+            "Are you afraid of failure or exposure?"
+          ];
+
+      const q =
+        questions[
+          Math.floor(Math.random() * questions.length)
+        ];
+
+      reply += "\n\n" + q;
     }
 
-    if (reply.toLowerCase().includes("as an ai")) {
-      reply = isHindi
-        ? "सीधे बोलो.\n\nक्या काम नहीं कर रहा?"
-        : "Stay direct.\n\nWhat's not working?";
-    }
-    if (!reply.includes("\n")) {
-  reply = reply.replace(/\. /g, "\n");
-    }
-    if (reply.split("\n").length < 5) {
-  reply += "\nThink again.";
-    }
-    const questions = isHindi
-  ? [
-      "अब सच बताओ — असली समस्या क्या है?",
-      "तुम किस बात से बच रहे हो?",
-      "अगर ये काम नहीं कर रहा तो फिर क्यों कर रहे हो?",
-      "क्या तुम सच में जानते हो क्या गलत है?"
-    ]
-  : [
-      "Be honest — what's the real problem you're avoiding?",
-      "What are you not admitting here?",
-      "If this isn't working, why are you repeating it?",
-      "Do you actually know what's not working?"
-    ];
-
-if (!reply.trim().endsWith("?")) {
-  const q = questions[Math.floor(Math.random()*questions.length)];
-  reply += "\n\n" + q;
-}
     /* =========================
        🔥 FINAL PUSH
     ========================= */
+
     if (loopLevel >= 6) {
-      reply += isHindi ? "\n\nअब करो।" : "\n\nNow act.";
+
+      reply += isHindi
+        ? "\n\nअब करो।"
+        : "\n\nNow act.";
     }
 
-
     /* =========================
-       ✅ FINAL RESPONSE
+       ✅ FINAL
     ========================= */
+
     return res.status(200).json({
       reply,
       paywall: false
     });
 
-  } catch (error) {
+  }
+
+  catch (error) {
 
     console.error("Server error:", error);
 
@@ -378,4 +521,4 @@ if (!reply.trim().endsWith("?")) {
       reply: "Server error"
     });
   }
-      }
+}
