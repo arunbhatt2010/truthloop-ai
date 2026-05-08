@@ -67,7 +67,7 @@ h1{
 }
 
 .category{
-  padding:12px 0;
+  padding:14px 0;
   border-bottom:1px solid #1d1d1d;
 }
 
@@ -79,6 +79,16 @@ h1{
   color:#fff;
   font-weight:bold;
   margin-bottom:6px;
+  font-size:16px;
+}
+
+.role a{
+  color:#fff;
+  text-decoration:none;
+}
+
+.role a:hover{
+  color:orange;
 }
 
 .desc{
@@ -107,10 +117,17 @@ button{
   font-size:12px;
   color:#777;
   margin-top:10px;
+  text-align:center;
 }
 
-.highlight{
-  color:#fff;
+.deep-link{
+  color:orange;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.deep-link:hover{
+  text-decoration:underline;
 }
 
 </style>
@@ -174,18 +191,81 @@ They just haven’t seen it clearly yet.
 <div class="box">
 
 <div class="label">WHO USES TRUTHLOOP?</div>
-<div class="role">
-  <a href="/app?type=founder"
-  style="color:#fff;text-decoration:none;">
-    Founders
-  </a>
-</div>
+
 <div class="category">
-<div class="role">Founders</div>
-<div class="desc">
-When execution quietly becomes endless optimization.
+  <div class="role">
+    <a href="/app?type=founder">
+      Founders
+    </a>
+  </div>
+
+  <div class="desc">
+    When execution quietly becomes endless optimization.
+  </div>
 </div>
+
+<div class="category">
+  <div class="role">
+    <a href="/app?type=creator">
+      Creators
+    </a>
+  </div>
+
+  <div class="desc">
+    When validation starts sounding like “growth.”
+  </div>
 </div>
+
+<div class="category">
+  <div class="role">
+    <a href="/app?type=freelancer">
+      Freelancers
+    </a>
+  </div>
+
+  <div class="desc">
+    When underpricing gets disguised as being practical.
+  </div>
+</div>
+
+<div class="category">
+  <div class="role">
+    <a href="/app?type=student">
+      Students
+    </a>
+  </div>
+
+  <div class="desc">
+    When preparation becomes avoidance.
+  </div>
+</div>
+
+<div class="category">
+  <div class="role">
+    <a href="/app?type=writer">
+      Writers & Authors
+    </a>
+  </div>
+
+  <div class="desc">
+    When polishing replaces honest expression.
+  </div>
+</div>
+
+<div class="category">
+  <div class="role">
+    <a href="/app?type=overthinker">
+      Overthinkers
+    </a>
+  </div>
+
+  <div class="desc">
+    When clarity becomes another delay tactic.
+  </div>
+</div>
+
+</div>
+
 <div class="box">
 
 <div class="label">GO DEEPER</div>
@@ -201,8 +281,8 @@ When execution quietly becomes endless optimization.
     It’s emotional protection.
     <br><br>
 
-    <a href="https://truthloop.in/why-you-procrastinate.html"
-    style="color:orange;text-decoration:none;">
+    <a class="deep-link"
+    href="/why-you-procrastinate.html">
       → Why you procrastinate
     </a>
   </div>
@@ -219,13 +299,14 @@ When execution quietly becomes endless optimization.
     Attention can quietly become emotional dependency.
     <br><br>
 
-    <a href="http://truthloop.in/why-you-seek-validation.html"
-    style="color:orange;text-decoration:none;">
+    <a class="deep-link"
+    href="/why-you-seek-validation.html">
       → Why you seek validation
     </a>
   </div>
 
 </div>
+
 <div class="category">
 
   <div class="role">
@@ -236,78 +317,12 @@ When execution quietly becomes endless optimization.
     Confusion sometimes protects people from difficult decisions.
     <br><br>
 
-    <a href="https://truthloop.in/why-you-feel-stuck.html"
-    style="color:orange;text-decoration:none;">
+    <a class="deep-link"
+    href="/why-you-feel-stuck.html">
       → Why you feel stuck
     </a>
   </div>
 
-</div>
-
-</div>
-  <div class="role">
-  <a href="/app?type=creator"
-  style="color:#fff;text-decoration:none;">
-    Creators
-  </a>
-  </div>
-<div class="category">
-<div class="role">Creators</div>
-<div class="desc">
-When validation starts sounding like “growth.”
-</div>
-</div>
-
-<div class="category">
-  <div class="role">
-  <a href="/app?type=freelancer"
-  style="color:#fff;text-decoration:none;">
-    Freelancers
-  </a>
-  </div>
-<div class="role">Freelancers</div>
-<div class="desc">
-When underpricing gets disguised as being practical.
-</div>
-</div>
-
-<div class="category">
-  <div class="role">
-  <a href="/app?type=student"
-  style="color:#fff;text-decoration:none;">
-    Students
-  </a>
-  </div>
-<div class="role">Students</div>
-<div class="desc">
-When preparation becomes avoidance.
-</div>
-</div>
-
-<div class="category">
-  <div class="role">
-  <a href="/app?type=writer"
-  style="color:#fff;text-decoration:none;">
-    Writers & Authors
-  </a>
-  </div>
-<div class="role">Writers & Authors</div>
-<div class="desc">
-When polishing replaces honest expression.
-</div>
-</div>
-
-<div class="category">
-  <div class="role">
-  <a href="/app?type=overthinker"
-  style="color:#fff;text-decoration:none;">
-    Overthinkers
-  </a>
-  </div>
-<div class="role">Overthinkers</div>
-<div class="desc">
-When clarity becomes another delay tactic.
-</div>
 </div>
 
 </div>
@@ -335,6 +350,7 @@ When clarity becomes another delay tactic.
 </div>
 
 <div class="cta">
+
 <button onclick="start()">
 See what you're missing →
 </button>
@@ -342,6 +358,7 @@ See what you're missing →
 <div class="small">
 Most people feel the shift within 60 seconds
 </div>
+
 </div>
 
 </div>
