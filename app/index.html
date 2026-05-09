@@ -454,21 +454,29 @@ role:"user",
 content:text
 }];
 
-outputBox.innerHTML = `
-<div style="
-background:#111;
-padding:18px;
-border-radius:14px;
-border:1px solid #222;
-margin-bottom:18px;
-line-height:1.8;
-font-size:16px;
-">
+const userDiv = document.createElement("div");
+
+userDiv.style.background = "#111";
+userDiv.style.padding = "18px";
+userDiv.style.borderRadius = "14px";
+userDiv.style.border = "1px solid #222";
+userDiv.style.marginBottom = "18px";
+userDiv.style.lineHeight = "1.8";
+userDiv.style.fontSize = "16px";
+
+userDiv.innerHTML = `
 <b style="color:orange;">You:</b><br><br>
 ${text}
-</div>
 `;
 
+outputBox.appendChild(userDiv);
+
+setTimeout(() => {
+userDiv.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+}, 100);
 messages=[{
 role:"user",
 content:text
