@@ -45,7 +45,9 @@ margin:0;
 max-width:520px;
 margin:auto;
 padding:14px;
-padding-bottom:90px;
+padding-bottom:120px;
+box-sizing:border-box;
+width:100%;
 }
 
 .output{
@@ -54,6 +56,9 @@ padding:22px 18px;
 border-radius:14px;
 margin-bottom:12px;
 line-height:1.7;
+max-height:70vh;
+overflow-y:auto;
+scroll-behavior:smooth;
 }
 
 input,button{
@@ -319,7 +324,10 @@ div.innerHTML += char;
 i++;
 }
 
-outputBox.scrollTop=outputBox.scrollHeight;
+window.scrollTo({
+top: document.body.scrollHeight,
+behavior: "smooth"
+});
 
 requestAnimationFrame(typing);
 
