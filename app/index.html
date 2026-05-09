@@ -43,28 +43,42 @@ margin:0;
 
 .container{
 width:100%;
-max-width:720px;
+max-width:680px;
 margin:0 auto;
-padding:20px;
+padding:14px;
 padding-bottom:120px;
 box-sizing:border-box;
 }
 
 .output{
 background:#000;
-padding:22px;
+padding:22px 18px;
 border-radius:16px;
 margin-bottom:14px;
 line-height:1.8;
 width:100%;
 box-sizing:border-box;
 
+border:1px solid #1d1d1d;
+
+min-height:420px;
 max-height:75vh;
+
 overflow-y:auto;
 scroll-behavior:smooth;
+}
 
-border:1px solid #1d1d1d;
-  }
+@media(min-width:768px){
+
+.container{
+padding-top:24px;
+}
+
+.output{
+min-height:520px;
+}
+
+}
 
 input,button{
 width:100%;
@@ -355,10 +369,7 @@ div.innerHTML += char;
 i++;
 }
 
-window.scrollTo({
-top: document.body.scrollHeight,
-behavior: "smooth"
-});
+outputBox.scrollTop = outputBox.scrollHeight;
 
 requestAnimationFrame(typing);
 
