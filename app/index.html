@@ -454,7 +454,45 @@ role:"user",
 content:text
 }];
 
-outputBox.innerHTML=`<b>You:</b> ${text}<br><br>`;
+outputBox.innerHTML = `
+<div style="
+background:#111;
+padding:18px;
+border-radius:14px;
+border:1px solid #222;
+margin-bottom:18px;
+line-height:1.8;
+font-size:16px;
+">
+<b style="color:orange;">You:</b><br><br>
+${text}
+</div>
+`;
+
+messages=[{
+role:"user",
+content:text
+}];
+
+outputBox.innerHTML = `
+<div style="
+background:#111;
+padding:18px;
+border-radius:14px;
+border:1px solid #222;
+margin-bottom:18px;
+line-height:1.8;
+font-size:16px;
+">
+<b style="color:orange;">You:</b><br><br>
+${text}
+</div>
+`;
+
+window.scrollTo({
+top: document.body.scrollHeight,
+behavior: "smooth"
+});
 
 const data=await callAPI();
 
