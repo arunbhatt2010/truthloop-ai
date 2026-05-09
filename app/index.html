@@ -102,7 +102,34 @@ border:1px solid #222;
 </head>
 
 <body>
+<div class="container">
 
+<h2 style="
+margin-top:0;
+margin-bottom:4px;
+font-size:28px;
+">
+TruthLoop
+</h2>
+
+<p style="
+color:#aaa;
+margin-top:0;
+margin-bottom:14px;
+font-size:15px;
+line-height:1.6;
+">
+You don’t need advice. You need clarity.
+</p>
+
+<div id="loopIndicator" style="
+color:orange;
+font-size:14px;
+margin-bottom:14px;
+font-weight:bold;
+">
+Loop 1 / 7
+</div>
 <div class="container">
 
 <div id="outputBox" class="output">
@@ -467,53 +494,30 @@ role:"user",
 content:text
 }];
 
-const userDiv = document.createElement("div");
+/* hide intro screen */
+outputBox.innerHTML="";
 
-userDiv.style.background = "#111";
-userDiv.style.padding = "18px";
-userDiv.style.borderRadius = "14px";
-userDiv.style.border = "1px solid #222";
-userDiv.style.marginBottom = "18px";
-userDiv.style.lineHeight = "1.8";
-userDiv.style.fontSize = "16px";
+const userDiv=document.createElement("div");
 
-userDiv.innerHTML = `
+userDiv.style.background="#111";
+userDiv.style.padding="18px";
+userDiv.style.borderRadius="14px";
+userDiv.style.border="1px solid #222";
+userDiv.style.marginBottom="18px";
+userDiv.style.lineHeight="1.8";
+userDiv.style.fontSize="16px";
+
+userDiv.innerHTML=`
 <b style="color:orange;">You:</b><br><br>
 ${text}
 `;
 
 outputBox.appendChild(userDiv);
 
-setTimeout(() => {
-userDiv.scrollIntoView({
-behavior:"smooth",
-block:"start"
-});
-}, 100);
-messages=[{
-role:"user",
-content:text
-}];
-
-outputBox.innerHTML = `
-<div style="
-background:#111;
-padding:18px;
-border-radius:14px;
-border:1px solid #222;
-margin-bottom:18px;
-line-height:1.8;
-font-size:16px;
-">
-<b style="color:orange;">You:</b><br><br>
-${text}
-</div>
-`;
-
-window.scrollTo({
-top: document.body.scrollHeight,
-behavior: "smooth"
-});
+/* smooth scroll */
+setTimeout(()=>{
+outputBox.scrollTop=outputBox.scrollHeight;
+},100);
 
 const data=await callAPI();
 
@@ -540,7 +544,7 @@ const text=reflectionInput.value.trim();
 if(!text)return;
 
 loopLevel++;
-
+document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} / 7`;
 track("loop_progress",{loop:loopLevel});
 
 messages.push({
@@ -575,32 +579,4 @@ reflectionInput.value="";
 </script>
 
 </body>
-<div class="container">
-
-<h2 style="
-margin-top:8px;
-margin-bottom:4px;
-font-size:28px;
-">
-TruthLoop
-</h2>
-
-<p style="
-color:#aaa;
-margin-top:0;
-margin-bottom:14px;
-font-size:15px;
-line-height:1.6;
-">
-You don’t need advice. You need clarity.
-</p>
-
-<div id="loopIndicator" style="
-color:orange;
-font-size:14px;
-margin-bottom:12px;
-font-weight:bold;
-">
-Loop 1 / 7
-</div>
 </html>
