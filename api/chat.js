@@ -622,7 +622,16 @@ The question should:
 - stay believable
 
 Never sound like interrogation.
+Never ask more than ONE question.
 
+If one strong question already exists,
+stop immediately.
+Avoid sounding like self-help,
+therapy,
+or motivational Hindi content.
+
+Sound emotionally observant,
+not spiritually wise.
 ---
 
 MOST IMPORTANT:
