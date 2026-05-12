@@ -88,6 +88,12 @@ export default async function handler(req, res) {
 
     const language =
   detectLanguage(lastUserMessage);
+
+const isHindi =
+  language === "hi";
+
+const isHinglish =
+  language === "hinglish";
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
@@ -581,18 +587,22 @@ not analyzed.
 
     if (!reply.trim().endsWith("?")) {
 
-      const questions = isHindi
-        ? [
-            "तुम असल में क्या बचा रहे हो?",
-            "तुम clarity चाहते हो या comfort?",
-            "तुम्हें डर failure से है या exposure से?"
-          ]
-        : [
-            "What are you emotionally protecting?",
-            "Do you want clarity or comfort?",
-            "Are you afraid of failure or exposure?"
-          ];
-
+      const questions =
+  isHindi
+    ? [
+        "तुम असल में क्या बचा रहे हो?",
+        "तुम clarity चाहते हो या comfort?"
+      ]
+    : isHinglish
+    ? [
+        "Tum actually avoid kya kar rahe ho?",
+        "Tum clarity chahte ho ya comfort?",
+        "Tumhe failure se darr hai ya exposure se?"
+      ]
+    : [
+        "What are you emotionally protecting?",
+        "Do you want clarity or comfort?"
+      ];
       const q =
         questions[
           Math.floor(Math.random() * questions.length)
