@@ -55,20 +55,39 @@ export default async function handler(req, res) {
 
     function detectLanguage(text) {
 
-      const hindiChars =
-        (text.match(/[\u0900-\u097F]/g) || []).length;
+  const hindiChars =
+    (text.match(/[\u0900-\u097F]/g) || []).length;
 
-      const englishChars =
-        (text.match(/[a-zA-Z]/g) || []).length;
+  const englishChars =
+    (text.match(/[a-zA-Z]/g) || []).length;
 
-      return hindiChars > englishChars
-        ? "hi"
-        : "en";
-    }
+  const hinglishWords = [
+    "hai","kar","kya","kyun","nahi",
+    "matlab","tum","aap","kaise",
+    "sach","avoid","clarity","comfort"
+  ];
 
-    const isHindi =
-      detectLanguage(lastUserMessage) === "hi";
+  const hinglishScore =
+    hinglishWords.filter(w =>
+      text.toLowerCase().includes(w)
+    ).length;
 
+  if (hindiChars > englishChars) {
+    return "hi";
+  }
+
+  if (
+    englishChars > 0 &&
+    hinglishScore >= 2
+  ) {
+    return "hinglish";
+  }
+
+  return "en";
+     }
+
+    const language =
+  detectLanguage(lastUserMessage);
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
