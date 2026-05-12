@@ -437,12 +437,54 @@ razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";
 
 razorpayBtn.onclick=function(){
 
-const rzp=new Razorpay({
-key:RAZORPAY_KEY_ID,
-amount:amount*100,
-currency:"INR",
+const options = {
 
-handler:function(){
+key: RAZORPAY_KEY_ID,
+
+amount: amount * 100,
+
+currency: "INR",
+
+name: "TruthLoop",
+
+description:
+amount === 49
+? "Unlock Loop 5"
+: "Unlock Loop 7",
+
+image: "https://truthloop.in/truthloop-hook.jpg",
+
+prefill: {
+name: "",
+email: "",
+contact: ""
+},
+
+theme: {
+color: "#ff7a00"
+},
+
+method: {
+upi: true,
+card: true,
+netbanking: true,
+wallet: true,
+emi: false,
+paylater: false
+},
+
+retry: {
+enabled: true,
+max_count: 2
+},
+
+modal: {
+backdropclose: false,
+escape: true,
+handleback: true
+},
+
+handler: function (response) {
 
 if(amount===49) payment49=true;
 if(amount===199) payment199=true;
@@ -458,7 +500,9 @@ paywallBox.style.display="none";
 
 }
 
-});
+};
+
+const rzp = new Razorpay(options);
 
 rzp.open();
 
