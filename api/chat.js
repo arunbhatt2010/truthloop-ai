@@ -476,9 +476,12 @@ Never sound like fake social-media psychology.
 ---
 
 STYLE:
-
-- Maximum 80 words
-- Maximum 3 short paragraphs
+- Usually between 80-140 words
+- Short when needed
+- Deeper when emotional tension increases
+Do not end too quickly
+if the emotional contradiction
+is becoming clearer.
 - Conversational rhythm
 - No bullet points
 - No essays
@@ -542,7 +545,7 @@ not analyzed.
           ],
 
           temperature: 0.7,
-          max_tokens: 140
+          max_tokens: 220
         })
       }
     );
