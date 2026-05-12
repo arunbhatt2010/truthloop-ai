@@ -38,6 +38,7 @@ export default async function handler(req, res) {
     } = body;
 
     if (!messages || !messages.length) {
+
       return res.status(400).json({
         reply: "No input provided"
       });
@@ -50,111 +51,37 @@ export default async function handler(req, res) {
       lastUserMessage.toLowerCase();
 
     /* =========================
-       🌍 LANGUAGE DETECTION
-    ========================= */
-
-    function detectLanguage(text) {
-
-      const hindiChars =
-        (text.match(/[\u0900-\u097F]/g) || []).length;
-
-      const englishChars =
-        (text.match(/[a-zA-Z]/g) || []).length;
-
-      const hinglishWords = [
-        "hai","kar","kya","kyun","nahi",
-        "matlab","tum","aap","kaise",
-        "samajh","sach","avoid","clarity",
-        "comfort","problem","kaam",
-        "client","postpone","darr"
-      ];
-
-      const hinglishScore =
-        hinglishWords.filter(word =>
-          text.toLowerCase().includes(word)
-        ).length;
-
-      /* PURE HINDI */
-
-      if (
-        hindiChars > 8 &&
-        hindiChars > englishChars
-      ) {
-        return "hi";
-      }
-
-      /* HINGLISH */
-
-      if (
-        englishChars > 0 &&
-        hinglishScore >= 2
-      ) {
-        return "hinglish";
-      }
-
-      /* DEFAULT */
-
-      return "en";
-    }
-
-    const language =
-      detectLanguage(lastUserMessage);
-
-    const isHindi =
-      language === "hi";
-
-    const isHinglish =
-      language === "hinglish";
-
-    /* =========================
        ❌ DOMAIN FILTER
     ========================= */
 
     const blockedPatterns = [
-      "doctor","medicine","pain","fever",
-      "treatment","relationship","breakup",
-      "girlfriend","boyfriend","marriage",
-      "दर्द","बुखार","इलाज","डॉक्टर",
-      "रिलेशनशिप","ब्रेकअप","प्यार","शादी"
+      "doctor",
+      "medicine",
+      "pain",
+      "fever",
+      "treatment",
+      "relationship",
+      "breakup",
+      "girlfriend",
+      "boyfriend",
+      "marriage",
+      "suicide",
+      "kill myself",
+      "therapy"
     ];
 
     if (
       loopLevel === 1 &&
-      blockedPatterns.some(w =>
-        lowerMsg.includes(w)
+      blockedPatterns.some(word =>
+        lowerMsg.includes(word)
       )
     ) {
 
-      let reply = "";
-
-      if (isHindi) {
-
-        reply =
-`यह decision problem नहीं है।
-
-ऐसा सवाल पूछो जहाँ फैसला लेना हो।`;
-
-      }
-
-      else if (isHinglish) {
-
-        reply =
-`Ye decision problem nahi lag raha.
-
-Aisa sawal pucho jahan real decision ya avoidance ho.`;
-
-      }
-
-      else {
-
-        reply =
+      return res.status(200).json({
+        reply:
 `This doesn't look like a decision problem.
 
-Ask something involving a real decision or avoidance.`;
-      }
-
-      return res.status(200).json({
-        reply
+Ask something involving avoidance, contradiction, hesitation, or a difficult decision.`
       });
     }
 
@@ -165,40 +92,17 @@ Ask something involving a real decision or avoidance.`;
     if (loopLevel === 1) {
 
       const words =
-        lastUserMessage.trim().split(/\s+/).length;
+        lastUserMessage
+          .trim()
+          .split(/\s+/).length;
 
       if (words < 4) {
 
-        let reply = "";
-
-        if (isHindi) {
-
-          reply =
-`बहुत vague है।
-
-ठीक क्या काम नहीं कर रहा?`;
-
-        }
-
-        else if (isHinglish) {
-
-          reply =
-`Bahut vague hai.
-
-Exactly kya kaam nahi kar raha?`;
-
-        }
-
-        else {
-
-          reply =
+        return res.status(200).json({
+          reply:
 `Too vague.
 
-What exactly is not working?`;
-        }
-
-        return res.status(200).json({
-          reply
+What exactly keeps repeating?`
         });
       }
     }
@@ -209,28 +113,33 @@ What exactly is not working?`;
 
     if (loopLevel === 5 && !paid49) {
 
-      const lines = isHindi
-        ? [
-            "तुम्हें जवाब पता है।\n\nतुम action टाल रहे हो।",
-            "नई जानकारी नहीं चाहिए।\n\nExecution चाहिए।",
-            "Pattern दिख चुका है।\n\nअब discomfort बच रहा है।"
-          ]
+      const lines = [
 
-        : isHinglish
-        ? [
-            "Tumhe already pata hai kya karna hai.\n\nTum bas action delay kar rahe ho.",
-            "Nayi information missing nahi hai.\n\nExecution missing hai.",
-            "Pattern dikh gaya hai.\n\nAb discomfort avoid ho raha hai."
-          ]
+        `You already know what to do.
 
-        : [
-            "You already know what to do.\n\nYou're delaying action.",
-            "Nothing new is missing.\n\nExecution is.",
-            "You saw the pattern.\n\nYou're still avoiding discomfort."
-          ];
+You're delaying action.`,
+
+        `Nothing new is missing.
+
+Execution is.`,
+
+        `The pattern is visible now.
+
+You're still protecting comfort.`,
+
+        `You keep returning to analysis
+right before exposure becomes real.`,
+
+        `Clarity stopped being the problem
+a while ago.`
+      ];
 
       const pick =
-        lines[Math.floor(Math.random() * lines.length)];
+        lines[
+          Math.floor(
+            Math.random() * lines.length
+          )
+        ];
 
       return res.status(200).json({
         reply: pick,
@@ -245,36 +154,11 @@ What exactly is not working?`;
 
     if (loopLevel >= 6 && !paid49) {
 
-      let reply = "";
-
-      if (isHindi) {
-
-        reply =
-`तुम discomfort skip करने की कोशिश कर रहे हो।
-
-पहले इसका सामना करो।`;
-
-      }
-
-      else if (isHinglish) {
-
-        reply =
-`Tum discomfort skip karne ki koshish kar rahe ho.
-
-Pehle iska saamna karo.`;
-
-      }
-
-      else {
-
-        reply =
+      return res.status(200).json({
+        reply:
 `You're trying to skip discomfort.
 
-Face this first.`;
-      }
-
-      return res.status(200).json({
-        reply,
+Face this first.`,
         paywall: true
       });
     }
@@ -285,36 +169,11 @@ Face this first.`;
 
     if (loopLevel === 7 && !paid199) {
 
-      let reply = "";
-
-      if (isHindi) {
-
-        reply =
-`अब clarity दिख चुकी है।
-
-अब commitment चाहिए।`;
-
-      }
-
-      else if (isHinglish) {
-
-        reply =
-`Ab clarity dikh chuki hai.
-
-Ab commitment chahiye.`;
-
-      }
-
-      else {
-
-        reply =
-`You already see the truth.
-
-Now commit.`;
-      }
-
       return res.status(200).json({
-        reply,
+        reply:
+`You already see the pattern.
+
+Now commit.`,
         paywall: true
       });
     }
@@ -332,62 +191,95 @@ Now commit.`;
     };
 
     const practicalWords = [
-      "seo","traffic","website","sales",
-      "clients","growth","money",
-      "strategy","marketing",
-      "conversion","business",
-      "linkedin","audience"
+      "seo",
+      "traffic",
+      "website",
+      "sales",
+      "clients",
+      "growth",
+      "money",
+      "strategy",
+      "marketing",
+      "conversion",
+      "business",
+      "linkedin",
+      "audience",
+      "startup",
+      "brand"
     ];
 
     const emotionalWords = [
-      "afraid","stuck","lost",
-      "anxiety","pressure",
-      "failure","tired",
-      "fear","confused"
+      "afraid",
+      "stuck",
+      "lost",
+      "anxiety",
+      "pressure",
+      "failure",
+      "tired",
+      "fear",
+      "overwhelmed"
     ];
 
     const validationWords = [
-      "followers","likes","views",
-      "noticed","attention",
-      "recognition","audience"
+      "followers",
+      "likes",
+      "views",
+      "noticed",
+      "attention",
+      "recognition",
+      "audience",
+      "approval"
     ];
 
     const avoidanceWords = [
-      "researching","planning",
-      "thinking","waiting",
-      "learning","perfecting",
-      "postpone","delay"
+      "researching",
+      "planning",
+      "thinking",
+      "waiting",
+      "learning",
+      "perfecting",
+      "postpone",
+      "delay",
+      "optimize",
+      "preparing"
     ];
 
     const confusedWords = [
-      "confused","clarity",
-      "direction","don't know",
+      "confused",
+      "clarity",
+      "direction",
+      "don't know",
       "unsure"
     ];
 
     practicalWords.forEach(word => {
-      if (lowerMsg.includes(word))
+      if (lowerMsg.includes(word)) {
         brain.practical += 2;
+      }
     });
 
     emotionalWords.forEach(word => {
-      if (lowerMsg.includes(word))
+      if (lowerMsg.includes(word)) {
         brain.emotional += 2;
+      }
     });
 
     validationWords.forEach(word => {
-      if (lowerMsg.includes(word))
+      if (lowerMsg.includes(word)) {
         brain.validation += 2;
+      }
     });
 
     avoidanceWords.forEach(word => {
-      if (lowerMsg.includes(word))
+      if (lowerMsg.includes(word)) {
         brain.avoidance += 2;
+      }
     });
 
     confusedWords.forEach(word => {
-      if (lowerMsg.includes(word))
+      if (lowerMsg.includes(word)) {
         brain.confused += 2;
+      }
     });
 
     /* =========================
@@ -400,18 +292,22 @@ Now commit.`;
       brain.practical > brain.emotional &&
       brain.practical > brain.validation
     ) {
+
       mode = "practical";
     }
 
     else if (brain.validation >= 4) {
+
       mode = "validation";
     }
 
     else if (brain.avoidance >= 4) {
+
       mode = "avoidance";
     }
 
     else if (brain.confused >= 4) {
+
       mode = "clarity";
     }
 
@@ -427,6 +323,8 @@ Now commit.`;
 Focus on strategic contradictions.
 
 Observe behavior before emotion.
+
+Notice where optimization replaces exposure.
 `;
     }
 
@@ -434,6 +332,8 @@ Observe behavior before emotion.
 
       modeInstruction = `
 Focus on approval dependency.
+
+Notice visibility patterns.
 
 Use subtle emotional tension.
 `;
@@ -445,6 +345,8 @@ Use subtle emotional tension.
 Notice delay disguised as preparation.
 
 Stay calm and precise.
+
+Avoid dramatic language.
 `;
     }
 
@@ -454,6 +356,8 @@ Stay calm and precise.
 Reduce noise.
 
 Create mental pause.
+
+Notice indecision patterns.
 `;
     }
 
@@ -463,6 +367,8 @@ Create mental pause.
 Notice contradictions slowly.
 
 Avoid dramatic psychology.
+
+Stay believable.
 `;
     }
 
@@ -508,6 +414,7 @@ Over:
 - conclusions
 - lectures
 - dramatic confrontation
+
 Do not explain obvious logic.
 
 Do not restate the user's input directly.
@@ -517,15 +424,20 @@ Avoid:
 - "this means"
 - "that is why"
 - obvious conclusions
+- motivational tone
+- therapy language
+- spiritual language
 
 Instead:
-quietly notice the tension underneath the behavior.
+quietly notice the tension
+underneath the behavior.
 
 The user should feel:
 "That was strangely accurate."
 
 Not:
 "That was logically explained."
+
 ---
 
 GOOD EXAMPLES:
@@ -538,13 +450,13 @@ GOOD EXAMPLES:
 
 "Part of you wants clarity.
 Another part avoids proof."
-"You want visibility without risking rejection."
 
-"Interesting. You want proof you're capable before acting publicly."
+"You want visibility without risking rejection."
 
 "You keep trying to reduce uncertainty before exposure."
 
 "The hesitation appears right where visibility becomes real."
+
 ---
 
 BAD EXAMPLES:
@@ -555,62 +467,12 @@ BAD EXAMPLES:
 
 "You are sabotaging yourself."
 
+"Deep inside, you're afraid."
+
+"You must face your truth."
+
 Never sound like fake social-media psychology.
 
----
-
-LANGUAGE ADAPTATION:
-
-TruthLoop must mirror the user's language style naturally.
-
-Supported styles:
-- English
-- Hinglish
-- Hindi
-
-LANGUAGE PRIORITY RULE:
-
-The emotional realism of TruthLoop
-is MORE important than perfect grammar.
-
-However:
-
-The AI must fully commit
-to ONE language style per response.
-
-Never mix:
-- English + Hindi randomly
-- Hindi + Hinglish randomly
-- Formal Hindi + casual Hinglish
-
-If the user writes in English:
-→ respond only in English.
-
-If the user writes in Hinglish:
-→ respond only in natural Roman Hinglish.
-
-If the user writes in Hindi:
-→ respond only in Hindi script.
-
-Never sound translated.
-
-Never switch language style suddenly.
-
-The user should feel:
-"this system talks like me."
-Avoid generic emotional abstractions like:
-- "andar ki ladai"
-- "badlav"
-- "taiyar"
-- "sach ka saamna"
-- "andar ka darr"
-
-TruthLoop focuses on:
-- visible behavior
-- repeated actions
-- contradictions
-- hesitation patterns
-- avoidance hidden inside logic
 ---
 
 STYLE:
@@ -621,6 +483,9 @@ STYLE:
 - No bullet points
 - No essays
 - Stop before over-explaining
+- Use clean natural English
+- Sound emotionally observant
+- Stay specific to the user's behavior
 
 ---
 
@@ -634,16 +499,12 @@ The question should:
 - stay believable
 
 Never sound like interrogation.
+
 Never ask more than ONE question.
 
 If one strong question already exists,
 stop immediately.
-Avoid sounding like self-help,
-therapy,
-or motivational Hindi content.
 
-Sound emotionally observant,
-not spiritually wise.
 ---
 
 MOST IMPORTANT:
@@ -697,7 +558,8 @@ not analyzed.
        📤 RESPONSE
     ========================= */
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     let reply =
       data?.choices?.[0]?.message?.content || "";
@@ -710,40 +572,51 @@ not analyzed.
       .replace(/As an AI/gi, "")
       .replace(/you should/gi, "")
       .replace(/Think again\./gi, "")
-      .replace(/^\s*["']|["']\s*$/g, "")
+      .replace(
+        /^\s*["']|["']\s*$/g,
+        ""
+      )
       .trim();
 
     /* =========================
-       🔧 FALLBACKS
+       🔧 REMOVE WEAK PHRASES
+    ========================= */
+
+    const weakPhrases = [
+      "maybe",
+      "perhaps",
+      "it seems",
+      "it looks like",
+      "possibly",
+      "could be",
+      "might be",
+      "deep inside"
+    ];
+
+    weakPhrases.forEach(phrase => {
+
+      const regex =
+        new RegExp(phrase, "gi");
+
+      reply =
+        reply.replace(regex, "");
+    });
+
+    reply = reply
+      .replace(/\n{3,}/g, "\n\n")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+
+    /* =========================
+       🔧 FALLBACK
     ========================= */
 
     if (!reply || reply.length < 20) {
 
-      if (isHindi) {
+      reply =
+`You're circling the real issue.
 
-        reply =
-`तुम असली बात से बच रहे हो।
-
-असल में क्या काम नहीं कर रहा?`;
-
-      }
-
-      else if (isHinglish) {
-
-        reply =
-`Tum asli problem se bach rahe ho.
-
-Actually kya kaam nahi kar raha?`;
-
-      }
-
-      else {
-
-        reply =
-`You're avoiding the real issue.
-
-What's actually not working?`;
-      }
+What keeps repeating even after you've already noticed it?`;
     }
 
     /* =========================
@@ -752,38 +625,24 @@ What's actually not working?`;
 
     if (!reply.trim().endsWith("?")) {
 
-      let questions = [];
+      const questions = [
 
-      if (isHindi) {
+        "What are you emotionally protecting?",
 
-        questions = [
-          "तुम असल में क्या बचा रहे हो?",
-          "तुम clarity चाहते हो या comfort?",
-          "तुम्हें डर failure से है या exposure से?"
-        ];
-      }
+        "What becomes uncomfortable the moment this gets real?",
 
-      else if (isHinglish) {
+        "What are you still trying to control before acting?",
 
-        questions = [
-          "Tum actually avoid kya kar rahe ho?",
-          "Tum clarity chahte ho ya comfort?",
-          "Tumhe failure se darr hai ya exposure se?"
-        ];
-      }
+        "What changes if you stop optimizing and start exposing the work?",
 
-      else {
-
-        questions = [
-          "What are you emotionally protecting?",
-          "Do you want clarity or comfort?",
-          "Are you afraid of failure or exposure?"
-        ];
-      }
+        "Where does the hesitation appear every time?"
+      ];
 
       const q =
         questions[
-          Math.floor(Math.random() * questions.length)
+          Math.floor(
+            Math.random() * questions.length
+          )
         ];
 
       reply += "\n\n" + q;
@@ -795,20 +654,7 @@ What's actually not working?`;
 
     if (loopLevel >= 6) {
 
-      if (isHindi) {
-
-        reply += "\n\nअब करो।";
-      }
-
-      else if (isHinglish) {
-
-        reply += "\n\nAb karo.";
-      }
-
-      else {
-
-        reply += "\n\nNow act.";
-      }
+      reply += "\n\nNow act.";
     }
 
     /* =========================
@@ -817,18 +663,20 @@ What's actually not working?`;
 
     return res.status(200).json({
       reply,
-      paywall: false,
-      language
+      paywall: false
     });
 
   }
 
   catch (error) {
 
-    console.error("Server error:", error);
+    console.error(
+      "Server error:",
+      error
+    );
 
     return res.status(500).json({
       reply: "Server error"
     });
   }
-  }
+        }
