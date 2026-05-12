@@ -50,50 +50,62 @@ export default async function handler(req, res) {
       lastUserMessage.toLowerCase();
 
     /* =========================
-       🌍 LANGUAGE
+       🌍 LANGUAGE DETECTION
     ========================= */
 
     function detectLanguage(text) {
 
-  const hindiChars =
-    (text.match(/[\u0900-\u097F]/g) || []).length;
+      const hindiChars =
+        (text.match(/[\u0900-\u097F]/g) || []).length;
 
-  const englishChars =
-    (text.match(/[a-zA-Z]/g) || []).length;
+      const englishChars =
+        (text.match(/[a-zA-Z]/g) || []).length;
 
-  const hinglishWords = [
-    "hai","kar","kya","kyun","nahi",
-    "matlab","tum","aap","kaise",
-    "sach","avoid","clarity","comfort"
-  ];
+      const hinglishWords = [
+        "hai","kar","kya","kyun","nahi",
+        "matlab","tum","aap","kaise",
+        "samajh","sach","avoid","clarity",
+        "comfort","problem","kaam",
+        "client","postpone","darr"
+      ];
 
-  const hinglishScore =
-    hinglishWords.filter(w =>
-      text.toLowerCase().includes(w)
-    ).length;
+      const hinglishScore =
+        hinglishWords.filter(word =>
+          text.toLowerCase().includes(word)
+        ).length;
 
-  if (hindiChars > englishChars) {
-    return "hi";
-  }
+      /* PURE HINDI */
 
-  if (
-    englishChars > 0 &&
-    hinglishScore >= 2
-  ) {
-    return "hinglish";
-  }
+      if (
+        hindiChars > 8 &&
+        hindiChars > englishChars
+      ) {
+        return "hi";
+      }
 
-  return "en";
-     }
+      /* HINGLISH */
+
+      if (
+        englishChars > 0 &&
+        hinglishScore >= 2
+      ) {
+        return "hinglish";
+      }
+
+      /* DEFAULT */
+
+      return "en";
+    }
 
     const language =
-  detectLanguage(lastUserMessage);
+      detectLanguage(lastUserMessage);
 
-const isHindi =
-  language === "hi";
+    const isHindi =
+      language === "hi";
 
-const isHinglish =
-  language === "hinglish";
+    const isHinglish =
+      language === "hinglish";
+
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
@@ -113,10 +125,36 @@ const isHinglish =
       )
     ) {
 
+      let reply = "";
+
+      if (isHindi) {
+
+        reply =
+`यह decision problem नहीं है।
+
+ऐसा सवाल पूछो जहाँ फैसला लेना हो।`;
+
+      }
+
+      else if (isHinglish) {
+
+        reply =
+`Ye decision problem nahi lag raha.
+
+Aisa sawal pucho jahan real decision ya avoidance ho.`;
+
+      }
+
+      else {
+
+        reply =
+`This doesn't look like a decision problem.
+
+Ask something involving a real decision or avoidance.`;
+      }
+
       return res.status(200).json({
-        reply: isHindi
-          ? "यह decision problem नहीं है।\n\nऐसा सवाल पूछो जहाँ फैसला लेना हो।"
-          : "This isn't a decision problem.\n\nAsk something where a decision is required."
+        reply
       });
     }
 
@@ -131,10 +169,36 @@ const isHinglish =
 
       if (words < 4) {
 
+        let reply = "";
+
+        if (isHindi) {
+
+          reply =
+`बहुत vague है।
+
+ठीक क्या काम नहीं कर रहा?`;
+
+        }
+
+        else if (isHinglish) {
+
+          reply =
+`Bahut vague hai.
+
+Exactly kya kaam nahi kar raha?`;
+
+        }
+
+        else {
+
+          reply =
+`Too vague.
+
+What exactly is not working?`;
+        }
+
         return res.status(200).json({
-          reply: isHindi
-            ? "बहुत vague है.\n\nठीक क्या काम नहीं कर रहा?"
-            : "Too vague.\n\nWhat exactly is not working?"
+          reply
         });
       }
     }
@@ -145,18 +209,25 @@ const isHinglish =
 
     if (loopLevel === 5 && !paid49) {
 
-      const lines = [
+      const lines = isHindi
+        ? [
+            "तुम्हें जवाब पता है।\n\nतुम action टाल रहे हो।",
+            "नई जानकारी नहीं चाहिए।\n\nExecution चाहिए।",
+            "Pattern दिख चुका है।\n\nअब discomfort बच रहा है।"
+          ]
 
-        "You already know what to do.\nYou're delaying action.",
+        : isHinglish
+        ? [
+            "Tumhe already pata hai kya karna hai.\n\nTum bas action delay kar rahe ho.",
+            "Nayi information missing nahi hai.\n\nExecution missing hai.",
+            "Pattern dikh gaya hai.\n\nAb discomfort avoid ho raha hai."
+          ]
 
-        "Nothing new is missing.\nExecution is.",
-
-        "You saw the pattern.\nYou're still avoiding discomfort.",
-
-        "You're asking again.\nBut the answer hasn't changed.",
-
-        "Clarity isn't your issue.\nAction is."
-      ];
+        : [
+            "You already know what to do.\n\nYou're delaying action.",
+            "Nothing new is missing.\n\nExecution is.",
+            "You saw the pattern.\n\nYou're still avoiding discomfort."
+          ];
 
       const pick =
         lines[Math.floor(Math.random() * lines.length)];
@@ -174,10 +245,36 @@ const isHinglish =
 
     if (loopLevel >= 6 && !paid49) {
 
+      let reply = "";
+
+      if (isHindi) {
+
+        reply =
+`तुम discomfort skip करने की कोशिश कर रहे हो।
+
+पहले इसका सामना करो।`;
+
+      }
+
+      else if (isHinglish) {
+
+        reply =
+`Tum discomfort skip karne ki koshish kar rahe ho.
+
+Pehle iska saamna karo.`;
+
+      }
+
+      else {
+
+        reply =
+`You're trying to skip discomfort.
+
+Face this first.`;
+      }
+
       return res.status(200).json({
-        reply: isHindi
-          ? "तुम skip कर रहे हो।\n\nपहले इसका सामना करो।"
-          : "You're trying to skip discomfort.\n\nFace this first.",
+        reply,
         paywall: true
       });
     }
@@ -188,10 +285,36 @@ const isHinglish =
 
     if (loopLevel === 7 && !paid199) {
 
+      let reply = "";
+
+      if (isHindi) {
+
+        reply =
+`अब clarity दिख चुकी है।
+
+अब commitment चाहिए।`;
+
+      }
+
+      else if (isHinglish) {
+
+        reply =
+`Ab clarity dikh chuki hai.
+
+Ab commitment chahiye.`;
+
+      }
+
+      else {
+
+        reply =
+`You already see the truth.
+
+Now commit.`;
+      }
+
       return res.status(200).json({
-        reply: isHindi
-          ? "अब clarity दिख चुकी है।\n\nअब commitment चाहिए।"
-          : "You already see the truth.\n\nNow commit.",
+        reply,
         paywall: true
       });
     }
@@ -212,13 +335,15 @@ const isHinglish =
       "seo","traffic","website","sales",
       "clients","growth","money",
       "strategy","marketing",
-      "conversion","business"
+      "conversion","business",
+      "linkedin","audience"
     ];
 
     const emotionalWords = [
       "afraid","stuck","lost",
       "anxiety","pressure",
-      "failure","tired"
+      "failure","tired",
+      "fear","confused"
     ];
 
     const validationWords = [
@@ -230,12 +355,14 @@ const isHinglish =
     const avoidanceWords = [
       "researching","planning",
       "thinking","waiting",
-      "learning","perfecting"
+      "learning","perfecting",
+      "postpone","delay"
     ];
 
     const confusedWords = [
       "confused","clarity",
-      "direction","don't know"
+      "direction","don't know",
+      "unsure"
     ];
 
     practicalWords.forEach(word => {
@@ -289,7 +416,7 @@ const isHinglish =
     }
 
     /* =========================
-       🧠 DYNAMIC MODE
+       🧠 MODE INSTRUCTION
     ========================= */
 
     let modeInstruction = "";
@@ -299,9 +426,7 @@ const isHinglish =
       modeInstruction = `
 Focus on strategic contradictions.
 
-Do not sound emotional immediately.
-
-Observe behavior first.
+Observe behavior before emotion.
 `;
     }
 
@@ -420,43 +545,29 @@ Supported styles:
 - Hinglish
 - Hindi
 
-RULES:
+LANGUAGE PRIORITY RULE:
+
+The emotional realism of TruthLoop
+is MORE important than perfect grammar.
+
+However:
+
+The AI must fully commit
+to ONE language style per response.
+
+Never mix:
+- English + Hindi randomly
+- Hindi + Hinglish randomly
+- Formal Hindi + casual Hinglish
 
 If the user writes in English:
-- Reply fully in English.
-- Keep the tone psychologically sharp and concise.
+→ respond only in English.
 
 If the user writes in Hinglish:
-- Reply in natural conversational Hinglish.
-- Do NOT translate formal Hindi.
-- Sound like a real human conversation.
-- Keep emotional realism and conversational rhythm.
+→ respond only in natural Roman Hinglish.
 
 If the user writes in Hindi:
-- Reply in simple spoken Hindi.
-- Avoid robotic or literary wording.
-
-Never use overly formal Hindi words like:
-- "karya"
-- "prakriya"
-- "avashyakta"
-- "isliye ki"
-- "atah"
-
-Prefer natural spoken words like:
-- "kaam"
-- "pattern"
-- "avoid"
-- "clarity"
-- "comfort"
-
-IMPORTANT:
-
-The language should feel:
-- emotionally natural
-- psychologically observant
-- conversational
-- tension-driven
+→ respond only in Hindi script.
 
 Never sound translated.
 
@@ -470,6 +581,13 @@ The user should feel:
 STYLE:
 
 - Maximum 80 words
+- Maximum 3 short paragraphs
+- Conversational rhythm
+- No bullet points
+- No essays
+- Stop before over-explaining
+
+---
 
 QUESTION RULE:
 
@@ -508,7 +626,7 @@ not analyzed.
 
         body: JSON.stringify({
 
-          model: "llama-3.1-8b-instant",
+          model: "llama-3.3-70b-versatile",
 
           messages: [
             {
@@ -519,7 +637,7 @@ not analyzed.
           ],
 
           temperature: 0.7,
-          max_tokens: 90
+          max_tokens: 140
         })
       }
     );
@@ -548,27 +666,8 @@ not analyzed.
       .replace(/As an AI/gi, "")
       .replace(/you should/gi, "")
       .replace(/Think again\./gi, "")
+      .replace(/^\s*["']|["']\s*$/g, "")
       .trim();
-
-    const brokenEndings = [
-      "because",
-      "but",
-      "maybe",
-      "perhaps",
-      "so",
-      "and"
-    ];
-
-    for (const end of brokenEndings) {
-
-      if (
-        reply.toLowerCase().endsWith(end)
-      ) {
-
-        reply =
-          reply.slice(0, -end.length).trim();
-      }
-    }
 
     /* =========================
        🔧 FALLBACKS
@@ -576,9 +675,31 @@ not analyzed.
 
     if (!reply || reply.length < 20) {
 
-      reply = isHindi
-        ? "तुम असली बात से बच रहे हो।\n\nअसल में क्या काम नहीं कर रहा?"
-        : "You're avoiding the real issue.\n\nWhat's actually not working?";
+      if (isHindi) {
+
+        reply =
+`तुम असली बात से बच रहे हो।
+
+असल में क्या काम नहीं कर रहा?`;
+
+      }
+
+      else if (isHinglish) {
+
+        reply =
+`Tum asli problem se bach rahe ho.
+
+Actually kya kaam nahi kar raha?`;
+
+      }
+
+      else {
+
+        reply =
+`You're avoiding the real issue.
+
+What's actually not working?`;
+      }
     }
 
     /* =========================
@@ -587,22 +708,35 @@ not analyzed.
 
     if (!reply.trim().endsWith("?")) {
 
-      const questions =
-  isHindi
-    ? [
-        "तुम असल में क्या बचा रहे हो?",
-        "तुम clarity चाहते हो या comfort?"
-      ]
-    : isHinglish
-    ? [
-        "Tum actually avoid kya kar rahe ho?",
-        "Tum clarity chahte ho ya comfort?",
-        "Tumhe failure se darr hai ya exposure se?"
-      ]
-    : [
-        "What are you emotionally protecting?",
-        "Do you want clarity or comfort?"
-      ];
+      let questions = [];
+
+      if (isHindi) {
+
+        questions = [
+          "तुम असल में क्या बचा रहे हो?",
+          "तुम clarity चाहते हो या comfort?",
+          "तुम्हें डर failure से है या exposure से?"
+        ];
+      }
+
+      else if (isHinglish) {
+
+        questions = [
+          "Tum actually avoid kya kar rahe ho?",
+          "Tum clarity chahte ho ya comfort?",
+          "Tumhe failure se darr hai ya exposure se?"
+        ];
+      }
+
+      else {
+
+        questions = [
+          "What are you emotionally protecting?",
+          "Do you want clarity or comfort?",
+          "Are you afraid of failure or exposure?"
+        ];
+      }
+
       const q =
         questions[
           Math.floor(Math.random() * questions.length)
@@ -617,9 +751,20 @@ not analyzed.
 
     if (loopLevel >= 6) {
 
-      reply += isHindi
-        ? "\n\nअब करो।"
-        : "\n\nNow act.";
+      if (isHindi) {
+
+        reply += "\n\nअब करो।";
+      }
+
+      else if (isHinglish) {
+
+        reply += "\n\nAb karo.";
+      }
+
+      else {
+
+        reply += "\n\nNow act.";
+      }
     }
 
     /* =========================
@@ -628,7 +773,8 @@ not analyzed.
 
     return res.status(200).json({
       reply,
-      paywall: false
+      paywall: false,
+      language
     });
 
   }
@@ -641,4 +787,4 @@ not analyzed.
       reply: "Server error"
     });
   }
-      }
+  }
