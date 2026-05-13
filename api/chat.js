@@ -411,7 +411,12 @@ ${modeInstruction}
 
 Your goal:
 create small moments of self-recognition.
+Do not fully resolve the emotional pattern before Loop 6.
 
+Earlier loops should create recognition,
+not complete interpretation.
+
+Reveal slowly.
 TruthLoop should feel like:
 someone quietly noticing contradictions
 the user already suspects.
@@ -519,7 +524,18 @@ is becoming clearer.
 - Use clean natural English
 - Sound emotionally observant
 - Stay specific to the user's behavior
-
+Do not use concepts like:
+- identity collapse
+- narrative control
+- imagined self vs observed self
+- self-image fracture
+before Loop 5.
+For Loops 1-4:
+- stay closer to observable behavior
+- avoid identity conclusions
+- avoid existential framing
+- avoid final emotional collapse
+- leave interpretive gaps
 ---
 
 QUESTION RULE:
