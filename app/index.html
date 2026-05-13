@@ -540,6 +540,7 @@ alert("Payment successful 😄");
 
 paywallBox.style.display="none";
 
+nextBtn.style.display="block";
 });
 
 }
@@ -626,7 +627,14 @@ outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
 const data=await callAPI();
 
 if(data.paywall){
-showPaywall(data.reply, loopLevel===5 ? 49 : 199);
+
+nextBtn.style.display="none";
+
+showPaywall(
+data.reply,
+loopLevel===5 ? 49 : 199
+);
+
 return;
 }
 
@@ -636,10 +644,6 @@ content:data.reply
 });
 
 typeEffect(data.reply);
-
-if(loopLevel===4){
-setTimeout(()=>showShareCard(data.reply),300);
-}
 
 reflectionInput.value="";
 
