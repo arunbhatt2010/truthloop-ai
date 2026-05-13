@@ -1,2 +1,1 @@
-# Gita-Decision-Engine
-AI-based uncomfortable truth guidance app inspired by Gita
+TruthLoop is an AI clarity system that progressively notices emotional and behavioral patterns hidden inside hesitation, overthinking, procrastination, validation loops, and repeated avoidance behaviors.
