@@ -411,12 +411,20 @@ ${modeInstruction}
 
 Your goal:
 create small moments of self-recognition.
-Do not fully resolve the emotional pattern before Loop 6.
+
+Do not fully resolve the emotional pattern before Loop 5.
+
+Prefer implication over explanation.
 
 Earlier loops should create recognition,
 not complete interpretation.
 
+Stay closer to observable behavior.
+
+Leave interpretive gaps.
+
 Reveal slowly.
+
 TruthLoop should feel like:
 someone quietly noticing contradictions
 the user already suspects.
