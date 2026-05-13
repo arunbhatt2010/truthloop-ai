@@ -152,7 +152,7 @@ a while ago.`
        🔒 LOOP 6+
     ========================= */
 
-    if (loopLevel >= 6 && !paid49) {
+    if (loopLevel === 6 && !paid49) {
 
       return res.status(200).json({
         reply:
@@ -655,10 +655,25 @@ What keeps repeating even after you've already noticed it?`;
        🔥 FINAL PUSH
     ========================= */
 
-    if (loopLevel >= 6) {
+    if (loopLevel === 6) {
 
-      reply += "\n\nNow act.";
-    }
+reply += "\n\nNow act.";
+}
+
+if (loopLevel === 7) {
+
+reply += `
+
+Now act.
+
+TruthLoop notices patterns.
+Not permanent truths.
+
+Recognition can create clarity.
+
+What you do next
+is still your choice.`;
+}
 
     /* =========================
        ✅ FINAL
