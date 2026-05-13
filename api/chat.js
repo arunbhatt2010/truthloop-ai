@@ -149,10 +149,10 @@ a while ago.`
     }
 
     /* =========================
-       🔒 LOOP 6+
-    ========================= */
+   🔒 LOOP 6 ACCESS
+========================= */
 
-    if (loopLevel === 6 && !paid49) {
+if (loopLevel === 6 && !paid49) {
 
       return res.status(200).json({
         reply:
