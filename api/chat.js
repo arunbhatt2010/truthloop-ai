@@ -115,24 +115,46 @@ What exactly keeps repeating?`
 
       const lines = [
 
-        `You already know what to do.
+`Loop 1 exposed the visible problem.
 
-You're delaying action.`,
+Loop 2 noticed the repeating tension.
 
-        `Nothing new is missing.
+Loop 3 followed the hesitation pattern.
 
-Execution is.`,
+Loop 4 showed where clarity keeps collapsing.
 
-        `The pattern is visible now.
+The next layer goes deeper:
+emotional avoidance,
+decision resistance,
+and hidden self-protection.
 
-You're still protecting comfort.`,
+Most people stop here.`,
 
-        `You keep returning to analysis
-right before exposure becomes real.`,
+`You already noticed the surface pattern.
 
-        `Clarity stopped being the problem
-a while ago.`
-      ];
+Now the deeper layer begins:
+why the same hesitation
+keeps returning
+even after awareness appears.
+
+This is where the conversation becomes harder to ignore.`,
+
+`The first loops focused on behavior.
+
+The next layer focuses on:
+what the behavior is protecting.
+
+That shift changes the conversation completely.`,
+
+`You’ve already seen:
+- the visible contradiction
+- the repeating hesitation
+- the tension underneath the behavior
+
+The next layer explores
+why clarity still doesn’t become action.`
+
+];
 
       const pick =
         lines[
