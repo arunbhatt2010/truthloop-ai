@@ -115,7 +115,23 @@ background:linear-gradient(45deg,orange,#ff5e00);
 font-weight:bold;
 font-size:15px;
 }
+.categoryBtn{
+width:auto;
+padding:10px 14px;
+margin-top:0;
+background:#181818;
+border:1px solid #2a2a2a;
+color:#fff;
+font-size:13px;
+border-radius:999px;
+cursor:pointer;
+transition:0.2s;
+}
 
+.categoryBtn:hover{
+border-color:orange;
+color:orange;
+}
 #shareBox,
 #paywallBox{
 display:none;
@@ -170,7 +186,51 @@ line-height:1.6;
 ">
 You don’t need advice. You need clarity.
 </p>
+<div style="
+margin-bottom:18px;
+background:#111;
+border:1px solid #222;
+padding:14px;
+border-radius:14px;
+">
 
+<div style="
+font-size:13px;
+color:#888;
+margin-bottom:12px;
+letter-spacing:1px;
+text-transform:uppercase;
+">
+Choose your current pattern
+</div>
+
+<div style="
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+">
+
+<button class="categoryBtn" data-type="creator">Creator</button>
+
+<button class="categoryBtn" data-type="writer">Writer</button>
+
+<button class="categoryBtn" data-type="author">Author</button>
+
+<button class="categoryBtn" data-type="founder">Founder</button>
+
+<button class="categoryBtn" data-type="owner">Owner</button>
+
+<button class="categoryBtn" data-type="student">Student</button>
+
+<button class="categoryBtn" data-type="overthinker">Overthinker</button>
+
+<button class="categoryBtn" data-type="validation">Validation</button>
+
+<button class="categoryBtn" data-type="failure">Fear of Failure</button>
+
+</div>
+
+</div>
 <div id="loopIndicator" style="
 color:orange;
 font-size:14px;
@@ -389,7 +449,7 @@ let loopLevel=1;
 let messages=[];
 let payment49=false;
 let payment199=false;
-
+let currentCategory="";
 /* Analytics */
 
 function track(event,data={}){
@@ -627,7 +687,23 @@ nextBtn.style.display="block";
 }).render("#paypal-button");
 
 }
+document.querySelectorAll(".categoryBtn").forEach(btn=>{
 
+btn.onclick=()=>{
+
+currentCategory=btn.dataset.type;
+
+document.querySelectorAll(".categoryBtn").forEach(b=>{
+b.style.borderColor="#2a2a2a";
+b.style.color="#fff";
+});
+
+btn.style.borderColor="orange";
+btn.style.color="orange";
+
+};
+
+});
 /* START */
 
 getBtn.onclick=async()=>{
