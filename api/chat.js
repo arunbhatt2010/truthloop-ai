@@ -30,12 +30,13 @@ export default async function handler(req, res) {
         : req.body;
 
     const {
-      messages,
-      loopLevel = 1,
-      paid49 = false,
-      paid199 = false,
-      shownLoop5 = []
-    } = body;
+  messages,
+  loopLevel = 1,
+  paid49 = false,
+  paid199 = false,
+  shownLoop5 = [],
+  currentCategory = ""
+} = body;
 
     if (!messages || !messages.length) {
 
@@ -393,7 +394,19 @@ Avoid dramatic psychology.
 Stay believable.
 `;
     }
+let categoryInstruction = "";
 
+if(currentCategory){
+
+categoryInstruction = `
+The user currently identifies most with this pattern category:
+${currentCategory}
+
+Subtly adapt examples, tension, and behavioral observations to fit this category.
+
+Do not mention the category directly unless naturally relevant.
+`;
+}
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
@@ -408,7 +421,7 @@ You are not a motivational AI.
 You notice patterns people unintentionally reveal.
 
 ${modeInstruction}
-
+${categoryInstruction}
 Your goal:
 create small moments of self-recognition.
 
