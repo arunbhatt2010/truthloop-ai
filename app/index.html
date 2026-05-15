@@ -355,15 +355,9 @@ WhatsApp
 </button>
 
 </div>
-<div style="
+<div id="articleBlock" style="
+display:none;
 margin-top:22px;
-margin-bottom:18px;
-padding:16px;
-background:#111;
-border:1px solid #222;
-border-radius:14px;
-line-height:1.8;
-">
 
 <div style="
 font-size:16px;
@@ -802,7 +796,9 @@ content:data.reply
 });
 
 typeEffect(data.reply);
-
+if(loopLevel >= 7){
+document.getElementById("articleBlock").style.display="block";
+  }
 reflectionInput.value="";
 
 };
