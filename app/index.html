@@ -305,7 +305,20 @@ font-size:15px;
 “Part of you wants growth.<br>
 Another part avoids proof.”
 </div>
-
+<div id="categoryMessage" style="
+display:none;
+background:#101010;
+border-left:3px solid orange;
+padding:14px;
+border-radius:10px;
+margin-bottom:18px;
+color:#f0f0f0;
+line-height:1.7;
+font-size:15px;
+transition:0.2s;
+">
+Category selected.
+</div>
 <div style="
 color:#999;
 font-size:15px;
@@ -453,6 +466,42 @@ let messages=[];
 let payment49=false;
 let payment199=false;
 let currentCategory="";
+const categoryMessages = {
+
+creator:
+"Creator pattern selected.<br>Creative pressure often hides deeper hesitation loops.",
+
+writer:
+"Writer pattern selected.<br>Sometimes the hardest part is not writing. It’s exposure.",
+
+author:
+"Author pattern selected.<br>Many people delay publishing long before they delay creating.",
+
+founder:
+"Founder pattern selected.<br>Execution pressure changes how people process uncertainty.",
+
+owner:
+"Owner pattern selected.<br>Responsibility can quietly turn clarity into survival mode.",
+
+student:
+"Student pattern selected.<br>Not every delay comes from laziness or lack of discipline.",
+
+jobseeker:
+"Job Seeker pattern selected.<br>Repeated uncertainty can quietly damage confidence.",
+
+overthinker:
+"Overthinking pattern selected.<br>Some minds stay busy to avoid emotional risk.",
+
+pattern:
+"You vs Your Pattern selected.<br>The real conflict is often underneath the visible behavior.",
+
+validation:
+"Validation pattern selected.<br>External approval can quietly control internal decisions.",
+
+failure:
+"Fear of Failure selected.<br>Many people avoid proof more than they avoid failure."
+
+};
 /* Analytics */
 
 function track(event,data={}){
@@ -704,6 +753,18 @@ b.style.color="#fff";
 
 btn.style.borderColor="orange";
 btn.style.color="orange";
+
+const categoryBox =
+document.getElementById("categoryMessage");
+
+if(categoryMessages[currentCategory]){
+
+categoryBox.style.display="block";
+
+categoryBox.innerHTML =
+categoryMessages[currentCategory];
+
+}
 
 };
 
