@@ -571,7 +571,7 @@ return { reply:"Network error 😃" };
 
 function typeEffect(text){
 text = text.replace(
-/\[\[highlight\]\]\s*([\s\S]*?)\s*\[\[end\]\]/gi,
+/<highlight>\s*([\s\S]*?)\s*<\/highlight>/gi,
 '<div class="truthHighlight">$1</div>'
 );
 
