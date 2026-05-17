@@ -445,9 +445,13 @@ sentence here
 
 At least ONE sentence in every response MUST use this format.
 
-Do not explain the highlight.
+Never use parentheses or single brackets.
 
-Only wrap the strongest sentence.
+Use ONLY this exact format:
+
+[[highlight]]
+text
+[[end]]
 Reveal slowly.
 
 TruthLoop should feel like:
