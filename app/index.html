@@ -93,23 +93,25 @@ box-shadow:
 0 0 0 3px rgba(255,140,0,0.12);    
     
   }    
-.output{    
-background:#000;    
-padding:22px 18px;    
-border-radius:16px;    
-margin-bottom:14px;    
-line-height:1.8;    
-width:100%;    
-box-sizing:border-box;    
-    
-border:1px solid #1d1d1d;    
-    
-min-height:420px;    
-max-height:none;    
-    
-overflow:visible;    
-scroll-behavior:smooth;    
-}    
+.output{
+background:#000;
+padding:22px 18px;
+border-radius:16px;
+margin-bottom:14px;
+line-height:1.8;
+width:100%;
+box-sizing:border-box;
+border:1px solid #1d1d1d;
+min-height:420px;
+max-height:none;
+overflow:hidden;
+
+display:flex;
+flex-direction:column;
+gap:12px;
+
+scroll-behavior:smooth;
+}
     
 @media(min-width:768px){    
     
