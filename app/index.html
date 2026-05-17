@@ -48,7 +48,29 @@ gtag('config', 'G-RBMQ2F6P9Q');
 <script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>
 
 <style>
+.truthHighlight{
 
+display:block;
+
+margin:18px 0;
+
+padding:14px;
+
+border-left:3px solid orange;
+
+background:#111;
+
+color:#fff;
+
+font-weight:bold;
+
+text-decoration:underline;
+
+border-radius:10px;
+
+line-height:1.8;
+
+  }
 body{
 background:#0f0f0f;
 color:#fff;
@@ -548,7 +570,11 @@ return { reply:"Network error 😃" };
 /* TYPE EFFECT */
 
 function typeEffect(text){
+text = text.replace(
+/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
 
+`<div class="truthHighlight">$1</div>`
+);
 const div=document.createElement("div");
 outputBox.appendChild(div);
 
