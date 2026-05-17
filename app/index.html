@@ -593,7 +593,7 @@ let i = 0;
 
 const speed = 8;
 
-const typing = setInterval(()=>{
+const interval = setInterval(()=>{
 
 div.innerHTML = text.substring(0,i);
 
@@ -603,7 +603,7 @@ i++;
 
 if(i > text.length){
 
-clearInterval(typing);
+clearInterval(interval);
 
 div.innerHTML = text;
 
@@ -614,9 +614,10 @@ reflectionInput.style.visibility = "visible";
 nextBtn.style.visibility = "visible";
 
 }
+
 },speed);
 
-}
+  }
     
 /* SHARE */    
     
