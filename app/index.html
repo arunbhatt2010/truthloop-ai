@@ -868,7 +868,16 @@ role:"user",
 content:text    
 });    
     
-outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;    
+const userReply=document.createElement("div");
+
+userReply.style.marginTop="18px";
+
+userReply.innerHTML=`
+<b style="color:orange;">You:</b><br><br>
+${text}<br><br>
+`;
+
+outputBox.appendChild(userReply);
     
 const data=await callAPI();    
     
