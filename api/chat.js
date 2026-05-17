@@ -683,7 +683,15 @@ not analyzed.
       reply =
         reply.replace(regex, "");
     });
+    reply = reply.replace(
+/\[\[\s*highlight\s*\]\]/gi,
+"[[highlight]]"
+);
 
+reply = reply.replace(
+/\[\[\s*end\s*\]\]/gi,
+"[[end]]"
+);
     reply = reply
       .replace(/\n{3,}/g, "\n\n")
       .replace(/\s{2,}/g, " ")
