@@ -552,8 +552,18 @@ const errorText=await res.text();
 console.error("API ERROR:",errorText);  
 return { reply:"Server error 😃" };  
 }  
-  
-return await res.json();  
+  console.log("SENDING:", {
+messages,
+loopLevel,
+paid49:payment49,
+paid199:payment199,
+currentCategory
+});
+const data = await res.json();
+
+console.log("API RESPONSE:", data);
+
+return data;
   
 }catch(err){  
   
@@ -800,7 +810,7 @@ content:text
   
 /* hide intro screen */  
 outputBox.innerHTML="";  
-  
+  outputBox.innerHTML = "<div style='color:#777'>Thinking...</div>";
 const userDiv=document.createElement("div");  
   
 userDiv.style.background="#111";  
