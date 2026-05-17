@@ -599,11 +599,13 @@ outputBox.scrollTop = outputBox.scrollHeight;
 
 i++;
 
-if(i<=text.length){
+if(i < text.length){
 
 requestAnimationFrame(typing);
 
 }else{
+
+div.innerHTML = text;
 
 reflectionInput.style.display="block";
 nextBtn.style.display="block";
