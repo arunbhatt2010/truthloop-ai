@@ -60,15 +60,15 @@ border-left:3px solid orange;
 
 background:#111;
 
-color:#fff;
+color:orange;
 
 font-weight:bold;
-
-text-decoration:underline;
 
 border-radius:10px;
 
 line-height:1.8;
+
+font-size:18px;
 
   }
 body{
@@ -575,6 +575,8 @@ text = text.replace(
 
 `<div class="truthHighlight">$1</div>`
 );
+
+text = text.replace(/\n/g,"<br>");
 const div=document.createElement("div");
 outputBox.appendChild(div);
 
