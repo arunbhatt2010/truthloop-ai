@@ -50,7 +50,7 @@ gtag('config', 'G-RBMQ2F6P9Q');
 <style>
 .truthHighlight{
 
-display:inline;
+display:inline-block;
 
 margin:12px 0;
 
@@ -592,14 +592,13 @@ if(i<=text.length){
 
 requestAnimationFrame(typing);
 
-}
+}else{
+
+nextBtn.style.display = "block";
 
 }
 
-typing();
-
-  }
-
+}
 /* SHARE */
 
 function showShareCard(text){
@@ -854,7 +853,16 @@ role:"user",
 content:text
 });
 
-outputBox.innerHTML += `<br><b>You:</b> ${text}<br><br>`;
+const userReply=document.createElement("div");
+
+userReply.style.marginTop="18px";
+
+userReply.innerHTML=`
+<b style="color:orange;">You:</b><br><br>
+${text}<br><br>
+`;
+
+outputBox.appendChild(userReply);
 
 const data=await callAPI();
 
