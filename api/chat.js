@@ -439,9 +439,9 @@ When a sentence carries the strongest emotional recognition or tension,
 
 wrap ONLY that sentence using:
 
-[[highlight]]
+<highlight>
 sentence here
-[[end]]
+</highlight>
 
 At least ONE sentence in every response must use the highlight block.
 
