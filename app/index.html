@@ -660,7 +660,7 @@ function showPaywall(message,amount){
 track("paywall_shown",{loop:loopLevel,amount});    
     
 paywallBox.style.display="block";    
-paySub.innerText=message;    
+paySub.innerHTML = message.replace(/\n/g,"<br>");
     
 razorpayBtn.style.display="block";    
 razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
