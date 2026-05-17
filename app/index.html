@@ -400,15 +400,29 @@ line-height:1.8;
 ">
 
 <div style="
+<button id="nextBtn" style="display:none;">
+Go deeper
+</button><!-- SHARE BOX --><div id="shareBox"><div id="shareText"></div><button onclick="copyShare()">
+Copy
+</button><button onclick="whatsappShare()">
+WhatsApp
+</button></div><div id="articleBlock" style="
+display:none;
+margin-top:22px;
+margin-bottom:18px;
+padding:16px;
+background:#111;
+border:1px solid #222;
+border-radius:14px;
+line-height:1.8;
+"><div style="
 font-size:16px;
 font-weight:bold;
 margin-bottom:10px;
 color:#fff;
 ">
 Explore More Clarity Systems
-</div>
-
-<a href="https://truthloop.in/why-you-feel-stuck.html"
+</div><a href="https://truthloop.in/why-you-feel-stuck.html"
 style="
 display:block;
 margin-bottom:10px;
@@ -448,22 +462,9 @@ font-weight:bold;
 → Visit TruthLoop AI
 </a>
 
-</div>
-<!-- PAYWALL -->
+</div><!-- PAYWALL --><div id="paywallBox"><div id="paySub"></div><button id="razorpayBtn"></button>
 
-<div id="paywallBox">
-
-<div id="paySub"></div>
-
-<button id="razorpayBtn"></button>
-
-<div id="paypal-button"></div>
-
-</div>
-
-</div>
-
-<script>
+<div id="paypal-button"></div></div><script>
 
 const API_URL="/api/chat";
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";
