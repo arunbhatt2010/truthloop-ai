@@ -364,9 +364,10 @@ Show me the truth →
 </button>    
     
 <input id="reflectionInput"
+style="display:none;"
 placeholder="Answer honestly..."/>
 
-<button id="nextBtn">
+<button id="nextBtn" style="display:none;">
 Go deeper
 </button>
     
@@ -607,8 +608,8 @@ clearInterval(interval);
 
 div.innerHTML = text;
 
-reflectionInput.removeAttribute("style");
-nextBtn.removeAttribute("style");
+reflectionInput.style.display = "block";
+nextBtn.style.display = "block";
 
 }
 
