@@ -241,14 +241,13 @@ You vs Your Pattern
 
 </div>
 
-</div>
 <div id="loopIndicator" style="
 color:orange;
 font-size:14px;
 margin-bottom:14px;
 font-weight:bold;
 ">
-Loop 1 / 7
+Loop 1 of 7
 </div>
 
 <div id="outputBox" class="output">
@@ -831,7 +830,7 @@ const text=reflectionInput.value.trim();
 if(!text)return;
 
 loopLevel++;
-document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} / 7`;
+document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;
 track("loop_progress",{loop:loopLevel});
 
 messages.push({
