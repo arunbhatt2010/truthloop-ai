@@ -742,452 +742,177 @@ font-weight:bold;
     
 </div>    
     
-<script>    
-    
-const API_URL="/api/chat";    
-const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
-    
-const outputBox=document.getElementById("outputBox");    
-const mainInput=document.getElementById("mainInput");    
-const reflectionInput=document.getElementById("reflectionInput");    
-const getBtn=document.getElementById("getBtn");    
-const nextBtn=document.getElementById("nextBtn");    
-    
-const shareBox=document.getElementById("shareBox");    
-const shareText=document.getElementById("shareText");    
-    
-const paywallBox=document.getElementById("paywallBox");    
-const paySub=document.getElementById("paySub");    
-const razorpayBtn=document.getElementById("razorpayBtn");    
-    
-let loopLevel=1;    
-let messages=[];    
-let payment49=false;    
-let payment199=false;    
-let currentCategory="";    
-const categoryMessages = {    
-    
-creator:    
-"Creator pattern selected.<br>Creative pressure often hides deeper hesitation loops.",    
-    
-writer:    
-"Writer pattern selected.<br>Sometimes the hardest part is not writing. It’s exposure.",    
-    
-author:    
-"Author pattern selected.<br>Many people delay publishing long before they delay creating.",    
-    
-founder:    
-"Founder pattern selected.<br>Execution pressure changes how people process uncertainty.",    
-    
-owner:    
-"Owner pattern selected.<br>Responsibility can quietly turn clarity into survival mode.",    
-    
-student:    
-"Student pattern selected.<br>Not every delay comes from laziness or lack of discipline.",    
-    
-jobseeker:    
-"Job Seeker pattern selected.<br>Repeated uncertainty can quietly damage confidence.",    
-    
-overthinker:    
-"Overthinking pattern selected.<br>Some minds stay busy to avoid emotional risk.",    
-    
-pattern:    
-"You vs Your Pattern selected.<br>The real conflict is often underneath the visible behavior.",    
-    
-validation:    
-"Validation pattern selected.<br>External approval can quietly control internal decisions.",    
-    
-failure:    
-"Fear of Failure selected.<br>Many people avoid proof more than they avoid failure."    
-    
-};    
-/* Analytics */    
-    
-function track(event,data={}){    
-if(typeof gtag!=="undefined"){    
-gtag('event',event,data);    
-}    
-}    
-    
-/* API */    
-    
-async function callAPI(){    
-    
-try{    
-    
-const res=await fetch(API_URL,{    
-method:"POST",    
-headers:{    
-"Content-Type":"application/json"    
-},    
-body:JSON.stringify({    
-messages,    
-loopLevel,    
-paid49:payment49,    
-paid199:payment199,    
-currentCategory    
-})    
-});    
-    
-if(!res.ok){    
-const errorText=await res.text();    
-console.error("API ERROR:",errorText);    
-return { reply:"Server error 😃" };    
-}    
-  console.log("SENDING:", {  
-messages,  
-loopLevel,  
-paid49:payment49,  
-paid199:payment199,  
-currentCategory  
-});  
-const data = await res.json();  
-  
-console.log("API RESPONSE:", data);  
-  
-return data;  
-    
-}catch(err){    
-    
-console.error("FETCH FAIL:",err);    
-return { reply:"Network error 😃" };    
-    
-}    
-    
-}    
-    
-/* TYPE EFFECT */    
-    
+<script>
+
+const API_URL="/api/chat";
+
+const outputBox=document.getElementById("outputBox");
+
+const reflectionInput=
+document.getElementById("reflectionInput");
+
+const nextBtn=
+document.getElementById("nextBtn");
+
+let loopLevel=1;
+
+let messages=[];
+
+/* TRACK */
+
+function track(event,data={}){
+
+if(typeof gtag!=="undefined"){
+
+gtag('event',event,data);
+
+}
+
+}
+
+/* API */
+
+async function callAPI(){
+
+try{
+
+const res=await fetch(API_URL,{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+messages,
+loopLevel
+})
+
+});
+
+const data=await res.json();
+
+return data;
+
+}catch(err){
+
+console.log(err);
+
+return {
+reply:"Network error 😃"
+};
+
+}
+
+}
+
+/* TYPE EFFECT */
+
 function typeEffect(text){
 
-text = text.replace(
+text=text.replace(
 /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
 `<span class="truthHighlight">$1</span>`
 );
 
-text = text.replace(/\n/g,"<br>");
+text=text.replace(/\n/g,"<br>");
 
-const div = document.createElement("div");
+const div=document.createElement("div");
+
+div.style.lineHeight="1.9";
+
+div.style.fontSize="18px";
+
+div.style.wordBreak="break-word";
 
 loopContent.appendChild(div);
 
-let i = 0;
+let i=0;
 
-const speed = 8;
+const interval=setInterval(()=>{
 
-const interval = setInterval(()=>{
+div.innerHTML=text.substring(0,i);
 
-div.innerHTML = text.substring(0,i);
-
-outputBox.scrollTop = outputBox.scrollHeight;
+outputBox.scrollTop=
+outputBox.scrollHeight;
 
 i++;
 
-if(i > text.length){
+if(i>text.length){
 
 clearInterval(interval);
 
-div.innerHTML = text;
+div.innerHTML=text;
 
-reflectionInput.style.display = "block";
-nextBtn.style.display = "block";
+reflectionInput.style.display="block";
+
+nextBtn.style.display="block";
+
+}
+
+},8);
 
 }
 
-},speed);
+/* NEXT LOOP */
 
-}
-    
-/* SHARE */    
-    
-function showShareCard(text){    
-    
-const clean=text.replace(/<[^>]*>?/gm,'').trim();    
-    
-shareText.innerText=    
-`This hit me harder than expected.    
-    
-${clean}    
-    
-Most people avoid this.    
-    
-https://truthloop.in`;    
-    
-shareBox.style.display="block";    
-    
-}    
-    
-function copyShare(){    
-navigator.clipboard.writeText(shareText.innerText);    
-}    
-    
-function whatsappShare(){    
-window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);    
-}    
-    
-/* PAYWALL */    
-    
-function showPaywall(message,amount){    
-    
-track("paywall_shown",{loop:loopLevel,amount});    
-    
-paywallBox.style.display="block";    
-paySub.innerHTML = message.replace(/\n/g,"<br>");
-    
-razorpayBtn.style.display="block";    
-razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
-    
-razorpayBtn.onclick=function(){    
-    
-const options = {    
-    
-key: RAZORPAY_KEY_ID,    
-    
-amount: amount * 100,    
-    
-currency: "INR",    
-    
-name: "TruthLoop",    
-    
-description:    
-amount === 49    
-? "Unlock Loop 5"    
-: "Unlock Loop 7",    
-    
-image: "https://truthloop.in/truthloop-hook.jpg",    
-    
-prefill: {    
-name: "",    
-email: "",    
-contact: ""    
-},    
-    
-theme: {    
-color: "#ff7a00"    
-},    
-    
-method: {    
-upi: true,    
-card: true,    
-netbanking: true,    
-wallet: true,    
-emi: false,    
-paylater: false    
-},    
-    
-retry: {    
-enabled: true,    
-max_count: 2    
-},    
-    
-modal: {    
-backdropclose: false,    
-escape: true,    
-handleback: true    
-},    
-    
-handler: function (response) {    
-    
-if(amount===49) payment49=true;    
-if(amount===199) payment199=true;    
-    
-track("payment_success",{    
-method:"razorpay",    
-value:amount    
-});    
-    
-alert("Payment successful 😄");    
-    
-paywallBox.style.display="none";    
-    
-}    
-    
-};    
-    
-const rzp = new Razorpay(options);    
-    
-rzp.open();    
-    
-};    
-    
-document.getElementById("paypal-button").innerHTML="";    
-    
-paypal.Buttons({    
-    
-createOrder:function(data,actions){    
-    
-return actions.order.create({    
-purchase_units:[{    
-amount:{    
-value: amount===49 ? "3.00" : "9.00"    
-}    
-}]    
-});    
-    
-},    
-    
-onApprove:function(data,actions){    
-    
-return actions.order.capture().then(function(){    
-    
-if(amount===49) payment49=true;    
-if(amount===199) payment199=true;    
-    
-track("payment_success",{    
-method:"paypal",    
-value:amount    
-});    
-    
-alert("Payment successful 😄");    
-    
-paywallBox.style.display="none";    
-    
-nextBtn.style.display="block";    
-});    
-    
-}    
-    
-}).render("#paypal-button");    
-    
-}    
-document.querySelectorAll(".categoryBtn").forEach(btn=>{    
-    
-btn.onclick=()=>{    
-    
-currentCategory=btn.dataset.type;    
-    
-document.querySelectorAll(".categoryBtn").forEach(b=>{    
-b.style.borderColor="#2a2a2a";    
-b.style.color="#fff";    
-});    
-    
-btn.style.borderColor="orange";    
-btn.style.color="orange";    
-    
-const categoryBox =    
-document.getElementById("categoryMessage");    
-    
-if(categoryMessages[currentCategory]){    
-    
-categoryBox.style.display="block";    
-    
-categoryBox.innerHTML =    
-categoryMessages[currentCategory];    
-    
-}    
-    
-};    
-    
-});    
-/* START */    
-    
-getBtn.onclick=async()=>{    
-    
-const text=mainInput.value.trim();    
-    
-if(!text)return;    
-    
-track("start_clicked");    
-    
-messages=[{    
-role:"user",    
-content:text    
-}];    
-    
-/* hide intro screen */    
-outputBox.innerHTML = `
+nextBtn.onclick=async()=>{
+
+const text=reflectionInput.value.trim();
+
+if(!text)return;
+
+loopLevel++;
+
+dynamicLoopIndicator.innerText=
+`Loop ${loopLevel} of 7`;
+
+messages.push({
+role:"user",
+content:text
+});
+
+const userReply=document.createElement("div");
+
+userReply.style.marginTop="18px";
+
+userReply.style.lineHeight="1.8";
+
+userReply.innerHTML=`
+
 <div style="
 background:#111;
 padding:18px;
 border-radius:14px;
 border:1px solid #222;
-margin-bottom:18px;
-line-height:1.8;
-font-size:16px;
 ">
-<b style="color:orange;">You:</b><br><br>
+
+<b style="color:orange;">You:</b>
+
+<br><br>
+
 ${text}
+
 </div>
-`;
-  
 
-    
-/* smooth scroll */    
-setTimeout(()=>{    
-outputBox.scrollTop=outputBox.scrollHeight;    
-},100);    
-    
-const data=await callAPI();    
-    
-typeEffect(data.reply);    
-    
-messages.push({    
-role:"assistant",    
-content:data.reply    
-});    
-    
-mainInput.style.display="none";
-getBtn.style.display="none";
-    
-};    
-    
-/* NEXT */    
-    
-nextBtn.onclick=async()=>{    
-    
-const text=reflectionInput.value.trim();    
-    
-if(!text)return;    
-    
-loopLevel++;    
-dynamicLoopIndicator.innerText =
-`Loop ${loopLevel} of 7`;
-track("loop_progress",{loop:loopLevel});    
-    
-messages.push({    
-role:"user",    
-content:text    
-});    
-    
-const userReply=document.createElement("div");
-
-userReply.style.marginTop="18px";
-
-userReply.innerHTML=`
-<b style="color:orange;">You:</b><br><br>
-${text}<br><br>
 `;
 
 loopContent.appendChild(userReply);
-    
-const data=await callAPI();    
-    
-if(data.paywall){    
-    
-nextBtn.style.display="none";    
-    
-showPaywall(    
-data.reply,    
-loopLevel===5 ? 49 : 199    
-);    
-    
-return;    
-}    
-    
-messages.push({    
-role:"assistant",    
-content:data.reply    
-});    
-    
-typeEffect(data.reply);    
-if(loopLevel >= 7){    
-document.getElementById("articleBlock").style.display="block";    
-  }    
-reflectionInput.value="";    
-    
-};    
-    
-</script>    
-    
+
+reflectionInput.value="";
+
+const data=await callAPI();
+
+messages.push({
+role:"assistant",
+content:data.reply
+});
+
+typeEffect(data.reply);
+
+};
+
+  </script> 
 </body>    
   </html>
