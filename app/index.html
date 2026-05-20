@@ -527,10 +527,10 @@ const data=await callAPI();
 
 messages.push({
 role:"assistant",
-content:data.reply
+content:data.reply || data.response
 });
 
-typeEffect(data.reply);
+typeEffect(data.reply || data.response);
 
 };
 
@@ -615,7 +615,7 @@ loopContent.appendChild(userReply);
 
 const data=await callAPI();
 
-if(data.paywall){
+console.log(data);{
 
 nextBtn.style.display="none";
 
