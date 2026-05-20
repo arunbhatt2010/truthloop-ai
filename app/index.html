@@ -350,105 +350,213 @@ Understand the emotional patterns behind hesitation,
 overthinking, execution resistance, and clarity collapse.
 </div>
     </div>
-<div id="loopIndicator" style="    
-color:orange;    
-font-size:14px;    
-margin-bottom:14px;    
-font-weight:bold;    
-">    
-Loop 1 of 7    
-</div>    
-    
-<div id="outputBox" class="output">    
-    
-<div style="    
-color:orange;    
-font-size:11px;    
-font-weight:bold;    
-letter-spacing:2px;    
-margin-bottom:14px;    
-">    
-TRUTHLOOP    
-</div>    
-    
-<div style="    
-font-size:28px;    
-font-weight:bold;    
-line-height:1.35;    
-margin-bottom:18px;    
-">    
-You don’t need more advice.<br>    
-<span style="color:orange;">You need clarity.</span>    
-</div>    
-    
-<div style="    
-color:#b5b5b5;    
-font-size:15px;    
-line-height:1.8;    
-margin-bottom:18px;    
-">    
-Most people think they struggle with motivation, discipline, focus, or consistency.    
-</div>    
-    
-<div style="    
-background:#111;    
-border:1px solid #222;    
-padding:16px;    
-border-radius:12px;    
-margin-bottom:18px;    
-color:#e2e2e2;    
-line-height:1.8;    
-font-size:15px;    
-">    
-But many are actually repeating:    
-<br><br>    
-    
-• overthinking<br>    
-• emotional avoidance<br>    
-• validation loops<br>    
-• self-sabotage    
-</div>    
-    
-<div style="    
-background:#101010;    
-border-left:3px solid orange;    
-padding:14px;    
-border-radius:10px;    
-margin-bottom:18px;    
-color:#f0f0f0;    
-line-height:1.7;    
-font-size:15px;    
-">    
-“Part of you wants growth.<br>    
-Another part avoids proof.”    
-</div>    
-<div id="categoryMessage" style="    
-display:none;    
-background:#101010;    
-border-left:3px solid orange;    
-padding:14px;    
-border-radius:10px;    
-margin-bottom:18px;    
-color:#f0f0f0;    
-line-height:1.7;    
-font-size:15px;    
-transition:0.2s;    
-">    
-Category selected.    
+<!-- ========================= -->
+<!-- NEW HOME SCREEN START 😃 -->
+<!-- Replace everything from: -->
+<!-- <div id="loopIndicator"... -->
+<!-- TO -->
+<!-- </div> before mainInput -->
+<!-- ========================= -->
+
+<div id="loopIndicator" style="
+color:orange;
+font-size:14px;
+margin-bottom:14px;
+font-weight:bold;
+display:none;
+">
+Loop 1 of 7
 </div>
-</div>    
-<input id="mainInput"    
-placeholder="Reply to TruthLoop..."    
-style="    
-background:#101010;    
-border:1px solid #262626;    
-box-shadow:0 0 0 1px rgba(255,140,0,0.05);    
-"/>    
-    
-<button id="getBtn">    
-Show me the truth →    
-</button>    
-    
+
+<div id="outputBox" class="output" style="
+padding:0;
+background:#000;
+border-radius:22px;
+overflow:hidden;
+border:1px solid #1f1f1f;
+">
+
+<!-- HERO SCREEN -->
+
+<div id="heroScreen" style="
+position:relative;
+text-align:center;
+background:#000;
+">
+
+<img 
+src="https://truthloop.in/images/iceberg-home.jpeg"
+style="
+width:100%;
+display:block;
+border-radius:22px;
+"
+/>
+
+</div>
+
+<!-- SCREEN 2 -->
+<div id="patternScreen" style="
+display:none;
+padding:22px;
+">
+
+<div style="
+font-size:13px;
+letter-spacing:2px;
+color:orange;
+margin-bottom:12px;
+font-weight:bold;
+">
+PATTERN DETECTION
+</div>
+
+<div style="
+font-size:30px;
+font-weight:bold;
+line-height:1.35;
+margin-bottom:14px;
+">
+What keeps repeating?
+</div>
+
+<div style="
+color:#a8a8a8;
+line-height:1.8;
+font-size:15px;
+margin-bottom:26px;
+">
+Choose the pattern that feels closest to your current internal loop.
+</div>
+
+<div style="
+display:flex;
+flex-direction:column;
+gap:12px;
+">
+
+<button class="patternOption"
+data-question="Why do I keep overthinking even when I know what to do?">
+I keep overthinking decisions
+</button>
+
+<button class="patternOption"
+data-question="Why do I avoid taking action even when the opportunity is important?">
+I avoid important action
+</button>
+
+<button class="patternOption"
+data-question="Why do I need validation before I feel confident?">
+I depend on validation
+</button>
+
+<button class="patternOption"
+data-question="Why do I start things but struggle to finish them?">
+I start but don’t finish
+</button>
+
+<button class="patternOption"
+data-question="Why do I feel emotionally stuck even when I want growth?">
+I feel emotionally stuck
+</button>
+
+<button class="patternOption"
+data-question="Why do I delay execution even after making plans?">
+I delay execution
+</button>
+
+<button class="patternOption"
+data-question="Why do I fear failure even before trying?">
+I fear failure
+</button>
+
+<button class="patternOption"
+data-question="Why do I avoid visibility and exposure?">
+I avoid visibility
+</button>
+
+<button class="patternOption"
+data-question="Why do I sabotage myself before progress happens?">
+I repeat self-sabotage
+</button>
+
+</div>
+
+</div>
+
+<!-- SCREEN 3 -->
+<div id="reflectionScreen" style="
+display:none;
+padding:22px;
+">
+
+<div style="
+font-size:13px;
+letter-spacing:2px;
+color:orange;
+margin-bottom:12px;
+font-weight:bold;
+">
+CLARITY ENTRY
+</div>
+
+<div style="
+font-size:28px;
+font-weight:bold;
+line-height:1.35;
+margin-bottom:16px;
+">
+TruthLoop needs context.
+</div>
+
+<div style="
+color:#aaa;
+line-height:1.8;
+font-size:15px;
+margin-bottom:22px;
+">
+Describe what keeps happening internally.
+Not the surface story.
+The deeper loop.
+</div>
+
+<input id="mainInput"
+placeholder="Reply to TruthLoop..."
+style="
+background:#101010;
+border:1px solid #262626;
+box-shadow:0 0 0 1px rgba(255,140,0,0.05);
+margin-bottom:16px;
+"/>
+
+<button id="getBtn">
+Show me the truth →
+</button>
+
+</div>
+
+<!-- SCREEN 4 -->
+<div id="loopScreen" style="
+display:none;
+padding:22px;
+">
+
+<div style="
+color:orange;
+font-size:14px;
+margin-bottom:14px;
+font-weight:bold;
+" id="dynamicLoopIndicator">
+Loop 1 of 7
+</div>
+
+<div id="loopContent"></div>
+
+</div>
+
+</div>
+
+<!-- reflection area -->
 <input id="reflectionInput"
 style="display:none;"
 placeholder="Answer honestly..."/>
@@ -456,6 +564,249 @@ placeholder="Answer honestly..."/>
 <button id="nextBtn" style="display:none;">
 Go deeper
 </button>
+
+<style>
+
+.patternOption{
+background:#111;
+border:1px solid #262626;
+color:#fff;
+padding:16px;
+border-radius:16px;
+text-align:left;
+font-size:15px;
+line-height:1.6;
+transition:0.2s;
+cursor:pointer;
+}
+
+.patternOption:hover{
+border-color:orange;
+color:orange;
+}
+
+</style>
+
+<script>
+
+/* ========================= */
+/* NEW SCREEN SYSTEM 😃 */
+/* ========================= */
+
+const heroScreen =
+document.getElementById("heroScreen");
+
+const patternScreen =
+document.getElementById("patternScreen");
+
+const reflectionScreen =
+document.getElementById("reflectionScreen");
+
+const loopScreen =
+document.getElementById("loopScreen");
+
+const loopContent =
+document.getElementById("loopContent");
+
+const dynamicLoopIndicator =
+document.getElementById("dynamicLoopIndicator");
+
+/* HERO CLICK */
+
+heroScreen.onclick=()=>{
+
+heroScreen.style.display="none";
+
+patternScreen.style.display="block";
+
+outputBox.style.padding="0";
+
+};
+
+/* PATTERN CLICK */
+
+document.querySelectorAll(".patternOption")
+.forEach(btn=>{
+
+btn.onclick=()=>{
+
+const autoQuestion =
+btn.dataset.question;
+
+mainInput.value = autoQuestion;
+
+patternScreen.style.display="none";
+
+reflectionScreen.style.display="block";
+
+};
+
+});
+
+/* ========================= */
+/* START LOOP */
+/* ========================= */
+
+getBtn.onclick=async()=>{
+
+const text=mainInput.value.trim();
+
+if(!text)return;
+
+track("start_clicked");
+
+messages=[{
+role:"user",
+content:text
+}];
+
+reflectionScreen.style.display="none";
+
+loopScreen.style.display="block";
+
+loopContent.innerHTML=`
+<div style="
+background:#111;
+padding:18px;
+border-radius:14px;
+border:1px solid #222;
+margin-bottom:18px;
+line-height:1.8;
+font-size:16px;
+">
+<b style="color:orange;">You:</b><br><br>
+${text}
+</div>
+`;
+
+const data=await callAPI();
+
+messages.push({
+role:"assistant",
+content:data.reply
+});
+
+typeEffect(data.reply);
+
+};
+
+/* ========================= */
+/* TYPE EFFECT UPDATE */
+/* ========================= */
+
+function typeEffect(text){
+
+text = text.replace(
+/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+`<span class="truthHighlight">$1</span>`
+);
+
+text = text.replace(/\n/g,"<br>");
+
+const div=document.createElement("div");
+
+loopContent.appendChild(div);
+
+let i=0;
+
+const speed=8;
+
+const interval=setInterval(()=>{
+
+div.innerHTML=text.substring(0,i);
+
+outputBox.scrollTop=
+outputBox.scrollHeight;
+
+i++;
+
+if(i>text.length){
+
+clearInterval(interval);
+
+div.innerHTML=text;
+
+reflectionInput.style.display="block";
+
+nextBtn.style.display="block";
+
+}
+
+},speed);
+
+}
+
+/* ========================= */
+/* NEXT LOOP UPDATE */
+/* ========================= */
+
+nextBtn.onclick=async()=>{
+
+const text=reflectionInput.value.trim();
+
+if(!text)return;
+
+loopLevel++;
+
+dynamicLoopIndicator.innerText =
+`Loop ${loopLevel} of 7`;
+
+track("loop_progress",{loop:loopLevel});
+
+messages.push({
+role:"user",
+content:text
+});
+
+const userReply=document.createElement("div");
+
+userReply.style.marginTop="18px";
+
+userReply.innerHTML=`
+<b style="color:orange;">You:</b><br><br>
+${text}<br><br>
+`;
+
+loopContent.appendChild(userReply);
+
+const data=await callAPI();
+
+if(data.paywall){
+
+nextBtn.style.display="none";
+
+showPaywall(
+data.reply,
+loopLevel===5 ? 49 : 199
+);
+
+return;
+
+}
+
+messages.push({
+role:"assistant",
+content:data.reply
+});
+
+typeEffect(data.reply);
+
+if(loopLevel >= 7){
+
+document.getElementById("articleBlock")
+.style.display="block";
+
+}
+
+reflectionInput.value="";
+
+};
+
+</script>
+
+<!-- ========================= -->
+<!-- NEW HOME SCREEN END 😃 -->
+<!-- ========================= -->
     
 <!-- SHARE BOX -->    
     
