@@ -1140,7 +1140,8 @@ const text=reflectionInput.value.trim();
 if(!text)return;    
     
 loopLevel++;    
-document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
+dynamicLoopIndicator.innerText =
+`Loop ${loopLevel} of 7`;
 track("loop_progress",{loop:loopLevel});    
     
 messages.push({    
@@ -1157,7 +1158,7 @@ userReply.innerHTML=`
 ${text}<br><br>
 `;
 
-outputBox.appendChild(userReply);
+loopContent.appendChild(userReply);
     
 const data=await callAPI();    
     
