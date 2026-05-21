@@ -705,14 +705,20 @@ theme: {
 color: "#ff7a00"    
 },    
     
-method: {    
-upi: true,    
-card: true,    
-netbanking: true,    
-wallet: true,    
-emi: false,    
-paylater: false    
-},    
+theme: {
+  color: "#ff7a00"
+},
+
+retry: {
+  enabled: true,
+  max_count: 2
+},
+
+modal: {
+  backdropclose: false,
+  escape: true,
+  handleback: true
+},
     
 retry: {    
 enabled: true,    
