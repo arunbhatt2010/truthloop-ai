@@ -308,48 +308,7 @@ z-index:2;
 New to <span style="color:orange;">TruthLoop AI</span>?
 </div>
 
-<div class="cta-text" style="
-font-size:15px;
-line-height:1.9;
-color:#cfcfcf;
-margin:auto;
-margin-bottom:26px;
-position:relative;
-z-index:2;
-">
-Learn how the 7-loop clarity system works,
-what questions create deeper responses,
-and how TruthLoop notices 
-<span style="color:orange;">behavioral patterns</span>,
-<span style="color:orange;">emotional patterns</span>,
-and hesitation loops inside real conversations.
-</div>
 
-<button onclick="window.location.href='https://truthloop.in/how-to-use-truthloop.html'" style="
-background:linear-gradient(135deg,#ff9500,#ff6a00);
-color:#fff;
-border:none;
-padding:15px 30px;
-font-size:15px;
-font-weight:700;
-border-radius:14px;
-cursor:pointer;
-box-shadow:0 8px 20px rgba(255,140,0,0.25);
-position:relative;
-z-index:2;
-">
-Understand TruthLoop AI →
-</button>
-<div style="
-margin-top:12px;
-font-size:12px;
-color:#777;
-line-height:1.6;
-">
-Understand the emotional patterns behind hesitation,
-overthinking, execution resistance, and clarity collapse.
-</div>
-    </div>
 <div id="loopIndicator" style="    
 color:orange;    
 font-size:14px;    
@@ -371,24 +330,17 @@ margin-bottom:14px;
 TRUTHLOOP    
 </div>    
     
-<div style="    
-font-size:28px;    
-font-weight:bold;    
-line-height:1.35;    
-margin-bottom:18px;    
-">    
-You don’t need more advice.<br>    
-<span style="color:orange;">You need clarity.</span>    
-</div>    
-    
-<div style="    
-color:#b5b5b5;    
-font-size:15px;    
-line-height:1.8;    
-margin-bottom:18px;    
-">    
-Most people think they struggle with motivation, discipline, focus, or consistency.    
-</div>    
+<div id="questionArea" style="
+display:none;
+background:#111;
+border:1px solid #222;
+padding:16px;
+border-radius:12px;
+margin-bottom:18px;
+line-height:1.8;
+">
+TruthLoop needs context.
+</div>
     
 <div style="    
 background:#111;    
@@ -570,42 +522,75 @@ let messages=[];
 let payment49=false;    
 let payment199=false;    
 let currentCategory="";    
-const categoryMessages = {    
-    
-creator:    
-"Creator pattern selected.<br>Creative pressure often hides deeper hesitation loops.",    
-    
-writer:    
-"Writer pattern selected.<br>Sometimes the hardest part is not writing. It’s exposure.",    
-    
-author:    
-"Author pattern selected.<br>Many people delay publishing long before they delay creating.",    
-    
-founder:    
-"Founder pattern selected.<br>Execution pressure changes how people process uncertainty.",    
-    
-owner:    
-"Owner pattern selected.<br>Responsibility can quietly turn clarity into survival mode.",    
-    
-student:    
-"Student pattern selected.<br>Not every delay comes from laziness or lack of discipline.",    
-    
-jobseeker:    
-"Job Seeker pattern selected.<br>Repeated uncertainty can quietly damage confidence.",    
-    
-overthinker:    
-"Overthinking pattern selected.<br>Some minds stay busy to avoid emotional risk.",    
-    
-pattern:    
-"You vs Your Pattern selected.<br>The real conflict is often underneath the visible behavior.",    
-    
-validation:    
-"Validation pattern selected.<br>External approval can quietly control internal decisions.",    
-    
-failure:    
-"Fear of Failure selected.<br>Many people avoid proof more than they avoid failure."    
-    
-};    
+const questionMap = {
+
+creator:[
+"Why do I keep creating but struggle to grow?",
+"What pattern keeps slowing my progress?",
+"Why does visibility feel uncomfortable?"
+],
+
+writer:[
+"Why do I delay publishing my work?",
+"Why do I keep rewriting instead of sharing?",
+"What pattern keeps repeating here?"
+],
+
+author:[
+"Why do I hesitate to publish?",
+"Why does finishing feel harder than starting?",
+"What am I not seeing?"
+],
+
+founder:[
+"Why do I delay important decisions?",
+"What keeps this pattern alive?",
+"Why do I keep carrying uncertainty?"
+],
+
+owner:[
+"Why do I feel stuck despite effort?",
+"What am I not seeing?",
+"What keeps repeating?"
+],
+
+student:[
+"Why do I know what to do but still delay it?",
+"Why does progress feel slower than expected?",
+"What pattern keeps repeating?"
+],
+
+jobseeker:[
+"Why do I hesitate to put myself forward?",
+"Why does rejection feel so heavy?",
+"What am I not seeing?"
+],
+
+overthinker:[
+"Why do I keep overthinking even when I know what to do?",
+"Why do I need certainty before acting?",
+"Why do simple decisions feel heavy?"
+],
+
+pattern:[
+"What keeps repeating in my life?",
+"What am I not seeing?",
+"Why does this pattern stay alive?"
+],
+
+validation:[
+"Why do I need validation before acting?",
+"Why does criticism affect me so much?",
+"What am I not seeing?"
+],
+
+failure:[
+"Why do I fear failure before I begin?",
+"Why do I avoid situations that test me?",
+"What pattern keeps repeating?"
+]
+
+};
 /* Analytics */    
     
 function track(event,data={}){    
@@ -874,16 +859,41 @@ document.getElementById("categoryMessage");
     
 if(categoryMessages[currentCategory]){    
     
-categoryBox.style.display="block";    
+const categoryBox =
+document.getElementById("questionArea");
+
+if(questionMap[currentCategory]){
+
+categoryBox.style.display="block";
+
+categoryBox.innerHTML =
+"<b>TruthLoop needs context.</b><br><br>";
+
+questionMap[currentCategory].forEach(q=>{
+
+categoryBox.innerHTML += `
+<div
+onclick="document.getElementById('mainInput').value='${q}'"
+style="
+margin-top:10px;
+padding:12px;
+background:#181818;
+border:1px solid #2a2a2a;
+border-radius:10px;
+cursor:pointer;
+transition:0.2s;
+">
+${q}
+</div>
+`;
+
+});
+
+}
     
-categoryBox.innerHTML =    
-categoryMessages[currentCategory];    
+};
     
-}    
-    
-};    
-    
-});    
+});
 /* START */    
     
 getBtn.onclick=async()=>{    
