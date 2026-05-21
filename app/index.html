@@ -322,7 +322,7 @@ TRUTHLOOP
 </div>   
 
     
-<div id="outputBox"></div>
+
 <div id="categoryMessage" style="    
 display:none;    
 background:#101010;    
@@ -792,6 +792,8 @@ nextBtn.style.display="block";
 
 document.querySelectorAll(".categoryBtn").forEach(btn=>{
 
+btn.onclick=()=>{
+
 alert("CATEGORY CLICKED");
 
 currentCategory=btn.dataset.type;
@@ -805,18 +807,13 @@ btn.style.borderColor="orange";
 btn.style.color="orange";
 
 if(questionMap[currentCategory]){
-
-mainInput.value =
-questionMap[currentCategory][0];
-
+mainInput.value = questionMap[currentCategory][0];
 mainInput.focus();
-
 }
 
 };
 
 });
-
 
 /* START */
     
