@@ -157,7 +157,32 @@ border-radius:999px;
 cursor:pointer;    
 transition:0.2s;    
 }    
-    
+.patternBtn{
+width:100%;
+margin-bottom:12px;
+background:#111;
+border:1px solid #262626;
+color:#fff;
+text-align:left;
+padding:16px;
+border-radius:16px;
+}
+
+.patternBtn:hover{
+border-color:orange;
+color:orange;
+}
+
+.questionBtn{
+width:100%;
+margin-bottom:12px;
+background:#111;
+border:1px solid #262626;
+color:#fff;
+text-align:left;
+padding:16px;
+border-radius:16px;
+  }    
 .categoryBtn:hover{    
 border-color:orange;    
 color:orange;    
@@ -468,6 +493,69 @@ let messages=[];
 let payment49=false;    
 let payment199=false;    
 let currentCategory="";    
+const screen1 =
+document.getElementById("screen1");
+
+const screen2 =
+document.getElementById("screen2");
+
+const screen3 =
+document.getElementById("screen3");
+
+const questionContainer =
+document.getElementById("questionContainer");
+
+const questionMap = {
+
+overthinking:[
+"Why do I keep overthinking even when I know what to do?",
+"Why do I delay decisions I already understand?",
+"Why do I need certainty before acting?"
+],
+
+validation:[
+"Why do I need validation before I feel confident?",
+"Why do criticism affect me so much?",
+"Why do I depend on approval?"
+],
+
+failure:[
+"Why do I fear failure even before trying?",
+"Why do I avoid situations where I can fail?",
+"Why do I hesitate when stakes are high?"
+],
+
+stuck:[
+"Why do I feel emotionally stuck?",
+"Why does progress feel difficult?",
+"Why do I repeat the same cycle?"
+],
+
+avoidance:[
+"Why do I avoid important action?",
+"Why do I escape difficult emotions?",
+"Why do I delay necessary decisions?"
+],
+
+visibility:[
+"Why do I avoid visibility and exposure?",
+"Why do I hide my work?",
+"Why does attention feel uncomfortable?"
+],
+
+execution:[
+"Why do I delay execution?",
+"Why do plans stay plans?",
+"Why do I struggle to start?"
+],
+
+sabotage:[
+"Why do I sabotage progress?",
+"Why do I quit when momentum starts?",
+"Why do I repeat self sabotage?"
+]
+
+};
 const categoryMessages = {    
     
 creator:    
