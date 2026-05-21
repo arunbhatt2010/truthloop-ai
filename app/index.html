@@ -831,19 +831,22 @@ nextBtn.style.display="block";
     
 }    
 document.querySelectorAll(".categoryBtn").forEach(btn=>{    
-    
-btn.onclick=()=>{    
-    
-currentCategory=btn.dataset.type;    
-    
-document.querySelectorAll(".categoryBtn").forEach(b=>{    
-b.style.borderColor="#2a2a2a";    
-b.style.color="#fff";    
-});    
-    
-btn.style.borderColor="orange";    
-btn.style.color="orange";    
-    
+document.querySelectorAll(".categoryBtn").forEach(btn=>{
+
+btn.onclick=()=>{
+
+alert("CATEGORY CLICKED");
+
+currentCategory=btn.dataset.type;
+
+document.querySelectorAll(".categoryBtn").forEach(b=>{
+b.style.borderColor="#2a2a2a";
+b.style.color="#fff";
+});
+
+btn.style.borderColor="orange";
+btn.style.color="orange";
+
 if(questionMap[currentCategory]){
 
 mainInput.value =
@@ -851,12 +854,13 @@ questionMap[currentCategory][0];
 
 mainInput.focus();
 
-  }
-    
+}
+
 };
-    
+
 });
-/* START */    
+
+/* START */
     
 getBtn.onclick=async()=>{    
     
