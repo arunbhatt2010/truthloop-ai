@@ -330,17 +330,7 @@ margin-bottom:14px;
 TRUTHLOOP    
 </div>    
     
-<div id="questionArea" style="
-display:none;
-background:#111;
-border:1px solid #222;
-padding:16px;
-border-radius:12px;
-margin-bottom:18px;
-line-height:1.8;
-">
-TruthLoop needs context.
-</div>
+
     
 <div style="    
 background:#111;    
@@ -854,42 +844,14 @@ b.style.color="#fff";
 btn.style.borderColor="orange";    
 btn.style.color="orange";    
     
-const categoryBox =    
-document.getElementById("categoryMessage");    
-    
-if(categoryMessages[currentCategory]){    
-    
-const categoryBox =
-document.getElementById("questionArea");
-
 if(questionMap[currentCategory]){
 
-categoryBox.style.display="block";
+mainInput.value =
+questionMap[currentCategory][0];
 
-categoryBox.innerHTML =
-"<b>TruthLoop needs context.</b><br><br>";
+mainInput.focus();
 
-questionMap[currentCategory].forEach(q=>{
-
-categoryBox.innerHTML += `
-<div
-onclick="document.getElementById('mainInput').value='${q}'"
-style="
-margin-top:10px;
-padding:12px;
-background:#181818;
-border:1px solid #2a2a2a;
-border-radius:10px;
-cursor:pointer;
-transition:0.2s;
-">
-${q}
-</div>
-`;
-
-});
-
-}
+  }
     
 };
     
