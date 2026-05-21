@@ -855,10 +855,11 @@ document.querySelectorAll(".categoryBtn").forEach(b=>{
 b.style.borderColor="#2a2a2a";    
 b.style.color="#fff";    
 });    
+/* SCREEN SYSTEM */
+
 continueBtn.onclick=()=>{
 
 screen1.style.display="none";
-
 screen2.style.display="block";
 
 };
@@ -869,18 +870,15 @@ document.querySelectorAll(".patternBtn")
 btn.onclick=()=>{
 
 screen2.style.display="none";
-
 screen3.style.display="block";
 
-const type =
-btn.dataset.screen;
+const type=btn.dataset.screen;
 
 questionContainer.innerHTML="";
 
 questionMap[type].forEach(q=>{
 
-const b =
-document.createElement("button");
+const b=document.createElement("button");
 
 b.className="questionBtn";
 
@@ -898,25 +896,7 @@ questionContainer.appendChild(b);
 
 };
 
-});    
-btn.style.borderColor="orange";    
-btn.style.color="orange";    
-    
-const categoryBox =    
-document.getElementById("categoryMessage");    
-    
-if(categoryMessages[currentCategory]){    
-    
-categoryBox.style.display="block";    
-    
-categoryBox.innerHTML =    
-categoryMessages[currentCategory];    
-    
-}    
-    
-};    
-    
-});    
+});
 /* START */    
     
 getBtn.onclick=async()=>{    
