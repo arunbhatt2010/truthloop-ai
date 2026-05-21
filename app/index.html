@@ -372,82 +372,135 @@ TRUTHLOOP
 </div>    
     
 <div style="    
-font-size:28px;    
-font-weight:bold;    
-line-height:1.35;    
-margin-bottom:18px;    
-">    
-You don’t need more advice.<br>    
-<span style="color:orange;">You need clarity.</span>    
-</div>    
-    
-<div style="    
-color:#b5b5b5;    
-font-size:15px;    
-line-height:1.8;    
-margin-bottom:18px;    
-">    
-Most people think they struggle with motivation, discipline, focus, or consistency.    
-</div>    
-    
-<div style="    
-background:#111;    
-border:1px solid #222;    
-padding:16px;    
-border-radius:12px;    
-margin-bottom:18px;    
-color:#e2e2e2;    
-line-height:1.8;    
-font-size:15px;    
-">    
-But many are actually repeating:    
-<br><br>    
-    
-• overthinking<br>    
-• emotional avoidance<br>    
-• validation loops<br>    
-• self-sabotage    
-</div>    
-    
-<div style="    
-background:#101010;    
-border-left:3px solid orange;    
-padding:14px;    
-border-radius:10px;    
-margin-bottom:18px;    
-color:#f0f0f0;    
-line-height:1.7;    
-font-size:15px;    
-">    
-“Part of you wants growth.<br>    
-Another part avoids proof.”    
-</div>    
-<div id="categoryMessage" style="    
-display:none;    
-background:#101010;    
-border-left:3px solid orange;    
-padding:14px;    
-border-radius:10px;    
-margin-bottom:18px;    
-color:#f0f0f0;    
-line-height:1.7;    
-font-size:15px;    
-transition:0.2s;    
-">    
-Category selected.    
+<div id="appScreens">
+
+<!-- SCREEN 1 -->
+
+<div id="screen1">
+
+<div style="
+background:#111;
+padding:28px;
+border-radius:22px;
+border:1px solid #222;
+text-align:center;
+margin-bottom:18px;
+">
+
+<div style="
+font-size:32px;
+font-weight:bold;
+margin-bottom:18px;
+">
+You only see 10%
 </div>
-</div>    
-<input id="mainInput"    
-placeholder="Reply to TruthLoop..."    
-style="    
-background:#101010;    
-border:1px solid #262626;    
-box-shadow:0 0 0 1px rgba(255,140,0,0.05);    
-"/>    
-    
-<button id="getBtn">    
-Show me the truth →    
-</button>    
+
+<div style="
+font-size:18px;
+color:#999;
+line-height:1.9;
+">
+
+The other 90% is hidden beneath:
+
+<br><br>
+
+• emotional patterns
+
+<br>
+
+• hesitation loops
+
+<br>
+
+• self protection
+
+<br>
+
+• avoidance
+
+</div>
+
+<button id="continueBtn">
+Continue →
+</button>
+
+</div>
+
+</div>
+
+<!-- SCREEN 2 -->
+
+<div id="screen2" style="display:none;">
+
+<h3>What keeps repeating?</h3>
+
+<button class="patternBtn"
+data-screen="overthinking">
+Overthinking
+</button>
+
+<button class="patternBtn"
+data-screen="validation">
+Validation
+</button>
+
+<button class="patternBtn"
+data-screen="failure">
+Fear of Failure
+</button>
+
+<button class="patternBtn"
+data-screen="stuck">
+Feeling Stuck
+</button>
+
+<button class="patternBtn"
+data-screen="avoidance">
+Emotional Avoidance
+</button>
+
+<button class="patternBtn"
+data-screen="visibility">
+Visibility Fear
+</button>
+
+<button class="patternBtn"
+data-screen="execution">
+Execution Resistance
+</button>
+
+<button class="patternBtn"
+data-screen="sabotage">
+Self Sabotage
+</button>
+
+</div>
+
+<!-- SCREEN 3 -->
+
+<div id="screen3" style="display:none;">
+
+<h3>Choose a starting question</h3>
+
+<div id="questionContainer"></div>
+
+<input
+id="mainInput"
+placeholder="Or write your own question..."
+style="
+background:#101010;
+border:1px solid #262626;
+"
+/>
+
+<button id="getBtn">
+Show me the truth →
+</button>
+
+</div>
+
+</div>
     
 <input id="reflectionInput"
 style="display:none;"
