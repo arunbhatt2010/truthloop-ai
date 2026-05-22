@@ -913,17 +913,20 @@ outputBox.appendChild(userReply);
     
 const data=await callAPI();    
     
-if(data.paywall){    
-    
-nextBtn.style.display="none";    
-    
-showPaywall(    
-data.reply,    
-loopLevel===5 ? 49 : 199    
-);    
-    
-return;    
-}    
+if(data.paywall){
+
+nextBtn.style.display="none";
+
+isLoading = false;
+nextBtn.disabled = false;
+
+showPaywall(
+data.reply,
+loopLevel===5 ? 49 : 199
+);
+
+return;
+  }
     
 messages.push({    
 role:"assistant",    
