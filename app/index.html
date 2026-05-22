@@ -875,11 +875,21 @@ getBtn.disabled = false;
     
 /* NEXT */    
     
-nextBtn.onclick=async()=>{    
-    
+nextBtn.onclick=async()=>{
+
+if (isLoading) return;
+
+isLoading = true;
+
+nextBtn.disabled = true;
+
 const text=reflectionInput.value.trim();    
     
-if(!text)return;    
+if(!text){
+   isLoading = false;
+   nextBtn.disabled = false;
+   return;
+  }   
     
 loopLevel++;    
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
@@ -925,7 +935,8 @@ if(loopLevel >= 7){
 document.getElementById("articleBlock").style.display="block";    
   }    
 reflectionInput.value="";    
-    
+isLoading = false;
+nextBtn.disabled = false;    
 };    
     
 </script>    
