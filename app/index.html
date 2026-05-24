@@ -182,6 +182,7 @@ word-break:break-word;
 margin-bottom:18px;
 color:#f0f0f0;
   }
+  <script src="journey-memory.js"></script>
 </style><script type="text/javascript">    
     (function(c,l,a,r,i,t,y){    
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};    
@@ -471,7 +472,25 @@ let messages=[];
 let payment49=false;
 let payment199=false;
 let currentCategory="";
+const savedJourney = loadJourney();
 
+if(savedJourney){
+
+loopLevel =
+savedJourney.loopLevel || 1;
+
+messages =
+savedJourney.messages || [];
+
+currentCategory =
+savedJourney.currentCategory || "";
+
+document.getElementById(
+"loopIndicator"
+).innerText =
+`Loop ${loopLevel} of 7`;
+
+  }
 let isLoading=false;
 
 const questionMap = {
@@ -865,7 +884,11 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-    
+saveJourney(
+loopLevel,
+messages,
+currentCategory
+);    
 mainInput.style.display="none";
 getBtn.style.display="none";
 isLoading = false;
@@ -932,11 +955,16 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-    
+saveJourney(
+loopLevel,
+messages,
+currentCategory
+);    
 typeEffect(data.reply);    
 if(loopLevel >= 7){    
 document.getElementById("articleBlock").style.display="block";    
-  }    
+clearJourney();  
+}    
 reflectionInput.value="";    
 isLoading = false;
 nextBtn.disabled = false;    
