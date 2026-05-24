@@ -851,7 +851,11 @@ messages=[{
 role:"user",    
 content:text    
 }];    
-    
+saveJourney(
+loopLevel,
+messages,
+currentCategory
+);    
 /* hide intro screen */    
 outputBox.innerHTML = `
 <div style="
@@ -914,6 +918,11 @@ if(!text){
   }   
     
 loopLevel++;    
+saveJourney(
+loopLevel,
+messages,
+currentCategory
+);
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
     
