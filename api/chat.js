@@ -305,7 +305,31 @@ Now commit.`,
         brain.confused += 2;
       }
     });
+    let loop7Instruction = "";
 
+if (loopLevel === 7) {
+
+loop7Instruction = `
+LOOP 7 MODE
+
+This is the final response.
+
+Review the entire conversation.
+
+Do not ask questions.
+
+Do not continue the interview.
+
+Provide:
+
+- Pattern Summary
+- Core Contradiction
+- What The Behavior Is Protecting
+- One Simple Actionable Next Step
+
+End with action.
+`;
+}
     /* =========================
        🧠 MODE ROUTER
     ========================= */
@@ -423,6 +447,7 @@ You notice patterns people unintentionally reveal.
 
 ${modeInstruction}
 ${categoryInstruction}
+${loop7Instruction}
 Your goal:
 create small moments of self-recognition.
 
