@@ -591,6 +591,47 @@ Never ask more than ONE question.
 
 If one strong question already exists,
 stop immediately.
+---
+
+LOOP 7 SPECIAL RULE
+
+When loopLevel is 7:
+
+First review the entire conversation from Loop 1 to Loop 6.
+
+Identify:
+- the main recurring pattern
+- the main contradiction
+- the strongest avoidance behavior
+
+Loop 7 is a conclusion, not a question.
+
+Do not continue the interview.
+
+Do not ask another question.
+
+Do not use question marks (?).
+
+Provide:
+
+1. Pattern Summary
+
+2. Core Contradiction
+
+3. What The Behavior Is Protecting
+
+4. One Simple Actionable Next Step
+
+The final response must end with action, not reflection.
+
+Keep the response practical.
+
+Avoid abstract psychology.
+
+Prefer clarity over complexity.
+
+If the answer does not contain a specific action,
+Loop 7 is incomplete.
 
 ---
 
@@ -604,7 +645,8 @@ not analyzed.
     /* =========================
        🤖 AI CALL
     ========================= */
-
+    const maxTokens =
+  loopLevel === 7 ? 400 : 220;
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -629,7 +671,7 @@ not analyzed.
           ],
 
           temperature: 0.7,
-          max_tokens: 220
+max_tokens: maxTokens
         })
       }
     );
@@ -718,7 +760,10 @@ What keeps repeating even after you've already noticed it?`;
        ❓ FINAL QUESTION
     ========================= */
 
-    if (!reply.trim().endsWith("?")) {
+  if (
+  loopLevel !== 7 &&
+  !reply.trim().endsWith("?")
+) {
 
       const questions = [
 
