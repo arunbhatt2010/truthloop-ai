@@ -986,7 +986,18 @@ function clearJourney() {
 
 localStorage.removeItem(MEMORY_KEY);
 
-  }    
+  }
+const restored = loadJourney();
+
+if(restored){
+
+loopLevel = restored.loopLevel || 1;
+messages = restored.messages || [];
+currentCategory = restored.currentCategory || "";
+
+alert("RESTORED 😃");
+
+  }  
 </script>    
     
 </body>    
