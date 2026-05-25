@@ -17,7 +17,7 @@ currentCategory,
 savedAt: Date.now()
 })
 );
-
+alert("JOURNEY SAVED");
 }catch(err){
 
 console.error("Journey Save Error", err);
