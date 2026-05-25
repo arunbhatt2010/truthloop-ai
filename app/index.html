@@ -794,10 +794,18 @@ document.querySelectorAll(".categoryBtn").forEach(btn=>{
 
 btn.onclick=()=>{
 
-alert("CATEGORY CLICKED");
+alert("Pattern selected");
 
 currentCategory=btn.dataset.type;
+clearJourney();
 
+loopLevel = 1;
+messages = [];
+
+document.getElementById("loopIndicator").innerText =
+"Loop 1 of 7";
+
+outputBox.innerHTML = "";
 document.querySelectorAll(".categoryBtn").forEach(b=>{
 b.style.borderColor="#2a2a2a";
 b.style.color="#fff";
