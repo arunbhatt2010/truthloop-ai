@@ -1013,8 +1013,16 @@ ${msg.content}<br><br>
 
 }else{
 
-div.innerHTML = msg.content;
-}
+let text = msg.content;
+
+text = text.replace(
+ /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
+);
+
+div.innerHTML = text;
+
+  }
 
 outputBox.appendChild(div);
 
