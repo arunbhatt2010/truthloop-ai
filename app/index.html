@@ -883,13 +883,7 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-if(typeof saveJourney==="function"){
-saveJourney(
-loopLevel,
-messages,
-currentCategory
-);
-  }  
+
 mainInput.style.display="none";
 getBtn.style.display="none";
 isLoading = false;
@@ -956,13 +950,7 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-if(typeof saveJourney==="function"){
-saveJourney(
-loopLevel,
-messages,
-currentCategory
-);    
-  }
+
 typeEffect(data.reply);    
 if(loopLevel >= 7){    
 document.getElementById("articleBlock").style.display="block";    
