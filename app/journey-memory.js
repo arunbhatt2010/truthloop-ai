@@ -8,8 +8,7 @@ console.log("MEMORY FILE LOADED");
 
 function saveJourney(loopLevel, messages, currentCategory){
 
-alert("SAVE " + loopLevel);
-try{
+alert("SAVE WORKING : " + loopLevel);
 
 localStorage.setItem(
 MEMORY_KEY,
@@ -21,6 +20,7 @@ savedAt: Date.now()
 })
 );
 
+}
 }catch(err){
 
 console.error("Journey Save Error", err);
