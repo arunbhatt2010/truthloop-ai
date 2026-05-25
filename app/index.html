@@ -476,7 +476,12 @@ let messages=[];
 let payment49=false;
 let payment199=false;
 let currentCategory="";
-const savedJourney = loadJourney();
+
+let savedJourney = null;
+
+if(typeof loadJourney === "function"){
+savedJourney = loadJourney();
+}
 
 if(savedJourney){
 
@@ -489,7 +494,7 @@ savedJourney.messages || [];
 currentCategory =
 savedJourney.currentCategory || "";
 
-                                        }
+  }
 let isLoading=false;
 
 const questionMap = {
