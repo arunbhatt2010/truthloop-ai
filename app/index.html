@@ -995,15 +995,7 @@ loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
 
-alert("RESTORED 😀");
-
-alert(
-"Loop: " + restored.loopLevel +
-"\nMessages: " + restored.messages.length +
-"\nCategory: " + restored.currentCategory
-);
-
-  }
+alert(JSON.stringify(messages));
   getBtn.disabled = false;
 </script>    
     
