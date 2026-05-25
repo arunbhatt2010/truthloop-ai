@@ -865,7 +865,7 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-    
+saveJourney();    
 mainInput.style.display="none";
 getBtn.style.display="none";
 isLoading = false;
@@ -932,7 +932,7 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-    
+saveJourney();    
 typeEffect(data.reply);    
 if(loopLevel >= 7){    
 document.getElementById("articleBlock").style.display="block";    
@@ -941,7 +941,38 @@ reflectionInput.value="";
 isLoading = false;
 nextBtn.disabled = false;    
 };    
-    
+/* JOURNEY MEMORY */
+
+const MEMORY_KEY = "truthloopMemory";
+
+function saveJourney() {
+
+localStorage.setItem(
+MEMORY_KEY,
+JSON.stringify({
+loopLevel,
+messages,
+currentCategory
+})
+);
+
+}
+
+function loadJourney() {
+
+const saved = localStorage.getItem(MEMORY_KEY);
+
+if(!saved) return null;
+
+return JSON.parse(saved);
+
+}
+
+function clearJourney() {
+
+localStorage.removeItem(MEMORY_KEY);
+
+  }    
 </script>    
     
 </body>    
