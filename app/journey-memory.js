@@ -29,7 +29,10 @@ console.error("Journey Save Error", err);
 function loadJourney(){
 
 try{
+const saved =
+localStorage.getItem(MEMORY_KEY);
 
+alert(saved);
 const saved =
 localStorage.getItem(MEMORY_KEY);
 
