@@ -192,6 +192,26 @@ color:#f0f0f0;
 </head>    
     
 <body>    
+<div id="restoreScreen" style="display:none;">
+
+<h2>Journey Found</h2>
+
+<p id="restorePattern"></p>
+
+<p id="restoreLoop"></p>
+
+<button id="continueJourneyBtn">
+CONTINUE JOURNEY
+</button>
+
+<button id="newPatternBtn">
+START NEW PATTERN
+</button>
+
+</div>
+
+<div id="mainApp">
+
 <div class="container">    
     
 <h2 style="    
@@ -334,7 +354,26 @@ color:#f0f0f0;
 line-height:1.7;    
 font-size:15px;    
 transition:0.2s;    
-">    
+">
+<div id="restoreScreen" style="display:none;text-align:center;padding:30px;">
+
+<h2 style="color:orange;">Journey Found</h2>
+
+<p id="restorePattern"></p>
+
+<p id="restoreLoop"></p>
+
+<button id="continueJourneyBtn"
+style="width:100%;padding:14px;margin-top:10px;background:orange;color:black;border:none;border-radius:10px;font-weight:bold;">
+CONTINUE JOURNEY
+</button>
+
+<button id="newPatternBtn"
+style="width:100%;padding:14px;margin-top:10px;background:#222;color:white;border:1px solid #444;border-radius:10px;font-weight:bold;">
+START NEW PATTERN
+</button>
+
+</div>  
 Category selected.    
 </div>
 </div>    
@@ -968,7 +1007,25 @@ nextBtn.innerText = "Select New Pattern";
 reflectionInput.value="";    
 isLoading = false;
 nextBtn.disabled = false;    
-};    
+};
+document.getElementById("continueJourneyBtn").onclick = () => {
+
+document.getElementById("restoreScreen").style.display = "none";
+
+document.getElementById("mainApp").style.display = "block";
+
+};
+document.getElementById("newPatternBtn").onclick = () => {
+
+clearJourney();
+
+loopLevel = 1;
+messages = [];
+currentCategory = "";
+
+location.reload();
+
+};  
 /* JOURNEY MEMORY */
 
 const MEMORY_KEY = "truthloopMemory";
@@ -1048,10 +1105,18 @@ nextBtn.innerText = "Continue Journey";
 if(loopLevel >= 7){
 nextBtn.innerText = "Select New Pattern";
   }
+ document.getElementById("restoreScreen").style.display = "block";
+document.getElementById("mainApp").style.display = "none";
+
+document.getElementById("restorePattern").innerText =
+"Pattern: " + currentCategory;
+
+document.getElementById("restoreLoop").innerText =
+"You left at Loop " + loopLevel + " of 7"; 
 getBtn.disabled = false;
 
   }
 </script>    
-    
+</div>   
 </body>    
   </html>
