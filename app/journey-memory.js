@@ -5,7 +5,7 @@
 const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney(loopLevel, messages, currentCategory){
-alert("SAVE WORKING");
+
 try{
 
 localStorage.setItem(
@@ -17,7 +17,7 @@ currentCategory,
 savedAt: Date.now()
 })
 );
-alert("JOURNEY SAVED");
+
 }catch(err){
 
 console.error("Journey Save Error", err);
@@ -32,7 +32,7 @@ try{
 const saved =
 localStorage.getItem(MEMORY_KEY);
 
-alert(saved);
+
 const saved =
 localStorage.getItem(MEMORY_KEY);
 
