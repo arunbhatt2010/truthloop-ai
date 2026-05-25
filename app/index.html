@@ -934,7 +934,13 @@ ${text}<br><br>
 
 outputBox.appendChild(userReply);
     
-const data=await callAPI();    
+alert("CALLING API");
+
+const data = await callAPI();
+
+alert("API RETURNED");
+
+console.log(data);
     
 if(data.paywall){
 
