@@ -5,7 +5,7 @@
 const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney(loopLevel, messages, currentCategory){
-
+alert("SAVE WORKING");
 try{
 
 localStorage.setItem(
