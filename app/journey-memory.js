@@ -72,3 +72,8 @@ savedAt: data.savedAt || null
 };
 
 }
+window.saveJourney = saveJourney;
+window.loadJourney = loadJourney;
+window.clearJourney = clearJourney;
+window.hasSavedJourney = hasSavedJourney;
+window.getJourneySummary = getJourneySummary;
