@@ -476,7 +476,20 @@ let messages=[];
 let payment49=false;
 let payment199=false;
 let currentCategory="";
+const savedJourney = loadJourney();
 
+if(savedJourney){
+
+loopLevel =
+savedJourney.loopLevel || 1;
+
+messages =
+savedJourney.messages || [];
+
+currentCategory =
+savedJourney.currentCategory || "";
+
+                                        }
 let isLoading=false;
 
 const questionMap = {
