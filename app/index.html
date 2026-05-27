@@ -425,7 +425,16 @@ background:#101010;
 border:1px solid #262626;    
 box-shadow:0 0 0 1px rgba(255,140,0,0.05);    
 "/>    
-    
+<div id="loopHint" style="
+font-size:12px;
+color:#888;
+text-align:center;
+margin-top:8px;
+margin-bottom:8px;
+display:none;
+">
+(TruthLoop only goes deeper after your answer.)
+</div>    
 <button id="getBtn">    
 Show me the truth →    
 </button>    
@@ -880,6 +889,9 @@ currentCategory=btn.dataset.type;
 clearJourney();
 
 loopLevel = 1;
+
+document.getElementById("loopHint").style.display = "none";
+
 messages = [];
 
 document.getElementById("loopIndicator").innerText =
@@ -994,6 +1006,11 @@ if(!text){
   }   
     
 loopLevel++;    
+if(loopLevel > 1 && loopLevel < 7){
+document.getElementById("loopHint").style.display = "block";
+}else{
+document.getElementById("loopHint").style.display = "none";
+  }
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
     
