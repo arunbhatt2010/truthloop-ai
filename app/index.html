@@ -710,7 +710,12 @@ if(i > text.length){
 clearInterval(interval);
 
 div.innerHTML = text;
+if(loopLevel > 1 && loopLevel < 7){
 
+div.innerHTML +=
+'<div style="font-size:12px;color:#888;text-align:center;margin-top:12px;">(TruthLoop only goes deeper after your answer.)</div>';
+
+  }
 reflectionInput.style.display = "block";
 nextBtn.style.display = "block";
 
@@ -1017,14 +1022,7 @@ ${text}<br><br>
 `;
 
 outputBox.appendChild(userReply);
-const loopGuide = document.createElement("div");
 
-loopGuide.innerHTML =
-'<div style="font-size:12px;color:#888;text-align:center;margin:10px 0;">(TruthLoop only goes deeper after your answer.)</div>';
-
-if(loopLevel > 1 && loopLevel < 7){
-outputBox.appendChild(loopGuide);
-   }    
 const data=await callAPI();    
     
 if(data.paywall){
