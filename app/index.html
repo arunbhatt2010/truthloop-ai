@@ -1160,6 +1160,22 @@ document.getElementById("restoreLoop").innerText =
 getBtn.disabled = false;
 
   }
+  document.getElementById("hintBox").addEventListener("click", () => {
+
+  const hint =
+  document.getElementById("hintContent");
+
+  if (hint.style.display === "block") {
+
+    hint.style.display = "none";
+
+  } else {
+
+    hint.style.display = "block";
+
+  }
+
+});
 </script>    
 </div>
   <footer style="
