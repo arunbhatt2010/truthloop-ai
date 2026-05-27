@@ -68,21 +68,22 @@ background:rgba(255,140,0,0.08);
 line-height:1.8;    
     
   }    
-body{    
-background:#0f0f0f;    
-color:#fff;    
-font-family:Arial;    
-margin:0;    
-}    
+body{
+background:
+radial-gradient(circle at top right, rgba(255,120,0,0.12), transparent 25%),
+radial-gradient(circle at bottom left, rgba(255,120,0,0.10), transparent 20%),
+#050505;
     
-.container{    
-width:100%;    
-max-width:680px;    
-margin:0 auto;    
-padding:14px;    
-padding-bottom:120px;    
-box-sizing:border-box;    
-}    
+.container{
+width:100%;
+max-width:760px;
+margin:0 auto;
+padding:18px;
+padding-bottom:140px;
+box-sizing:border-box;
+position:relative;
+z-index:2;
+  }
 #mainInput:focus{    
     
 outline:none;    
@@ -112,7 +113,46 @@ gap:12px;
 
 scroll-behavior:smooth;
 }
-    
+@keyframes pulseGlow{
+0%{opacity:0.5;}
+50%{opacity:1;}
+100%{opacity:0.5;}
+}
+
+@keyframes floatDots{
+0%{transform:translateY(0px);}
+50%{transform:translateY(-6px);}
+100%{transform:translateY(0px);}
+}
+
+@keyframes linePulse{
+0%{opacity:0.3;width:40%;}
+50%{opacity:1;width:100%;}
+100%{opacity:0.3;width:40%;}
+}
+
+.truthAnimatedLine{
+height:2px;
+background:linear-gradient(90deg, transparent, orange, transparent);
+margin-top:10px;
+animation:linePulse 3s infinite;
+border-radius:999px;
+}
+
+.truthloopGlow{
+animation:pulseGlow 3s infinite;
+}
+
+.floatingDot{
+position:absolute;
+width:6px;
+height:6px;
+background:orange;
+border-radius:50%;
+opacity:0.5;
+animation:floatDots 4s infinite ease-in-out;
+box-shadow:0 0 12px orange;
+  }    
 @media(min-width:768px){    
     
 .container{    
@@ -144,7 +184,17 @@ button{
 background:linear-gradient(45deg,orange,#ff5e00);    
 font-weight:bold;    
 font-size:15px;    
+box-shadow:
+0 0 25px rgba(255,120,0,0.22);
+
+transition:0.25s;
 }    
+button:hover{
+transform:translateY(-2px);
+
+box-shadow:
+0 0 35px rgba(255,120,0,0.35);
+  }
 .categoryBtn{    
 width:auto;    
 padding:10px 14px;    
@@ -214,11 +264,21 @@ START NEW PATTERN
 
 <div class="container">    
     
-<h2 style="    
-margin-top:0;    
-margin-bottom:4px;    
-font-size:28px;    
-">    
+<h2 style="
+margin-top:0;
+margin-bottom:6px;
+font-size:56px;
+line-height:0.95;
+font-weight:900;
+letter-spacing:-2px;
+color:white;
+position:relative;
+z-index:2;
+" class="truthloopGlow">
+Find what you're avoiding.
+</h2>
+
+<div class="truthAnimatedLine"></div>
 TruthLoop    
 </h2>    
 <div style="    
@@ -243,7 +303,10 @@ margin-bottom:14px;
 font-size:15px;    
 line-height:1.6;    
 ">    
-You don’t need advice. You need clarity.    
+Most people don't need more advice.
+<b style="color:white;">
+They need to see the hidden pattern behind their hesitation.
+</b>
 </p>    
 <div style="    
 margin-bottom:18px;    
@@ -345,7 +408,9 @@ text-align:center;
 position:relative;
 overflow:hidden;
 ">
-
+<div class="floatingDot" style="top:30px;right:40px;"></div>
+<div class="floatingDot" style="top:80px;left:60px;animation-delay:1s;"></div>
+<div class="floatingDot" style="bottom:40px;right:120px;animation-delay:2s;"></div>
 <div style="
 position:absolute;
 top:-40px;
@@ -366,9 +431,23 @@ font-size:14px;
 margin-bottom:14px;    
 font-weight:bold;    
 ">    
-Loop 1 of 7    
+🟠 LOOP 1 OF 7
 </div>    
-    
+<div id="truthScore" style="
+position:absolute;
+top:24px;
+right:24px;
+padding:10px 14px;
+border-radius:999px;
+background:rgba(255,140,0,0.12);
+border:1px solid rgba(255,140,0,0.25);
+font-size:13px;
+color:#ffb347;
+backdrop-filter:blur(10px);
+box-shadow:0 0 15px rgba(255,140,0,0.15);
+">
+Truth Score: 68%
+ </div>   
 <div id="outputBox" class="output">    
     
 <div style="    
@@ -902,7 +981,7 @@ document.getElementById("hintBox").innerHTML =
 clearJourney();
 
 loopLevel = 1;
-
+let truthScore = 68;
 
 
 messages = [];
@@ -1020,7 +1099,15 @@ if(!text){
     
 loopLevel++;    
 
+truthScore += 4;
 
+const scoreEl =
+document.getElementById("truthScore");
+
+if(scoreEl){
+scoreEl.innerText =
+`Truth Score: ${truthScore}%`;
+  }
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
     
