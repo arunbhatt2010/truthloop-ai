@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8"/>
@@ -26,16 +27,16 @@ scroll-behavior:smooth;
 
 body{
 font-family:'Inter',sans-serif;
-background:#050505;
+background:#040404;
 overflow-x:hidden;
 color:white;
 min-height:100vh;
 position:relative;
 }
 
-/* =========================
+/* ===================================
 BACKGROUND
-========================= */
+=================================== */
 
 .bg{
 position:fixed;
@@ -49,46 +50,46 @@ position:absolute;
 inset:0;
 
 background:
-linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),
-linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);
 
-background-size:40px 40px;
+background-size:42px 42px;
 
-opacity:.12;
+opacity:.1;
 }
 
 .orb{
 position:absolute;
 border-radius:50%;
-filter:blur(90px);
-opacity:.28;
-animation:float 12s ease-in-out infinite;
+filter:blur(120px);
+opacity:.25;
+animation:float 18s ease-in-out infinite;
 }
 
 .orb1{
-width:300px;
-height:300px;
+width:340px;
+height:340px;
 background:#ff7a00;
-top:-100px;
-right:-80px;
+top:-120px;
+right:-100px;
 }
 
 .orb2{
 width:240px;
 height:240px;
-background:#ff4d00;
-bottom:-80px;
-left:-60px;
-animation-delay:2s;
+background:#ff5100;
+bottom:-60px;
+left:-50px;
+animation-delay:3s;
 }
 
 .orb3{
 width:180px;
 height:180px;
-background:#ffb300;
+background:#ffb100;
 top:45%;
 left:60%;
-animation-delay:4s;
+animation-delay:6s;
 }
 
 @keyframes float{
@@ -98,28 +99,29 @@ transform:translateY(0px) translateX(0px);
 }
 
 50%{
-transform:translateY(-30px) translateX(15px);
+transform:translateY(-35px) translateX(20px);
 }
 
 }
 
-/* =========================
+/* ===================================
 MAIN
-========================= */
+=================================== */
 
 .container{
 position:relative;
 z-index:2;
 max-width:760px;
 margin:auto;
-padding:22px 12px 120px;
+padding:24px 12px 120px;
 }
 
-/* =========================
-HERO
-========================= */
+/* ===================================
+LOGO
+=================================== */
 
 .logo{
+
 display:inline-flex;
 align-items:center;
 gap:10px;
@@ -128,52 +130,112 @@ padding:10px 16px;
 
 border-radius:999px;
 
-background:rgba(255,255,255,0.04);
+background:rgba(255,255,255,.04);
 
-border:1px solid rgba(255,140,0,0.18);
+border:1px solid rgba(255,140,0,.18);
 
 font-size:12px;
-
 letter-spacing:2px;
 
 color:#ffb36a;
 
 backdrop-filter:blur(12px);
 
-margin-bottom:22px;
+margin-bottom:24px;
+
+animation:logoBreath 4s ease-in-out infinite;
+
 }
+
+@keyframes logoBreath{
+
+0%,100%{
+transform:translateY(0px) scale(1);
+opacity:.85;
+
+box-shadow:
+0 0 0 rgba(255,140,0,0);
+}
+
+50%{
+transform:translateY(-2px) scale(1.04);
+
+opacity:1;
+
+box-shadow:
+0 0 35px rgba(255,140,0,.24);
+}
+
+}
+
+/* ===================================
+HERO
+=================================== */
 
 .heroTitle{
-font-size:58px;
-line-height:.94;
+font-size:62px;
+line-height:.92;
 font-weight:800;
 letter-spacing:-3px;
-margin-bottom:18px;
-position:relative;
+margin-bottom:10px;
 }
 
-.heroTitle::after{
-content:"";
+.heroTitle span{
+color:#ffb25c;
+}
 
-position:absolute;
+.heroLine{
 
-left:0;
-bottom:-12px;
+width:100%;
+height:3px;
 
-width:120px;
-height:6px;
+margin-top:20px;
+margin-bottom:26px;
 
 border-radius:999px;
 
 background:
-linear-gradient(90deg,#ff9d00,transparent);
+linear-gradient(
+90deg,
+transparent,
+#ff8c00,
+#ffb347,
+#ff8c00,
+transparent
+);
+
+background-size:220% 100%;
+
+animation:lineFlow 3s linear infinite;
+
+box-shadow:
+0 0 22px rgba(255,140,0,.5);
+
+}
+
+@keyframes lineFlow{
+
+0%{
+background-position:0% 0%;
+opacity:.45;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+background-position:220% 0%;
+opacity:.45;
+}
+
 }
 
 .heroSub{
 font-size:18px;
 line-height:1.9;
 color:#9f9f9f;
-max-width:620px;
+max-width:640px;
 margin-bottom:34px;
 }
 
@@ -182,18 +244,19 @@ color:white;
 font-weight:700;
 }
 
-/* =========================
+/* ===================================
 MAIN CARD
-========================= */
+=================================== */
 
 .mainCard{
 
 position:relative;
 
 background:
-rgba(12,12,12,.76);
+rgba(10,10,10,.78);
 
-border:1px solid rgba(255,255,255,.06);
+border:
+1px solid rgba(255,255,255,.06);
 
 border-radius:34px;
 
@@ -201,12 +264,14 @@ padding:18px;
 
 overflow:hidden;
 
-backdrop-filter:blur(30px) saturate(140%);
+backdrop-filter:
+blur(30px)
+saturate(150%);
 
 box-shadow:
-0 0 0 1px rgba(255,255,255,.03),
-0 40px 120px rgba(0,0,0,.85),
-0 0 100px rgba(255,120,0,.08);
+0 0 0 1px rgba(255,255,255,.02),
+0 50px 120px rgba(0,0,0,.9),
+0 0 120px rgba(255,120,0,.08);
 
 }
 
@@ -221,22 +286,22 @@ background:
 linear-gradient(
 145deg,
 rgba(255,255,255,.04),
-transparent 30%
+transparent 35%
 );
 
 pointer-events:none;
 
 }
 
-/* =========================
+/* ===================================
 CATEGORY
-========================= */
+=================================== */
 
 .sectionTitle{
 font-size:12px;
 letter-spacing:2px;
 text-transform:uppercase;
-color:#8d8d8d;
+color:#888;
 margin-bottom:16px;
 }
 
@@ -244,7 +309,7 @@ margin-bottom:16px;
 display:flex;
 flex-wrap:wrap;
 gap:10px;
-margin-bottom:18px;
+margin-bottom:20px;
 }
 
 .category{
@@ -272,6 +337,7 @@ transition:.25s ease;
 }
 
 .category::before{
+
 content:"";
 
 position:absolute;
@@ -280,11 +346,12 @@ inset:0;
 background:
 linear-gradient(
 135deg,
-rgba(255,160,0,.18),
+rgba(255,170,0,.18),
 transparent
 );
 
 opacity:0;
+
 transition:.3s ease;
 }
 
@@ -295,7 +362,7 @@ border-color:
 rgba(255,140,0,.35);
 
 box-shadow:
-0 0 30px rgba(255,140,0,.12);
+0 0 25px rgba(255,140,0,.14);
 }
 
 .category:hover::before{
@@ -307,21 +374,21 @@ opacity:1;
 background:
 linear-gradient(
 135deg,
-rgba(255,140,0,.22),
+rgba(255,140,0,.24),
 rgba(255,90,0,.12)
 );
 
 border-color:
-rgba(255,160,0,.35);
+rgba(255,170,0,.4);
 
 box-shadow:
-0 0 28px rgba(255,140,0,.18);
+0 0 30px rgba(255,140,0,.2);
 
 }
 
-/* =========================
+/* ===================================
 HOW
-========================= */
+=================================== */
 
 .how{
 
@@ -354,9 +421,9 @@ background:
 rgba(255,140,0,.12);
 }
 
-/* =========================
+/* ===================================
 LOOP
-========================= */
+=================================== */
 
 .loop{
 
@@ -366,58 +433,27 @@ overflow:hidden;
 
 padding:20px;
 
-border-radius:28px;
+border-radius:30px;
 
 background:
 linear-gradient(
 180deg,
-#0d0d0d,
-#070707
+#0b0b0b,
+#050505
 );
 
 border:
 1px solid rgba(255,255,255,.06);
 
 box-shadow:
-0 20px 70px rgba(0,0,0,.75),
-0 0 60px rgba(255,120,0,.06);
+0 25px 80px rgba(0,0,0,.85),
+0 0 70px rgba(255,120,0,.08);
 
 }
 
-.loop::before{
-
-content:"";
-
-position:absolute;
-
-width:240px;
-height:240px;
-
-background:
-rgba(255,140,0,.12);
-
-filter:blur(100px);
-
-top:-70px;
-right:-80px;
-
-animation:pulse 5s ease infinite;
-
-}
-
-@keyframes pulse{
-
-0%,100%{
-opacity:.3;
-transform:scale(1);
-}
-
-50%{
-opacity:.6;
-transform:scale(1.2);
-}
-
-}
+/* ===================================
+LOOP TOP
+=================================== */
 
 .loopTop{
 display:flex;
@@ -432,6 +468,10 @@ letter-spacing:3px;
 font-weight:700;
 color:#ffb25c;
 }
+
+/* ===================================
+TRUTH SCORE
+=================================== */
 
 .truthScore{
 
@@ -448,11 +488,71 @@ border:
 font-size:13px;
 
 color:#ffba72;
+
+animation:scorePulse 2.5s ease infinite;
+
+position:relative;
+
+overflow:hidden;
+
 }
 
-/* =========================
+.truthScore::before{
+
+content:"";
+
+position:absolute;
+
+top:0;
+left:-100%;
+
+width:70%;
+height:100%;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+rgba(255,255,255,.22),
+transparent
+);
+
+transform:skewX(-25deg);
+
+animation:scoreScan 3s linear infinite;
+
+}
+
+@keyframes scorePulse{
+
+0%,100%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.06);
+
+box-shadow:
+0 0 35px rgba(255,140,0,.32);
+}
+
+}
+
+@keyframes scoreScan{
+
+0%{
+left:-100%;
+}
+
+100%{
+left:180%;
+}
+
+}
+
+/* ===================================
 PROGRESS
-========================= */
+=================================== */
 
 .progressRail{
 display:flex;
@@ -472,11 +572,12 @@ position:relative;
 background:#ff9d00;
 
 box-shadow:
-0 0 12px rgba(255,140,0,.7),
-0 0 30px rgba(255,140,0,.3);
+0 0 12px rgba(255,140,0,.8),
+0 0 30px rgba(255,140,0,.4);
 }
 
 .progressDot.active::before{
+
 content:"";
 
 position:absolute;
@@ -504,9 +605,9 @@ opacity:0;
 
 }
 
-/* =========================
+/* ===================================
 OUTPUT
-========================= */
+=================================== */
 
 .output{
 
@@ -514,7 +615,7 @@ position:relative;
 
 overflow:hidden;
 
-min-height:430px;
+min-height:470px;
 
 border-radius:24px;
 
@@ -523,12 +624,15 @@ padding:30px 22px;
 background:
 linear-gradient(
 180deg,
-#060606,
-#101010
+#050505,
+#111111
 );
 
 border:
 1px solid rgba(255,255,255,.06);
+
+box-shadow:
+inset 0 0 60px rgba(255,140,0,.03);
 
 }
 
@@ -542,17 +646,33 @@ inset:0;
 background:
 radial-gradient(
 circle at top,
-rgba(255,140,0,.08),
+rgba(255,140,0,.10),
 transparent 45%
 );
 
 pointer-events:none;
 
+animation:outputGlow 6s ease infinite;
+
 }
 
-/* =========================
+@keyframes outputGlow{
+
+0%,100%{
+opacity:.4;
+transform:scale(1);
+}
+
+50%{
+opacity:.8;
+transform:scale(1.08);
+}
+
+}
+
+/* ===================================
 AI ORB
-========================= */
+=================================== */
 
 .aiOrb{
 
@@ -573,7 +693,6 @@ box-shadow:
 0 0 40px rgba(255,140,0,.35);
 
 animation:orbBreath 3s ease infinite;
-
 }
 
 @keyframes orbBreath{
@@ -590,59 +709,121 @@ opacity:1;
 
 }
 
-/* =========================
-PARTICLES
-========================= */
+/* ===================================
+FLOATING DOTS
+=================================== */
 
-.particle{
+.floating-dot{
 position:absolute;
-width:6px;
-height:6px;
-background:#ff9d2f;
 border-radius:50%;
-opacity:.4;
-animation:particleFloat 6s linear infinite;
+background:#ff8c00;
+
+box-shadow:
+0 0 12px rgba(255,140,0,.8);
+
+opacity:.55;
+
+animation:floatDot linear infinite;
 }
 
-.particle:nth-child(1){
-top:20%;
-left:12%;
-animation-delay:0s;
+.dot1{
+width:5px;
+height:5px;
+left:8%;
+bottom:12%;
+animation-duration:9s;
 }
 
-.particle:nth-child(2){
-top:60%;
-left:70%;
+.dot2{
+width:7px;
+height:7px;
+left:18%;
+bottom:5%;
+animation-duration:12s;
 animation-delay:2s;
 }
 
-.particle:nth-child(3){
-top:80%;
-left:40%;
+.dot3{
+width:4px;
+height:4px;
+left:32%;
+bottom:10%;
+animation-duration:8s;
 animation-delay:4s;
 }
 
-@keyframes particleFloat{
+.dot4{
+width:6px;
+height:6px;
+left:46%;
+bottom:8%;
+animation-duration:13s;
+animation-delay:1s;
+}
+
+.dot5{
+width:5px;
+height:5px;
+left:58%;
+bottom:4%;
+animation-duration:10s;
+animation-delay:3s;
+}
+
+.dot6{
+width:8px;
+height:8px;
+left:72%;
+bottom:9%;
+animation-duration:15s;
+animation-delay:5s;
+}
+
+.dot7{
+width:5px;
+height:5px;
+left:82%;
+bottom:6%;
+animation-duration:11s;
+animation-delay:6s;
+}
+
+.dot8{
+width:4px;
+height:4px;
+left:90%;
+bottom:14%;
+animation-duration:9s;
+animation-delay:7s;
+}
+
+@keyframes floatDot{
 
 0%{
-transform:translateY(0px);
-opacity:.2;
-}
+transform:
+translateY(0px)
+translateX(0px);
 
-50%{
-opacity:.7;
-}
-
-100%{
-transform:translateY(-25px);
 opacity:.1;
 }
 
+50%{
+opacity:1;
 }
 
-/* =========================
+100%{
+transform:
+translateY(-160px)
+translateX(45px);
+
+opacity:0;
+}
+
+}
+
+/* ===================================
 TEXT
-========================= */
+=================================== */
 
 .truthLabel{
 font-size:11px;
@@ -654,36 +835,63 @@ margin-bottom:28px;
 
 .typewriter{
 
-font-size:21px;
-line-height:2;
+font-size:22px;
+line-height:2.1;
 font-weight:500;
 color:#f5f5f5;
 
-animation:textReveal 1.1s ease;
+animation:textReveal 1.2s ease;
 
 }
 
 .typewriter strong{
+
 color:#ffb869;
+
 position:relative;
+
+display:inline-block;
+
+animation:keywordPulse 2.5s ease infinite;
 }
 
 .typewriter strong::after{
+
 content:"";
+
 position:absolute;
+
 left:0;
 bottom:-2px;
+
 width:100%;
 height:2px;
+
 background:#ff9d00;
+
 opacity:.7;
+}
+
+@keyframes keywordPulse{
+
+0%,100%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.03);
+
+text-shadow:
+0 0 14px rgba(255,140,0,.4);
+}
+
 }
 
 @keyframes textReveal{
 
 0%{
 opacity:0;
-transform:translateY(16px);
+transform:translateY(18px);
 filter:blur(8px);
 }
 
@@ -695,17 +903,17 @@ filter:blur(0px);
 
 }
 
-/* =========================
+/* ===================================
 AI THINKING
-========================= */
+=================================== */
 
 .aiThinking{
 display:flex;
 align-items:center;
 gap:10px;
-margin-top:18px;
-color:#9f9f9f;
+margin-top:20px;
 font-size:13px;
+color:#9f9f9f;
 }
 
 .thinkingDots{
@@ -743,13 +951,13 @@ opacity:1;
 
 }
 
-/* =========================
+/* ===================================
 WARNING
-========================= */
+=================================== */
 
 .warning{
 
-margin-top:24px;
+margin-top:26px;
 
 padding:16px;
 
@@ -770,12 +978,12 @@ color:#ffba72;
 
 }
 
-/* =========================
+/* ===================================
 INPUT
-========================= */
+=================================== */
 
 .inputArea{
-margin-top:20px;
+margin-top:22px;
 }
 
 .input{
@@ -815,19 +1023,17 @@ color:#777;
 .input:focus{
 
 border-color:
-rgba(255,140,0,.4);
+rgba(255,140,0,.45);
 
 box-shadow:
-0 0 0 4px rgba(255,140,0,.08);
-
-background:
-rgba(255,255,255,.06);
+0 0 0 4px rgba(255,140,0,.08),
+0 0 40px rgba(255,140,0,.08);
 
 }
 
-/* =========================
+/* ===================================
 BUTTON
-========================= */
+=================================== */
 
 .button{
 
@@ -910,9 +1116,9 @@ box-shadow:
 
 }
 
-/* =========================
+/* ===================================
 FOOTER
-========================= */
+=================================== */
 
 .footer{
 margin-top:36px;
@@ -921,12 +1127,11 @@ font-size:13px;
 line-height:1.8;
 color:#6f6f6f;
 opacity:.7;
-letter-spacing:.5px;
 }
 
-/* =========================
+/* ===================================
 MOBILE
-========================= */
+=================================== */
 
 @media(max-width:768px){
 
@@ -935,7 +1140,7 @@ padding:18px 10px 120px;
 }
 
 .heroTitle{
-font-size:44px;
+font-size:46px;
 line-height:1;
 letter-spacing:-2px;
 }
@@ -969,6 +1174,10 @@ padding:18px;
 font-size:15px;
 }
 
+.progressRail{
+gap:8px;
+}
+
 }
 
 </style>
@@ -994,8 +1203,10 @@ TRUTHLOOP AI
 </div>
 
 <h1 class="heroTitle">
-Find what you’re avoiding.
+Find what you’re <span>avoiding.</span>
 </h1>
+
+<div class="heroLine"></div>
 
 <p class="heroSub">
 
@@ -1016,15 +1227,10 @@ Choose your current pattern
 <div class="categoryWrap">
 
 <div class="category active">Founder</div>
-
 <div class="category">Overthinker</div>
-
 <div class="category">Validation</div>
-
 <div class="category">Fear of Failure</div>
-
 <div class="category">Creator</div>
-
 <div class="category">Student</div>
 
 </div>
@@ -1063,9 +1269,14 @@ Truth Score: 68%
 
 <div class="aiOrb"></div>
 
-<div class="particle"></div>
-<div class="particle"></div>
-<div class="particle"></div>
+<div class="floating-dot dot1"></div>
+<div class="floating-dot dot2"></div>
+<div class="floating-dot dot3"></div>
+<div class="floating-dot dot4"></div>
+<div class="floating-dot dot5"></div>
+<div class="floating-dot dot6"></div>
+<div class="floating-dot dot7"></div>
+<div class="floating-dot dot8"></div>
 
 <div class="truthLabel">
 TRUTHLOOP
@@ -1143,6 +1354,21 @@ btn.classList.add('active');
 });
 
 });
+
+let score = 68;
+
+setInterval(()=>{
+
+score++;
+
+if(score > 74){
+score = 68;
+}
+
+document.querySelector('.truthScore').innerText =
+`Truth Score: ${score}%`;
+
+},2200);
 
 </script>
 
