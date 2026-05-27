@@ -1,4 +1,4 @@
-const OPEN_GATE_TEST = true;
+
 export default async function handler(req, res) {
 
   /* =========================
@@ -113,7 +113,7 @@ What exactly keeps repeating?`
        🔒 LOOP 5 PAYWALL
     ========================= */
 
-    if (loopLevel === 5 && !paid49 && !OPEN_GATE_TEST) {
+if (loopLevel === 5 && !paid49) {
 
       const lines = [
 
@@ -176,7 +176,7 @@ why clarity still doesn’t become action.`
    🔒 LOOP 6 ACCESS
 ========================= */
 
-if (loopLevel === 6 && !paid49 && !OPEN_GATE_TEST) {
+if (loopLevel === 6 && !paid49){
 
       return res.status(200).json({
         reply:
@@ -191,7 +191,7 @@ Face this first.`,
        🔒 LOOP 7 PAYWALL
     ========================= */
 
-    if (loopLevel === 7 && !paid199 && !OPEN_GATE_TEST) {
+if (loopLevel === 7 && !paid199) {
 
       return res.status(200).json({
         reply:
