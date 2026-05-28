@@ -1085,71 +1085,540 @@ text-decoration:none;
     
 <a href="https://truthloop.in/why-you-procrastinate.html"    
 style="    
-display:block;    
-margin-bottom:10px;    
-color:orange;    
-text-decoration:none;    
-">    
-→ Why You Procrastinate    
-</a>    
-    
-<a href="https://truthloop.in/why-you-seek-validation.html"    
-style="    
-display:block;    
-margin-bottom:10px;    
-color:orange;    
-text-decoration:none;    
-">    
-→ Why You Seek Validation    
-</a>    
-    
-<a href="https://truthloop.in/"    
-style="    
-display:block;    
-color:#fff;    
-text-decoration:none;    
-font-weight:bold;    
-">    
-→ Visit TruthLoop AI    
-</a>    
-    
-</div>    
-<!-- PAYWALL -->    
-    
-<div id="paywallBox">    
-    
-<div id="paySub"></div>    
-    
-<button id="razorpayBtn"></button>    
-    
-<div id="paypal-button"></div>    
-    
-</div>    
-    
-</div>    
-    
-<script>    
-    
-const API_URL="/api/chat";    
-const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
-    
-const outputBox=document.getElementById("outputBox");    
-const mainInput=document.getElementById("mainInput");    
-const reflectionInput=document.getElementById("reflectionInput");    
-const getBtn=document.getElementById("getBtn");    
-const nextBtn=document.getElementById("nextBtn");    
-    
-const shareBox=document.getElementById("shareBox");    
-const shareText=document.getElementById("shareText");    
-    
-const paywallBox=document.getElementById("paywallBox");    
-const paySub=document.getElementById("paySub");    
-const razorpayBtn=document.getElementById("razorpayBtn");    
-    
+<div id="hintContent" style="
+display:none;
+background:linear-gradient(180deg,#101010,#151515);
+border:1px solid #262626;
+padding:16px;
+border-radius:16px;
+font-size:14px;
+line-height:1.9;
+color:#ddd;
+margin-top:14px;
+margin-bottom:14px;
+box-shadow:
+inset 0 0 20px rgba(255,140,0,0.04);
+">
+
+<div style="
+color:#ffb347;
+font-size:12px;
+letter-spacing:2px;
+margin-bottom:14px;
+font-weight:bold;
+">
+TRUTHLOOP FLOW
+</div>
+
+• Select a pattern<br><br>
+
+• Use the suggested question or rewrite it<br><br>
+
+• Click "Show me the truth"<br><br>
+
+• Answer follow-up questions<br><br>
+
+• Ask your own question anytime
+
+</div>
+
+<div class="cta-box" style="
+margin-top:26px;
+margin-bottom:20px;
+padding:32px 26px;
+border-radius:26px;
+background:
+linear-gradient(
+145deg,
+#101010,
+#1a1a1a
+);
+
+border:1px solid #2a2a2a;
+
+box-shadow:
+0 0 35px rgba(255,140,0,0.08),
+inset 0 0 25px rgba(255,140,0,0.03);
+
+text-align:center;
+
+position:relative;
+
+overflow:hidden;
+">
+
+<!-- FLOATING DOTS -->
+
+<div class="floatingDot"
+style="
+top:30px;
+right:40px;
+">
+</div>
+
+<div class="floatingDot"
+style="
+top:90px;
+left:50px;
+animation-delay:1s;
+">
+</div>
+
+<div class="floatingDot"
+style="
+bottom:40px;
+right:120px;
+animation-delay:2s;
+">
+</div>
+
+<!-- GLOW ORB -->
+
+<div style="
+position:absolute;
+top:-40px;
+right:-40px;
+width:140px;
+height:140px;
+background:rgba(255,140,0,0.06);
+border-radius:50%;
+filter:blur(20px);
+">
+</div>
+
+<!-- LOOP TOP -->
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:12px;
+margin-bottom:18px;
+flex-wrap:wrap;
+">
+
+<div id="loopIndicator" style="
+color:#ffb347;
+font-size:13px;
+font-weight:bold;
+letter-spacing:1px;
+">
+🟠 LOOP 1 OF 7
+</div>
+
+<div id="truthScore" style="
+display:none;
+padding:10px 14px;
+border-radius:999px;
+background:rgba(255,140,0,0.12);
+border:1px solid rgba(255,140,0,0.25);
+font-size:13px;
+color:#ffb347;
+backdrop-filter:blur(10px);
+box-shadow:0 0 15px rgba(255,140,0,0.15);
+">
+Truth Score: 68%
+</div>
+
+</div>
+
+<!-- LOOP BAR -->
+
+<div id="loopProgressWrap" style="
+margin-bottom:22px;
+width:100%;
+height:6px;
+background:#141414;
+border-radius:999px;
+overflow:hidden;
+">
+
+<div id="loopProgressBar" style="
+width:14%;
+height:100%;
+background:
+linear-gradient(
+90deg,
+orange,
+#ff8c00
+);
+
+border-radius:999px;
+
+box-shadow:
+0 0 12px rgba(255,140,0,0.45);
+
+transition:0.4s;
+">
+</div>
+
+</div>
+
+<!-- OUTPUT -->
+
+<div id="outputBox" class="output">
+
+<div style="
+color:#ffb347;
+font-size:11px;
+font-weight:bold;
+letter-spacing:2px;
+margin-bottom:14px;
+text-align:left;
+">
+TRUTHLOOP ANALYSIS
+</div>
+
+</div>
+
+<!-- CATEGORY MESSAGE -->
+
+<div id="categoryMessage" style="
+display:none;
+background:
+linear-gradient(
+180deg,
+#101010,
+#151515
+);
+
+border-left:3px solid orange;
+
+padding:16px;
+
+border-radius:14px;
+
+margin-bottom:18px;
+
+color:#f0f0f0;
+
+line-height:1.8;
+
+font-size:15px;
+
+transition:0.25s;
+
+box-shadow:
+0 0 20px rgba(255,140,0,0.04);
+
+text-align:left;
+">
+
+Category selected.
+
+</div>
+
+</div>
+
+<!-- RESTORE SCREEN -->
+
+<div id="restoreScreen" style="
+display:none;
+text-align:center;
+padding:34px 24px;
+background:
+linear-gradient(
+180deg,
+#101010,
+#181818
+);
+
+border:1px solid #2a2a2a;
+
+border-radius:24px;
+
+margin-bottom:20px;
+
+box-shadow:
+0 0 25px rgba(255,140,0,0.08);
+">
+
+<div style="
+font-size:13px;
+letter-spacing:2px;
+color:#ffb347;
+margin-bottom:14px;
+font-weight:bold;
+">
+TRUTHLOOP MEMORY
+</div>
+
+<h2 style="
+color:white;
+font-size:32px;
+margin-bottom:14px;
+line-height:1;
+">
+Journey Found
+</h2>
+
+<div class="truthAnimatedLine"></div>
+
+<p id="restorePattern"
+style="
+margin-top:20px;
+margin-bottom:10px;
+color:#ddd;
+line-height:1.8;
+">
+</p>
+
+<p id="restoreLoop"
+style="
+margin-bottom:22px;
+color:#aaa;
+line-height:1.8;
+">
+</p>
+
+<button id="continueJourneyBtn"
+style="
+width:100%;
+padding:15px;
+margin-top:10px;
+background:
+linear-gradient(
+45deg,
+orange,
+#ff5e00
+);
+
+color:black;
+
+border:none;
+
+border-radius:14px;
+
+font-weight:bold;
+
+font-size:15px;
+
+box-shadow:
+0 0 25px rgba(255,140,0,0.22);
+">
+
+CONTINUE JOURNEY
+
+</button>
+
+<button id="newPatternBtn"
+style="
+width:100%;
+padding:15px;
+margin-top:12px;
+background:#181818;
+color:white;
+border:1px solid #333;
+border-radius:14px;
+font-weight:bold;
+font-size:15px;
+">
+
+START NEW PATTERN
+
+</button>
+
+</div>
+
+<!-- INPUT -->
+
+<input id="mainInput"
+
+placeholder="Reply to TruthLoop..."
+
+style="
+background:
+linear-gradient(
+180deg,
+#101010,
+#161616
+);
+
+border:1px solid #262626;
+
+box-shadow:
+0 0 0 1px rgba(255,140,0,0.05);
+
+border-radius:16px;
+
+padding:16px;
+
+font-size:15px;
+
+margin-top:16px;
+"/>
+
+<!-- MAIN BUTTON -->
+
+<button id="getBtn">
+
+Show me the truth →
+
+</button>
+
+<!-- REFLECTION -->
+
+<input id="reflectionInput"
+style="display:none;"
+placeholder="Answer honestly..."/>
+
+<button id="nextBtn" style="display:none;">
+Go deeper
+</button>
+
+<!-- SHARE BOX -->
+
+<div id="shareBox">
+
+<div id="shareText"></div>
+
+<button onclick="copyShare()">
+Copy
+</button>
+
+<button onclick="whatsappShare()">
+WhatsApp
+</button>
+
+</div>
+
+<!-- ARTICLE BLOCK -->
+
+<div id="articleBlock" style="
+display:none;
+margin-top:26px;
+margin-bottom:18px;
+padding:20px;
+background:
+linear-gradient(
+180deg,
+#111,
+#181818
+);
+
+border:1px solid #262626;
+
+border-radius:20px;
+
+line-height:1.9;
+
+box-shadow:
+0 0 25px rgba(255,140,0,0.05);
+">
+
+<div style="
+font-size:17px;
+font-weight:bold;
+margin-bottom:14px;
+color:#fff;
+">
+Explore More Clarity Systems
+</div>
+
+<a href="https://truthloop.in/why-you-feel-stuck.html"
+style="
+display:block;
+margin-bottom:12px;
+color:orange;
+text-decoration:none;
+">
+→ Why You Feel Stuck
+</a>
+
+<a href="https://truthloop.in/why-you-procrastinate.html"
+style="
+display:block;
+margin-bottom:12px;
+color:orange;
+text-decoration:none;
+">
+→ Why You Procrastinate
+</a>
+
+<a href="https://truthloop.in/why-you-seek-validation.html"
+style="
+display:block;
+margin-bottom:12px;
+color:orange;
+text-decoration:none;
+">
+→ Why You Seek Validation
+</a>
+
+<a href="https://truthloop.in/"
+style="
+display:block;
+color:#fff;
+text-decoration:none;
+font-weight:bold;
+margin-top:14px;
+">
+→ Visit TruthLoop AI
+</a>
+
+</div>
+
+<!-- PAYWALL -->
+
+<div id="paywallBox">
+
+<div id="paySub"></div>
+
+<button id="razorpayBtn"></button>
+
+<div id="paypal-button"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const API_URL="/api/chat";
+
+const RAZORPAY_KEY_ID=
+"rzp_live_SkoC6fqjfhi4WP";
+
+const outputBox=
+document.getElementById("outputBox");
+
+const mainInput=
+document.getElementById("mainInput");
+
+const reflectionInput=
+document.getElementById("reflectionInput");
+
+const getBtn=
+document.getElementById("getBtn");
+
+const nextBtn=
+document.getElementById("nextBtn");
+
+const shareBox=
+document.getElementById("shareBox");
+
+const shareText=
+document.getElementById("shareText");
+
+const paywallBox=
+document.getElementById("paywallBox");
+
+const paySub=
+document.getElementById("paySub");
+
+const razorpayBtn=
+document.getElementById("razorpayBtn");
+
 let loopLevel=1;
+
+let truthScore=68;
+
 let messages=[];
+
 let payment49=false;
+
 let payment199=false;
+
 let currentCategory="";
 
 let isLoading=false;
