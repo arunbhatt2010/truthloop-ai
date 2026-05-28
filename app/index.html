@@ -1439,7 +1439,35 @@ let currentCategory="";
 let isLoading=false;
 
 const questionMap = {
+document.querySelectorAll(".categoryBtn").forEach(btn=>{
 
+btn.onclick=()=>{
+
+document
+.querySelectorAll(".categoryBtn")
+.forEach(b=>b.classList.remove("active"));
+
+btn.classList.add("active");
+
+currentCategory = btn.dataset.type;
+
+const selected =
+questionMap[currentCategory];
+
+if(selected){
+
+mainInput.value = selected[0];
+
+}
+
+localStorage.setItem(
+"truthloop_pattern",
+currentCategory
+);
+
+};
+
+});
 creator:[
 "Why do I keep creating but struggle to grow?",
 "What pattern keeps slowing my progress?",
@@ -1910,7 +1938,8 @@ if(!text){
   }   
     
 loopLevel++;    
-
+document.querySelector(".truthScore").innerText =
+"Truth Score: " + (loopLevel * 14) + "%";
 
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
@@ -2078,22 +2107,52 @@ document.getElementById("restoreLoop").innerText =
 getBtn.disabled = false;
 
   }
-  document.getElementById("hintBox").addEventListener("click",()=>{
+  document
+.getElementById("hintBox")
+.onclick=()=>{
 
-const hint =
+const box =
 document.getElementById("hintContent");
 
-if (hint.style.display === "block") {
+if(box.style.display==="block"){
 
-hint.style.display = "none";
+box.style.display="none";
 
-} else {
+}else{
 
-hint.style.display = "block";
+box.style.display="block";
 
 }
 
-});
+};
+const savedPattern =
+localStorage.getItem("truthloop_pattern");
+
+if(savedPattern){
+
+currentCategory = savedPattern;
+
+const savedBtn =
+document.querySelector(
+'.categoryBtn[data-type="' +
+savedPattern +
+'"]'
+);
+
+if(savedBtn){
+
+savedBtn.classList.add("active");
+
+}
+
+if(questionMap[savedPattern]){
+
+mainInput.value =
+questionMap[savedPattern][0];
+
+}
+
+  }  
 </script>    
 </div>
   <footer style="
