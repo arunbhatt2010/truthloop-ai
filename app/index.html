@@ -1278,10 +1278,33 @@ Choose your current pattern
 
 </div>
 
-<div class="how">
+<div id="hintBox" class="how">
 💡 HOW DOES THIS WORK?
 </div>
+<div id="hintContent" style="
+display:none;
+background:#111;
+border:1px solid #222;
+padding:12px;
+border-radius:10px;
+font-size:14px;
+line-height:1.7;
+color:#ddd;
+margin-top:10px;
+margin-bottom:10px;
+">
 
+• Select a pattern<br><br>
+
+• Use the suggested question or rewrite it<br><br>
+
+• Click "Show me the truth"<br><br>
+
+• Answer follow-up questions<br><br>
+
+• Ask your own question anytime
+
+</div>
 <div class="loop">
 
 <div class="loopTop">
@@ -1291,7 +1314,7 @@ LOOP 1 OF 7
 </div>
 
 <div class="truthScore">
-Truth Score: 68%
+Truth Score: 0%
 </div>
 
 </div>
@@ -1326,11 +1349,7 @@ TRUTHLOOP
 </div>
 
 
-<div class="warning">
 
-⚠️ Answer first. TruthLoop only goes deeper after your answer.
-
-</div>
 
 </div>
 
@@ -1548,12 +1567,7 @@ const speed = 8;
 const interval = setInterval(()=>{
 
 div.innerHTML = text.substring(0,i);
-outputBox.innerHTML += `
-<div class="analysisLine">
-<span class="thinkingDot"></span>
-TruthLoop is analyzing emotional resistance...
-</div>
-`;
+
 outputBox.scrollTop = outputBox.scrollHeight;
 
 i++;
@@ -1561,7 +1575,16 @@ i++;
 if(i > text.length){
 
 clearInterval(interval);
+if(!document.querySelector(".analysisLine")){
 
+div.innerHTML += `
+<div class="analysisLine">
+<span class="thinkingDot"></span>
+TruthLoop is analyzing emotional resistance...
+</div>
+`;
+
+  }
 div.innerHTML = text;
 if(loopLevel >= 1 && loopLevel < 7){
 
@@ -1746,12 +1769,13 @@ document.querySelectorAll(".categoryBtn").forEach(btn=>{
 btn.onclick=()=>{
 const selected =
 questionMap[btn.dataset.type];
-
+mainInput.value =
+questionMap[currentCategory][0];
 if(selected){
 mainInput.value = selected[0];
 currentCategory = btn.dataset.type;
   }
-alert("Pattern selected");
+
 
 currentCategory=btn.dataset.type;
 document.getElementById("hintContent").style.display = "none";
