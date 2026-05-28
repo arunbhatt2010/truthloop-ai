@@ -224,79 +224,680 @@ TruthLoop
 <div style="    
 margin-bottom:14px;    
 ">    
-    
-<a href="https://truthloop.in/"    
-style="    
-color:orange;    
-text-decoration:none;    
-font-size:14px;    
-font-weight:bold;    
-">    
-← TruthLoop AI Home    
-</a>    
-    
-</div>    
-<p style="    
-color:#aaa;    
-margin-top:0;    
-margin-bottom:14px;    
-font-size:15px;    
-line-height:1.6;    
-">    
-You don’t need advice. You need clarity.    
-</p>    
-<div style="    
-margin-bottom:18px;    
-background:#111;    
-border:1px solid #222;    
-padding:14px;    
-border-radius:14px;    
-">    
-    
-<div style="    
-font-size:13px;    
-color:#888;    
-margin-bottom:12px;    
-letter-spacing:1px;    
-text-transform:uppercase;    
-">    
-Choose your current pattern    
-</div>    
-    
-<div style="    
-display:flex;    
-flex-wrap:wrap;    
-gap:10px;    
-">    
-    
-<button class="categoryBtn" data-type="creator">Creator</button>    
-    
-<button class="categoryBtn" data-type="writer">Writer</button>    
-    
-<button class="categoryBtn" data-type="author">Author</button>    
-    
-<button class="categoryBtn" data-type="founder">Founder</button>    
-    
-<button class="categoryBtn" data-type="owner">Owner</button>    
-    
-<button class="categoryBtn" data-type="student">Student</button>    
-<button class="categoryBtn" data-type="jobseeker">    
-Job Seeker    
-</button>    
-<button class="categoryBtn" data-type="overthinker">Overthinker</button>    
-<button class="categoryBtn" data-type="pattern">    
-You vs Your Pattern    
-</button>    
-<button class="categoryBtn" data-type="validation">Validation</button>    
-    
-<button class="categoryBtn" data-type="failure">Fear of Failure</button>    
-    
-</div>  
-  <div id="hintBox" style="
-margin-top:12px;
-margin-bottom:12px;
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+
+background:
+radial-gradient(circle at top right, rgba(255,120,0,0.12), transparent 25%),
+radial-gradient(circle at bottom left, rgba(255,120,0,0.10), transparent 20%),
+#050505;
+
+color:#fff;
+
+font-family:Arial,sans-serif;
+
+margin:0;
+
+overflow-x:hidden;
+
+min-height:100vh;
+
+}
+
+/* =========================
+BACKGROUND ORBS
+========================= */
+
+body::before{
+content:"";
+
+position:fixed;
+
+top:-120px;
+right:-100px;
+
+width:320px;
+height:320px;
+
+background:
+rgba(255,120,0,0.08);
+
+border-radius:50%;
+
+filter:blur(90px);
+
+pointer-events:none;
+
+animation:orbFloat 8s ease-in-out infinite;
+
+}
+
+body::after{
+content:"";
+
+position:fixed;
+
+bottom:-100px;
+left:-80px;
+
+width:240px;
+height:240px;
+
+background:
+rgba(255,120,0,0.06);
+
+border-radius:50%;
+
+filter:blur(80px);
+
+pointer-events:none;
+
+animation:orbFloat 10s ease-in-out infinite;
+
+}
+
+@keyframes orbFloat{
+
+0%,100%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(-20px);
+}
+
+}
+
+/* =========================
+TRUTH HIGHLIGHT
+========================= */
+
+.truthHighlight{
+
+display:inline;
+
+color:#d7c2a1;
+
+font-weight:400;
+
+font-size:17px;
+
+line-height:1.8;
+
+letter-spacing:0.2px;
+
+background:
+linear-gradient(
+180deg,
+transparent 78%,
+rgba(255,140,0,0.08) 78%
+);
+
+padding:1px 2px;
+
+text-align:left;
+
+word-break:normal;
+
+overflow-wrap:break-word;
+
+}
+
+/* =========================
+CONTAINER
+========================= */
+
+.container{
+
+width:100%;
+
+max-width:760px;
+
+margin:0 auto;
+
+padding:18px;
+
+padding-bottom:140px;
+
+box-sizing:border-box;
+
+position:relative;
+
+z-index:2;
+
+}
+
+/* =========================
+INPUT FOCUS
+========================= */
+
+#mainInput:focus{
+
+outline:none;
+
+border-color:orange;
+
+box-shadow:
+0 0 0 3px rgba(255,140,0,0.12);
+
+}
+
+/* =========================
+OUTPUT
+========================= */
+
+.output{
+
+background:
+linear-gradient(
+180deg,
+#050505,
+#0b0b0b
+);
+
+padding:28px 20px;
+
+border-radius:20px;
+
+margin-bottom:14px;
+
+line-height:1.7;
+
+width:100%;
+
+box-sizing:border-box;
+
+border:1px solid #1d1d1d;
+
+min-height:420px;
+
+max-height:none;
+
+overflow:hidden;
+
+display:flex;
+
+flex-direction:column;
+
+gap:12px;
+
+scroll-behavior:smooth;
+
+position:relative;
+
+font-size:16px;
+
+font-weight:400;
+
+color:#d8d8d8;
+
+letter-spacing:0.3px;
+
+box-shadow:
+inset 0 0 40px rgba(255,120,0,0.05);
+
+}
+
+/* =========================
+FLOATING DOTS
+========================= */
+
+.floatingDot{
+
+position:absolute;
+
+width:8px;
+height:8px;
+
+background:orange;
+
+border-radius:50%;
+
+opacity:0.9;
+
+animation:
+floatDots 4s infinite ease-in-out;
+
+box-shadow:
+0 0 12px orange;
+
+z-index:10;
+
+pointer-events:none;
+
+}
+
+@keyframes floatDots{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(-6px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
+}
+
+/* =========================
+TRUTHLOOP FLOATING
+========================= */
+
+.truthloopFloating{
+
+display:inline-block;
+
+animation:
+truthFloat 3s ease-in-out infinite;
+
+color:#ffb347;
+
+text-shadow:
+0 0 12px rgba(255,140,0,0.35);
+
+font-weight:bold;
+
+letter-spacing:1px;
+
+}
+
+@keyframes truthFloat{
+
+0%{
+transform:translateY(0px);
+opacity:0.7;
+}
+
+50%{
+transform:translateY(-3px);
+opacity:1;
+}
+
+100%{
+transform:translateY(0px);
+opacity:0.7;
+}
+
+}
+
+/* =========================
+HERO LINE
+========================= */
+
+.truthAnimatedLine{
+
+height:2px;
+
+width:100%;
+
+margin-top:14px;
+
+margin-bottom:18px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+orange,
+#ff8c00,
+orange,
+transparent
+);
+
+background-size:200% 100%;
+
+animation:
+linePulse 2s infinite linear;
+
+border-radius:999px;
+
+opacity:0.9;
+
+box-shadow:
+0 0 12px rgba(255,140,0,0.35);
+
+}
+
+@keyframes linePulse{
+
+0%{
+background-position:0% 50%;
+opacity:0.4;
+}
+
+50%{
+background-position:100% 50%;
+opacity:1;
+}
+
+100%{
+background-position:0% 50%;
+opacity:0.4;
+}
+
+}
+
+/* =========================
+RESPONSIVE
+========================= */
+
+@media(min-width:768px){
+
+.container{
+padding-top:24px;
+}
+
+.output{
+min-height:520px;
+}
+
+}
+
+/* =========================
+INPUTS
+========================= */
+
+input,
+button{
+
+width:100%;
+
+padding:14px;
+
+margin-top:10px;
+
+border-radius:14px;
+
+border:none;
+
+box-sizing:border-box;
+
+}
+
+input{
+
+background:#111;
+
+color:#fff;
+
+font-size:15px;
+
+border:1px solid #262626;
+
+}
+
+/* =========================
+BUTTONS
+========================= */
+
+button{
+
+background:
+linear-gradient(
+45deg,
+orange,
+#ff5e00
+);
+
+font-weight:bold;
+
+font-size:15px;
+
+box-shadow:
+0 0 25px rgba(255,120,0,0.22);
+
+transition:0.25s;
+
+cursor:pointer;
+
+}
+
+button:hover{
+
+transform:translateY(-2px);
+
+box-shadow:
+0 0 35px rgba(255,120,0,0.35);
+
+}
+
+/* =========================
+CATEGORY BUTTONS
+========================= */
+
+.categoryBtn{
+
+width:auto;
+
+padding:10px 14px;
+
+margin-top:0;
+
+background:#181818;
+
+border:1px solid #2a2a2a;
+
+color:#fff;
+
+font-size:13px;
+
+border-radius:999px;
+
+cursor:pointer;
+
+transition:0.2s;
+
+}
+
+.categoryBtn:hover{
+
+border-color:orange;
+
+color:orange;
+
+}
+
+/* =========================
+SHARE + PAYWALL
+========================= */
+
+#shareBox,
+#paywallBox{
+
+display:none;
+
+background:#111;
+
+padding:15px;
+
+border-radius:14px;
+
+margin-top:10px;
+
+text-align:center;
+
+border:1px solid #222;
+
+}
+
+#paywallBox{
+line-height:1.8;
+font-size:15px;
+word-break:break-word;
+}
+
+#paySub{
+margin-bottom:18px;
+color:#f0f0f0;
+}
+
+</style>
+
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){
+c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "wqdq8qf8r3");
+</script>
+
+</head>
+
+<body>
+
+<div id="restoreScreen" style="display:none;">
+
+<h2>Journey Found</h2>
+
+<p id="restorePattern"></p>
+
+<p id="restoreLoop"></p>
+
+<button id="continueJourneyBtn">
+CONTINUE JOURNEY
+</button>
+
+<button id="newPatternBtn">
+START NEW PATTERN
+</button>
+
+</div>
+
+<div id="mainApp">
+
+<div class="container">
+
+<h1 class="heroTitle"
+style="
+margin-top:0;
+margin-bottom:6px;
+font-size:56px;
+line-height:0.95;
+font-weight:900;
+letter-spacing:-2px;
+color:white;
+">
+Find what you're avoiding.
+</h1>
+
+<div class="truthAnimatedLine"></div>
+
+<div style="
+margin-bottom:16px;
+">
+
+<a href="https://truthloop.in/"
+style="
+text-decoration:none;
+font-size:14px;
+">
+
+<span class="truthloopFloating">
+✦ TruthLoop AI
+</span>
+
+</a>
+
+</div>
+
+<p style="
+color:#aaa;
+margin-top:0;
+margin-bottom:20px;
+font-size:16px;
+line-height:1.8;
+">
+
+Most people don't need more advice.
+
+<b style="color:white;">
+They need to see the hidden pattern behind their hesitation.
+</b>
+
+</p>
+
+<div style="
+margin-bottom:18px;
+background:#111;
+border:1px solid #222;
+padding:18px;
+border-radius:22px;
+position:relative;
+overflow:hidden;
+box-shadow:0 0 25px rgba(255,140,0,0.08);
+">
+
+<div style="
+font-size:13px;
+color:#888;
+margin-bottom:14px;
+letter-spacing:1px;
+text-transform:uppercase;
+">
+
+Choose your current pattern
+
+</div>
+
+<div style="
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+">
+
+<button class="categoryBtn" data-type="creator">Creator</button>
+
+<button class="categoryBtn" data-type="writer">Writer</button>
+
+<button class="categoryBtn" data-type="author">Author</button>
+
+<button class="categoryBtn" data-type="founder">Founder</button>
+
+<button class="categoryBtn" data-type="owner">Owner</button>
+
+<button class="categoryBtn" data-type="student">Student</button>
+
+<button class="categoryBtn" data-type="jobseeker">
+Job Seeker
+</button>
+
+<button class="categoryBtn" data-type="overthinker">
+Overthinker
+</button>
+
+<button class="categoryBtn" data-type="pattern">
+You vs Your Pattern
+</button>
+
+<button class="categoryBtn" data-type="validation">
+Validation
+</button>
+
+<button class="categoryBtn" data-type="failure">
+Fear of Failure
+</button>
+
+</div>
+
+<div id="hintBox" style="
+margin-top:14px;
 padding:14px 18px;
-border-radius:12px;
+border-radius:14px;
 background:rgba(255,140,0,0.12);
 border:1px solid rgba(255,140,0,0.35);
 color:orange;
@@ -307,7 +908,6 @@ cursor:pointer;
 ">
 
 💡 HOW DOES THIS WORK?
-
 </div>
 
 <div id="hintContent" style="
