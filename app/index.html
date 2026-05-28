@@ -1548,7 +1548,12 @@ const speed = 8;
 const interval = setInterval(()=>{
 
 div.innerHTML = text.substring(0,i);
-
+outputBox.innerHTML += `
+<div class="analysisLine">
+<span class="thinkingDot"></span>
+TruthLoop is analyzing emotional resistance...
+</div>
+`;
 outputBox.scrollTop = outputBox.scrollHeight;
 
 i++;
