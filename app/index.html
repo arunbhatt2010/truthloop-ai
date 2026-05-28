@@ -1308,7 +1308,7 @@ Truth Score: 68%
 
 </div>
 
-<div class="output">
+<div id="outputBox" class="output">
 
 <div class="aiOrb"></div>
 
@@ -1360,14 +1360,19 @@ TruthLoop is analyzing emotional resistance...
 <div class="inputArea">
 
 <input
+id="mainInput"
 class="input"
 placeholder="Answer honestly..."
 />
 
-<button class="button">
+<button id="getBtn" class="button">
 Show me the truth →
 </button>
+<input id="reflectionInput" style="display:none;"/>
 
+<button id="nextBtn" style="display:none;">
+Continue
+</button>
 </div>
 
 </div>
