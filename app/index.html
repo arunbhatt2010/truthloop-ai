@@ -68,6 +68,52 @@ background:rgba(255,140,0,0.08);
 line-height:1.8;    
     
   }    
+.heroLine{
+
+width:100%;
+height:3px;
+
+margin-top:18px;
+margin-bottom:24px;
+
+border-radius:999px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+#ff8c00,
+#ffb347,
+#ff8c00,
+transparent
+);
+
+background-size:220% 100%;
+
+animation:lineFlow 3s linear infinite;
+
+box-shadow:
+0 0 22px rgba(255,140,0,.5);
+
+}
+
+@keyframes lineFlow{
+
+0%{
+background-position:0% 0%;
+opacity:.45;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+background-position:220% 0%;
+opacity:.45;
+}
+
+  }
 body{    
 background:#0f0f0f;    
 color:#fff;    
@@ -94,23 +140,39 @@ box-shadow:
     
   }    
 .output{
-background:#000;
-padding:22px 18px;
-border-radius:16px;
-margin-bottom:14px;
-line-height:1.8;
-width:100%;
-box-sizing:border-box;
-border:1px solid #1d1d1d;
-min-height:420px;
-max-height:none;
+
+position:relative;
+
 overflow:hidden;
 
-display:flex;
-flex-direction:column;
-gap:12px;
+background:
+linear-gradient(
+180deg,
+#050505,
+#111111
+);
 
-scroll-behavior:smooth;
+padding:28px 22px;
+
+border-radius:24px;
+
+margin-bottom:14px;
+
+line-height:1.9;
+
+width:100%;
+
+box-sizing:border-box;
+
+border:
+1px solid rgba(255,255,255,.06);
+
+min-height:460px;
+
+box-shadow:
+inset 0 0 60px rgba(255,140,0,.03),
+0 25px 80px rgba(0,0,0,.65);
+
 }
     
 @media(min-width:768px){    
@@ -161,7 +223,42 @@ transition:0.2s;
 .categoryBtn:hover{    
 border-color:orange;    
 color:orange;    
-}    
+}
+.aiOrb{
+
+position:absolute;
+
+top:22px;
+right:22px;
+
+width:14px;
+height:14px;
+
+border-radius:50%;
+
+background:#ff9d00;
+
+box-shadow:
+0 0 18px rgba(255,160,0,.8),
+0 0 40px rgba(255,140,0,.35);
+
+animation:orbBreath 3s ease infinite;
+
+}
+
+@keyframes orbBreath{
+
+0%,100%{
+transform:scale(1);
+opacity:.7;
+}
+
+50%{
+transform:scale(1.45);
+opacity:1;
+}
+
+  }  
 #shareBox,    
 #paywallBox{    
 display:none;    
@@ -177,10 +274,123 @@ line-height:1.8;
 font-size:15px;
 word-break:break-word;
 }
+.truthScore{
 
+display:inline-block;
+
+margin-bottom:16px;
+
+padding:10px 14px;
+
+border-radius:999px;
+
+background:
+rgba(255,140,0,.08);
+
+border:
+1px solid rgba(255,140,0,.18);
+
+font-size:13px;
+
+color:#ffba72;
+
+animation:scorePulse 2.5s ease infinite;
+
+}
+
+@keyframes scorePulse{
+
+0%,100%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.06);
+
+box-shadow:
+0 0 35px rgba(255,140,0,.32);
+}
+
+  }
 #paySub{
 margin-bottom:18px;
 color:#f0f0f0;
+  }
+.floating-dot{
+position:absolute;
+border-radius:50%;
+background:#ff8c00;
+
+box-shadow:
+0 0 12px rgba(255,140,0,.8);
+
+opacity:.55;
+
+animation:floatDot linear infinite;
+}
+
+.dot1{
+width:5px;
+height:5px;
+left:8%;
+bottom:12%;
+animation-duration:9s;
+}
+
+.dot2{
+width:7px;
+height:7px;
+left:18%;
+bottom:5%;
+animation-duration:12s;
+}
+
+.dot3{
+width:4px;
+height:4px;
+left:32%;
+bottom:10%;
+animation-duration:8s;
+}
+
+.dot4{
+width:6px;
+height:6px;
+left:46%;
+bottom:8%;
+animation-duration:13s;
+}
+
+.dot5{
+width:5px;
+height:5px;
+left:58%;
+bottom:4%;
+animation-duration:10s;
+}
+
+@keyframes floatDot{
+
+0%{
+transform:
+translateY(0px)
+translateX(0px);
+
+opacity:.1;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+transform:
+translateY(-160px)
+translateX(45px);
+
+opacity:0;
+}
+
   }
 </style><script type="text/javascript">    
     (function(c,l,a,r,i,t,y){    
@@ -213,7 +423,7 @@ START NEW PATTERN
 <div id="mainApp">
 
 <div class="container">    
-    
+<div class="aiOrb"></div>  
 <h2 style="    
 margin-top:0;    
 margin-bottom:4px;    
@@ -245,14 +455,15 @@ line-height:1.6;
 ">    
 You don’t need advice. You need clarity.    
 </p>    
-<div style="    
+
+  <div style="    
 margin-bottom:18px;    
 background:#111;    
 border:1px solid #222;    
 padding:14px;    
 border-radius:14px;    
 ">    
-    
+<div class="heroLine"></div>   
 <div style="    
 font-size:13px;    
 color:#888;    
@@ -368,9 +579,15 @@ font-weight:bold;
 ">    
 Loop 1 of 7    
 </div>    
-    
+<div id="truthScore" class="truthScore">
+Truth Score: 0%
+ </div>   
 <div id="outputBox" class="output">    
-    
+<div class="floating-dot dot1"></div>
+<div class="floating-dot dot2"></div>
+<div class="floating-dot dot3"></div>
+<div class="floating-dot dot4"></div>
+<div class="floating-dot dot5"></div>    
 <div style="    
 color:orange;    
 font-size:11px;    
