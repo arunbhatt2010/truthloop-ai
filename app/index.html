@@ -1592,17 +1592,8 @@ i++;
 if(i > text.length){
 
 clearInterval(interval);
-if(!document.querySelector(".analysisLine")){
-
-div.innerHTML += `
-<div class="analysisLine">
-<span class="thinkingDot"></span>
-TruthLoop is analyzing emotional resistance...
-</div>
-`;
-
-  }
 div.innerHTML = text;
+
 if(loopLevel >= 1 && loopLevel < 7){
 
 div.innerHTML += `
