@@ -1325,29 +1325,6 @@ Truth Score: 68%
 TRUTHLOOP
 </div>
 
-<div class="typewriter">
-
-You say you want clarity.<br><br>
-
-But most of your recent decisions optimized
-<strong>safety</strong>,
-not truth.<br><br>
-
-The hesitation isn’t random anymore.
-
-</div>
-
-<div class="aiThinking">
-
-<div class="thinkingDots">
-<span></span>
-<span></span>
-<span></span>
-</div>
-
-TruthLoop is analyzing emotional resistance...
-
-</div>
 
 <div class="warning">
 
@@ -1399,20 +1376,7 @@ btn.classList.add('active');
 
 });
 
-let score = 68;
 
-setInterval(()=>{
-
-score++;
-
-if(score > 74){
-score = 68;
-}
-
-document.querySelector('.truthScore').innerText =
-`Truth Score: ${score}%`;
-
-},2200);    
     
 const API_URL="/api/chat";    
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
@@ -1775,7 +1739,13 @@ nextBtn.style.display="block";
 document.querySelectorAll(".categoryBtn").forEach(btn=>{
 
 btn.onclick=()=>{
+const selected =
+questionMap[btn.dataset.type];
 
+if(selected){
+mainInput.value = selected[0];
+currentCategory = btn.dataset.type;
+  }
 alert("Pattern selected");
 
 currentCategory=btn.dataset.type;
@@ -2071,20 +2041,20 @@ document.getElementById("restoreLoop").innerText =
 getBtn.disabled = false;
 
   }
-  document.getElementById("hintBox").addEventListener("click", () => {
+  document.getElementById("hintBox").addEventListener("click",()=>{
 
-  const hint =
-  document.getElementById("hintContent");
+const hint =
+document.getElementById("hintContent");
 
-  if (hint.style.display === "block") {
+if (hint.style.display === "block") {
 
-    hint.style.display = "none";
+hint.style.display = "none";
 
-  } else {
+} else {
 
-    hint.style.display = "block";
+hint.style.display = "block";
 
-  }
+}
 
 });
 </script>    
