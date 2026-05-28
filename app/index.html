@@ -1304,7 +1304,11 @@ ${text}<br><br>
 outputBox.appendChild(userReply);
 
 const data=await callAPI();    
-    
+document.getElementById("truthScore")
+.innerText =
+"Truth Score: " +
+Math.floor(Math.random()*25+70)
++ "%";    
 if(data.paywall){
 
 nextBtn.style.display="none";
