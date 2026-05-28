@@ -1,0 +1,2139 @@
+  
+<!DOCTYPE html>    
+<html lang="en">    
+<head>    
+<meta charset="UTF-8" />    
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>    
+    
+<title>TruthLoop - Find what you're avoiding</title>    
+    
+<meta name="description" content="TruthLoop exposes the hidden emotional patterns affecting decisions, execution, procrastination, validation addiction, overthinking, and self-sabotage." />    
+<!-- Open Graph -->    
+<meta property="og:type" content="website" />    
+<meta property="og:url" content="https://truthloop.in/app/" />    
+<meta property="og:title" content="TruthLoop - Find what you're avoiding" />    
+<meta property="og:description" content="You don’t need more advice. You’re avoiding something deeper. Find the hidden pattern behind your hesitation in 30 seconds." />    
+<meta property="og:image" content="https://truthloop.in/truthloop-hook.jpg" />    
+<meta property="og:image:secure_url" content="https://truthloop.in/truthloop-hook.jpg" />    
+<meta property="og:image:type" content="image/jpeg" />    
+<meta property="og:image:width" content="1200" />    
+<meta property="og:image:height" content="630" />    
+    
+<!-- Twitter -->    
+<meta name="twitter:card" content="summary_large_image" />    
+<meta name="twitter:url" content="https://truthloop.in/app" />    
+<meta name="twitter:title" content="TruthLoop - Find what you're avoiding" />    
+<meta name="twitter:description" content="TruthLoop exposes hidden emotional patterns affecting decisions, execution, and self-sabotage." />    
+<meta name="twitter:image" content="https://truthloop.in/truthloop-hook.jpg" />    
+    
+<!-- Canonical -->    
+<link rel="canonical" href="https://truthloop.in/app/" />    
+<!-- Google Analytics -->    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>    
+    
+<script>    
+window.dataLayer = window.dataLayer || [];    
+    
+function gtag(){    
+  dataLayer.push(arguments);    
+}    
+    
+gtag('js', new Date());    
+gtag('config', 'G-RBMQ2F6P9Q');    
+</script>    
+    
+<!-- Razorpay -->    
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>    
+    
+<!-- PayPal -->    
+<script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>    
+    
+<style>    
+.truthHighlight{    
+    
+display:inline;    
+    
+margin:12px 0;    
+    
+padding:2px 6px;    
+    
+color:orange;    
+    
+font-weight:bold;    
+    
+border-bottom:1px solid orange;    
+    
+background:rgba(255,140,0,0.08);    
+    
+line-height:1.8;    
+    
+  }    
+body{    
+font-family:'Inter',sans-serif;
+background:#040404;
+overflow-x:hidden;
+color:white;
+min-height:100vh;
+position:relative;
+}
+
+/* ===================================
+BACKGROUND
+=================================== */
+
+.bg{
+position:fixed;
+inset:0;
+overflow:hidden;
+z-index:0;
+}
+
+.grid{
+position:absolute;
+inset:0;
+
+background:
+linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);
+
+background-size:42px 42px;
+
+opacity:.1;
+}
+
+.orb{
+position:absolute;
+border-radius:50%;
+filter:blur(120px);
+opacity:.25;
+animation:float 18s ease-in-out infinite;
+}
+
+.orb1{
+width:340px;
+height:340px;
+background:#ff7a00;
+top:-120px;
+right:-100px;
+}
+
+.orb2{
+width:240px;
+height:240px;
+background:#ff5100;
+bottom:-60px;
+left:-50px;
+animation-delay:3s;
+}
+
+.orb3{
+width:180px;
+height:180px;
+background:#ffb100;
+top:45%;
+left:60%;
+animation-delay:6s;
+}
+
+@keyframes float{
+
+0%,100%{
+transform:translateY(0px) translateX(0px);
+}
+
+50%{
+transform:translateY(-35px) translateX(20px);
+}
+
+}
+
+/* ===================================
+MAIN
+=================================== */
+
+.container{
+position:relative;
+z-index:2;
+max-width:760px;
+margin:auto;
+padding:24px 12px 120px;
+}
+
+/* ===================================
+LOGO
+=================================== */
+
+.logo{
+
+display:inline-flex;
+align-items:center;
+gap:10px;
+
+padding:10px 16px;
+
+border-radius:999px;
+
+background:rgba(255,255,255,.04);
+
+border:1px solid rgba(255,140,0,.18);
+
+font-size:12px;
+letter-spacing:2px;
+
+color:#ffb36a;
+
+backdrop-filter:blur(12px);
+
+margin-bottom:24px;
+
+animation:logoBreath 4s ease-in-out infinite;
+
+}
+
+@keyframes logoBreath{
+
+0%,100%{
+transform:translateY(0px) scale(1);
+opacity:.85;
+
+box-shadow:
+0 0 0 rgba(255,140,0,0);
+}
+
+50%{
+transform:translateY(-2px) scale(1.04);
+
+opacity:1;
+
+box-shadow:
+0 0 35px rgba(255,140,0,.24);
+}
+
+}
+
+/* ===================================
+HERO
+=================================== */
+
+.heroTitle{
+font-size:62px;
+line-height:.92;
+font-weight:800;
+letter-spacing:-3px;
+margin-bottom:10px;
+}
+
+.heroTitle span{
+color:#ffb25c;
+}
+
+.heroLine{
+
+width:100%;
+height:3px;
+
+margin-top:20px;
+margin-bottom:26px;
+
+border-radius:999px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+#ff8c00,
+#ffb347,
+#ff8c00,
+transparent
+);
+
+background-size:220% 100%;
+
+animation:lineFlow 3s linear infinite;
+
+box-shadow:
+0 0 22px rgba(255,140,0,.5);
+
+}
+
+@keyframes lineFlow{
+
+0%{
+background-position:0% 0%;
+opacity:.45;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+background-position:220% 0%;
+opacity:.45;
+}
+
+}
+
+.heroSub{
+font-size:18px;
+line-height:1.9;
+color:#9f9f9f;
+max-width:640px;
+margin-bottom:34px;
+}
+
+.heroSub span{
+color:white;
+font-weight:700;
+}
+
+/* ===================================
+MAIN CARD
+=================================== */
+
+.mainCard{
+
+position:relative;
+
+background:
+rgba(10,10,10,.78);
+
+border:
+1px solid rgba(255,255,255,.06);
+
+border-radius:34px;
+
+padding:18px;
+
+overflow:hidden;
+
+backdrop-filter:
+blur(30px)
+saturate(150%);
+
+box-shadow:
+0 0 0 1px rgba(255,255,255,.02),
+0 50px 120px rgba(0,0,0,.9),
+0 0 120px rgba(255,120,0,.08);
+
+}
+
+.mainCard::before{
+
+content:"";
+
+position:absolute;
+inset:0;
+
+background:
+linear-gradient(
+145deg,
+rgba(255,255,255,.04),
+transparent 35%
+);
+
+pointer-events:none;
+
+}
+
+/* ===================================
+CATEGORY
+=================================== */
+
+.sectionTitle{
+font-size:12px;
+letter-spacing:2px;
+text-transform:uppercase;
+color:#888;
+margin-bottom:16px;
+}
+
+.categoryWrap{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-bottom:20px;
+}
+
+.category{
+
+position:relative;
+
+overflow:hidden;
+
+padding:12px 18px;
+
+border-radius:999px;
+
+background:
+rgba(255,255,255,.03);
+
+border:
+1px solid rgba(255,255,255,.08);
+
+font-size:14px;
+font-weight:600;
+
+cursor:pointer;
+
+transition:.25s ease;
+}
+
+.category::before{
+
+content:"";
+
+position:absolute;
+inset:0;
+
+background:
+linear-gradient(
+135deg,
+rgba(255,170,0,.18),
+transparent
+);
+
+opacity:0;
+
+transition:.3s ease;
+}
+
+.category:hover{
+transform:translateY(-2px);
+
+border-color:
+rgba(255,140,0,.35);
+
+box-shadow:
+0 0 25px rgba(255,140,0,.14);
+}
+
+.category:hover::before{
+opacity:1;
+}
+
+.category.active{
+
+background:
+linear-gradient(
+135deg,
+rgba(255,140,0,.24),
+rgba(255,90,0,.12)
+);
+
+border-color:
+rgba(255,170,0,.4);
+
+box-shadow:
+0 0 30px rgba(255,140,0,.2);
+
+}
+
+/* ===================================
+HOW
+=================================== */
+
+.how{
+
+padding:16px;
+
+border-radius:18px;
+
+background:
+rgba(255,140,0,.08);
+
+border:
+1px solid rgba(255,140,0,.18);
+
+text-align:center;
+
+font-size:14px;
+font-weight:700;
+
+color:#ffba72;
+
+cursor:pointer;
+
+transition:.25s ease;
+
+margin-bottom:24px;
+}
+
+.how:hover{
+background:
+rgba(255,140,0,.12);
+}
+
+/* ===================================
+LOOP
+=================================== */
+
+.loop{
+
+position:relative;
+
+overflow:hidden;
+
+padding:20px;
+
+border-radius:30px;
+
+background:
+linear-gradient(
+180deg,
+#0b0b0b,
+#050505
+);
+
+border:
+1px solid rgba(255,255,255,.06);
+
+box-shadow:
+0 25px 80px rgba(0,0,0,.85),
+0 0 70px rgba(255,120,0,.08);
+
+}
+
+/* ===================================
+LOOP TOP
+=================================== */
+
+.loopTop{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+}
+
+.loopText{
+font-size:12px;
+letter-spacing:3px;
+font-weight:700;
+color:#ffb25c;
+}
+
+/* ===================================
+TRUTH SCORE
+=================================== */
+
+.truthScore{
+
+padding:10px 14px;
+
+border-radius:999px;
+
+background:
+rgba(255,140,0,.08);
+
+border:
+1px solid rgba(255,140,0,.18);
+
+font-size:13px;
+
+color:#ffba72;
+
+animation:scorePulse 2.5s ease infinite;
+
+position:relative;
+
+overflow:hidden;
+
+}
+
+.truthScore::before{
+
+content:"";
+
+position:absolute;
+
+top:0;
+left:-100%;
+
+width:70%;
+height:100%;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+rgba(255,255,255,.22),
+transparent
+);
+
+transform:skewX(-25deg);
+
+animation:scoreScan 3s linear infinite;
+
+}
+
+@keyframes scorePulse{
+
+0%,100%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.06);
+
+box-shadow:
+0 0 35px rgba(255,140,0,.32);
+}
+
+}
+
+@keyframes scoreScan{
+
+0%{
+left:-100%;
+}
+
+100%{
+left:180%;
+}
+
+}
+
+/* ===================================
+PROGRESS
+=================================== */
+
+.progressRail{
+display:flex;
+gap:10px;
+margin-bottom:24px;
+}
+
+.progressDot{
+width:10px;
+height:10px;
+border-radius:50%;
+background:rgba(255,255,255,.14);
+position:relative;
+}
+
+.progressDot.active{
+background:#ff9d00;
+
+box-shadow:
+0 0 12px rgba(255,140,0,.8),
+0 0 30px rgba(255,140,0,.4);
+}
+
+.progressDot.active::before{
+
+content:"";
+
+position:absolute;
+inset:-4px;
+
+border-radius:50%;
+
+border:
+1px solid rgba(255,180,0,.35);
+
+animation:pulseDot 2s infinite;
+}
+
+@keyframes pulseDot{
+
+0%{
+transform:scale(.8);
+opacity:.8;
+}
+
+100%{
+transform:scale(2);
+opacity:0;
+}
+
+}
+
+/* ===================================
+OUTPUT
+=================================== */
+
+.output{
+
+position:relative;
+
+overflow:hidden;
+
+min-height:470px;
+
+border-radius:24px;
+
+padding:30px 22px;
+
+background:
+linear-gradient(
+180deg,
+#050505,
+#111111
+);
+
+border:
+1px solid rgba(255,255,255,.06);
+
+box-shadow:
+inset 0 0 60px rgba(255,140,0,.03);
+
+}
+
+.output::before{
+
+content:"";
+
+position:absolute;
+inset:0;
+
+background:
+radial-gradient(
+circle at top,
+rgba(255,140,0,.10),
+transparent 45%
+);
+
+pointer-events:none;
+
+animation:outputGlow 6s ease infinite;
+
+}
+
+@keyframes outputGlow{
+
+0%,100%{
+opacity:.4;
+transform:scale(1);
+}
+
+50%{
+opacity:.8;
+transform:scale(1.08);
+}
+
+}
+
+/* ===================================
+AI ORB
+=================================== */
+
+.aiOrb{
+
+position:absolute;
+
+top:24px;
+right:24px;
+
+width:14px;
+height:14px;
+
+border-radius:50%;
+
+background:#ff9d00;
+
+box-shadow:
+0 0 18px rgba(255,160,0,.8),
+0 0 40px rgba(255,140,0,.35);
+
+animation:orbBreath 3s ease infinite;
+}
+
+@keyframes orbBreath{
+
+0%,100%{
+transform:scale(1);
+opacity:.7;
+}
+
+50%{
+transform:scale(1.45);
+opacity:1;
+}
+
+}
+
+/* ===================================
+FLOATING DOTS
+=================================== */
+
+.floating-dot{
+position:absolute;
+border-radius:50%;
+background:#ff8c00;
+
+box-shadow:
+0 0 12px rgba(255,140,0,.8);
+
+opacity:.55;
+
+animation:floatDot linear infinite;
+}
+
+.dot1{
+width:5px;
+height:5px;
+left:8%;
+bottom:12%;
+animation-duration:9s;
+}
+
+.dot2{
+width:7px;
+height:7px;
+left:18%;
+bottom:5%;
+animation-duration:12s;
+animation-delay:2s;
+}
+
+.dot3{
+width:4px;
+height:4px;
+left:32%;
+bottom:10%;
+animation-duration:8s;
+animation-delay:4s;
+}
+
+.dot4{
+width:6px;
+height:6px;
+left:46%;
+bottom:8%;
+animation-duration:13s;
+animation-delay:1s;
+}
+
+.dot5{
+width:5px;
+height:5px;
+left:58%;
+bottom:4%;
+animation-duration:10s;
+animation-delay:3s;
+}
+
+.dot6{
+width:8px;
+height:8px;
+left:72%;
+bottom:9%;
+animation-duration:15s;
+animation-delay:5s;
+}
+
+.dot7{
+width:5px;
+height:5px;
+left:82%;
+bottom:6%;
+animation-duration:11s;
+animation-delay:6s;
+}
+
+.dot8{
+width:4px;
+height:4px;
+left:90%;
+bottom:14%;
+animation-duration:9s;
+animation-delay:7s;
+}
+
+@keyframes floatDot{
+
+0%{
+transform:
+translateY(0px)
+translateX(0px);
+
+opacity:.1;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+transform:
+translateY(-160px)
+translateX(45px);
+
+opacity:0;
+}
+
+}
+
+/* ===================================
+TEXT
+=================================== */
+
+.truthLabel{
+font-size:11px;
+letter-spacing:5px;
+font-weight:700;
+color:#ff9d43;
+margin-bottom:28px;
+}
+
+.typewriter{
+
+font-size:22px;
+line-height:2.1;
+font-weight:500;
+color:#f5f5f5;
+
+animation:textReveal 1.2s ease;
+
+}
+
+.typewriter strong{
+
+color:#ffb869;
+
+position:relative;
+
+display:inline-block;
+
+animation:keywordPulse 2.5s ease infinite;
+}
+
+.typewriter strong::after{
+
+content:"";
+
+position:absolute;
+
+left:0;
+bottom:-2px;
+
+width:100%;
+height:2px;
+
+background:#ff9d00;
+
+opacity:.7;
+}
+
+@keyframes keywordPulse{
+
+0%,100%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.03);
+
+text-shadow:
+0 0 14px rgba(255,140,0,.4);
+}
+
+}
+
+@keyframes textReveal{
+
+0%{
+opacity:0;
+transform:translateY(18px);
+filter:blur(8px);
+}
+
+100%{
+opacity:1;
+transform:translateY(0px);
+filter:blur(0px);
+}
+
+}
+
+/* ===================================
+AI THINKING
+=================================== */
+
+.aiThinking{
+display:flex;
+align-items:center;
+gap:10px;
+margin-top:20px;
+font-size:13px;
+color:#9f9f9f;
+}
+
+.thinkingDots{
+display:flex;
+gap:6px;
+}
+
+.thinkingDots span{
+width:6px;
+height:6px;
+border-radius:50%;
+background:#ff9d00;
+animation:thinking 1.4s infinite;
+}
+
+.thinkingDots span:nth-child(2){
+animation-delay:.2s;
+}
+
+.thinkingDots span:nth-child(3){
+animation-delay:.4s;
+}
+
+@keyframes thinking{
+
+0%,80%,100%{
+transform:scale(.5);
+opacity:.3;
+}
+
+40%{
+transform:scale(1.2);
+opacity:1;
+}
+
+}
+
+/* ===================================
+WARNING
+=================================== */
+
+.warning{
+
+margin-top:26px;
+
+padding:16px;
+
+border-radius:18px;
+
+background:
+rgba(255,140,0,.08);
+
+border:
+1px solid rgba(255,140,0,.20);
+
+text-align:center;
+
+font-size:14px;
+font-weight:600;
+
+color:#ffba72;
+
+}
+
+/* ===================================
+INPUT
+=================================== */
+
+.inputArea{
+margin-top:22px;
+}
+
+.input{
+
+width:100%;
+
+padding:18px 20px;
+
+background:
+linear-gradient(
+180deg,
+rgba(255,255,255,.05),
+rgba(255,255,255,.03)
+);
+
+border:
+1px solid rgba(255,255,255,.08);
+
+border-radius:20px;
+
+outline:none;
+
+font-size:16px;
+
+color:white;
+
+transition:.25s ease;
+
+backdrop-filter:blur(20px);
+
+}
+
+.input::placeholder{
+color:#777;
+}
+
+.input:focus{
+
+border-color:
+rgba(255,140,0,.45);
+
+box-shadow:
+0 0 0 4px rgba(255,140,0,.08),
+0 0 40px rgba(255,140,0,.08);
+
+}
+
+/* ===================================
+BUTTON
+=================================== */
+
+.button{
+
+position:relative;
+
+overflow:hidden;
+
+width:100%;
+
+margin-top:16px;
+
+padding:20px;
+
+border:none;
+
+border-radius:22px;
+
+cursor:pointer;
+
+font-size:16px;
+font-weight:800;
+
+letter-spacing:.5px;
+
+background:
+linear-gradient(
+135deg,
+#ffb347,
+#ff5a00
+);
+
+color:black;
+
+transition:.3s ease;
+
+box-shadow:
+0 14px 40px rgba(255,120,0,.35),
+0 0 50px rgba(255,120,0,.18);
+
+}
+
+.button::before{
+
+content:"";
+
+position:absolute;
+
+top:0;
+left:-120%;
+
+width:80%;
+height:100%;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+rgba(255,255,255,.35),
+transparent
+);
+
+transform:skewX(-25deg);
+
+transition:.7s;
+}
+
+.button:hover::before{
+left:140%;
+}
+
+.button:hover{
+
+transform:
+translateY(-3px)
+scale(1.01);
+
+box-shadow:
+0 22px 50px rgba(255,120,0,.42),
+0 0 80px rgba(255,120,0,.25);
+
+}
+
+/* ===================================
+FOOTER
+=================================== */
+
+.footer{
+margin-top:36px;
+text-align:center;
+font-size:13px;
+line-height:1.8;
+color:#6f6f6f;
+opacity:.7;
+}
+
+/* ===================================
+MOBILE
+=================================== */
+
+@media(max-width:768px){
+
+.container{
+padding:18px 10px 120px;
+}
+
+.heroTitle{
+font-size:46px;
+line-height:1;
+letter-spacing:-2px;
+}
+
+.heroSub{
+font-size:16px;
+line-height:1.8;
+}
+
+.output{
+min-height:420px;
+padding:24px 18px;
+}
+
+.typewriter{
+font-size:18px;
+line-height:1.9;
+}
+
+.mainCard{
+padding:14px;
+border-radius:26px;
+}
+
+.loop{
+padding:16px;
+}
+
+.button{
+padding:18px;
+font-size:15px;
+}
+
+.progressRail{
+gap:8px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="bg">
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="grid"></div>
+
+</div>
+
+<div class="container">
+
+<div class="logo">
+TRUTHLOOP AI
+</div>
+
+<h1 class="heroTitle">
+Find what you’re <span>avoiding.</span>
+</h1>
+
+<div class="heroLine"></div>
+
+<p class="heroSub">
+
+Most people don’t need more advice.
+
+<span>
+They need to see the hidden pattern behind their hesitation.
+</span>
+
+</p>
+
+<div class="mainCard">
+
+<div class="sectionTitle">
+Choose your current pattern
+</div>
+
+<div class="categoryWrap">
+
+<div class="category active">Founder</div>
+<div class="category">Overthinker</div>
+<div class="category">Validation</div>
+<div class="category">Fear of Failure</div>
+<div class="category">Creator</div>
+<div class="category">Student</div>
+
+</div>
+
+<div class="how">
+💡 HOW DOES THIS WORK?
+</div>
+
+<div class="loop">
+
+<div class="loopTop">
+
+<div class="loopText">
+LOOP 1 OF 7
+</div>
+
+<div class="truthScore">
+Truth Score: 68%
+</div>
+
+</div>
+
+<div class="progressRail">
+
+<div class="progressDot active"></div>
+<div class="progressDot"></div>
+<div class="progressDot"></div>
+<div class="progressDot"></div>
+<div class="progressDot"></div>
+<div class="progressDot"></div>
+<div class="progressDot"></div>
+
+</div>
+
+<div class="output">
+
+<div class="aiOrb"></div>
+
+<div class="floating-dot dot1"></div>
+<div class="floating-dot dot2"></div>
+<div class="floating-dot dot3"></div>
+<div class="floating-dot dot4"></div>
+<div class="floating-dot dot5"></div>
+<div class="floating-dot dot6"></div>
+<div class="floating-dot dot7"></div>
+<div class="floating-dot dot8"></div>
+
+<div class="truthLabel">
+TRUTHLOOP
+</div>
+
+<div class="typewriter">
+
+You say you want clarity.<br><br>
+
+But most of your recent decisions optimized
+<strong>safety</strong>,
+not truth.<br><br>
+
+The hesitation isn’t random anymore.
+
+</div>
+
+<div class="aiThinking">
+
+<div class="thinkingDots">
+<span></span>
+<span></span>
+<span></span>
+</div>
+
+TruthLoop is analyzing emotional resistance...
+
+</div>
+
+<div class="warning">
+
+⚠️ Answer first. TruthLoop only goes deeper after your answer.
+
+</div>
+
+</div>
+
+<div class="inputArea">
+
+<input
+class="input"
+placeholder="Answer honestly..."
+/>
+
+<button class="button">
+Show me the truth →
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+No signup. No account. Privacy first.
+
+</div>
+
+</div>
+
+<script>
+
+document.querySelectorAll('.category').forEach(btn=>{
+
+btn.addEventListener('click',()=>{
+
+document
+.querySelectorAll('.category')
+.forEach(el=>el.classList.remove('active'));
+
+btn.classList.add('active');
+
+});
+
+});
+
+let score = 68;
+
+setInterval(()=>{
+
+score++;
+
+if(score > 74){
+score = 68;
+}
+
+document.querySelector('.truthScore').innerText =
+`Truth Score: ${score}%`;
+
+},2200);
+<script>    
+    
+const API_URL="/api/chat";    
+const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
+    
+const outputBox=document.getElementById("outputBox");    
+const mainInput=document.getElementById("mainInput");    
+const reflectionInput=document.getElementById("reflectionInput");    
+const getBtn=document.getElementById("getBtn");    
+const nextBtn=document.getElementById("nextBtn");    
+    
+const shareBox=document.getElementById("shareBox");    
+const shareText=document.getElementById("shareText");    
+    
+const paywallBox=document.getElementById("paywallBox");    
+const paySub=document.getElementById("paySub");    
+const razorpayBtn=document.getElementById("razorpayBtn");    
+    
+let loopLevel=1;
+let messages=[];
+let payment49=false;
+let payment199=false;
+let currentCategory="";
+
+let isLoading=false;
+
+const questionMap = {
+
+creator:[
+"Why do I keep creating but struggle to grow?",
+"What pattern keeps slowing my progress?",
+"Why does visibility feel uncomfortable?"
+],
+
+writer:[
+"Why do I delay publishing my work?",
+"Why do I keep rewriting instead of sharing?",
+"What pattern keeps repeating here?"
+],
+
+author:[
+"Why do I hesitate to publish?",
+"Why does finishing feel harder than starting?",
+"What am I not seeing?"
+],
+
+founder:[
+"Why do I delay important decisions?",
+"What keeps this pattern alive?",
+"Why do I keep carrying uncertainty?"
+],
+
+owner:[
+"Why do I feel stuck despite effort?",
+"What am I not seeing?",
+"What keeps repeating?"
+],
+
+student:[
+"Why do I know what to do but still delay it?",
+"Why does progress feel slower than expected?",
+"What pattern keeps repeating?"
+],
+
+jobseeker:[
+"Why do I hesitate to put myself forward?",
+"Why does rejection feel so heavy?",
+"What am I not seeing?"
+],
+
+overthinker:[
+"Why do I keep overthinking even when I know what to do?",
+"Why do I need certainty before acting?",
+"Why do simple decisions feel heavy?"
+],
+
+pattern:[
+"What keeps repeating in my life?",
+"What am I not seeing?",
+"Why does this pattern stay alive?"
+],
+
+validation:[
+"Why do I need validation before acting?",
+"Why does criticism affect me so much?",
+"What am I not seeing?"
+],
+
+failure:[
+"Why do I fear failure before I begin?",
+"Why do I avoid situations that test me?",
+"What pattern keeps repeating?"
+]
+
+};
+/* Analytics */    
+    
+function track(event,data={}){    
+if(typeof gtag!=="undefined"){    
+gtag('event',event,data);    
+}    
+}    
+    
+/* API */    
+    
+async function callAPI(){    
+    
+try{    
+    
+const res=await fetch(API_URL,{    
+method:"POST",    
+headers:{    
+"Content-Type":"application/json"    
+},    
+body:JSON.stringify({    
+messages,    
+loopLevel,    
+paid49:payment49,    
+paid199:payment199,    
+currentCategory    
+})    
+});    
+    
+if(!res.ok){    
+const errorText=await res.text();    
+console.error("API ERROR:",errorText);    
+return { reply:"Server error 😃" };    
+}    
+  console.log("SENDING:", {  
+messages,  
+loopLevel,  
+paid49:payment49,  
+paid199:payment199,  
+currentCategory  
+});  
+const data = await res.json();  
+  
+console.log("API RESPONSE:", data);  
+  
+return data;  
+    
+}catch(err){    
+    
+console.error("FETCH FAIL:",err);    
+return { reply:"Network error 😃" };    
+    
+}    
+    
+}    
+    
+/* TYPE EFFECT */    
+    
+function typeEffect(text){
+
+text = text.replace(
+/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+`<span class="truthHighlight">$1</span>`
+);
+
+text = text.replace(/\n/g,"<br>");
+
+const div = document.createElement("div");
+
+outputBox.appendChild(div);
+
+let i = 0;
+
+const speed = 8;
+
+const interval = setInterval(()=>{
+
+div.innerHTML = text.substring(0,i);
+
+outputBox.scrollTop = outputBox.scrollHeight;
+
+i++;
+
+if(i > text.length){
+
+clearInterval(interval);
+
+div.innerHTML = text;
+if(loopLevel >= 1 && loopLevel < 7){
+
+div.innerHTML += `
+<div style="
+font-size:15px;
+font-weight:600;
+color:#ffb347;
+text-align:center;
+margin-top:14px;
+padding:8px;
+background:rgba(255,140,0,0.08);
+border:1px solid rgba(255,140,0,0.25);
+border-radius:8px;
+">
+⚠️ Answer first. TruthLoop only goes deeper after your answer.
+</div>
+`;
+
+  }
+reflectionInput.style.display = "block";
+nextBtn.style.display = "block";
+
+}
+
+},speed);
+
+}
+    
+/* SHARE */    
+    
+function showShareCard(text){    
+    
+const clean=text.replace(/<[^>]*>?/gm,'').trim();    
+    
+shareText.innerText=    
+`This hit me harder than expected.    
+    
+${clean}    
+    
+Most people avoid this.    
+    
+https://truthloop.in`;    
+    
+shareBox.style.display="block";    
+    
+}    
+    
+function copyShare(){    
+navigator.clipboard.writeText(shareText.innerText);    
+}    
+    
+function whatsappShare(){    
+window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);    
+}    
+    
+/* PAYWALL */    
+    
+function showPaywall(message,amount){    
+    
+track("paywall_shown",{loop:loopLevel,amount});    
+    
+paywallBox.style.display="block";    
+paySub.innerHTML = message.replace(/\n/g,"<br>");
+    
+razorpayBtn.style.display="block";    
+razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
+    
+razorpayBtn.onclick=function(){    
+    
+const options = {    
+    
+key: RAZORPAY_KEY_ID,    
+    
+amount: amount * 100,    
+    
+currency: "INR",    
+    
+name: "TruthLoop",    
+    
+description:    
+amount === 49    
+? "Unlock Loop 5"    
+: "Unlock Loop 7",    
+    
+image: "https://truthloop.in/truthloop-hook.jpg",    
+    
+prefill: {    
+name: "",    
+email: "",    
+contact: ""    
+},    
+    
+theme: {    
+color: "#ff7a00"    
+},    
+    
+
+
+retry: {
+  enabled: true,
+  max_count: 2
+},
+
+modal: {
+  backdropclose: false,
+  escape: true,
+  handleback: true
+},
+    
+
+    
+
+    
+handler: function (response) {    
+    
+if(amount===49) payment49=true;    
+if(amount===199) payment199=true;    
+    
+track("payment_success",{    
+method:"razorpay",    
+value:amount    
+});    
+    
+alert("Payment successful 😄");    
+    
+paywallBox.style.display="none";    
+    
+}    
+    
+};    
+    
+const rzp = new Razorpay(options);    
+    
+rzp.open();    
+    
+};    
+    
+document.getElementById("paypal-button").innerHTML="";    
+    
+paypal.Buttons({    
+    
+createOrder:function(data,actions){    
+    
+return actions.order.create({    
+purchase_units:[{    
+amount:{    
+value: amount===49 ? "3.00" : "9.00"    
+}    
+}]    
+});    
+    
+},    
+    
+onApprove:function(data,actions){    
+    
+return actions.order.capture().then(function(){    
+    
+if(amount===49) payment49=true;    
+if(amount===199) payment199=true;    
+    
+track("payment_success",{    
+method:"paypal",    
+value:amount    
+});    
+    
+alert("Payment successful 😄");    
+    
+paywallBox.style.display="none";    
+    
+nextBtn.style.display="block";    
+});    
+    
+}    
+    
+}).render("#paypal-button");
+
+}
+
+document.querySelectorAll(".categoryBtn").forEach(btn=>{
+
+btn.onclick=()=>{
+
+alert("Pattern selected");
+
+currentCategory=btn.dataset.type;
+document.getElementById("hintContent").style.display = "none";
+
+document.getElementById("hintBox").innerHTML =
+"💡 HOW DOES THIS WORK?";
+clearJourney();
+
+loopLevel = 1;
+
+
+
+messages = [];
+
+document.getElementById("loopIndicator").innerText =
+"Loop 1 of 7";
+
+outputBox.innerHTML = "";
+document.querySelectorAll(".categoryBtn").forEach(b=>{
+b.style.borderColor="#2a2a2a";
+b.style.color="#fff";
+});
+
+btn.style.borderColor="orange";
+btn.style.color="orange";
+
+if(questionMap[currentCategory]){
+mainInput.value = questionMap[currentCategory][0];
+mainInput.focus();
+}
+
+};
+
+});
+
+/* START */
+    
+getBtn.onclick=async()=>{    
+if (isLoading) return;
+
+isLoading = true;
+
+getBtn.disabled = true;    
+const text=mainInput.value.trim();    
+    
+if(!text)return;    
+    
+track("start_clicked");    
+    
+messages=[{    
+role:"user",    
+content:text    
+}];    
+    
+/* hide intro screen */    
+outputBox.innerHTML = `
+<div style="
+background:#111;
+padding:18px;
+border-radius:14px;
+border:1px solid #222;
+margin-bottom:18px;
+line-height:1.8;
+font-size:16px;
+">
+<b style="color:orange;">You:</b><br><br>
+${text}
+</div>
+`;
+  
+
+    
+/* smooth scroll */    
+setTimeout(()=>{    
+outputBox.scrollTop=outputBox.scrollHeight;    
+},100);    
+    
+const data=await callAPI();    
+    
+typeEffect(data.reply);    
+    
+messages.push({    
+role:"assistant",    
+content:data.reply    
+});    
+saveJourney();    
+function saveJourney() {
+
+
+
+localStorage.setItem(
+MEMORY_KEY,
+JSON.stringify({
+loopLevel,
+messages,
+currentCategory
+})
+);
+
+  }
+  mainInput.style.display="none";
+getBtn.style.display="none";
+isLoading = false;
+
+getBtn.disabled = false;    
+};    
+    
+/* NEXT */    
+    
+nextBtn.onclick=async()=>{
+
+if (isLoading) return;
+
+isLoading = true;
+
+nextBtn.disabled = true;
+
+const text=reflectionInput.value.trim();    
+    
+if(!text){
+   isLoading = false;
+   nextBtn.disabled = false;
+   return;
+  }   
+    
+loopLevel++;    
+
+
+document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
+track("loop_progress",{loop:loopLevel});    
+    
+messages.push({    
+role:"user",    
+content:text    
+});    
+    
+const userReply=document.createElement("div");
+
+userReply.style.marginTop="18px";
+
+userReply.innerHTML=`
+<b style="color:orange;">You:</b><br><br>
+${text}<br><br>
+`;
+
+outputBox.appendChild(userReply);
+
+const data=await callAPI();    
+    
+if(data.paywall){
+
+nextBtn.style.display="none";
+
+isLoading = false;
+nextBtn.disabled = false;
+
+showPaywall(
+data.reply,
+loopLevel===5 ? 49 : 199
+);
+
+return;
+  }
+    
+messages.push({    
+role:"assistant",    
+content:data.reply    
+});    
+saveJourney();    
+typeEffect(data.reply);    
+if(loopLevel >= 7){
+
+document.getElementById("articleBlock").style.display="block";
+showShareCard(data.reply);
+if(window.isRestoredJourney){
+nextBtn.innerText = "Select New Pattern";
+}
+
+}
+reflectionInput.value="";    
+isLoading = false;
+nextBtn.disabled = false;    
+};
+document.getElementById("continueJourneyBtn").onclick = () => {
+
+document.getElementById("restoreScreen").style.display = "none";
+
+document.getElementById("mainApp").style.display = "block";
+
+};
+document.getElementById("newPatternBtn").onclick = () => {
+
+clearJourney();
+
+loopLevel = 1;
+messages = [];
+currentCategory = "";
+
+location.reload();
+
+};  
+/* JOURNEY MEMORY */
+
+const MEMORY_KEY = "truthloopMemory";
+
+function saveJourney() {
+
+localStorage.setItem(
+MEMORY_KEY,
+JSON.stringify({
+loopLevel,
+messages,
+currentCategory
+})
+);
+
+}
+
+function loadJourney() {
+
+const saved = localStorage.getItem(MEMORY_KEY);
+
+if(!saved) return null;
+
+return JSON.parse(saved);
+
+}
+
+function clearJourney() {
+
+localStorage.removeItem(MEMORY_KEY);
+
+  }
+const restored = loadJourney();
+
+if(restored){
+window.isRestoredJourney = true;
+loopLevel = restored.loopLevel || 1;
+messages = restored.messages || [];
+currentCategory = restored.currentCategory || "";
+
+document.getElementById("loopIndicator").innerText =
+`Loop ${loopLevel} of 7`;
+
+outputBox.innerHTML = "";
+
+messages.forEach(msg=>{
+
+const div = document.createElement("div");
+
+if(msg.role === "user"){
+
+div.innerHTML = `
+<b style="color:orange;">You:</b><br><br>
+${msg.content}<br><br>
+`;
+
+}else{
+
+let text = msg.content;
+
+text = text.replace(
+ /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
+);
+
+div.innerHTML = text;
+
+  }
+
+outputBox.appendChild(div);
+
+});
+if(loopLevel < 7){
+nextBtn.innerText = "Continue Journey";
+}
+
+if(loopLevel >= 7){
+nextBtn.innerText = "Select New Pattern";
+  }
+ document.getElementById("restoreScreen").style.display = "block";
+document.getElementById("mainApp").style.display = "none";
+const selectedBtn =
+document.querySelector(
+'.categoryBtn[data-type="' + currentCategory + '"]'
+);
+document.getElementById("restorePattern").innerText =
+"Pattern: " + currentCategory;
+
+document.getElementById("restoreLoop").innerText =
+"You left at Loop " + loopLevel + " of 7"; 
+getBtn.disabled = false;
+
+  }
+  document.getElementById("hintBox").addEventListener("click", () => {
+
+  const hint =
+  document.getElementById("hintContent");
+
+  if (hint.style.display === "block") {
+
+    hint.style.display = "none";
+
+  } else {
+
+    hint.style.display = "block";
+
+  }
+
+});
+</script>    
+</div>
+  <footer style="
+margin-top:40px;
+padding:20px;
+text-align:center;
+border-top:1px solid #222;
+background:#0b0b0b;
+font-size:13px;
+color:#888;
+">
+
+<div style="margin-bottom:12px;">
+TruthLoop © 2026
+</div>
+
+<div style="
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:14px;
+">
+
+<a href="/privacy.html"
+style="color:orange;text-decoration:none;">
+Privacy Policy
+</a>
+
+<a href="/terms.html"
+style="color:orange;text-decoration:none;">
+Terms
+</a>
+
+<a href="/refund.html"
+style="color:orange;text-decoration:none;">
+Refund Policy
+</a>
+
+<a href="/cookie-policy.html"
+style="color:orange;text-decoration:none;">
+Cookie Policy
+</a>
+
+</div>
+<div style="margin-top:12px;color:#666;font-size:12px;">
+No signup. No account. Privacy first.
+</div>
+</footer>
+</body>    
+  </html>
