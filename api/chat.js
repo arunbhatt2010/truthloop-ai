@@ -930,10 +930,31 @@ is still your choice.`;
        ✅ FINAL
     ========================= */
 
-    return res.status(200).json({
-      reply,
-      paywall: false
-    });
+    let analysis = reply;
+let question = "";
+
+if(loopLevel !== 7){
+
+const lines = reply.split("\n");
+
+const lastLine = lines[lines.length - 1].trim();
+
+if(lastLine.endsWith("?")){
+
+question = lastLine;
+
+analysis = lines.slice(0,-1).join("\n").trim();
+
+}
+
+}
+
+return res.status(200).json({
+  analysis,
+  question,
+  reply,
+  paywall:false
+});
 
   }
 
