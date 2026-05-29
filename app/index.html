@@ -993,7 +993,45 @@ const speed = 8;
 const interval = setInterval(()=>{
 
 div.innerHTML = text.substring(0,i);
+const questions = div.querySelectorAll("p");
 
+if(questions.length){
+
+const last = questions[questions.length - 1];
+
+last.innerHTML = `
+<div style="
+margin-top:20px;
+padding:16px;
+border-radius:14px;
+background:rgba(255,140,0,0.08);
+border:1px solid rgba(255,140,0,0.25);
+text-align:center;
+">
+
+<div style="
+color:#ffb347;
+font-size:12px;
+font-weight:700;
+letter-spacing:2px;
+margin-bottom:10px;
+text-transform:uppercase;
+">
+❓ Question For You
+</div>
+
+<div style="
+font-size:18px;
+font-weight:700;
+line-height:1.7;
+color:#fff;
+">
+${last.innerHTML}
+</div>
+
+</div>
+`;
+  }
 outputBox.scrollTop = outputBox.scrollHeight;
 
 i++;
