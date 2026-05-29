@@ -1003,13 +1003,15 @@ if(i > text.length){
 clearInterval(interval);
 
 div.innerHTML = text;
-const questions = div.querySelectorAll("p");
-alert(div.innerHTML);
-if(questions.length){
+const match = div.innerHTML.match(/([^.!?]*\?)/g);
 
-const last = questions[questions.length - 1];
+if(match && match.length){
 
-last.innerHTML = `
+const lastQuestion = match[match.length - 1];
+
+div.innerHTML = div.innerHTML.replace(
+lastQuestion,
+`
 <div style="
 margin-top:20px;
 padding:16px;
@@ -1036,12 +1038,14 @@ font-weight:700;
 line-height:1.7;
 color:#fff;
 ">
-${last.innerHTML}
+${lastQuestion}
 </div>
 
 </div>
-`;
-  }
+`
+);
+
+}
 reflectionInput.style.display = "block";
 
 setTimeout(() => {
