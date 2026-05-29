@@ -993,6 +993,16 @@ const speed = 8;
 const interval = setInterval(()=>{
 
 div.innerHTML = text.substring(0,i);
+
+outputBox.scrollTop = outputBox.scrollHeight;
+
+i++;
+
+if(i > text.length){
+
+clearInterval(interval);
+
+div.innerHTML = text;
 const questions = div.querySelectorAll("p");
 
 if(questions.length){
@@ -1031,34 +1041,6 @@ ${last.innerHTML}
 
 </div>
 `;
-  }
-outputBox.scrollTop = outputBox.scrollHeight;
-
-i++;
-
-if(i > text.length){
-
-clearInterval(interval);
-
-div.innerHTML = text;
-if(loopLevel >= 1 && loopLevel < 7){
-
-div.innerHTML += `
-<div style="
-font-size:15px;
-font-weight:600;
-color:#ffb347;
-text-align:center;
-margin-top:14px;
-padding:8px;
-background:rgba(255,140,0,0.08);
-border:1px solid rgba(255,140,0,0.25);
-border-radius:8px;
-">
-⚠️ Answer first. TruthLoop only goes deeper after your answer.
-</div>
-`;
-
   }
 reflectionInput.style.display = "block";
 nextBtn.style.display = "block";
