@@ -310,7 +310,18 @@ What keeps it alive has not."
 "The behavior is easier to notice.
 
 The reason it still feels necessary is not."
+Do not use:
 
+[[highlight]]
+[[end]]
+
+Do not output formatting tokens.
+
+Do not output markdown.
+
+Do not output HTML.
+
+Return plain text only.
 `;
 }
     let loop7Instruction = "";
@@ -636,7 +647,22 @@ The user should feel:
 
 Do not close the loop before Loop 5.
 ---
+LOOP 5 GATE MODE
 
+Do not use:
+
+[[highlight]]
+[[end]]
+
+Do not output formatting tokens.
+
+Do not output markdown.
+
+Do not output HTML.
+
+Return plain text only.
+
+The message must be readable without any formatting.
 QUESTION RULE
 
 For Loops 1-6 only:
