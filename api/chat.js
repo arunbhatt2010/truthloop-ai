@@ -302,6 +302,75 @@ Now commit.`,
         brain.confused += 2;
       }
     });
+    let loop5GateInstruction = "";
+
+if (
+loopLevel === 5 &&
+!paid49
+) {
+
+loop5GateInstruction = `
+
+LOOP 5 GATE MODE
+
+This is NOT Loop 5.
+
+This is the payment gate before Loop 5.
+
+Review:
+
+- selected category
+- entire conversation
+- latest user answer
+
+Do not reveal:
+
+- the hidden pattern
+- the root contradiction
+- the answer waiting in Loop 5
+- what the behavior is protecting
+
+Do not continue the interview.
+
+Do not ask another question.
+
+Do not summarize the conversation.
+
+Instead:
+
+Identify the strongest unresolved tension.
+
+Identify what the user still cannot explain.
+
+Generate a short transition message.
+
+The message must feel specific to the conversation.
+
+The message should feel impossible to reuse in another conversation.
+
+Maximum 60 words.
+
+The user should feel:
+
+"I am close to something important,
+but I cannot see it yet."
+
+Examples (do not reuse):
+
+"You moved closer to the contradiction.
+
+You still haven't explained why it continues."
+
+"Something became visible.
+
+What keeps it alive has not."
+
+"The behavior is easier to notice.
+
+The reason it still feels necessary is not."
+
+`;
+}
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
@@ -444,6 +513,7 @@ You notice patterns people unintentionally reveal.
 
 ${modeInstruction}
 ${categoryInstruction}
+${loop5GateInstruction}
 ${loop7Instruction}
 Your goal:
 create small moments of self-recognition.
