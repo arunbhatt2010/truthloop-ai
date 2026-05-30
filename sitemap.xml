@@ -122,4 +122,17 @@
 <changefreq>weekly</changefreq>
 <priority>0.95</priority>
 </url>
+<url>
+<loc>https://truthloop.in/why-cant-i-trust-my-own-decisions.html</loc>
+<lastmod>2026-05-30</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.95</priority>
+</url>
+
+<url>
+<loc>https://truthloop.in/why-do-i-need-permission-before-acting.html</loc>
+<lastmod>2026-05-30</lastmod>
+<changefreq>weekly</changefreq>
+<priority>0.95</priority>
+</url>
 </urlset>
