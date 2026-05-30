@@ -109,65 +109,7 @@ What exactly keeps repeating?`
       }
     }
 
-    /* =========================
-       🔒 LOOP 5 PAYWALL
-    ========================= */
-
-if (loopLevel === 5 && !paid49) {
-
-const lines = [
-
-`You've noticed a pattern.
-
-Most people stop here.
-
-Not because they lack awareness.
-
-Because awareness rarely explains why the pattern survives.
-
-The next layer explores what keeps this cycle alive even after you can already see it.`,
-
-`Something important just happened.
-
-The behavior became visible.
-
-But visible behavior is usually not the real driver.
-
-The next layer looks at what keeps pulling you back into the same pattern.`,
-
-`You are closer than most people get.
-
-The pattern is now easier to notice.
-
-The harder question is different:
-
-Why does it keep returning even after you recognize it?
-
-That layer hasn't been explored yet.`,
-
-`Recognition creates clarity.
-
-Clarity does not automatically create change.
-
-The next layer explores the force that keeps the pattern active even when awareness is present.
-
-Most people never reach that point.`
-
-];
-
-const pick =
-lines[
-Math.floor(
-Math.random() * lines.length
-)
-];
-
-return res.status(200).json({
-reply: pick,
-paywall: true,
-shownLoop5: [...shownLoop5, pick]
-});
-  }
+ 
 
     /* =========================
    🔒 LOOP 6 ACCESS
@@ -961,7 +903,14 @@ reply = reply.replace(
 
 What keeps repeating even after you've already noticed it?`;
     }
+if (loopLevel === 5 && !paid49) {
 
+return res.status(200).json({
+reply,
+paywall: true
+});
+
+}
     /* =========================
        ❓ FINAL QUESTION
     ========================= */
