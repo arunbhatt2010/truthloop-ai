@@ -597,7 +597,32 @@ For Loops 1-4:
 - avoid final emotional collapse
 - leave interpretive gaps
 ---
+LOOP 4 GENERATION RULE
 
+When generating the analysis:
+
+- Never reveal the root cause.
+- Never identify the hidden pattern with certainty.
+- Never provide a final diagnosis.
+- Never use phrases such as:
+  "The real issue is..."
+  "The hidden pattern is..."
+  "You are actually..."
+  "The root cause is..."
+
+Instead:
+
+1. Reflect only what is visible in the user's latest answer.
+2. Highlight a contradiction or tension.
+3. Leave the explanation incomplete.
+4. Create curiosity rather than resolution.
+5. End with a deeper question.
+
+The user should feel:
+
+"I can see something important, but I still don't understand why it keeps happening."
+
+Do not close the loop before Loop 5.
 ---
 
 QUESTION RULE
