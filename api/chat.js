@@ -115,62 +115,59 @@ What exactly keeps repeating?`
 
 if (loopLevel === 5 && !paid49) {
 
-      const lines = [
+const lines = [
 
-`Loop 1 exposed the visible problem.
+`You've noticed a pattern.
 
-Loop 2 noticed the repeating tension.
+Most people stop here.
 
-Loop 3 followed the hesitation pattern.
+Not because they lack awareness.
 
-Loop 4 showed where clarity keeps collapsing.
+Because awareness rarely explains why the pattern survives.
 
-The next layer goes deeper:
-emotional avoidance,
-decision resistance,
-and hidden self-protection.
+The next layer explores what keeps this cycle alive even after you can already see it.`,
 
-Most people stop here.`,
+`Something important just happened.
 
-`You already noticed the surface pattern.
+The behavior became visible.
 
-Now the deeper layer begins:
-why the same hesitation
-keeps returning
-even after awareness appears.
+But visible behavior is usually not the real driver.
 
-This is where the conversation becomes harder to ignore.`,
+The next layer looks at what keeps pulling you back into the same pattern.`,
 
-`The first loops focused on behavior.
+`You are closer than most people get.
 
-The next layer focuses on:
-what the behavior is protecting.
+The pattern is now easier to notice.
 
-That shift changes the conversation completely.`,
+The harder question is different:
 
-`You’ve already seen:
-- the visible contradiction
-- the repeating hesitation
-- the tension underneath the behavior
+Why does it keep returning even after you recognize it?
 
-The next layer explores
-why clarity still doesn’t become action.`
+That layer hasn't been explored yet.`,
+
+`Recognition creates clarity.
+
+Clarity does not automatically create change.
+
+The next layer explores the force that keeps the pattern active even when awareness is present.
+
+Most people never reach that point.`
 
 ];
 
-      const pick =
-        lines[
-          Math.floor(
-            Math.random() * lines.length
-          )
-        ];
+const pick =
+lines[
+Math.floor(
+Math.random() * lines.length
+)
+];
 
-      return res.status(200).json({
-        reply: pick,
-        paywall: true,
-        shownLoop5: [...shownLoop5, pick]
-      });
-    }
+return res.status(200).json({
+reply: pick,
+paywall: true,
+shownLoop5: [...shownLoop5, pick]
+});
+  }
 
     /* =========================
    🔒 LOOP 6 ACCESS
