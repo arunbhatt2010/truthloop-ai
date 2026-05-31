@@ -1093,7 +1093,12 @@ function showPaywall(message,amount){
 track("paywall_shown",{loop:loopLevel,amount});    
     
 paywallBox.style.display="block";    
-paySub.innerHTML = message.replace(/\n/g,"<br>");
+paySub.innerHTML = message
+.replace(
+ /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
+)
+.replace(/\n/g,"<br>");
     
 razorpayBtn.style.display="block";    
 razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
