@@ -1002,6 +1002,7 @@ if(i > text.length){
 clearInterval(interval);
 
 div.innerHTML = text;
+
 const match = div.innerHTML.match(/([^.!?]*\?)/g);
 
 if(match && match.length){
@@ -1045,13 +1046,15 @@ ${lastQuestion}
 );
 
 }
-reflectionInput.style.display = "block";
 
 setTimeout(() => {
-  reflectionInput.focus();
-}, 300);
 
+reflectionInput.style.display = "block";
 nextBtn.style.display = "block";
+
+}, 500);
+
+  }
 }
 
 },speed);
