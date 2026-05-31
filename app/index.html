@@ -1088,14 +1088,17 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     
 /* PAYWALL */    
     
-function showPaywall(message,amount){    
-    
-track("paywall_shown",{loop:loopLevel,amount});    
-    
-paywallBox.style.display="block";    
+function showPaywall(message,amount){
+
+track("paywall_shown",{loop:loopLevel,amount});
+
+console.log("PAYWALL RAW:", message);
+
+paywallBox.style.display="block";
+
 paySub.innerHTML = message
 .replace(
- /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ /\[\[\s*highlight\s*\]\]([\s\S]*?)\[\[\s*end\s*\]\]/gi,
  '<span class="truthHighlight">$1</span>'
 )
 .replace(/\n/g,"<br>");
