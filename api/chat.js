@@ -481,15 +481,22 @@ not complete interpretation.
 Stay closer to observable behavior.
 
 Leave interpretive gaps.
-When a sentence carries the strongest emotional recognition or contradiction,
+HIGHLIGHT RULE
 
-wrap ONLY that sentence using:
+Apply [[highlight]] and [[end]] ONLY for Loop 1, Loop 2, Loop 3 and Loop 4 responses.
 
-[[highlight]]
-sentence here
-[[end]]
+Never use [[highlight]] or [[end]] inside:
 
-At least ONE sentence in every response MUST use this format.
+- Loop 5 gate messages
+- Paywall messages
+- Loop 7 summaries
+- System messages
+
+For Loop 1-4:
+
+Wrap only the single strongest sentence.
+
+Maximum one highlighted sentence per response.
 
 Never use parentheses or single brackets.
 
