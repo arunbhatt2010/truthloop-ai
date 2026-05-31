@@ -976,10 +976,9 @@ return { reply:"Network error 😃" };
 function typeEffect(text){
 
 text = text.replace(
-/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
-`<span class="truthHighlight">$1</span>`
+ /\[\[\s*highlight\s*\]\]\s*([\s\S]*?)\s*\[\[\s*end\s*\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
 );
-
 text = text.replace(/\n/g,"<br>");
 
 const div = document.createElement("div");
