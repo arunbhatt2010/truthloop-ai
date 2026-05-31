@@ -654,21 +654,17 @@ The user should feel:
 
 Do not close the loop before Loop 5.
 ---
-LOOP 5 GATE MODE
+LOOP 5 GATE MODE OVERRIDE
 
-Do not use:
+This section overrides all highlight instructions,
+question instructions,
+and response-formatting instructions defined elsewhere.
 
-[[highlight]]
-[[end]]
+Do not generate highlighted sentences.
 
-Do not output formatting tokens.
+Do not generate questions.
 
-Do not output markdown.
-
-Do not output HTML.
-
-Return plain text only.
-
+Generate only a gate message.
 The message must be readable without any formatting.
 QUESTION RULE
 
