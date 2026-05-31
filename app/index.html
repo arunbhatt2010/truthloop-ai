@@ -976,8 +976,8 @@ return { reply:"Network error 😃" };
 function typeEffect(text){
 
 text = text.replace(
- /\[\[\s*highlight\s*\]\]\s*([\s\S]*?)\s*\[\[\s*end\s*\]\]/gi,
- '<span class="truthHighlight">$1</span>'
+ /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ `<span class="truthHighlight">$1</span>`
 );
 text = text.replace(/\n/g,"<br>");
 
