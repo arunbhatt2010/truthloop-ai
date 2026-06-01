@@ -651,7 +651,22 @@ margin-top:12px;
 </div>
  </div>  
 <button class="navBtn">🔄 My Loops</button>
+<div id="myLoopsContent"
+style="
+display:none;
+margin-top:16px;
+padding:18px;
+background:#111;
+border:1px solid #222;
+border-radius:16px;
+"><h3 style="color:#fff;">
+📚 My Loops
+</h3><div id="journeyContent">No saved journeys yet.
 
+Complete your first TruthLoop
+to unlock pattern memory.
+
+</div></div>
 <button class="navBtn">📊 Insights</button>
 
  </div>   
@@ -1696,7 +1711,16 @@ return;
 messages.push({    
 role:"assistant",    
 content:data.reply    
-});    
+});
+localStorage.setItem(
+"truthloop_journey",
+JSON.stringify({
+category: currentCategory,
+loop: loopLevel,
+question: question || "",
+updatedAt: Date.now()
+})
+);  
 saveJourney();    
 typeEffect(data.reply);    
 if(loopLevel >= 7){
@@ -1859,6 +1883,54 @@ learnMoreBtn.addEventListener("click", () => {
 
 seoLinks.style.display =
 seoLinks.style.display === "block"
+? "none"
+: "block";
+
+});
+const myLoopsBtn =
+document.querySelectorAll(".navBtn")[1];
+
+const myLoopsContent =
+document.getElementById(
+"myLoopsContent"
+);
+
+myLoopsBtn.addEventListener(
+"click",
+() => {
+
+const saved =
+JSON.parse(
+localStorage.getItem(
+"truthloop_journey"
+)
+);
+
+if(saved){
+
+document.getElementById(
+"journeyContent"
+).innerHTML = `
+
+<strong>
+Last Journey Found
+</strong><br><br>
+
+Pattern:
+${saved.category}
+
+<br><br>
+
+Loop:
+${saved.loop} of 7
+
+`;
+
+}
+
+myLoopsContent.style.display =
+myLoopsContent.style.display
+=== "block"
 ? "none"
 : "block";
 
