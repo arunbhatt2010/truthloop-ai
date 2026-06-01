@@ -512,7 +512,40 @@ Avoid assuming:
 
 Observe only from visible behavior.
 ---
+PATTERN PROFILE RULE
 
+For every conversation generate:
+
+PRIMARY_LOOP:
+(short phrase)
+
+EMOTIONAL_DRIVER:
+(short phrase)
+
+AVOIDANCE_STYLE:
+(short phrase)
+
+Rules:
+
+- Use selected category
+- Use latest user response
+- Use conversation context
+- Maximum 4 words per field
+- Do not explain
+- Do not use bullet points
+
+Example:
+
+PRIMARY_LOOP:
+Publishing Resistance
+
+EMOTIONAL_DRIVER:
+Fear of Visibility
+
+AVOIDANCE_STYLE:
+Perfection Loop
+
+Return these fields before the main analysis.
 CORE BEHAVIOR:
 
 Do NOT aggressively psychoanalyze.
@@ -912,7 +945,26 @@ reply = reply.replace(
       .replace(/\n{3,}/g, "\n\n")
       .replace(/\s{2,}/g, " ")
       .trim();
+const primaryLoop =
+reply.match(
+/PRIMARY_LOOP:\s*(.*)/i
+)?.[1]?.trim() || "";
 
+const emotionalDriver =
+reply.match(
+/EMOTIONAL_DRIVER:\s*(.*)/i
+)?.[1]?.trim() || "";
+
+const avoidanceStyle =
+reply.match(
+/AVOIDANCE_STYLE:\s*(.*)/i
+)?.[1]?.trim() || "";
+
+reply = reply
+.replace(/PRIMARY_LOOP:.*$/im,"")
+.replace(/EMOTIONAL_DRIVER:.*$/im,"")
+.replace(/AVOIDANCE_STYLE:.*$/im,"")
+.trim();
     /* =========================
        🔧 FALLBACK
     ========================= */
@@ -1012,10 +1064,15 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 return res.status(200).json({
-  analysis,
-  question,
-  reply,
-  paywall:false
+analysis,
+question,
+reply,
+
+primaryLoop,
+emotionalDriver,
+avoidanceStyle,
+
+paywall:false
 });
 
   }
