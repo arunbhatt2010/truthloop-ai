@@ -1807,6 +1807,7 @@ document.getElementById("loopIndicator").innerText =
 
 // outputBox.innerHTML = "";
 
+/*
 messages.forEach(msg=>{
 
 const div = document.createElement("div");
@@ -1823,17 +1824,18 @@ ${msg.content}<br><br>
 let text = msg.content;
 
 text = text.replace(
- /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
- '<span class="truthHighlight">$1</span>'
+/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+'<span class="truthHighlight">$1</span>'
 );
 
 div.innerHTML = text;
 
-  }
+}
 
 outputBox.appendChild(div);
 
 });
+*/
 if(loopLevel < 7){
 nextBtn.innerText = "Continue Journey";
 }
