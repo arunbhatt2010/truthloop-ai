@@ -1053,9 +1053,7 @@ is still your choice.`;
     /* =========================
        ✅ FINAL
     ========================= */
-let primaryLoop = "";
-let emotionalDriver = "";
-let avoidanceStyle = "";
+
     let analysis = reply;
 let question = "";
 
