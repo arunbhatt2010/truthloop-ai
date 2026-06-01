@@ -377,7 +377,93 @@ End with action.
 
       mode = "clarity";
     }
+let primaryLoop = "";
+let emotionalDriver = "";
+let avoidanceStyle = "";
 
+/* CATEGORY FIRST */
+
+if(currentCategory === "author"){
+
+primaryLoop = "Publishing Resistance";
+emotionalDriver = "Fear Of Visibility";
+avoidanceStyle = "Perfection Loop";
+
+}
+
+else if(currentCategory === "creator"){
+
+primaryLoop = "Consistency Resistance";
+emotionalDriver = "Need For Validation";
+avoidanceStyle = "Preparation Loop";
+
+}
+
+else if(currentCategory === "founder"){
+
+primaryLoop = "Decision Resistance";
+emotionalDriver = "Fear Of Wrong Moves";
+avoidanceStyle = "Analysis Loop";
+
+}
+
+else if(currentCategory === "business"){
+
+primaryLoop = "Growth Resistance";
+emotionalDriver = "Fear Of Failure";
+avoidanceStyle = "Optimization Loop";
+
+}
+
+else if(currentCategory === "student"){
+
+primaryLoop = "Execution Resistance";
+emotionalDriver = "Fear Of Judgment";
+avoidanceStyle = "Overthinking Loop";
+
+}
+
+/* BRAIN OVERRIDE */
+
+if(brain.validation >= 4){
+
+primaryLoop = "Validation Seeking";
+emotionalDriver = "Need For Approval";
+avoidanceStyle = "External Feedback";
+
+}
+
+if(brain.avoidance >= 4){
+
+primaryLoop = "Action Resistance";
+emotionalDriver = "Fear Of Exposure";
+avoidanceStyle = "Preparation Loop";
+
+}
+
+if(brain.confused >= 4){
+
+primaryLoop = "Clarity Seeking";
+emotionalDriver = "Fear Of Wrong Choice";
+avoidanceStyle = "Overthinking Loop";
+
+}
+
+if(brain.emotional >= 4){
+
+primaryLoop = "Emotional Resistance";
+emotionalDriver = "Fear Of Discomfort";
+avoidanceStyle = "Protection Loop";
+
+}
+
+if(brain.practical >= 6){
+
+primaryLoop = "Optimization Resistance";
+emotionalDriver = "Fear Of Imperfection";
+avoidanceStyle = "Research Loop";
+
+      }
     /* =========================
        🧠 MODE INSTRUCTION
     ========================= */
@@ -536,45 +622,7 @@ Rules:
 
 Example:
 
-PATTERN PROFILE RULE
 
-For every conversation, first generate:
-
-PRIMARY_LOOP:
-(short phrase, max 4 words)
-
-EMOTIONAL_DRIVER:
-(short phrase, max 4 words)
-
-AVOIDANCE_STYLE:
-(short phrase, max 4 words)
-
-Rules:
-
-- Use the selected category.
-- Use the latest user response.
-- Use conversation context.
-- Maximum 4 words per field.
-- Always generate all 3 fields.
-- Never leave a field empty.
-- Place these 3 fields BEFORE the main TruthLoop analysis.
-
-Example:
-
-PRIMARY_LOOP:
-Publishing Resistance
-
-EMOTIONAL_DRIVER:
-Fear of Visibility
-
-AVOIDANCE_STYLE:
-Perfection Loop
-
-After generating these fields, continue with the normal TruthLoop analysis.
-
-These fields are machine-readable metadata used by the application UI.
-
-The user should only experience the TruthLoop analysis.
 CORE BEHAVIOR:
 
 Do NOT aggressively psychoanalyze.
@@ -923,20 +971,9 @@ max_tokens: maxTokens
 
     let reply =
       data?.choices?.[0]?.message?.content || "";
-const primaryLoop =
-(reply.match(/PRIMARY_LOOP:\s*(.*)/i)?.[1] || "").trim();
 
-const emotionalDriver =
-(reply.match(/EMOTIONAL_DRIVER:\s*(.*)/i)?.[1] || "").trim();
 
-const avoidanceStyle =
-(reply.match(/AVOIDANCE_STYLE:\s*(.*)/i)?.[1] || "").trim();
 
-reply = reply
-.replace(/PRIMARY_LOOP:.*(\n|$)/gi,"")
-.replace(/EMOTIONAL_DRIVER:.*(\n|$)/gi,"")
-.replace(/AVOIDANCE_STYLE:.*(\n|$)/gi,"")
-.trim();
     /* =========================
        ✂️ CLEANER
     ========================= */
