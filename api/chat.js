@@ -968,20 +968,7 @@ reply = reply.replace(
       .replace(/\n{3,}/g, "\n\n")
       .replace(/\s{2,}/g, " ")
       .trim();
-const primaryLoop =
-reply.match(
-/PRIMARY_LOOP:\s*(.*)/i
-)?.[1]?.trim() || "";
 
-const emotionalDriver =
-reply.match(
-/EMOTIONAL_DRIVER:\s*(.*)/i
-)?.[1]?.trim() || "";
-
-const avoidanceStyle =
-reply.match(
-/AVOIDANCE_STYLE:\s*(.*)/i
-)?.[1]?.trim() || "";
 
 reply = reply
 .replace(/PRIMARY_LOOP:.*$/im,"")
@@ -1066,7 +1053,9 @@ is still your choice.`;
     /* =========================
        ✅ FINAL
     ========================= */
-
+let primaryLoop = "";
+let emotionalDriver = "";
+let avoidanceStyle = "";
     let analysis = reply;
 let question = "";
 
