@@ -1623,11 +1623,13 @@ document.getElementById("profileTrigger").innerText =
 document.getElementById("profileAvoidance").innerText =
 "Avoidance Style: " +
 (data.avoidanceStyle || "Loading...");    
-typeEffect(data.reply);    
+typeEffect(
+ data.reply || "No response received."
+);    
     
 messages.push({    
 role:"assistant",    
-content:data.reply    
+content:data.reply || "No response received."    
 });    
 saveJourney();    
 function saveJourney() {
