@@ -1576,7 +1576,10 @@ setTimeout(()=>{
 outputBox.scrollTop=outputBox.scrollHeight;    
 },100);    
     
-const data=await callAPI();    
+const data = await callAPI();
+
+alert(JSON.stringify(data));
+
 document.getElementById("profilePrimary").innerText =
 "Primary Loop: " +
 (data.primaryLoop || "Loading...");
