@@ -1445,7 +1445,18 @@ patternIndicator.style.display = "block";
 
 patternIndicator.innerText =
 currentCategory.replace(/([A-Z])/g, ' $1')
-.toUpperCase() + " PATTERN";  
+.toUpperCase() + " PATTERN";
+ document.getElementById("patternProfile").style.display =
+"block";
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Publishing Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Fear of Visibility";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Perfection Loop"; 
 document.getElementById("hintContent").style.display = "none";
 
 document.getElementById("hintBox").innerHTML =
