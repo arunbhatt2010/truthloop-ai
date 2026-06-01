@@ -1550,18 +1550,12 @@ document.getElementById("mainApp").style.display = "block";
 
 };
 document.getElementById("newPatternBtn").onclick = () => {
-document.getElementById(
-"patternIndicator"
-).style.display = "none";
-clearJourney();
 
-loopLevel = 1;
-messages = [];
-currentCategory = "";
+localStorage.removeItem("truthloopMemory");
 
 location.reload();
 
-};  
+};
 /* JOURNEY MEMORY */
 
 const MEMORY_KEY = "truthloopMemory";
