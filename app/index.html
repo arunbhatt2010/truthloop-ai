@@ -1243,7 +1243,15 @@ currentCategory
 const data = await res.json();  
   
 console.log("API RESPONSE:", data);  
-  
+localStorage.setItem(
+"truthloop_journey",
+JSON.stringify({
+category: currentCategory,
+loop: loopLevel,
+question: messages[messages.length - 1]?.content || "",
+updatedAt: Date.now()
+})
+);  
 return data;  
     
 }catch(err){    
