@@ -545,7 +545,17 @@ Fear of Visibility
 AVOIDANCE_STYLE:
 Perfection Loop
 
-Return these fields before the main analysis.
+Return ONLY:
+
+PRIMARY_LOOP:
+EMOTIONAL_DRIVER:
+AVOIDANCE_STYLE:
+
+inside separate metadata fields.
+
+Never show these labels inside the user-facing reply.
+
+The reply must contain only the TruthLoop analysis.
 CORE BEHAVIOR:
 
 Do NOT aggressively psychoanalyze.
@@ -894,7 +904,20 @@ max_tokens: maxTokens
 
     let reply =
       data?.choices?.[0]?.message?.content || "";
+const primaryLoop =
+(reply.match(/PRIMARY_LOOP:\s*(.*)/i)?.[1] || "").trim();
 
+const emotionalDriver =
+(reply.match(/EMOTIONAL_DRIVER:\s*(.*)/i)?.[1] || "").trim();
+
+const avoidanceStyle =
+(reply.match(/AVOIDANCE_STYLE:\s*(.*)/i)?.[1] || "").trim();
+
+reply = reply
+.replace(/PRIMARY_LOOP:.*(\n|$)/gi,"")
+.replace(/EMOTIONAL_DRIVER:.*(\n|$)/gi,"")
+.replace(/AVOIDANCE_STYLE:.*(\n|$)/gi,"")
+.trim();
     /* =========================
        ✂️ CLEANER
     ========================= */
