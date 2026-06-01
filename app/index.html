@@ -1248,10 +1248,10 @@ localStorage.setItem(
 JSON.stringify({
 category: currentCategory,
 loop: loopLevel,
-question: messages[messages.length - 1]?.content || "",
+question: "",
 updatedAt: Date.now()
 })
-);  
+);
 return data;  
     
 }catch(err){    
