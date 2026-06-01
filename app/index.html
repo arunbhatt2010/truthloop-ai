@@ -1875,31 +1875,13 @@ homeContent.style.display === "block"
 : "block";
 
 });
-const learnMoreBtn =
-document.getElementById("learnMoreBtn");
-
-const seoLinks =
-document.getElementById("seoLinks");
-
-learnMoreBtn.addEventListener("click", () => {
-
-seoLinks.style.display =
-seoLinks.style.display === "block"
-? "none"
-: "block";
-
-});
 const myLoopsBtn =
 document.getElementById("myLoopsBtn");
 
 const myLoopsContent =
-document.getElementById(
-"myLoopsContent"
-);
+document.getElementById("myLoopsContent");
 
-myLoopsBtn.addEventListener(
-"click",
-() => {
+myLoopsBtn.addEventListener("click", () => {
 
 const saved =
 JSON.parse(
@@ -1913,30 +1895,21 @@ if(saved){
 document.getElementById(
 "journeyContent"
 ).innerHTML = `
-
-<strong>
-Last Journey Found
-</strong><br><br>
-
-Pattern:
-${saved.category}
-
+<strong>Last Journey Found</strong>
 <br><br>
-
-Loop:
-${saved.loop} of 7
-
+Pattern: ${saved.category}
+<br><br>
+Loop: ${saved.loop} of 7
 `;
 
 }
 
 myLoopsContent.style.display =
-myLoopsContent.style.display
-=== "block"
+myLoopsContent.style.display === "block"
 ? "none"
 : "block";
 
-});  
+});
 </script>    
 </div>
   <footer style="
