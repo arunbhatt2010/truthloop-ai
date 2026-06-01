@@ -650,7 +650,9 @@ margin-top:12px;
 </a>
 </div>
  </div>  
-<button class="navBtn">🔄 My Loops</button>
+<button id="myLoopsBtn" class="navBtn">
+📚 My Loops
+</button>
 <div id="myLoopsContent"
 style="
 display:none;
@@ -1888,7 +1890,7 @@ seoLinks.style.display === "block"
 
 });
 const myLoopsBtn =
-document.querySelectorAll(".navBtn")[1];
+document.getElementById("myLoopsBtn");
 
 const myLoopsContent =
 document.getElementById(
