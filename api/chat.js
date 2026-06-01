@@ -383,19 +383,27 @@ let avoidanceStyle = "";
 
 /* CATEGORY FIRST */
 
-if(currentCategory === "author"){
-
-primaryLoop = "Publishing Resistance";
-emotionalDriver = "Fear Of Visibility";
-avoidanceStyle = "Perfection Loop";
-
-}
-
-else if(currentCategory === "creator"){
+if(currentCategory === "creator"){
 
 primaryLoop = "Consistency Resistance";
 emotionalDriver = "Need For Validation";
 avoidanceStyle = "Preparation Loop";
+
+}
+
+else if(currentCategory === "writer"){
+
+primaryLoop = "Publishing Resistance";
+emotionalDriver = "Fear Of Judgment";
+avoidanceStyle = "Editing Loop";
+
+}
+
+else if(currentCategory === "author"){
+
+primaryLoop = "Publishing Resistance";
+emotionalDriver = "Fear Of Visibility";
+avoidanceStyle = "Perfection Loop";
 
 }
 
@@ -407,11 +415,11 @@ avoidanceStyle = "Analysis Loop";
 
 }
 
-else if(currentCategory === "business"){
+else if(currentCategory === "owner"){
 
 primaryLoop = "Growth Resistance";
 emotionalDriver = "Fear Of Failure";
-avoidanceStyle = "Optimization Loop";
+avoidanceStyle = "Control Loop";
 
 }
 
@@ -423,45 +431,43 @@ avoidanceStyle = "Overthinking Loop";
 
 }
 
-/* BRAIN OVERRIDE */
+else if(currentCategory === "jobseeker"){
 
-if(brain.validation >= 4){
-
-primaryLoop = "Validation Seeking";
-emotionalDriver = "Need For Approval";
-avoidanceStyle = "External Feedback";
+primaryLoop = "Visibility Resistance";
+emotionalDriver = "Fear Of Rejection";
+avoidanceStyle = "Waiting Loop";
 
 }
 
-if(brain.avoidance >= 4){
+else if(currentCategory === "overthinker"){
 
-primaryLoop = "Action Resistance";
-emotionalDriver = "Fear Of Exposure";
-avoidanceStyle = "Preparation Loop";
-
-}
-
-if(brain.confused >= 4){
-
-primaryLoop = "Clarity Seeking";
+primaryLoop = "Decision Resistance";
 emotionalDriver = "Fear Of Wrong Choice";
-avoidanceStyle = "Overthinking Loop";
+avoidanceStyle = "Analysis Loop";
 
 }
 
-if(brain.emotional >= 4){
+else if(currentCategory === "pattern"){
 
-primaryLoop = "Emotional Resistance";
-emotionalDriver = "Fear Of Discomfort";
-avoidanceStyle = "Protection Loop";
+primaryLoop = "Pattern Repetition";
+emotionalDriver = "Hidden Tension";
+avoidanceStyle = "Familiar Loop";
 
 }
 
-if(brain.practical >= 6){
+else if(currentCategory === "validation"){
 
-primaryLoop = "Optimization Resistance";
-emotionalDriver = "Fear Of Imperfection";
-avoidanceStyle = "Research Loop";
+primaryLoop = "Approval Seeking";
+emotionalDriver = "Need For Validation";
+avoidanceStyle = "Feedback Loop";
+
+}
+
+else if(currentCategory === "failure"){
+
+primaryLoop = "Failure Avoidance";
+emotionalDriver = "Fear Of Failure";
+avoidanceStyle = "Delay Loop";
 
       }
     /* =========================
