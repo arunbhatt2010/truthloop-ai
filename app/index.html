@@ -232,6 +232,31 @@ transition:0.2s;
 border-color:orange;    
 color:orange;    
 }
+.navBtn{
+
+background:#111;
+
+border:1px solid rgba(168,85,247,.25);
+
+color:#fff;
+
+padding:10px 16px;
+
+border-radius:12px;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.navBtn:hover{
+
+border-color:#a855f7;
+
+box-shadow:0 0 20px rgba(168,85,247,.25);
+
+  }  
 .truthLoopCard{
 
 margin-top:24px;
@@ -561,7 +586,22 @@ TruthLoop
 <div style="    
 margin-bottom:14px;    
 ">    
-    
+ <div id="topNav"
+style="
+display:flex;
+justify-content:flex-end;
+gap:12px;
+margin-bottom:24px;
+flex-wrap:wrap;
+">
+
+<button class="navBtn">🏠 Home</button>
+
+<button class="navBtn">🔄 My Loops</button>
+
+<button class="navBtn">📊 Insights</button>
+
+ </div>   
 <a href="https://truthloop.in/"    
 style="    
 color:orange;    
@@ -761,7 +801,7 @@ color:#fff;
 font-size:14px;
 margin-bottom:8px;
 ">
-Primary Loop: —
+Primary Loop: 
 </div>
 
 <div id="profileTrigger"
@@ -770,7 +810,7 @@ color:#bbb;
 font-size:13px;
 margin-bottom:8px;
 ">
-Emotional Driver: —
+Emotional Driver: 
 </div>
 
 <div id="profileAvoidance"
@@ -778,7 +818,7 @@ style="
 color:#888;
 font-size:13px;
 ">
-Avoidance Style: —
+Avoidance Style: 
 </div>
 
 </div>
@@ -893,7 +933,7 @@ The pattern on repeat is."
 
 <br><br>
 
-— TruthLoop
+ TruthLoop
 
 </div>  
 <input id="reflectionInput"
