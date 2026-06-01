@@ -620,8 +620,7 @@ margin-bottom:24px;
 flex-wrap:wrap;
 ">
 
-<button class="navBtn">🏠 Home</button>
-
+<button id="homeBtn" class="navBtn">🏠 Home</button>
 <button class="navBtn">🔄 My Loops</button>
 
 <button class="navBtn">📊 Insights</button>
@@ -1826,6 +1825,20 @@ getBtn.disabled = false;
   }
 
 });
+ const homeBtn =
+document.getElementById("homeBtn");
+
+const homeContent =
+document.getElementById("homeContent");
+
+homeBtn.addEventListener("click", () => {
+
+homeContent.style.display =
+homeContent.style.display === "block"
+? "none"
+: "block";
+
+}); 
 </script>    
 </div>
   <footer style="
