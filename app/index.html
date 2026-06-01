@@ -1342,6 +1342,14 @@ btn.onclick=()=>{
 alert("Pattern selected");
 
 currentCategory=btn.dataset.type;
+const patternIndicator =
+document.getElementById("patternIndicator");
+
+patternIndicator.style.display = "block";
+
+patternIndicator.innerText =
+currentCategory.replace(/([A-Z])/g, ' $1')
+.toUpperCase() + " PATTERN";  
 document.getElementById("hintContent").style.display = "none";
 
 document.getElementById("hintBox").innerHTML =
@@ -1531,7 +1539,9 @@ document.getElementById("mainApp").style.display = "block";
 
 };
 document.getElementById("newPatternBtn").onclick = () => {
-
+document.getElementById(
+"patternIndicator"
+).style.display = "none";
 clearJourney();
 
 loopLevel = 1;
