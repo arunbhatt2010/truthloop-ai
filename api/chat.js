@@ -152,7 +152,93 @@ Now commit.`,
       avoidance: 0,
       confused: 0
     };
+/* =========================
+   🧠 CATEGORY BRAIN
+========================= */
 
+let primaryLoop = "";
+let emotionalDriver = "";
+let avoidanceStyle = "";
+
+if(currentCategory === "founder"){
+
+primaryLoop = "Decision Resistance";
+emotionalDriver = "Fear Of Wrong Moves";
+avoidanceStyle = "Analysis Loop";
+
+}
+
+else if(currentCategory === "creator"){
+
+primaryLoop = "Consistency Resistance";
+emotionalDriver = "Need For Validation";
+avoidanceStyle = "Preparation Loop";
+
+}
+
+else if(currentCategory === "writer"){
+
+primaryLoop = "Publishing Resistance";
+emotionalDriver = "Fear Of Judgment";
+avoidanceStyle = "Editing Loop";
+
+}
+
+else if(currentCategory === "author"){
+
+primaryLoop = "Publishing Resistance";
+emotionalDriver = "Fear Of Visibility";
+avoidanceStyle = "Perfection Loop";
+
+}
+
+else if(currentCategory === "owner"){
+
+primaryLoop = "Growth Resistance";
+emotionalDriver = "Risk Tension";
+avoidanceStyle = "Control Habit";
+
+}
+
+else if(currentCategory === "student"){
+
+primaryLoop = "Execution Resistance";
+emotionalDriver = "Performance Tension";
+avoidanceStyle = "Delay Habit";
+
+}
+
+else if(currentCategory === "jobseeker"){
+
+primaryLoop = "Visibility Resistance";
+emotionalDriver = "Fear Of Rejection";
+avoidanceStyle = "Waiting Loop";
+
+}
+
+else if(currentCategory === "overthinker"){
+
+primaryLoop = "Decision Resistance";
+emotionalDriver = "Certainty Tension";
+avoidanceStyle = "Analysis Habit";
+
+}
+
+else if(currentCategory === "validation"){
+
+primaryLoop = "Approval Seeking";
+emotionalDriver = "Recognition Tension";
+avoidanceStyle = "Checking Habit";
+
+}
+
+else if(currentCategory === "failure"){
+
+primaryLoop = "Failure Avoidance";
+emotionalDriver = "Failure Tension";
+avoidanceStyle = "Delay Habit";
+
+}
     const practicalWords = [
       "seo",
       "traffic",
@@ -443,12 +529,30 @@ let categoryInstruction = "";
 if(currentCategory){
 
 categoryInstruction = `
-The user currently identifies most with this pattern category:
+
+Current Category:
 ${currentCategory}
 
-Subtly adapt examples, tension, and behavioral observations to fit this category.
+Current Brain State:
 
-Do not mention the category directly unless naturally relevant.
+PRIMARY_LOOP:
+${primaryLoop}
+
+EMOTIONAL_DRIVER:
+${emotionalDriver}
+
+AVOIDANCE_STYLE:
+${avoidanceStyle}
+
+Use these as working hypotheses.
+
+The conversation may strengthen,
+weaken,
+or modify them.
+
+Do not repeat these labels directly.
+
+Let them influence the observations.
 `;
 }
     /* =========================
