@@ -1120,6 +1120,11 @@ return res.status(200).json({
   analysis,
   question,
   reply,
+
+  primaryLoop,
+  emotionalDriver,
+  avoidanceStyle,
+
   paywall:false
 });
   }
