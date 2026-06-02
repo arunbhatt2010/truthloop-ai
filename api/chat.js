@@ -381,95 +381,98 @@ let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
 
-/* CATEGORY FIRST */
+/* ============================
+   CATEGORY FIRST
+============================ */
 
 if(currentCategory === "creator"){
 
-primaryLoop = "Consistency Resistance";
-emotionalDriver = "Need For Validation";
-avoidanceStyle = "Preparation Loop";
+  primaryLoop = "Consistency Resistance";
+  emotionalDriver = "Need For Validation";
+  avoidanceStyle = "Preparation Loop";
 
 }
 
 else if(currentCategory === "writer"){
 
-primaryLoop = "Publishing Resistance";
-emotionalDriver = "Fear Of Judgment";
-avoidanceStyle = "Editing Loop";
+  primaryLoop = "Publishing Resistance";
+  emotionalDriver = "Fear Of Judgement";
+  avoidanceStyle = "Editing Loop";
 
 }
 
 else if(currentCategory === "author"){
 
-primaryLoop = "Publishing Resistance";
-emotionalDriver = "Fear Of Visibility";
-avoidanceStyle = "Perfection Loop";
+  primaryLoop = "Publishing Resistance";
+  emotionalDriver = "Fear Of Visibility";
+  avoidanceStyle = "Perfection Loop";
 
 }
 
 else if(currentCategory === "founder"){
 
-primaryLoop = "Decision Resistance";
-emotionalDriver = "Fear Of Wrong Moves";
-avoidanceStyle = "Analysis Loop";
+  primaryLoop = "Decision Resistance";
+  emotionalDriver = "Fear Of Wrong Moves";
+  avoidanceStyle = "Analysis Loop";
 
 }
 
 else if(currentCategory === "owner"){
 
-primaryLoop = "Growth Resistance";
-emotionalDriver = "Fear Of Failure";
-avoidanceStyle = "Control Loop";
+  primaryLoop = "Growth Resistance";
+  emotionalDriver = "Risk Tension";
+  avoidanceStyle = "Control Loop";
 
 }
 
 else if(currentCategory === "student"){
 
-primaryLoop = "Execution Resistance";
-emotionalDriver = "Fear Of Judgment";
-avoidanceStyle = "Overthinking Loop";
+  primaryLoop = "Execution Resistance";
+  emotionalDriver = "Performance Tension";
+  avoidanceStyle = "Delay Loop";
 
 }
 
 else if(currentCategory === "jobseeker"){
 
-primaryLoop = "Visibility Resistance";
-emotionalDriver = "Fear Of Rejection";
-avoidanceStyle = "Waiting Loop";
+  primaryLoop = "Visibility Resistance";
+  emotionalDriver = "Fear Of Rejection";
+  avoidanceStyle = "Waiting Loop";
 
 }
 
 else if(currentCategory === "overthinker"){
 
-primaryLoop = "Decision Resistance";
-emotionalDriver = "Fear Of Wrong Choice";
-avoidanceStyle = "Analysis Loop";
+  primaryLoop = "Decision Resistance";
+  emotionalDriver = "Fear Of Wrong Choice";
+  avoidanceStyle = "Analysis Loop";
 
 }
 
 else if(currentCategory === "pattern"){
 
-primaryLoop = "Pattern Repetition";
-emotionalDriver = "Hidden Tension";
-avoidanceStyle = "Familiar Loop";
+  primaryLoop = "Pattern Repetition";
+  emotionalDriver = "Hidden Tension";
+  avoidanceStyle = "Familiar Loop";
 
 }
 
 else if(currentCategory === "validation"){
 
-primaryLoop = "Approval Seeking";
-emotionalDriver = "Need For Validation";
-avoidanceStyle = "Feedback Loop";
+  primaryLoop = "Approval Seeking";
+  emotionalDriver = "Need For Validation";
+  avoidanceStyle = "Feedback Loop";
 
 }
 
 else if(currentCategory === "failure"){
 
-primaryLoop = "Failure Avoidance";
-emotionalDriver = "Fear Of Failure";
-avoidanceStyle = "Delay Loop";
+  primaryLoop = "Failure Avoidance";
+  emotionalDriver = "Fear Of Failure";
+  avoidanceStyle = "Delay Loop";
 
-      }
+}
+*/
     /* =========================
        🧠 MODE INSTRUCTION
     ========================= */
