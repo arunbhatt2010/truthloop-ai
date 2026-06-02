@@ -1483,7 +1483,17 @@ outputBox.scrollTop=outputBox.scrollHeight;
 },100);    
     
 const data=await callAPI();    
-    
+ document.getElementById("profilePrimary").innerText =
+"Primary Loop: " +
+(data.primaryLoop || "Loading...");
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: " +
+(data.emotionalDriver || "Loading...");
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: " +
+(data.avoidanceStyle || "Loading...");   
 typeEffect(data.reply);    
     
 messages.push({    
@@ -1553,7 +1563,17 @@ ${text}<br><br>
 outputBox.appendChild(userReply);
 
 const data=await callAPI();    
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: " +
+(data.primaryLoop || "Loading...");
 
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: " +
+(data.emotionalDriver || "Loading...");
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: " +
+(data.avoidanceStyle || "Loading...");
 if(data.paywall){
 
 nextBtn.style.display="none";
