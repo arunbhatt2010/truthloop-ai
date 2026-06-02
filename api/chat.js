@@ -987,7 +987,78 @@ Recognition can create clarity.
 What you do next
 is still your choice.`;
 }
+let primaryLoop = "";
+let emotionalDriver = "";
+let avoidanceStyle = "";
 
+switch(currentCategory){
+
+case "creator":
+primaryLoop = "Consistency Resistance";
+emotionalDriver = "Need For Validation";
+avoidanceStyle = "Preparation Loop";
+break;
+
+case "writer":
+primaryLoop = "Publishing Resistance";
+emotionalDriver = "Fear Of Judgement";
+avoidanceStyle = "Editing Loop";
+break;
+
+case "author":
+primaryLoop = "Publishing Resistance";
+emotionalDriver = "Fear Of Visibility";
+avoidanceStyle = "Perfection Loop";
+break;
+
+case "founder":
+primaryLoop = "Decision Resistance";
+emotionalDriver = "Fear Of Wrong Moves";
+avoidanceStyle = "Analysis Loop";
+break;
+
+case "owner":
+primaryLoop = "Growth Resistance";
+emotionalDriver = "Risk Tension";
+avoidanceStyle = "Control Habit";
+break;
+
+case "student":
+primaryLoop = "Execution Resistance";
+emotionalDriver = "Performance Tension";
+avoidanceStyle = "Delay Loop";
+break;
+
+case "jobseeker":
+primaryLoop = "Visibility Resistance";
+emotionalDriver = "Fear Of Rejection";
+avoidanceStyle = "Waiting Loop";
+break;
+
+case "overthinker":
+primaryLoop = "Decision Resistance";
+emotionalDriver = "Fear Of Wrong Choice";
+avoidanceStyle = "Analysis Loop";
+break;
+
+case "pattern":
+primaryLoop = "Pattern Repetition";
+emotionalDriver = "Hidden Tension";
+avoidanceStyle = "Familiar Loop";
+break;
+
+case "validation":
+primaryLoop = "Approval Seeking";
+emotionalDriver = "Need For Validation";
+avoidanceStyle = "Feedback Loop";
+break;
+
+case "failure":
+primaryLoop = "Failure Avoidance";
+emotionalDriver = "Fear Of Failure";
+avoidanceStyle = "Delay Loop";
+break;
+  }
     /* =========================
        ✅ FINAL
     ========================= */
@@ -1012,10 +1083,13 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 return res.status(200).json({
-  analysis,
-  question,
-  reply,
-  paywall:false
+analysis,
+question,
+reply,
+primaryLoop,
+emotionalDriver,
+avoidanceStyle,
+paywall:false
 });
 
   }
