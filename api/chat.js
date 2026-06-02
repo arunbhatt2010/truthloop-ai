@@ -987,6 +987,9 @@ Recognition can create clarity.
 What you do next
 is still your choice.`;
 }
+let primaryLoop = "";
+let emotionalDriver = "";
+let avoidanceStyle = "";    
 /*
 let primaryLoop = "";
 let emotionalDriver = "";
