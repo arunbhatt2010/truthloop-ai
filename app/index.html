@@ -1474,14 +1474,148 @@ currentCategory.replace(/([A-Z])/g, ' $1')
  document.getElementById("patternProfile").style.display =
 "block";
 
+if(currentCategory === "creator"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Consistency Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Need For Validation";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Preparation Loop";
+
+}
+
+else if(currentCategory === "writer"){
+
 document.getElementById("profilePrimary").innerText =
 "Primary Loop: Publishing Resistance";
 
 document.getElementById("profileTrigger").innerText =
-"Emotional Driver: Fear of Visibility";
+"Emotional Driver: Fear Of Judgement";
 
 document.getElementById("profileAvoidance").innerText =
-"Avoidance Style: Perfection Loop"; 
+"Avoidance Style: Editing Loop";
+
+}
+
+else if(currentCategory === "author"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Publishing Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Fear Of Visibility";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Perfection Loop";
+
+}
+
+else if(currentCategory === "founder"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Decision Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Fear Of Wrong Moves";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Analysis Loop";
+
+}
+
+else if(currentCategory === "owner"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Growth Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Risk Tension";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Control Loop";
+
+}
+
+else if(currentCategory === "student"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Execution Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Performance Tension";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Delay Loop";
+
+}
+
+else if(currentCategory === "jobseeker"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Visibility Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Fear Of Rejection";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Waiting Loop";
+
+}
+
+else if(currentCategory === "overthinker"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Decision Resistance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Fear Of Wrong Choice";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Analysis Loop";
+
+}
+
+else if(currentCategory === "pattern"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Pattern Repetition";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Hidden Tension";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Familiar Loop";
+
+}
+
+else if(currentCategory === "validation"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Approval Seeking";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Need For Validation";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Feedback Loop";
+
+}
+
+else if(currentCategory === "failure"){
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: Failure Avoidance";
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: Fear Of Failure";
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: Delay Loop";
+
+}
 document.getElementById("hintContent").style.display = "none";
 
 document.getElementById("hintBox").innerHTML =
