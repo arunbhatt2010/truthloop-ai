@@ -987,6 +987,7 @@ Recognition can create clarity.
 What you do next
 is still your choice.`;
 }
+/*
 let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
@@ -1058,7 +1059,9 @@ primaryLoop = "Failure Avoidance";
 emotionalDriver = "Fear Of Failure";
 avoidanceStyle = "Delay Loop";
 break;
-  }
+
+}
+*/
     /* =========================
        ✅ FINAL
     ========================= */
