@@ -543,6 +543,94 @@ Subtly adapt examples, tension, and behavioral observations to fit this category
 Do not mention the category directly unless naturally relevant.
 `;
 }
+let categoryProfileInstruction = "";
+
+if(currentCategory){
+
+categoryProfileInstruction = `
+
+CATEGORY PROFILE EXAMPLES
+
+These are examples only.
+
+Do NOT reuse them directly.
+
+Do NOT lock the diagnosis to these examples.
+
+Use them only as possible starting directions.
+
+The final PRIMARY_LOOP,
+EMOTIONAL_DRIVER,
+and AVOIDANCE_STYLE
+must be generated from:
+
+- category
+- latest answer
+- conversation history
+
+Creator:
+PRIMARY_LOOP: Consistency Resistance
+EMOTIONAL_DRIVER: Visibility Tension
+AVOIDANCE_STYLE: Preparation Habit
+
+Writer:
+PRIMARY_LOOP: Publishing Resistance
+EMOTIONAL_DRIVER: Judgment Tension
+AVOIDANCE_STYLE: Revision Habit
+
+Author:
+PRIMARY_LOOP: Completion Resistance
+EMOTIONAL_DRIVER: Exposure Tension
+AVOIDANCE_STYLE: Perfection Habit
+
+Founder:
+PRIMARY_LOOP: Decision Resistance
+EMOTIONAL_DRIVER: Uncertainty Tension
+AVOIDANCE_STYLE: Analysis Habit
+
+Owner:
+PRIMARY_LOOP: Growth Resistance
+EMOTIONAL_DRIVER: Risk Tension
+AVOIDANCE_STYLE: Control Habit
+
+Student:
+PRIMARY_LOOP: Execution Resistance
+EMOTIONAL_DRIVER: Performance Tension
+AVOIDANCE_STYLE: Delay Habit
+
+Job Seeker:
+PRIMARY_LOOP: Opportunity Resistance
+EMOTIONAL_DRIVER: Rejection Tension
+AVOIDANCE_STYLE: Waiting Habit
+
+Overthinker:
+PRIMARY_LOOP: Decision Resistance
+EMOTIONAL_DRIVER: Certainty Tension
+AVOIDANCE_STYLE: Analysis Habit
+
+Pattern:
+PRIMARY_LOOP: Repetition Pattern
+EMOTIONAL_DRIVER: Hidden Tension
+AVOIDANCE_STYLE: Familiar Habit
+
+Validation:
+PRIMARY_LOOP: Approval Seeking
+EMOTIONAL_DRIVER: Recognition Tension
+AVOIDANCE_STYLE: Checking Habit
+
+Failure:
+PRIMARY_LOOP: Failure Avoidance
+EMOTIONAL_DRIVER: Failure Tension
+AVOIDANCE_STYLE: Delay Habit
+
+The profile is a working hypothesis.
+
+The profile may evolve as new evidence appears.
+
+It is not a fixed diagnosis.
+
+`;
+    }    
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
@@ -558,6 +646,7 @@ You notice patterns people unintentionally reveal.
 
 ${modeInstruction}
 ${categoryInstruction}
+${categoryProfileInstruction}
 ${loop5GateInstruction}
 ${loop7Instruction}
 Your goal:
