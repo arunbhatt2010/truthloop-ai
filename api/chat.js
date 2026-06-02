@@ -451,6 +451,32 @@ Subtly adapt examples, tension, and behavioral observations to fit this category
 Do not mention the category directly unless naturally relevant.
 `;
 }
+ const profilePrompt = `
+You are the TruthLoop Profile Engine.
+
+Analyze the complete conversation.
+
+Generate:
+
+PRIMARY_LOOP
+EMOTIONAL_DRIVER
+AVOIDANCE_STYLE
+
+Rules:
+
+- Use conversation only.
+- Ignore category labels.
+- Maximum 5 words per field.
+- Update profile when pattern changes.
+
+Return ONLY valid JSON.
+
+{
+"primaryLoop":"",
+"emotionalDriver":"",
+"avoidanceStyle":""
+}
+`;   
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
@@ -858,10 +884,61 @@ max_tokens: maxTokens
 
     const data =
       await response.json();
+const profileResponse = await fetch(
+"https://api.groq.com/openai/v1/chat/completions",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+Authorization:
+"Bearer " + process.env.GROQ_API_KEY
+},
+body:JSON.stringify({
+model:"llama-3.3-70b-versatile",
+messages:[
+{
+role:"system",
+content:profilePrompt
+},
+...messages.slice(-10)
+],
+temperature:0.3,
+max_tokens:120
+})
+}
+);
 
+const profileData =
+await profileResponse.json();
     let reply =
       data?.choices?.[0]?.message?.content || "";
+let primaryLoop = "";
+let emotionalDriver = "";
+let avoidanceStyle = "";
 
+try{
+
+const profile =
+JSON.parse(
+profileData?.choices?.[0]?.message?.content || "{}"
+);
+
+primaryLoop =
+profile.primaryLoop || "";
+
+emotionalDriver =
+profile.emotionalDriver || "";
+
+avoidanceStyle =
+profile.avoidanceStyle || "";
+
+}catch(e){
+
+primaryLoop = "";
+emotionalDriver = "";
+avoidanceStyle = "";
+
+  }
     /* =========================
        ✂️ CLEANER
     ========================= */
@@ -990,81 +1067,7 @@ is still your choice.`;
 let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";    
-/*
-let primaryLoop = "";
-let emotionalDriver = "";
-let avoidanceStyle = "";
 
-switch(currentCategory){
-
-case "creator":
-primaryLoop = "Consistency Resistance";
-emotionalDriver = "Need For Validation";
-avoidanceStyle = "Preparation Loop";
-break;
-
-case "writer":
-primaryLoop = "Publishing Resistance";
-emotionalDriver = "Fear Of Judgement";
-avoidanceStyle = "Editing Loop";
-break;
-
-case "author":
-primaryLoop = "Publishing Resistance";
-emotionalDriver = "Fear Of Visibility";
-avoidanceStyle = "Perfection Loop";
-break;
-
-case "founder":
-primaryLoop = "Decision Resistance";
-emotionalDriver = "Fear Of Wrong Moves";
-avoidanceStyle = "Analysis Loop";
-break;
-
-case "owner":
-primaryLoop = "Growth Resistance";
-emotionalDriver = "Risk Tension";
-avoidanceStyle = "Control Habit";
-break;
-
-case "student":
-primaryLoop = "Execution Resistance";
-emotionalDriver = "Performance Tension";
-avoidanceStyle = "Delay Loop";
-break;
-
-case "jobseeker":
-primaryLoop = "Visibility Resistance";
-emotionalDriver = "Fear Of Rejection";
-avoidanceStyle = "Waiting Loop";
-break;
-
-case "overthinker":
-primaryLoop = "Decision Resistance";
-emotionalDriver = "Fear Of Wrong Choice";
-avoidanceStyle = "Analysis Loop";
-break;
-
-case "pattern":
-primaryLoop = "Pattern Repetition";
-emotionalDriver = "Hidden Tension";
-avoidanceStyle = "Familiar Loop";
-break;
-
-case "validation":
-primaryLoop = "Approval Seeking";
-emotionalDriver = "Need For Validation";
-avoidanceStyle = "Feedback Loop";
-break;
-
-case "failure":
-primaryLoop = "Failure Avoidance";
-emotionalDriver = "Fear Of Failure";
-avoidanceStyle = "Delay Loop";
-break;
-
-}
-*/
     /* =========================
        ✅ FINAL
     ========================= */
@@ -1092,9 +1095,11 @@ return res.status(200).json({
 analysis,
 question,
 reply,
+
 primaryLoop,
 emotionalDriver,
 avoidanceStyle,
+
 paywall:false
 });
 
