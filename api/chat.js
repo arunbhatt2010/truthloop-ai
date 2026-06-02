@@ -966,20 +966,7 @@ max_tokens: maxTokens
 
     let reply =
       data?.choices?.[0]?.message?.content || "";
-const primaryLoop =
-(reply.match(/PRIMARY_LOOP:\s*(.*)/i)?.[1] || "").trim();
 
-const emotionalDriver =
-(reply.match(/EMOTIONAL_DRIVER:\s*(.*)/i)?.[1] || "").trim();
-
-const avoidanceStyle =
-(reply.match(/AVOIDANCE_STYLE:\s*(.*)/i)?.[1] || "").trim();
-
-reply = reply
-.replace(/PRIMARY_LOOP:.*$/gim, "")
-.replace(/EMOTIONAL_DRIVER:.*$/gim, "")
-.replace(/AVOIDANCE_STYLE:.*$/gim, "")
-.trim();
     /* =========================
        ✂️ CLEANER
     ========================= */
@@ -1133,11 +1120,6 @@ return res.status(200).json({
   analysis,
   question,
   reply,
-
-  primaryLoop,
-  emotionalDriver,
-  avoidanceStyle,
-
   paywall:false
 });
   }
