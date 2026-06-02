@@ -114,12 +114,25 @@ opacity:.45;
 }
 
   }
-body{    
-background:#0f0f0f;    
-color:#fff;    
-font-family:Arial;    
-margin:0;    
-}    
+body{
+
+background:
+radial-gradient(
+circle at top right,
+rgba(168,85,247,0.12),
+transparent 35%
+),
+linear-gradient(
+180deg,
+#081228 0%,
+#050914 100%
+);
+
+color:#fff;
+font-family:Arial;
+margin:0;
+
+}
     
 .container{    
 width:100%;    
@@ -148,8 +161,8 @@ overflow:hidden;
 background:
 linear-gradient(
 180deg,
-#050505,
-#111111
+#091224,
+#0d1326
 );
 
 padding:28px 22px;
@@ -236,11 +249,11 @@ height:14px;
 
 border-radius:50%;
 
-background:#ff9d00;
+background:#a855f7;
 
 box-shadow:
-0 0 18px rgba(255,160,0,.8),
-0 0 40px rgba(255,140,0,.35);
+0 0 18px rgba(168,85,247,.8),
+0 0 40px rgba(168,85,247,.35);
 
 animation:orbBreath 3s ease infinite;
 
@@ -259,16 +272,17 @@ opacity:1;
 }
 
   }  
-#shareBox,    
-#paywallBox{    
-display:none;    
-background:#111;    
-padding:15px;    
-border-radius:12px;    
-margin-top:10px;    
-text-align:center;    
-border:1px solid #222;    
-}    
+#shareBox,
+#paywallBox{
+display:none;
+background:#0b1020;
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+text-align:center;
+border:1px solid rgba(168,85,247,.18);
+box-shadow:0 0 18px rgba(168,85,247,.12);
+}
 #paywallBox{
 line-height:1.8;
 font-size:15px;
@@ -319,7 +333,7 @@ color:#f0f0f0;
 .floating-dot{
 position:absolute;
 border-radius:50%;
-background:#ff8c00;
+background:#a855f7;
 
 box-shadow:
 0 0 12px rgba(255,140,0,.8);
@@ -628,9 +642,17 @@ margin-top:22px;
 margin-bottom:18px;
 padding:28px;
 border-radius:22px;
-background:linear-gradient(145deg,#111,#1a1a1a);
-border:1px solid #2a2a2a;
-box-shadow:0 0 25px rgba(255,140,0,0.08);
+
+background:linear-gradient(
+145deg,
+#0b1020,
+#131a33
+);
+
+border:1px solid rgba(168,85,247,.18);
+
+box-shadow:0 0 25px rgba(168,85,247,.12);
+
 text-align:center;
 position:relative;
 overflow:hidden;
@@ -661,10 +683,13 @@ style="
 display:block;
 margin:16px 0;
 padding:18px;
-background:rgba(10,10,10,.85);
+background:rgba(8,18,40,.85);
 border:1px solid rgba(168,85,247,.35);
 border-radius:16px;
 line-height:1.8;
+box-shadow:
+0 0 30px rgba(168,85,247,.08);
+
 ">
 <div id="profilePrimary"
 style="
