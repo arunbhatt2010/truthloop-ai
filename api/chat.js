@@ -472,7 +472,7 @@ else if(currentCategory === "failure"){
   avoidanceStyle = "Delay Loop";
 
 }
-*/
+
     /* =========================
        🧠 MODE INSTRUCTION
     ========================= */
