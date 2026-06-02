@@ -913,17 +913,7 @@ MOST IMPORTANT:
 Users stay engaged
 when they feel understood,
 not analyzed.
-PROFILE UPDATE RULE
 
-At the start of EVERY response output:
-
-PRIMARY_LOOP: <short pattern name>
-EMOTIONAL_DRIVER: <short emotional driver>
-AVOIDANCE_STYLE: <short avoidance style>
-
-===VISIBLE===
-
-Then continue with the normal TruthLoop response.
 `;
 
     /* =========================
