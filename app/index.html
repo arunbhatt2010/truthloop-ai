@@ -1251,7 +1251,10 @@ razorpayBtn.style.display="block";
 razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
     
 razorpayBtn.onclick=function(){    
-    
+track("payment_started",{
+  amount:amount,
+  loop:loopLevel
+});    
 const options = {    
     
 key: RAZORPAY_KEY_ID,    
@@ -1416,7 +1419,9 @@ const text=mainInput.value.trim();
 if(!text)return;    
     
 track("start_clicked");    
-    
+track("question_submitted",{
+  question_length:text.length
+});    
 messages=[{    
 role:"user",    
 content:text    
@@ -1498,7 +1503,7 @@ loopLevel++;
 
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
-    
+track(`loop_${loopLevel}_completed`);    
 messages.push({    
 role:"user",    
 content:text    
@@ -1552,7 +1557,9 @@ isLoading = false;
 nextBtn.disabled = false;    
 };
 document.getElementById("continueJourneyBtn").onclick = () => {
-
+track("journey_restored",{
+  loop:loopLevel
+});
 document.getElementById("restoreScreen").style.display = "none";
 
 document.getElementById("mainApp").style.display = "block";
