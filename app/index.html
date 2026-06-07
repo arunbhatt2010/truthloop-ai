@@ -1497,13 +1497,13 @@ if(!text){
    nextBtn.disabled = false;
    return;
   }   
-    
+track(`loop_${loopLevel}_completed`);     
 loopLevel++;    
 
 
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
-track(`loop_${loopLevel}_completed`);    
+   
 messages.push({    
 role:"user",    
 content:text    
