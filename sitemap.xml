@@ -135,4 +135,24 @@
 <changefreq>weekly</changefreq>
 <priority>0.95</priority>
 </url>
+  <url>
+  <loc>https://truthloop.in/why-i-need-more-certainty-before-acting.html</loc>
+  <lastmod>2026-06-07</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+
+<url>
+  <loc>https://truthloop.in/why-i-keep-looking-for-the-right-answer.html</loc>
+  <lastmod>2026-06-07</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+
+<url>
+  <loc>https://truthloop.in/why-i-keep-researching-instead-of-deciding.html</loc>
+  <lastmod>2026-06-07</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
 </urlset>
