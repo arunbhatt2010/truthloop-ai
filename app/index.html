@@ -1439,7 +1439,19 @@ getBtn.onclick=async()=>{
 
 const text = mainInput.value.trim();
 
-if(!text) return;
+if(!text){
+
+mainInput.focus();
+
+mainInput.style.borderColor = "orange";
+
+setTimeout(()=>{
+mainInput.style.borderColor = "#262626";
+},1000);
+
+return;
+
+}
 
 document.getElementById("guideText").style.display="none";
 
