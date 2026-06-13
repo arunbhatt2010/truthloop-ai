@@ -1436,20 +1436,24 @@ mainInput.focus();
 /* START */
     
 getBtn.onclick=async()=>{
-document.getElementById("guideText").style.display="none";  
+
+const text = mainInput.value.trim();
+
+if(!text) return;
+
+document.getElementById("guideText").style.display="none";
+
 if (isLoading) return;
 
 isLoading = true;
 
-getBtn.disabled = true;    
-const text=mainInput.value.trim();    
-    
-if(!text)return;    
-    
-track("start_clicked");    
+getBtn.disabled = true;
+
+track("start_clicked");
+
 track("question_submitted",{
   question_length:text.length
-});    
+});
 messages=[{    
 role:"user",    
 content:text    
