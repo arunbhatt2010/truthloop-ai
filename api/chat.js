@@ -461,12 +461,17 @@ Generate:
 PRIMARY_LOOP
 EMOTIONAL_DRIVER
 AVOIDANCE_STYLE
+HIDDEN_ASSUMPTION
 
 Rules:
 
 - Use conversation only.
 - Ignore category labels.
+- Hidden Assumption must be a working hypothesis.
+- It should represent the strongest belief required for the behavior to continue.
+- It must evolve as the conversation deepens.
 - Maximum 5 words per field.
+- Hidden Assumption: maximum 6 words.
 - Update profile when pattern changes.
 
 Return ONLY valid JSON.
@@ -474,9 +479,10 @@ Return ONLY valid JSON.
 {
 "primaryLoop":"",
 "emotionalDriver":"",
-"avoidanceStyle":""
+"avoidanceStyle":"",
+"hiddenAssumption":""
 }
-`;   
+`;
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
@@ -496,7 +502,31 @@ ${loop5GateInstruction}
 ${loop7Instruction}
 Your goal:
 create small moments of self-recognition.
+HIDDEN ASSUMPTION RULE
 
+A hidden assumption exists beneath the visible pattern.
+
+Treat it as a working hypothesis.
+
+Update it as the conversation evolves.
+
+Use it to guide:
+- observations
+- tension
+- recognition
+- questions
+
+Never reveal the hidden assumption directly.
+
+Never say:
+"The hidden assumption is..."
+
+Never diagnose it.
+
+The user should discover it indirectly through the conversation.
+
+The hidden assumption should influence every loop,
+but remain invisible.
 Do not fully resolve the emotional pattern before Loop 5.
 
 Prefer implication over explanation.
@@ -915,6 +945,7 @@ await profileResponse.json();
 let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
+let hiddenAssumption = "";
 
 try{
 
@@ -931,12 +962,14 @@ profile.emotionalDriver || "";
 
 avoidanceStyle =
 profile.avoidanceStyle || "";
-
+hiddenAssumption =
+profile.hiddenAssumption || "";
 }catch(e){
 
 primaryLoop = "";
 emotionalDriver = "";
 avoidanceStyle = "";
+hiddenAssumption = "";
 
   }
     /* =========================
@@ -1097,6 +1130,7 @@ reply,
 primaryLoop,
 emotionalDriver,
 avoidanceStyle,
+hiddenAssumption,
 
 paywall:false
 });
