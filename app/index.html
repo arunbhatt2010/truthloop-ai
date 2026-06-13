@@ -779,9 +779,19 @@ Emotional Driver:
 style="
 color:#94a3b8;
 font-size:13px;
+margin-bottom:8px;
 display:block;
 ">
 Avoidance Style:
+</div>
+
+<div id="profileBelief"
+style="
+color:#fbbf24;
+font-size:13px;
+display:block;
+">
+Underlying Belief:
 </div>
 
 </div>
@@ -1119,7 +1129,8 @@ document.getElementById(
 ).innerText =
 "Avoidance Style: " +
 data.avoidanceStyle;
-
+document.getElementById("profileBelief").innerText =
+"Underlying Belief: " + (hiddenAssumption || "");
   }  
 return data;  
     
