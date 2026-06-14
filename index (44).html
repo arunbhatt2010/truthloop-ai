@@ -1,0 +1,1781 @@
+  
+<!DOCTYPE html>    
+<html lang="en">    
+<head>    
+<meta charset="UTF-8" />    
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>    
+    
+<title>TruthLoop - Find what you're avoiding</title>    
+    
+<meta name="description" content="TruthLoop exposes the hidden emotional patterns affecting decisions, execution, procrastination, validation addiction, overthinking, and self-sabotage." />    
+<!-- Open Graph -->    
+<meta property="og:type" content="website" />    
+<meta property="og:url" content="https://truthloop.in/app/" />    
+<meta property="og:title" content="TruthLoop - Find what you're avoiding" />    
+<meta property="og:description" content="You don’t need more advice. You’re avoiding something deeper. Find the hidden pattern behind your hesitation in 30 seconds." />    
+<meta property="og:image" content="https://truthloop.in/truthloop-hook.jpg" />    
+<meta property="og:image:secure_url" content="https://truthloop.in/truthloop-hook.jpg" />    
+<meta property="og:image:type" content="image/jpeg" />    
+<meta property="og:image:width" content="1200" />    
+<meta property="og:image:height" content="630" />    
+    
+<!-- Twitter -->    
+<meta name="twitter:card" content="summary_large_image" />    
+<meta name="twitter:url" content="https://truthloop.in/app" />    
+<meta name="twitter:title" content="TruthLoop - Find what you're avoiding" />    
+<meta name="twitter:description" content="TruthLoop exposes hidden emotional patterns affecting decisions, execution, and self-sabotage." />    
+<meta name="twitter:image" content="https://truthloop.in/truthloop-hook.jpg" />    
+    
+<!-- Canonical -->    
+<link rel="canonical" href="https://truthloop.in/app/" />    
+<!-- Google Analytics -->    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>    
+    
+<script>    
+window.dataLayer = window.dataLayer || [];    
+    
+function gtag(){    
+  dataLayer.push(arguments);    
+}    
+    
+gtag('js', new Date());    
+gtag('config', 'G-RBMQ2F6P9Q');    
+</script>    
+    
+<!-- Razorpay -->    
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>    
+    
+<!-- PayPal -->    
+<script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>    
+    
+<style>    
+.truthHighlight{    
+    
+display:inline;    
+    
+margin:12px 0;    
+    
+padding:2px 6px;    
+    
+color:orange;    
+    
+font-weight:bold;    
+    
+border-bottom:1px solid orange;    
+    
+background:rgba(255,140,0,0.08);    
+    
+line-height:1.8;    
+    
+  }
+.heroTitle{
+
+font-size:42px;
+font-weight:800;
+line-height:1.1;
+
+color:#ffffff;
+
+margin-bottom:12px;
+
+text-shadow:
+0 0 15px rgba(168,85,247,.12);
+
+}
+
+.heroTitle span{
+
+color:#a855f7;
+
+}
+
+.heroSub{
+
+color:#cbd5e1;
+
+font-size:16px;
+
+line-height:1.7;
+
+margin-bottom:24px;
+
+  }  
+.heroLine{
+
+width:100%;
+height:3px;
+
+margin-top:18px;
+margin-bottom:24px;
+
+border-radius:999px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+#ff8c00,
+#ffb347,
+#ff8c00,
+transparent
+);
+
+background-size:220% 100%;
+
+animation:lineFlow 3s linear infinite;
+
+box-shadow:
+0 0 22px rgba(255,140,0,.5);
+
+}
+
+@keyframes lineFlow{
+
+0%{
+background-position:0% 0%;
+opacity:.45;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+background-position:220% 0%;
+opacity:.45;
+}
+
+  }
+body{
+background:#050816;
+color:#fff;
+  }
+    
+.container{    
+width:100%;    
+max-width:680px;    
+margin:0 auto;    
+padding:14px;    
+padding-bottom:120px;    
+box-sizing:border-box;    
+}    
+#mainInput:focus{    
+    
+outline:none;    
+    
+border-color:orange;    
+    
+box-shadow:    
+0 0 0 3px rgba(255,140,0,0.12);    
+    
+  }    
+.output{
+
+position:relative;
+
+overflow:visible;
+
+background:
+linear-gradient(
+180deg,
+#091224,
+#0d1326
+);
+
+padding:28px 22px;
+
+border-radius:24px;
+
+margin-bottom:14px;
+
+line-height:1.9;
+
+width:100%;
+
+box-sizing:border-box;
+
+border:
+1px solid rgba(255,255,255,.06);
+
+min-height:460px;
+
+box-shadow:
+inset 0 0 60px rgba(255,140,0,.03),
+0 25px 80px rgba(0,0,0,.65);
+
+}
+    
+@media(min-width:768px){    
+    
+.container{    
+padding-top:24px;    
+}    
+    
+.output{    
+min-height:520px;    
+}    
+    
+}    
+    
+input,button{    
+width:100%;    
+padding:14px;    
+margin-top:10px;    
+border-radius:10px;    
+border:none;    
+box-sizing:border-box;    
+}    
+    
+input{    
+background:#111;    
+color:#fff;    
+font-size:15px;    
+}    
+    
+button{    
+background:linear-gradient(45deg,orange,#ff5e00);    
+font-weight:bold;    
+font-size:15px;    
+}    
+.categoryBtn{    
+width:auto;    
+padding:10px 14px;    
+margin-top:0;    
+background:#181818;    
+border:1px solid #2a2a2a;    
+color:#fff;    
+font-size:13px;    
+border-radius:999px;    
+cursor:pointer;    
+transition:0.2s;    
+}    
+    
+.categoryBtn:hover{    
+border-color:orange;    
+color:orange;    
+}
+.aiOrb{
+
+position:absolute;
+
+top:22px;
+right:22px;
+
+width:14px;
+height:14px;
+
+border-radius:50%;
+
+background:#a855f7;
+
+box-shadow:
+0 0 18px rgba(168,85,247,.8),
+0 0 40px rgba(168,85,247,.35);
+
+animation:orbBreath 3s ease infinite;
+
+}
+
+@keyframes orbBreath{
+
+0%,100%{
+transform:scale(1);
+opacity:.7;
+}
+
+50%{
+transform:scale(1.45);
+opacity:1;
+}
+
+  }  
+#shareBox,
+#paywallBox{
+display:none;
+background:#0b1020;
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+text-align:center;
+border:1px solid rgba(168,85,247,.18);
+box-shadow:0 0 18px rgba(168,85,247,.12);
+}
+#paywallBox{
+line-height:1.8;
+font-size:15px;
+word-break:break-word;
+}
+.truthScore{
+
+display:inline-block;
+
+margin-bottom:16px;
+
+padding:10px 14px;
+
+border-radius:999px;
+
+background:
+rgba(255,140,0,.08);
+
+border:
+1px solid rgba(255,140,0,.18);
+
+font-size:13px;
+
+color:#ffba72;
+
+animation:scorePulse 2.5s ease infinite;
+
+}
+
+@keyframes scorePulse{
+
+0%,100%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.06);
+
+box-shadow:
+0 0 35px rgba(255,140,0,.32);
+}
+
+  }
+#paySub{
+margin-bottom:18px;
+color:#f0f0f0;
+  }
+.floating-dot{
+
+position:absolute;
+
+border-radius:50%;
+
+background:#a855f7;
+
+box-shadow:
+0 0 12px #a855f7,
+0 0 25px rgba(168,85,247,.5);
+
+opacity:.75;
+
+animation:floatDot linear infinite;
+
+}
+
+.dot1{
+width:5px;
+height:5px;
+left:8%;
+bottom:12%;
+animation-duration:9s;
+}
+
+.dot2{
+width:7px;
+height:7px;
+left:18%;
+bottom:5%;
+animation-duration:12s;
+}
+
+.dot3{
+width:4px;
+height:4px;
+left:32%;
+bottom:10%;
+animation-duration:8s;
+}
+
+.dot4{
+width:6px;
+height:6px;
+left:46%;
+bottom:8%;
+animation-duration:13s;
+}
+
+.dot5{
+width:5px;
+height:5px;
+left:58%;
+bottom:4%;
+animation-duration:10s;
+}
+@keyframes guidePulse{
+  0%{opacity:.5;}
+  50%{
+    opacity:1;
+    text-shadow:0 0 10px rgba(255,140,0,.8);
+  }
+  100%{opacity:.5;}
+  }
+@keyframes floatDot{
+
+0%{
+transform:
+translateY(0px)
+translateX(0px);
+
+opacity:.1;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+transform:
+translateY(-160px)
+translateX(45px);
+
+opacity:0;
+}
+
+  }
+.loopBadge{
+
+display:inline-block;
+
+padding:10px 18px;
+
+border-radius:999px;
+
+background:
+linear-gradient(
+90deg,
+rgba(255,140,0,.18),
+rgba(255,140,0,.05)
+);
+
+border:1px solid rgba(255,140,0,.28);
+
+color:#ffb347;
+
+font-size:12px;
+
+font-weight:700;
+
+letter-spacing:2px;
+
+text-transform:uppercase;
+
+box-shadow:
+0 0 20px rgba(255,140,0,.12);
+
+backdrop-filter:blur(8px);
+
+  }
+</style><script type="text/javascript">    
+    (function(c,l,a,r,i,t,y){    
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};    
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;    
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);    
+    })(window, document, "clarity", "script", "wqdq8qf8r3");    
+</script>    
+</head>    
+    
+<body>    
+<div id="restoreScreen" style="display:none;">
+
+<h2>Journey Found</h2>
+
+<p id="restorePattern"></p>
+
+<p id="restoreLoop"></p>
+
+<button id="continueJourneyBtn">
+CONTINUE JOURNEY
+</button>
+
+<button id="newPatternBtn">
+START NEW PATTERN
+</button>
+
+</div>
+
+<div id="mainApp">
+
+<div class="container">    
+<h1 class="heroTitle">
+Find what you're <span>avoiding.</span>
+</h1>
+
+<div class="heroLine"></div>
+
+<p class="heroSub">
+Most people don't need more advice.
+<span>
+They need to see the hidden pattern behind their hesitation.
+</span>
+</p>
+<div class="aiOrb"></div>  
+<div class="floatingDot" style="
+top:120px;
+left:12%;
+animation-duration:8s;
+"></div>
+
+<div class="floatingDot" style="
+top:220px;
+left:72%;
+animation-duration:11s;
+"></div>
+
+<div class="floatingDot" style="
+top:420px;
+left:35%;
+animation-duration:9s;
+"></div>
+
+<div class="floatingDot" style="
+top:540px;
+left:82%;
+animation-duration:13s;
+"></div>
+
+<div class="floatingDot" style="
+top:780px;
+left:18%;
+animation-duration:10s;
+"></div>
+
+<div class="floatingDot" style="
+top:980px;
+left:60%;
+animation-duration:14s;
+"></div>
+<h2 style="
+margin-top:0;
+margin-bottom:4px;
+font-size:28px;
+color:#fff;
+
+text-shadow:
+0 0 15px rgba(168,85,247,.15);
+">
+TruthLoop
+</h2>
+<div style="    
+margin-bottom:14px;    
+">    
+    
+<a href="https://truthloop.in/"    
+style="    
+color:#a855f7;
+text-decoration:none;    
+font-size:14px;    
+font-weight:bold;    
+">    
+← TruthLoop AI Home    
+</a>    
+    
+</div>    
+<p style="    
+color:#aaa;    
+margin-top:0;    
+margin-bottom:14px;    
+font-size:15px;    
+line-height:1.6;    
+">    
+</p>    
+
+  <div style="
+margin-bottom:18px;
+
+background:linear-gradient(
+145deg,
+#0b1020,
+#131a33
+);
+
+border:1px solid rgba(168,85,247,.15);
+
+padding:14px;
+
+border-radius:14px;
+
+box-shadow:
+0 0 20px rgba(168,85,247,.05);
+">
+<div class="heroLine"></div>   
+<div style="
+display:none;
+font-size:13px;    
+color:#888;    
+margin-bottom:12px;    
+letter-spacing:1px;    
+text-transform:uppercase;    
+">    
+Choose your current pattern    
+</div>    
+    
+<div style="
+display:none;
+flex-wrap:wrap;
+gap:10px;
+">
+    
+<button class="categoryBtn" data-type="creator">Creator</button>    
+    
+<button class="categoryBtn" data-type="writer">Writer</button>    
+    
+<button class="categoryBtn" data-type="author">Author</button>    
+    
+<button class="categoryBtn" data-type="founder">Founder</button>    
+    
+<button class="categoryBtn" data-type="owner">Owner</button>    
+    
+<button class="categoryBtn" data-type="student">Student</button>    
+<button class="categoryBtn" data-type="jobseeker">    
+Job Seeker    
+</button>    
+<button class="categoryBtn" data-type="overthinker">Overthinker</button>    
+<button class="categoryBtn" data-type="pattern">    
+You vs Your Pattern    
+</button>    
+<button class="categoryBtn" data-type="validation">Validation</button>    
+    
+<button class="categoryBtn" data-type="failure">Fear of Failure</button>    
+    
+</div>  
+  <div id="hintBox" style="
+display:none;    
+margin-top:12px;
+margin-bottom:12px;
+padding:14px 18px;
+border-radius:12px;
+background:rgba(255,140,0,0.12);
+border:1px solid rgba(255,140,0,0.35);
+color:orange;
+font-size:15px;
+font-weight:bold;
+text-align:center;
+cursor:pointer;
+">
+
+💡 HOW DOES THIS WORK?
+
+</div>
+
+<div id="hintContent" style="
+display:none;
+background:#111;
+border:1px solid #222;
+padding:12px;
+border-radius:10px;
+font-size:14px;
+line-height:1.7;
+color:#ddd;
+margin-bottom:10px;
+">
+
+• Select a pattern<br><br>
+
+• Use the suggested question or rewrite it<br>
+
+<span style="color:orange;font-weight:bold;">
+(Or ask your own question. Discover the hidden pattern behind it.)
+</span><br><br>
+
+• Click "Show me the truth"<br><br>
+
+• Answer follow-up questions honestly<br>
+
+<span style="color:orange;font-weight:bold;">
+(The pattern appears in your answers. Avoid only "yes", "no", or one-word replies. Detailed responses reveal deeper patterns.)
+</span>
+</div>
+   <div class="cta-box" style="
+margin-top:22px;
+margin-bottom:18px;
+padding:28px;
+border-radius:22px;
+
+background:linear-gradient(
+145deg,
+#0b1020,
+#131a33
+);
+
+border:1px solid rgba(168,85,247,.18);
+
+box-shadow:
+0 0 30px rgba(168,85,247,.12),
+0 0 80px rgba(168,85,247,.05);
+
+text-align:center;
+position:relative;
+overflow:hidden;
+">
+
+<div style="
+position:absolute;
+top:-40px;
+right:-40px;
+width:140px;
+height:140px;
+background:rgba(168,85,247,.12);
+border-radius:50%;
+filter:blur(40px);
+"></div>
+
+<div
+id="loopIndicator"
+class="loopBadge"
+style="display:none;"
+>
+LOOP 1 OF 7
+</div>
+
+<div id="patternProfile"
+style="
+display:block;
+margin:16px 0;
+padding:18px;
+
+background:linear-gradient(
+145deg,
+rgba(15,23,42,.95),
+rgba(30,27,75,.90)
+);
+
+border:1px solid rgba(168,85,247,.35);
+
+border-radius:16px;
+
+line-height:1.8;
+
+box-shadow:
+0 0 25px rgba(168,85,247,.12),
+inset 0 0 20px rgba(168,85,247,.05);
+">
+
+<div id="profilePrimary"
+style="
+color:#ffffff;
+font-size:15px;
+font-weight:700;
+margin-top:10px;
+margin-bottom:8px;
+display:block;
+">
+Primary Loop:
+</div>
+
+<div id="profileTrigger"
+style="
+color:#c4b5fd;
+font-size:13px;
+margin-bottom:8px;
+display:block;
+">
+Emotional Driver:
+</div>
+
+<div id="profileAvoidance"
+style="
+color:#94a3b8;
+font-size:13px;
+margin-bottom:8px;
+display:block;
+">
+Avoidance Style:
+</div>
+
+<div id="profileBelief"
+style="
+color:#fbbf24;
+font-size:13px;
+display:block;
+">
+Underlying Belief:
+</div>
+
+</div>
+
+<div id="outputBox" class="output">    
+<div class="floating-dot dot1"></div>
+<div class="floating-dot dot2"></div>
+<div class="floating-dot dot3"></div>
+<div class="floating-dot dot4"></div>
+<div class="floating-dot dot5"></div>    
+<div style="    
+color:orange;    
+font-size:11px;    
+font-weight:bold;    
+letter-spacing:2px;    
+margin-bottom:14px;    
+">    
+TRUTHLOOP    
+</div>    
+</div>   
+
+    
+
+<div id="categoryMessage" style="    
+display:none;    
+background:#101010;    
+border-left:3px solid orange;    
+padding:14px;    
+border-radius:10px;    
+margin-bottom:18px;    
+color:#f0f0f0;    
+line-height:1.7;    
+font-size:15px;    
+transition:0.2s;    
+">
+<div id="restoreScreen" style="display:none;text-align:center;padding:30px;">
+
+<h2 style="color:orange;">Journey Found</h2>
+
+<p id="restorePattern"></p>
+
+<p id="restoreLoop"></p>
+
+<button id="continueJourneyBtn"
+style="width:100%;padding:14px;margin-top:10px;background:orange;color:black;border:none;border-radius:10px;font-weight:bold;">
+CONTINUE JOURNEY
+</button>
+
+<button id="newPatternBtn"
+style="width:100%;padding:14px;margin-top:10px;background:#222;color:white;border:1px solid #444;border-radius:10px;font-weight:bold;">
+START NEW PATTERN
+</button>
+
+</div>  
+Category selected.    
+</div>
+</div>    
+<input id="mainInput"    
+placeholder="Reply to TruthLoop..."    
+style="    
+background:#101010;    
+border:1px solid #262626;    
+box-shadow:0 0 0 1px rgba(255,140,0,0.05);    
+"/>    
+<div id="guideText" style="
+text-align:center;
+color:orange;
+font-size:14px;
+margin:12px 0;
+font-weight:bold;
+animation:guidePulse 2s infinite;
+">
+Type your question with some context in "Reply To TruthLoop AI", then click "Show Me The Truth".
+</div>
+<button id="getBtn">    
+Show me the truth →    
+</button>    
+    
+<input id="reflectionInput"
+style="display:none;"
+placeholder="Answer honestly..."/>
+
+<button id="nextBtn" style="display:none;">
+Go deeper
+</button>
+    
+<!-- SHARE BOX -->    
+    
+<div id="shareBox">    
+    
+<div id="shareText"></div>    
+    
+<button onclick="copyShare()">    
+Copy    
+</button>    
+    
+<button onclick="whatsappShare()">    
+WhatsApp    
+</button>    
+    
+</div>    
+<div id="articleBlock" style="    
+display:none;    
+margin-top:22px;    
+margin-bottom:18px;    
+padding:16px;    
+background:#111;    
+border:1px solid #222;    
+border-radius:14px;    
+line-height:1.8;    
+">    
+    
+<div style="    
+font-size:16px;    
+font-weight:bold;    
+margin-bottom:10px;    
+color:#fff;    
+">    
+Explore More Clarity Systems    
+</div>    
+    
+<a href="https://truthloop.in/why-you-feel-stuck.html"    
+style="    
+display:block;    
+margin-bottom:10px;    
+color:orange;    
+text-decoration:none;    
+">    
+→ Why You Feel Stuck    
+</a>    
+    
+<a href="https://truthloop.in/why-you-procrastinate.html"    
+style="    
+display:block;    
+margin-bottom:10px;    
+color:orange;    
+text-decoration:none;    
+">    
+→ Why You Procrastinate    
+</a>    
+    
+<a href="https://truthloop.in/why-you-seek-validation.html"    
+style="    
+display:block;    
+margin-bottom:10px;    
+color:orange;    
+text-decoration:none;    
+">    
+→ Why You Seek Validation    
+</a>    
+    
+<a href="https://truthloop.in/"    
+style="    
+display:block;    
+color:#fff;    
+text-decoration:none;    
+font-weight:bold;    
+">    
+→ Visit TruthLoop AI    
+</a>    
+    
+</div>    
+<!-- PAYWALL -->    
+    
+<div id="paywallBox">    
+    
+<div id="paySub"></div>    
+    
+<button id="razorpayBtn"></button>    
+    
+<div id="paypal-button"></div>    
+    
+</div>    
+    
+</div>    
+    
+<script>    
+    
+const API_URL="/api/chat";    
+const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
+    
+const outputBox=document.getElementById("outputBox");    
+const mainInput=document.getElementById("mainInput");    
+const reflectionInput=document.getElementById("reflectionInput");    
+const getBtn=document.getElementById("getBtn");    
+const nextBtn=document.getElementById("nextBtn");    
+    
+const shareBox=document.getElementById("shareBox");    
+const shareText=document.getElementById("shareText");    
+    
+const paywallBox=document.getElementById("paywallBox");    
+const paySub=document.getElementById("paySub");    
+const razorpayBtn=document.getElementById("razorpayBtn");    
+    
+let loopLevel=1;
+let messages=[];
+let payment49=false;
+let payment199=false;
+let currentCategory="";
+
+let isLoading=false;
+
+const questionMap = {
+
+creator:[
+"Why do I keep creating but struggle to grow?",
+"What pattern keeps slowing my progress?",
+"Why does visibility feel uncomfortable?"
+],
+
+writer:[
+"Why do I delay publishing my work?",
+"Why do I keep rewriting instead of sharing?",
+"What pattern keeps repeating here?"
+],
+
+author:[
+"Why do I hesitate to publish?",
+"Why does finishing feel harder than starting?",
+"What am I not seeing?"
+],
+
+founder:[
+"Why do I delay important decisions?",
+"What keeps this pattern alive?",
+"Why do I keep carrying uncertainty?"
+],
+
+owner:[
+"Why do I feel stuck despite effort?",
+"What am I not seeing?",
+"What keeps repeating?"
+],
+
+student:[
+"Why do I know what to do but still delay it?",
+"Why does progress feel slower than expected?",
+"What pattern keeps repeating?"
+],
+
+jobseeker:[
+"Why do I hesitate to put myself forward?",
+"Why does rejection feel so heavy?",
+"What am I not seeing?"
+],
+
+overthinker:[
+"Why do I keep overthinking even when I know what to do?",
+"Why do I need certainty before acting?",
+"Why do simple decisions feel heavy?"
+],
+
+pattern:[
+"What keeps repeating in my life?",
+"What am I not seeing?",
+"Why does this pattern stay alive?"
+],
+
+validation:[
+"Why do I need validation before acting?",
+"Why does criticism affect me so much?",
+"What am I not seeing?"
+],
+
+failure:[
+"Why do I fear failure before I begin?",
+"Why do I avoid situations that test me?",
+"What pattern keeps repeating?"
+]
+
+};
+/* Analytics */    
+    
+function track(event,data={}){    
+if(typeof gtag!=="undefined"){    
+gtag('event',event,data);    
+}    
+}    
+    
+/* API */    
+    
+async function callAPI(){    
+    
+try{    
+    
+const res=await fetch(API_URL,{    
+method:"POST",    
+headers:{    
+"Content-Type":"application/json"    
+},    
+body:JSON.stringify({    
+messages,    
+loopLevel,    
+paid49:payment49,    
+paid199:payment199,    
+currentCategory    
+})    
+});    
+    
+if(!res.ok){    
+const errorText=await res.text();    
+console.error("API ERROR:",errorText);    
+return { reply:"Server error 😃" };    
+}    
+  console.log("SENDING:", {  
+messages,  
+loopLevel,  
+paid49:payment49,  
+paid199:payment199,  
+currentCategory  
+});  
+const data = await res.json();  
+  
+console.log("API RESPONSE:", data);  
+if(data.primaryLoop){
+
+document.getElementById(
+"patternProfile"
+).style.display = "block";
+
+document.getElementById(
+"profilePrimary"
+).innerText =
+"Primary Loop: " +
+data.primaryLoop;
+
+document.getElementById(
+"profileTrigger"
+).innerText =
+"Emotional Driver: " +
+data.emotionalDriver;
+
+document.getElementById(
+"profileAvoidance"
+).innerText =
+"Avoidance Style: " +
+data.avoidanceStyle;
+document.getElementById("profileBelief").innerText =
+"Underlying Belief: " + (data.hiddenAssumption || "");
+  }  
+return data;  
+    
+}catch(err){    
+    
+console.error("FETCH FAIL:",err);    
+return { reply:"Network error 😃" };    
+    
+}    
+    
+}    
+    
+/* TYPE EFFECT */    
+    
+function typeEffect(text){
+
+text = text.replace(
+ /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ `<span class="truthHighlight">$1</span>`
+);
+text = text.replace(/\n/g,"<br>");
+
+const div = document.createElement("div");
+
+outputBox.appendChild(div);
+
+let i = 0;
+
+const speed = 4;
+
+const interval = setInterval(()=>{
+
+div.innerHTML = text.substring(0,i);
+
+outputBox.scrollTop = outputBox.scrollHeight;
+
+i++;
+
+if(i > text.length){
+
+clearInterval(interval);
+
+div.innerHTML = text;
+const match = div.innerHTML.match(/([^.!?]*\?)/g);
+
+if(match && match.length){
+
+const lastQuestion = match[match.length - 1];
+
+div.innerHTML = div.innerHTML.replace(
+lastQuestion,
+`
+<div style="
+margin-top:20px;
+padding:16px;
+border-radius:14px;
+background:rgba(255,140,0,0.08);
+border:1px solid rgba(255,140,0,0.25);
+text-align:center;
+">
+
+<div style="
+color:#ffb347;
+font-size:12px;
+font-weight:700;
+letter-spacing:2px;
+margin-bottom:10px;
+text-transform:uppercase;
+">
+❓ Question For You
+</div>
+
+<div style="
+font-size:20px;
+font-weight:700;
+line-height:1.7;
+color:#fff;
+">
+${lastQuestion}
+</div>
+
+</div>
+`
+);
+
+}
+reflectionInput.style.display = "block";
+
+setTimeout(() => {
+  // reflectionInput.focus();
+}, 300);
+
+nextBtn.style.display = "block";
+}
+
+},speed);
+
+}
+    
+/* SHARE */    
+    
+function showShareCard(text){    
+    
+const clean=text.replace(/<[^>]*>?/gm,'').trim();    
+    
+shareText.innerText=    
+`This hit me harder than expected.    
+    
+${clean}    
+    
+Most people avoid this.    
+    
+https://truthloop.in`;    
+    
+shareBox.style.display="block";    
+    
+}    
+    
+function copyShare(){    
+navigator.clipboard.writeText(shareText.innerText);    
+}    
+    
+function whatsappShare(){    
+window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);    
+}    
+    
+/* PAYWALL */    
+    
+function showPaywall(message,amount){
+
+track("paywall_shown",{loop:loopLevel,amount});
+
+console.log("PAYWALL RAW:", message);
+
+paywallBox.style.display="block";
+
+paySub.innerHTML = message
+.replace(
+ /\[\[\s*highlight\s*\]\]([\s\S]*?)\[\[\s*end\s*\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
+)
+.replace(/\n/g,"<br>");
+    
+razorpayBtn.style.display="block";    
+razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
+    
+razorpayBtn.onclick=function(){    
+track("payment_started",{
+  amount:amount,
+  loop:loopLevel
+});    
+const options = {    
+    
+key: RAZORPAY_KEY_ID,    
+    
+amount: amount * 100,    
+    
+currency: "INR",    
+    
+name: "TruthLoop",    
+    
+description:    
+amount === 49    
+? "Unlock Loop 5"    
+: "Unlock Loop 7",    
+    
+image: "https://truthloop.in/truthloop-hook.jpg",    
+    
+prefill: {    
+name: "",    
+email: "",    
+contact: ""    
+},    
+    
+theme: {    
+color: "#ff7a00"    
+},    
+    
+
+
+retry: {
+  enabled: true,
+  max_count: 2
+},
+
+modal: {
+  backdropclose: false,
+  escape: true,
+  handleback: true
+},
+    
+
+    
+
+    
+handler: function (response) {    
+    
+if(amount===49) payment49=true;    
+if(amount===199) payment199=true;    
+    
+track("payment_success",{    
+method:"razorpay",    
+value:amount    
+});    
+    
+alert("Payment successful 😄");    
+    
+paywallBox.style.display="none";    
+    
+}    
+    
+};    
+    
+const rzp = new Razorpay(options);    
+    
+rzp.open();    
+    
+};    
+    
+document.getElementById("paypal-button").innerHTML="";    
+    
+paypal.Buttons({    
+    
+createOrder:function(data,actions){    
+    
+return actions.order.create({    
+purchase_units:[{    
+amount:{    
+value: amount===49 ? "3.00" : "9.00"    
+}    
+}]    
+});    
+    
+},    
+    
+onApprove:function(data,actions){    
+    
+return actions.order.capture().then(function(){    
+    
+if(amount===49) payment49=true;    
+if(amount===199) payment199=true;    
+    
+track("payment_success",{    
+method:"paypal",    
+value:amount    
+});    
+    
+alert("Payment successful 😄");    
+    
+paywallBox.style.display="none";    
+    
+nextBtn.style.display="block";    
+});    
+    
+}    
+    
+}).render("#paypal-button");
+
+}
+
+document.querySelectorAll(".categoryBtn").forEach(btn=>{
+
+btn.onclick=()=>{
+document.getElementById(
+"patternProfile"
+).style.display = "none";
+alert("Pattern selected");
+
+currentCategory=btn.dataset.type;
+document.getElementById("hintContent").style.display = "none";
+
+document.getElementById("hintBox").innerHTML =
+"💡 HOW DOES THIS WORK?";
+clearJourney();
+
+loopLevel = 1;
+
+
+
+messages = [];
+
+document.getElementById("loopIndicator").innerText =
+"Loop 1 of 7";
+
+outputBox.innerHTML = "";
+document.querySelectorAll(".categoryBtn").forEach(b=>{
+b.style.borderColor="#2a2a2a";
+b.style.color="#fff";
+});
+
+btn.style.borderColor="orange";
+btn.style.color="orange";
+
+if(questionMap[currentCategory]){
+mainInput.value = questionMap[currentCategory][0];
+mainInput.focus();
+}
+
+};
+
+});
+
+/* START */
+    
+getBtn.onclick=async()=>{
+
+const text = mainInput.value.trim();
+
+if(!text){
+
+mainInput.focus();
+
+mainInput.style.borderColor = "orange";
+
+setTimeout(()=>{
+mainInput.style.borderColor = "#262626";
+},1000);
+
+return;
+
+}
+
+document.getElementById("guideText").style.display="none";
+
+if (isLoading) return;
+
+isLoading = true;
+
+getBtn.disabled = true;
+
+track("start_clicked");
+
+track("question_submitted",{
+  question_length:text.length
+});
+messages=[{    
+role:"user",    
+content:text    
+}];    
+    
+/* hide intro screen */    
+outputBox.innerHTML = `
+<div style="
+background:#111;
+padding:18px;
+border-radius:14px;
+border:1px solid #222;
+margin-bottom:18px;
+line-height:1.8;
+font-size:16px;
+">
+<b style="color:orange;">You:</b><br><br>
+${text}
+</div>
+`;
+  
+
+    
+/* smooth scroll */    
+setTimeout(()=>{    
+outputBox.scrollTop=outputBox.scrollHeight;    
+},100);    
+    
+const data=await callAPI();    
+    
+typeEffect(data.reply);    
+    
+messages.push({    
+role:"assistant",    
+content:data.reply    
+});    
+saveJourney();    
+function saveJourney() {
+
+
+
+localStorage.setItem(
+MEMORY_KEY,
+JSON.stringify({
+loopLevel,
+messages,
+currentCategory
+})
+);
+
+  }
+  mainInput.style.display="none";
+getBtn.style.display="none";
+isLoading = false;
+
+getBtn.disabled = false;    
+};    
+    
+/* NEXT */    
+    
+nextBtn.onclick=async()=>{
+
+if (isLoading) return;
+
+isLoading = true;
+
+nextBtn.disabled = true;
+
+const text=reflectionInput.value.trim();    
+    
+if(!text){
+   isLoading = false;
+   nextBtn.disabled = false;
+   return;
+  }   
+track(`loop_${loopLevel}_completed`);     
+loopLevel++;    
+
+
+document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
+track("loop_progress",{loop:loopLevel});    
+   
+messages.push({    
+role:"user",    
+content:text    
+});    
+    
+const userReply=document.createElement("div");
+
+userReply.style.marginTop="18px";
+
+userReply.innerHTML=`
+<b style="color:orange;">You:</b><br><br>
+${text}<br><br>
+`;
+
+outputBox.appendChild(userReply);
+
+const data=await callAPI();    
+
+if(data.paywall){
+
+nextBtn.style.display="none";
+
+isLoading = false;
+nextBtn.disabled = false;
+
+showPaywall(
+data.reply,
+loopLevel===5 ? 49 : 199
+);
+
+return;
+  }
+    
+messages.push({    
+role:"assistant",    
+content:data.reply    
+});    
+saveJourney();    
+typeEffect(data.reply);    
+if(loopLevel >= 7){
+
+document.getElementById("articleBlock").style.display="block";
+showShareCard(data.reply);
+if(window.isRestoredJourney){
+nextBtn.innerText = "Select New Pattern";
+}
+
+}
+reflectionInput.value="";    
+isLoading = false;
+nextBtn.disabled = false;    
+};
+document.getElementById("continueJourneyBtn").onclick = () => {
+track("journey_restored",{
+  loop:loopLevel
+});
+document.getElementById("restoreScreen").style.display = "none";
+
+document.getElementById("mainApp").style.display = "block";
+
+};
+document.getElementById("newPatternBtn").onclick = () => {
+
+clearJourney();
+
+loopLevel = 1;
+messages = [];
+currentCategory = "";
+
+location.reload();
+
+};  
+/* JOURNEY MEMORY */
+
+const MEMORY_KEY = "truthloopMemory";
+
+function saveJourney() {
+
+localStorage.setItem(
+MEMORY_KEY,
+JSON.stringify({
+loopLevel,
+messages,
+currentCategory
+})
+);
+
+}
+
+function loadJourney() {
+
+const saved = localStorage.getItem(MEMORY_KEY);
+
+if(!saved) return null;
+
+return JSON.parse(saved);
+
+}
+
+function clearJourney() {
+
+localStorage.removeItem(MEMORY_KEY);
+
+  }
+const restored = loadJourney();
+
+if(restored){
+window.isRestoredJourney = true;
+loopLevel = restored.loopLevel || 1;
+messages = restored.messages || [];
+currentCategory = restored.currentCategory || "";
+
+document.getElementById("loopIndicator").innerText =
+`Loop ${loopLevel} of 7`;
+
+outputBox.innerHTML = "";
+
+messages.forEach(msg=>{
+
+const div = document.createElement("div");
+
+if(msg.role === "user"){
+
+div.innerHTML = `
+<b style="color:orange;">You:</b><br><br>
+${msg.content}<br><br>
+`;
+
+}else{
+
+let text = msg.content;
+
+text = text.replace(
+ /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
+);
+
+div.innerHTML = text;
+
+  }
+
+outputBox.appendChild(div);
+
+});
+if(loopLevel < 7){
+nextBtn.innerText = "Continue Journey";
+}
+
+if(loopLevel >= 7){
+nextBtn.innerText = "Select New Pattern";
+  }
+ document.getElementById("restoreScreen").style.display = "block";
+document.getElementById("mainApp").style.display = "none";
+const selectedBtn =
+document.querySelector(
+'.categoryBtn[data-type="' + currentCategory + '"]'
+);
+document.getElementById("restorePattern").innerText =
+"Pattern: " + currentCategory;
+
+document.getElementById("restoreLoop").innerText =
+"You left at Loop " + loopLevel + " of 7"; 
+getBtn.disabled = false;
+
+  }
+  document.getElementById("hintBox").addEventListener("click", () => {
+
+  const hint =
+  document.getElementById("hintContent");
+
+  if (hint.style.display === "block") {
+
+    hint.style.display = "none";
+
+  } else {
+
+    hint.style.display = "block";
+
+  }
+
+});
+</script>    
+</div>
+  <footer style="
+margin-top:40px;
+padding:20px;
+text-align:center;
+border-top:1px solid #222;
+background:#0b0b0b;
+font-size:13px;
+color:#888;
+">
+
+<div style="margin-bottom:12px;">
+TruthLoop © 2026
+</div>
+
+<div style="
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:14px;
+">
+
+<a href="/privacy.html"
+style="color:orange;text-decoration:none;">
+Privacy Policy
+</a>
+
+<a href="/terms.html"
+style="color:orange;text-decoration:none;">
+Terms
+</a>
+
+<a href="/refund.html"
+style="color:orange;text-decoration:none;">
+Refund Policy
+</a>
+
+<a href="/cookie-policy.html"
+style="color:orange;text-decoration:none;">
+Cookie Policy
+</a>
+
+</div>
+<div style="margin-top:12px;color:#666;font-size:12px;">
+No signup. No account. Privacy first.
+</div>
+</footer>
+</body>    
+  </html>
