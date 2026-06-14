@@ -1273,7 +1273,76 @@ paySub.innerHTML = message
  '<span class="truthHighlight">$1</span>'
 )
 .replace(/\n/g,"<br>");
-    
+paySub.innerHTML += `
+
+<div style="
+margin-top:20px;
+padding:20px;
+border-radius:16px;
+
+background:linear-gradient(
+145deg,
+rgba(15,23,42,.95),
+rgba(30,27,75,.90)
+);
+
+border:1px solid rgba(168,85,247,.35);
+
+box-shadow:
+0 0 25px rgba(168,85,247,.12);
+
+text-align:left;
+line-height:1.9;
+">
+
+<div style="
+color:#22c55e;
+font-size:16px;
+font-weight:700;
+margin-bottom:12px;
+">
+✓ Pattern Found
+</div>
+
+<div style="
+color:#cbd5e1;
+font-size:14px;
+margin-bottom:8px;
+">
+30% Clarity Reached
+</div>
+
+<div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-bottom:16px;
+">
+Unlock Remaining 70%
+</div>
+
+<div style="
+color:#94a3b8;
+margin-bottom:8px;
+">
+🔒 Root Driver
+</div>
+
+<div style="
+color:#94a3b8;
+margin-bottom:8px;
+">
+🔒 Core Contradiction
+</div>
+
+<div style="
+color:#94a3b8;
+">
+🔒 Action Path
+</div>
+
+</div>
+`;    
 razorpayBtn.style.display="block";    
 razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
     
