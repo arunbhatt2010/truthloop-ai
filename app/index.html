@@ -1273,6 +1273,8 @@ paySub.innerHTML = message
  '<span class="truthHighlight">$1</span>'
 )
 .replace(/\n/g,"<br>");
+if(amount === 49){
+
 paySub.innerHTML += `
 
 <div style="
@@ -1322,7 +1324,66 @@ Unlock Remaining 70%
 
 </div>
 
-`;    
+`;
+
+}else{
+
+paySub.innerHTML += `
+
+<div style="
+margin-top:18px;
+padding-top:16px;
+border-top:1px solid rgba(168,85,247,.25);
+text-align:left;
+">
+
+<div style="
+color:#22c55e;
+font-weight:700;
+font-size:15px;
+margin-bottom:10px;
+">
+✓ Root Driver Found
+</div>
+
+<div style="
+color:#cbd5e1;
+font-size:14px;
+margin-bottom:12px;
+">
+70% Clarity Reached
+</div>
+
+<div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-bottom:14px;
+">
+Unlock Final 30%
+</div>
+
+<div style="color:#94a3b8;margin-bottom:8px;">
+🔒 Core Contradiction
+</div>
+
+<div style="color:#94a3b8;margin-bottom:8px;">
+🔒 What The Behavior Protects
+</div>
+
+<div style="color:#94a3b8;margin-bottom:8px;">
+🔒 Personalized Action Path
+</div>
+
+<div style="color:#94a3b8;">
+🔒 Final TruthLoop Summary
+</div>
+
+</div>
+
+`;
+
+}
 razorpayBtn.style.display="block";    
 razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
     
