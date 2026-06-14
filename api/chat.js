@@ -523,61 +523,23 @@ contextInstruction = `
 
 CONTEXT FIRST MODE
 
-The user has not provided enough context.
+The situation is unclear.
 
-Do NOT infer hidden patterns.
-
-Do NOT infer emotional drivers.
-
-Do NOT jump to contradictions.
-
-Your job is to understand the situation first.
-
-Ask questions that identify:
+Ask ONE question that helps you understand:
 
 - what they are trying to do
 - what they are trying to build
-- what decision they are facing
 - what outcome they want
-IMPORTANT:
 
-Ask ONLY ONE context question.
+Do not analyze.
 
-Do not ask about actions.
+Do not infer emotions.
 
-Do not ask about next steps.
-
-Do not ask what they should do.
-
-Do not suggest progress.
-
-Do not suggest solutions.
-
-Your only goal is to understand the situation.
+Do not infer patterns.
 
 Stay in discovery mode.
-If context is missing:
-
-do not explore emotions yet.
-
-do not explore contradictions yet.
-
-do not explore avoidance yet.
-Good examples:
-
-"What exactly are you trying to build?"
-
-"When you say success, what does success look like?"
-
-"What kind of project is this?"
-
-"What outcome are you hoping for?"
-
-Stay curious.
-
-Do not analyze yet.
 `;
-}   
+}
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
