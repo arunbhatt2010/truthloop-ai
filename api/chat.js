@@ -377,7 +377,39 @@ End with action.
 
       mode = "clarity";
     }
+/* =========================
+   🧠 CONTEXT DETECTOR
+========================= */
 
+let contextMissing = false;
+
+const vagueTerms = [
+  "something",
+  "project",
+  "business",
+  "help people",
+  "success",
+  "grow",
+  "improve",
+  "better",
+  "start"
+];
+
+if (
+  loopLevel <= 2 &&
+  vagueTerms.some(term =>
+    lowerMsg.includes(term)
+  )
+) {
+  contextMissing = true;
+}
+
+if (
+  loopLevel <= 2 &&
+  lastUserMessage.trim().split(/\s+/).length < 8
+) {
+  contextMissing = true;
+}
     /* =========================
        🧠 MODE INSTRUCTION
     ========================= */
@@ -483,6 +515,46 @@ Return ONLY valid JSON.
 "hiddenAssumption":""
 }
 `;
+ let contextInstruction = "";
+
+if (contextMissing) {
+
+contextInstruction = `
+
+CONTEXT FIRST MODE
+
+The user has not provided enough context.
+
+Do NOT infer hidden patterns.
+
+Do NOT infer emotional drivers.
+
+Do NOT jump to contradictions.
+
+Your job is to understand the situation first.
+
+Ask questions that identify:
+
+- what they are trying to do
+- what they are trying to build
+- what decision they are facing
+- what outcome they want
+
+Good examples:
+
+"What exactly are you trying to build?"
+
+"When you say success, what does success look like?"
+
+"What kind of project is this?"
+
+"What outcome are you hoping for?"
+
+Stay curious.
+
+Do not analyze yet.
+`;
+}   
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
@@ -498,6 +570,7 @@ You notice patterns people unintentionally reveal.
 
 ${modeInstruction}
 ${categoryInstruction}
+${contextInstruction}
 ${loop5GateInstruction}
 ${loop7Instruction}
 Your goal:
@@ -610,7 +683,23 @@ The user should feel:
 
 Not:
 "That was logically explained."
+CONTEXT RULE
 
+Before identifying a pattern,
+first determine whether the user
+has provided enough situational context.
+
+If the object of discussion is unclear:
+
+- do not interpret
+- do not infer motives
+- do not infer emotions
+
+Ask a context-building question first.
+
+TruthLoop discovers patterns.
+
+It does not guess them.
 ---
 
 GOOD EXAMPLES:
