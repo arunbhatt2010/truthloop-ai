@@ -1257,8 +1257,9 @@ function whatsappShare(){
 window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);    
 }    
     
-/* PAYWALL */    
-    
+
+/* PAYWALL */
+
 function showPaywall(message,amount){
 
 track("paywall_shown",{loop:loopLevel,amount});
@@ -1267,16 +1268,30 @@ console.log("PAYWALL RAW:", message);
 
 paywallBox.style.display="block";
 
-paySub.innerHTML = message
+paySub.innerHTML = `
+
+<div style="
+max-height:260px;
+overflow-y:auto;
+padding:14px;
+margin-bottom:18px;
+border-radius:14px;
+background:#111827;
+border:1px solid rgba(255,255,255,.06);
+line-height:1.9;
+text-align:left;
+">
+
+${message
 .replace(
  /\[\[\s*highlight\s*\]\]([\s\S]*?)\[\[\s*end\s*\]\]/gi,
  '<span class="truthHighlight">$1</span>'
 )
-.replace(/\n/g,"<br>");
-paySub.innerHTML += `
+.replace(/\n/g,"<br>")}
+
+</div>
 
 <div style="
-margin-top:20px;
 padding:20px;
 border-radius:16px;
 
@@ -1297,7 +1312,7 @@ line-height:1.9;
 
 <div style="
 color:#22c55e;
-font-size:16px;
+font-size:18px;
 font-weight:700;
 margin-bottom:12px;
 ">
@@ -1307,50 +1322,62 @@ margin-bottom:12px;
 <div style="
 color:#cbd5e1;
 font-size:14px;
-margin-bottom:8px;
+margin-bottom:10px;
 ">
 30% Clarity Reached
 </div>
 
 <div style="
+height:1px;
+background:rgba(255,255,255,.08);
+margin:14px 0;
+"></div>
+
+<div style="
 color:#fbbf24;
-font-size:14px;
+font-size:15px;
 font-weight:600;
 margin-bottom:16px;
 ">
-Unlock Remaining 70%
+Unlock Your Complete Pattern
 </div>
 
 <div style="
 color:#94a3b8;
-margin-bottom:8px;
+margin-bottom:10px;
+font-size:15px;
 ">
 🔒 Root Driver
 </div>
 
 <div style="
 color:#94a3b8;
-margin-bottom:8px;
+margin-bottom:10px;
+font-size:15px;
 ">
 🔒 Core Contradiction
 </div>
 
 <div style="
 color:#94a3b8;
+font-size:15px;
 ">
 🔒 Action Path
 </div>
 
 </div>
-`;    
-razorpayBtn.style.display="block";    
-razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
-    
-razorpayBtn.onclick=function(){    
+
+`;
+
+razorpayBtn.style.display="block";
+razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";
+
+razorpayBtn.onclick=function(){
+
 track("payment_started",{
-  amount:amount,
-  loop:loopLevel
-});    
+amount:amount,
+loop:loopLevel
+});
 const options = {    
     
 key: RAZORPAY_KEY_ID,    
