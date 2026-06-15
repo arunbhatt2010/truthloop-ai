@@ -990,6 +990,7 @@ let loopLevel=1;
 let messages=[];
 let payment49=false;
 let payment199=false;
+let userCountry = "IN";  
 let currentCategory="";
 
 let isLoading=false;
@@ -1384,8 +1385,28 @@ Unlock Final 30%
 `;
 
 }
-razorpayBtn.style.display="block";    
-razorpayBtn.innerText = amount===49 ? "Pay ₹49" : "Pay ₹199";    
+if(userCountry === "IN"){
+
+razorpayBtn.style.display="block";
+
+razorpayBtn.innerText =
+amount===49
+? "Pay ₹49"
+: "Pay ₹199";
+
+document.getElementById(
+"paypal-button"
+).style.display="none";
+
+}else{
+
+razorpayBtn.style.display="none";
+
+document.getElementById(
+"paypal-button"
+).style.display="block";
+
+}    
     
 razorpayBtn.onclick=function(){    
 track("payment_started",{
@@ -1731,7 +1752,27 @@ location.reload();
 
 };  
 /* JOURNEY MEMORY */
+async function detectCountry(){
 
+try{
+
+const res = await fetch(
+"https://ipapi.co/json/"
+);
+
+const data = await res.json();
+
+userCountry =
+data.country_code || "IN";
+
+}catch(e){
+
+userCountry = "IN";
+
+}
+
+  }
+detectCountry();  
 const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney() {
