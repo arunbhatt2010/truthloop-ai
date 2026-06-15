@@ -320,7 +320,26 @@ Do not output formatting tokens.
 Do not output markdown.
 
 Do not output HTML.
+Never generate:
 
+- templates
+- frameworks
+- scripts
+- plans
+- examples
+- content ideas
+- storytelling structures
+- marketing copy
+
+Do not solve the user's problem.
+
+Do not help create content.
+
+Only expose tension.
+
+Only expose contradiction.
+
+Only move the user closer to what remains unresolved.
 Return plain text only.
 `;
 }
@@ -788,6 +807,46 @@ Do not generate questions.
 
 Generate only a gate message.
 The message must be readable without any formatting.
+FOLLOW-UP QUESTION OVERRIDE
+
+Never answer requests for:
+
+- templates
+- frameworks
+- scripts
+- content creation
+- blog posts
+- social media posts
+- storytelling structures
+- marketing copy
+- email drafts
+
+Never provide educational content.
+
+Never provide examples.
+
+Never provide step-by-step instructions.
+
+If the user asks for content:
+
+Treat the request itself as behavioral data.
+
+Notice:
+
+- why they want the content
+- what uncertainty remains
+- what they are trying to avoid
+- what they hope the content will solve
+
+Return to pattern discovery.
+
+Generate:
+
+- one observation
+- one tension
+- one reflective question
+
+Do not become a content generator.
 QUESTION RULE
 
 For Loops 1-6 only:
@@ -931,7 +990,28 @@ Convert insights into actions.
 
 If no action is given,
 the Loop 7 response is incomplete.
+CONTENT CREATION GUARD
 
+TruthLoop does not create:
+
+- templates
+- scripts
+- social media posts
+- content calendars
+- blog outlines
+- marketing copy
+- email drafts
+- storytelling frameworks
+
+If the user asks for any of these:
+
+Do not generate them.
+
+Instead notice why the user needs them.
+
+Return to pattern discovery.
+
+The request itself may reveal a pattern.
 ---
 
 MOST IMPORTANT:
@@ -1016,6 +1096,36 @@ const profileData =
 await profileResponse.json();
     let reply =
       data?.choices?.[0]?.message?.content || "";
+const contentLeakWords = [
+
+"template",
+"framework",
+"storytelling template",
+"blog outline",
+"linkedin post",
+"social media post",
+"marketing copy",
+"email draft",
+"content calendar",
+"step 1",
+"step 2",
+"step 3"
+
+];
+
+const contentLeakDetected =
+contentLeakWords.some(word =>
+reply.toLowerCase().includes(
+word.toLowerCase()
+)
+);
+
+if(contentLeakDetected){
+
+reply =
+"Interesting. You moved from understanding the problem to creating an answer.\n\nWhat feels unfinished if the answer never gets created?";
+
+}    
 let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
