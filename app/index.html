@@ -468,6 +468,22 @@ box-shadow:
 backdrop-filter:blur(8px);
 
   }
+.protected-mode .truthHighlight{
+filter:blur(6px);
+user-select:none;
+}
+
+.protected-mode #profileBelief,
+.protected-mode #profileAvoidance{
+filter:blur(8px);
+opacity:.55;
+}
+
+.protected-mode #profileBelief::after,
+.protected-mode #profileAvoidance::after{
+content:" 🔒 Export Protected";
+color:#ffb347;
+  }  
 </style><script type="text/javascript">    
     (function(c,l,a,r,i,t,y){    
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};    
@@ -1883,7 +1899,18 @@ getBtn.disabled = false;
 /* ==========================
    COPY PROTECTION SYSTEM
 ========================== */
+function activateProtectedMode(){
 
+  localStorage.setItem(
+    "exportRisk",
+    "true"
+  );
+
+  document.body.classList.add(
+    "protected-mode"
+  );
+
+  }
 function showCopyGate(){
 
   if(document.getElementById("copyGate")) return;
@@ -2001,7 +2028,7 @@ document.addEventListener("keydown",(e)=>{
     track("ctrl_a_blocked",{
       loop:loopLevel
     });
-
+activateProtectedMode();
     showCopyGate();
 
   }
