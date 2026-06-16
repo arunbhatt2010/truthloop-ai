@@ -484,11 +484,11 @@ opacity:.55;
 content:" 🔒 Export Protected";
 color:#ffb347;
   }
- .protected-mode #outputBox{
-filter:blur(12px);
-pointer-events:none;
-user-select:none;
-}
+.protected-mode .aiResponse{
+ filter:blur(12px);
+ pointer-events:none;
+ user-select:none;
+  }
 
 .protected-mode #patternProfile{
 filter:blur(12px);
@@ -1182,7 +1182,7 @@ text = text.replace(
 text = text.replace(/\n/g,"<br>");
 
 const div = document.createElement("div");
-
+div.className = "aiResponse";
 outputBox.appendChild(div);
 
 let i = 0;
