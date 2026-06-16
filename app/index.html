@@ -483,7 +483,18 @@ opacity:.55;
 .protected-mode #profileAvoidance::after{
 content:" 🔒 Export Protected";
 color:#ffb347;
-  }  
+  }
+ .protected-mode #outputBox{
+filter:blur(12px);
+pointer-events:none;
+user-select:none;
+}
+
+.protected-mode #patternProfile{
+filter:blur(12px);
+pointer-events:none;
+user-select:none;
+  } 
 </style><script type="text/javascript">    
     (function(c,l,a,r,i,t,y){    
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};    
