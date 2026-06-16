@@ -1880,6 +1880,156 @@ getBtn.disabled = false;
   }
 
 });
+/* ==========================
+   COPY PROTECTION SYSTEM
+========================== */
+
+function showCopyGate(){
+
+  if(document.getElementById("copyGate")) return;
+
+  const gate = document.createElement("div");
+
+  gate.id = "copyGate";
+
+  gate.innerHTML = `
+  <div style="
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.88);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  ">
+
+    <div style="
+      max-width:460px;
+      width:100%;
+      background:#0b1020;
+      border:1px solid rgba(168,85,247,.25);
+      border-radius:18px;
+      padding:26px;
+      text-align:center;
+      color:white;
+    ">
+
+      <h2 style="
+        color:#ff8c00;
+        margin-top:0;
+      ">
+        ⚠️ Copy Protection
+      </h2>
+
+      <p style="
+        line-height:1.8;
+        color:#ddd;
+      ">
+        This TruthLoop session contains
+        proprietary behavioral analysis.
+      </p>
+
+      <p style="
+        line-height:1.8;
+        color:#bbb;
+      ">
+        Full transcript copying,
+        redistribution,
+        or commercial reuse
+        is not permitted.
+      </p>
+
+      <p style="
+        color:#ffb347;
+        font-weight:bold;
+        margin-top:14px;
+      ">
+        Sign in to save or export your session.
+      </p>
+
+      <button onclick="closeCopyGate()"
+      style="
+        margin-top:14px;
+        background:orange;
+        color:black;
+        border:none;
+        border-radius:10px;
+        padding:14px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+        Continue Reading
+      </button>
+
+    </div>
+
+  </div>
+  `;
+
+  document.body.appendChild(gate);
+
+}
+
+function closeCopyGate(){
+
+  const gate =
+  document.getElementById("copyGate");
+
+  if(gate) gate.remove();
+
+}
+
+/* Ctrl+A Detection */
+
+document.addEventListener("keydown",(e)=>{
+
+  const isSelectAll =
+  (e.ctrlKey || e.metaKey) &&
+  e.key.toLowerCase()==="a";
+
+  if(!isSelectAll) return;
+
+  const text =
+  document.getElementById("outputBox")
+  ?.innerText || "";
+
+  if(text.length > 300){
+
+    e.preventDefault();
+
+    track("ctrl_a_blocked",{
+      loop:loopLevel
+    });
+
+    showCopyGate();
+
+  }
+
+});
+
+/* Copy Detection */
+
+document.addEventListener("copy",(e)=>{
+
+  const selected =
+  window.getSelection()
+  .toString();
+
+  if(selected.length < 250){
+    return;
+  }
+
+  e.preventDefault();
+
+  track("copy_blocked",{
+    chars:selected.length,
+    loop:loopLevel
+  });
+
+  showCopyGate();
+
+});  
 </script>    
 </div>
   <footer style="
