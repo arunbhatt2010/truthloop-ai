@@ -290,10 +290,22 @@ if (
 ) {
 
   return res.status(200).json({
-    reply: discoveryPrompt
-  });
+  reply: `🚀 OPPORTUNITY SCAN STARTED
 
-  }
+Analyzing:
+
+• Audience patterns
+• Repeated conversations
+• High engagement themes
+• Founder pain points
+• Opportunity gaps
+
+Generating GTM Intelligence...
+
+(Discovery Engine Phase 1)`
+});
+
+   }
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
