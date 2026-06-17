@@ -288,7 +288,32 @@ if (
   founderMode &&
   lowerMsg === "scan"
 ) {
-
+const discoveryCompletion =
+  await fetch(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json",
+        Authorization:
+          `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model:
+          "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content:
+              discoveryPrompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      })
+    }
+  );
   return res.status(200).json({
   reply: `🚀 OPPORTUNITY SCAN STARTED
 
