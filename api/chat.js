@@ -226,6 +226,37 @@ const objectiveMessage =
         )
     )?.content || "";
     /* =========================
+   BLOCK 8D
+   PROFILE ENTRY GATE
+========================= */
+
+const profileLink =
+  [...messages]
+    .reverse()
+    .find(
+      m =>
+        m.role === "user" &&
+        (
+          m.content.includes("linkedin.com") ||
+          m.content.includes("facebook.com") ||
+          m.content.includes("x.com") ||
+          m.content.includes("reddit.com")
+        )
+    )?.content || "";
+    /* =========================
+   BLOCK 8E
+   PROFILE VALIDATION
+========================= */
+
+const hasProfile =
+  profileLink.length > 0;
+
+const cleanObjective =
+  objectiveMessage &&
+  !objectiveMessage.includes(".com")
+    ? objectiveMessage
+    : "Unknown";
+    /* =========================
    BLOCK 8B
    DISCOVERY PROMPT
 ========================= */
@@ -302,37 +333,8 @@ Suggested Action:
 Discussion Link:
 N/A
 `;
- /* =========================
-   BLOCK 8D
-   PROFILE ENTRY GATE
-========================= */
-
-const profileLink =
-  [...messages]
-    .reverse()
-    .find(
-      m =>
-        m.role === "user" &&
-        (
-          m.content.includes("linkedin.com") ||
-          m.content.includes("facebook.com") ||
-          m.content.includes("x.com") ||
-          m.content.includes("reddit.com")
-        )
-    )?.content || "";
-    /* =========================
-   BLOCK 8E
-   PROFILE VALIDATION
-========================= */
-
-const hasProfile =
-  profileLink.length > 0;
-
-const cleanObjective =
-  objectiveMessage &&
-  !objectiveMessage.includes(".com")
-    ? objectiveMessage
-    : "Unknown";
+ 
+    
     /* =========================
    BLOCK 8F
    DISCOVERY SCORING ENGINE
