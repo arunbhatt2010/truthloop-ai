@@ -47,20 +47,18 @@ export default async function handler(req, res) {
     }
 
     const lastUserMessage =
-      messages[messages.length - 1]?.content || "";
-
-    const lastUserMessage =
-      messages[messages.length - 1]?.content || "";
+  messages[messages.length - 1]?.content || "";
 
 const lowerMsg =
-      lastUserMessage.toLowerCase();
+  lastUserMessage.trim().toLowerCase();
 
 const founderMode =
-      messages.some(
-        m =>
-          m.role === "user" &&
-          m.content.trim() === "Admin Gopi"
-      );
+  messages.some(
+    m =>
+      m.role === "user" &&
+      m.content.trim().toLowerCase() ===
+      "admin gopi"
+  );
   const discoverySources = [
   "linkedin",
   "facebook",
