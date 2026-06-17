@@ -156,6 +156,86 @@ Describe your niche or objective.`
 
     }
     /* =========================
+   BLOCK 6
+   OBJECTIVE CAPTURE
+========================= */
+
+const discoverySources = [
+  "linkedin",
+  "facebook",
+  "reddit",
+  "x",
+  "indie hackers",
+  "google"
+];
+
+const selectedSource =
+  messages.find(m =>
+    discoverySources.includes(
+      m.content.trim().toLowerCase()
+    )
+  )?.content;
+
+if (
+  founderMode &&
+  selectedSource &&
+  !discoverySources.includes(lowerMsg)
+) {
+
+  return res.status(200).json({
+    reply: `🎯 DISCOVERY OBJECTIVE SET
+
+Platform:
+${selectedSource}
+
+Target:
+${lastUserMessage}
+
+Preparing Opportunity Scan...
+
+Scanning for:
+
+• Recurring pain points
+• Hidden frustrations
+• Demand signals
+• Content gaps
+• Comment opportunities
+• GTM opportunities
+
+Type:
+
+SCAN`
+  });
+
+    }
+    /* =========================
+   BLOCK 7
+   SCAN TRIGGER
+========================= */
+
+if (
+  founderMode &&
+  lowerMsg === "scan"
+) {
+
+  return res.status(200).json({
+    reply: `🚀 OPPORTUNITY SCAN STARTED
+
+Analyzing:
+
+• Audience patterns
+• Repeated conversations
+• High engagement themes
+• Founder pain points
+• Opportunity gaps
+
+Generating GTM Intelligence...
+
+(Discovery Engine Phase 1)`
+  });
+
+  }
+    /* =========================
        ❌ DOMAIN FILTER
     ========================= */
 
