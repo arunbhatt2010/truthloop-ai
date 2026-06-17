@@ -51,7 +51,14 @@ export default async function handler(req, res) {
 
     const lowerMsg =
       lastUserMessage.toLowerCase();
+const founderMode =
+lastUserMessage.trim() ===
+"Admin Gopi";
+    if(founderMode){
 
+// Discovery Engine
+
+    }
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
