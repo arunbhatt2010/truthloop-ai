@@ -314,20 +314,15 @@ const discoveryCompletion =
       })
     }
   );
+  const discoveryData =
+  await discoveryCompletion.json();
+
+const opportunityReply =
+  discoveryData?.choices?.[0]
+    ?.message?.content ||
+  "No opportunity found.";
   return res.status(200).json({
-  reply: `🚀 OPPORTUNITY SCAN STARTED
-
-Analyzing:
-
-• Audience patterns
-• Repeated conversations
-• High engagement themes
-• Founder pain points
-• Opportunity gaps
-
-Generating GTM Intelligence...
-
-(Discovery Engine Phase 1)`
+  reply: opportunityReply
 });
 
    }
