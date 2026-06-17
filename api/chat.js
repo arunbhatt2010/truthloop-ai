@@ -241,7 +241,15 @@ ${cleanObjective}
 Profile Source:
 ${profileLink || "Not Provided"}
 Mission:
+Scoring Model:
 
+Demand Signals = 25
+Repeated Pain Points = 25
+Buying Intent = 20
+Engagement Potential = 15
+Competition Gap = 15
+
+Total Opportunity Score = 100
 Identify:
 
 - Recurring pain points
@@ -325,6 +333,23 @@ const cleanObjective =
   !objectiveMessage.includes(".com")
     ? objectiveMessage
     : "Unknown";
+    /* =========================
+   BLOCK 8F
+   DISCOVERY SCORING ENGINE
+========================= */
+
+let demandScore = 0;
+let painScore = 0;
+let buyingIntentScore = 0;
+let engagementScore = 0;
+let gapScore = 0;
+
+let opportunityScore =
+  demandScore +
+  painScore +
+  buyingIntentScore +
+  engagementScore +
+  gapScore;
     /* =========================
    BLOCK 7
    SCAN TRIGGER
