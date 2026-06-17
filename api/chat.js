@@ -237,8 +237,9 @@ Platform:
 ${selectedSource || "Unknown"}
 
 Objective:
-${objectiveMessage || "Unknown"}
-
+${cleanObjective}
+Profile Source:
+${profileLink || "Not Provided"}
 Mission:
 
 Identify:
@@ -310,7 +311,20 @@ const profileLink =
           m.content.includes("x.com") ||
           m.content.includes("reddit.com")
         )
-    )?.content || "";   
+    )?.content || "";
+    /* =========================
+   BLOCK 8E
+   PROFILE VALIDATION
+========================= */
+
+const hasProfile =
+  profileLink.length > 0;
+
+const cleanObjective =
+  objectiveMessage &&
+  !objectiveMessage.includes(".com")
+    ? objectiveMessage
+    : "Unknown";
     /* =========================
    BLOCK 7
    SCAN TRIGGER
