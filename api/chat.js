@@ -212,6 +212,7 @@ const objectiveMessage =
     .find(
       m =>
         m.role === "user" &&
+
         ![
           "admin gopi",
           "linkedin",
@@ -223,7 +224,12 @@ const objectiveMessage =
           "scan"
         ].includes(
           m.content.trim().toLowerCase()
-        )
+        ) &&
+
+        !m.content.includes("linkedin.com") &&
+        !m.content.includes("facebook.com") &&
+        !m.content.includes("reddit.com") &&
+        !m.content.includes("x.com")
     )?.content || "";
     /* =========================
    BLOCK 8D
