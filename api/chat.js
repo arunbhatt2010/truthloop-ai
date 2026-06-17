@@ -259,7 +259,21 @@ Rules:
 - Prioritize opportunity over popularity.
 - Hide internal reasoning.
 - Return only actionable intelligence.
+CRITICAL RULE:
 
+If no profile link is provided:
+
+Return only:
+
+PROFILE REQUIRED
+
+Provide:
+
+- Profile URL
+- Group URL
+- Community URL
+
+Discovery cannot begin without a source.
 Output Format:
 
 TOP OPPORTUNITY
@@ -279,6 +293,24 @@ Suggested Action:
 Discussion Link:
 N/A
 `;
+ /* =========================
+   BLOCK 8D
+   PROFILE ENTRY GATE
+========================= */
+
+const profileLink =
+  [...messages]
+    .reverse()
+    .find(
+      m =>
+        m.role === "user" &&
+        (
+          m.content.includes("linkedin.com") ||
+          m.content.includes("facebook.com") ||
+          m.content.includes("x.com") ||
+          m.content.includes("reddit.com")
+        )
+    )?.content || "";   
     /* =========================
    BLOCK 7
    SCAN TRIGGER
