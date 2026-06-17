@@ -160,14 +160,6 @@ Describe your niche or objective.`
    OBJECTIVE CAPTURE
 ========================= */
 
-const discoverySources = [
-  "linkedin",
-  "facebook",
-  "reddit",
-  "x",
-  "indie hackers",
-  "google"
-];
 
 const selectedSource =
   messages.find(m =>
@@ -179,7 +171,8 @@ const selectedSource =
 if (
   founderMode &&
   selectedSource &&
-  !discoverySources.includes(lowerMsg)
+  !discoverySources.includes(lowerMsg) &&
+  lowerMsg !== "scan"
 ) {
 
   return res.status(200).json({
