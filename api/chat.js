@@ -49,14 +49,112 @@ export default async function handler(req, res) {
     const lastUserMessage =
       messages[messages.length - 1]?.content || "";
 
-    const lowerMsg =
-      lastUserMessage.toLowerCase();
-const founderMode =
-lastUserMessage.trim() ===
-"Admin Gopi";
-    if(founderMode){
+    const lastUserMessage =
+      messages[messages.length - 1]?.content || "";
 
-// Discovery Engine
+const lowerMsg =
+      lastUserMessage.toLowerCase();
+
+const founderMode =
+      messages.some(
+        m =>
+          m.role === "user" &&
+          m.content.trim() === "Admin Gopi"
+      );
+  const discoverySources = [
+  "linkedin",
+  "facebook",
+  "reddit",
+  "x",
+  "indie hackers",
+  "google"
+];
+    if (
+  lastUserMessage.trim() ===
+  "Admin Gopi"
+){
+
+  return res.status(200).json({
+
+    reply: `🔒 Founder Mode Activated
+
+Discovery Sources Available
+
+• LinkedIn
+• Facebook
+• Reddit
+• X
+• Indie Hackers
+• Google
+
+Type a source name.`
+
+  });
+
+  }
+ if (
+  founderMode &&
+  lowerMsg === "linkedin"
+){
+
+  return res.status(200).json({
+
+    reply: `LINKEDIN DISCOVERY STARTED
+
+Scanning for:
+
+• High engagement conversations
+• Founder pain points
+• Repeating objections
+• Hidden audience frustrations
+• Opportunity gaps
+• Comment opportunities
+
+Describe your niche or objective.`
+
+  });
+
+        }
+    if (
+  founderMode &&
+  lowerMsg === "facebook"
+){
+
+  return res.status(200).json({
+    reply: `FACEBOOK DISCOVERY STARTED
+
+Scanning for:
+
+• Group conversations
+• Recurring problems
+• Emotional triggers
+• Viral discussion patterns
+• GTM opportunities
+
+Describe your niche or objective.`
+  });
+
+    }
+    if (
+  founderMode &&
+  lowerMsg === "reddit"
+){
+
+  return res.status(200).json({
+
+    reply: `REDDIT DISCOVERY STARTED
+
+Looking for:
+
+• Complaints
+• Frustrations
+• Unsolved problems
+• Hidden demand
+• Buying intent
+
+Describe your niche or objective.`
+
+  });
 
     }
     /* =========================
