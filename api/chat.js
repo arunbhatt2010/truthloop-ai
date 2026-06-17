@@ -202,6 +202,30 @@ SCAN`
 
     }
     /* =========================
+   BLOCK 8A
+   DISCOVERY OBJECTIVE
+========================= */
+
+const objectiveMessage =
+  [...messages]
+    .reverse()
+    .find(
+      m =>
+        m.role === "user" &&
+        ![
+          "admin gopi",
+          "linkedin",
+          "facebook",
+          "reddit",
+          "x",
+          "google",
+          "indie hackers",
+          "scan"
+        ].includes(
+          m.content.trim().toLowerCase()
+        )
+    )?.content || "";
+    /* =========================
    BLOCK 7
    SCAN TRIGGER
 ========================= */
