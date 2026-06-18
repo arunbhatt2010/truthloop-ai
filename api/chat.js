@@ -237,6 +237,47 @@ SCAN`
 
     }
     /* =========================
+   BLOCK 6A
+   OPPORTUNITY TYPE
+========================= */
+
+const opportunityTypes = [
+  "gtm",
+  "content",
+  "product",
+  "sales",
+  "audience",
+  "community",
+  "custom"
+];
+
+if (
+  founderMode &&
+  selectedSource &&
+  cleanObjective !== "Unknown" &&
+  opportunityTypes.includes(lowerMsg)
+){
+
+  return res.status(200).json({
+    reply: `OPPORTUNITY TYPE SET
+
+Type:
+${lastUserMessage.toUpperCase()}
+
+What should be analyzed?
+
+Examples:
+
+• TruthLoop AI
+• AI Agency
+• SaaS
+• Newsletter
+• Course
+• Book Funnel`
+  });
+
+      }
+    /* =========================
    BLOCK 8A
    DISCOVERY OBJECTIVE
 ========================= */
@@ -265,6 +306,34 @@ const objectiveMessage =
         !m.content.includes("facebook.com") &&
         !m.content.includes("reddit.com") &&
         !m.content.includes("x.com")
+    )?.content || "";
+    const selectedOpportunityType =
+  [...messages]
+    .reverse()
+    .find(
+      m =>
+        opportunityTypes.includes(
+          m.content.trim().toLowerCase()
+        )
+    )?.content || "";
+    const focusArea =
+  [...messages]
+    .reverse()
+    .find(
+      m =>
+        m.role === "user" &&
+
+        !discoverySources.includes(
+          m.content.trim().toLowerCase()
+        ) &&
+
+        !opportunityTypes.includes(
+          m.content.trim().toLowerCase()
+        ) &&
+
+        !m.content.includes(".com") &&
+
+        m.content !== objectiveMessage
     )?.content || "";
     /* =========================
    BLOCK 8D
@@ -310,6 +379,11 @@ ${selectedSource || "Unknown"}
 
 Objective:
 ${cleanObjective}
+Opportunity Type:
+${selectedOpportunityType || "Unknown"}
+
+Focus Area:
+${focusArea || "Unknown"}
 Profile Source:
 ${profileLink || "Not Provided"}
 Mission:
@@ -403,7 +477,22 @@ unless directly supported by signals.
 Output only the single highest opportunity.
 
 The opportunity must be:
+The opportunity MUST be about
+the Focus Area.
 
+Do not generate generic founder
+opportunities.
+
+If Focus Area is:
+
+TruthLoop AI
+
+then all opportunities must be
+about TruthLoop AI.
+
+Never switch to consulting,
+agency, cloud migration,
+or unrelated founder advice.
 - specific
 - actionable
 - monetizable
