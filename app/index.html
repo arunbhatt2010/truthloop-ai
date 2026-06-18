@@ -1001,7 +1001,7 @@ let payment49=false;
 let payment199=false;
 let userCountry = "IN";  
 let currentCategory="";
-
+let discoveryMode = false;
 let isLoading=false;
 
 const questionMap = {
@@ -1635,7 +1635,20 @@ outputBox.scrollTop=outputBox.scrollHeight;
 },100);    
     
 const data=await callAPI();    
-    
+ if(
+  data.reply &&
+ (
+   data.reply.includes("DISCOVERY") ||
+   data.reply.includes("LinkedIn") ||
+   data.reply.includes("LINKEDIN")
+ )
+){
+   discoveryMode = true;
+
+   console.log(
+     "DISCOVERY MODE ON"
+   );
+}   
 typeEffect(data.reply);    
     
 messages.push({    
@@ -1682,7 +1695,9 @@ if(!text){
    return;
   }   
 track(`loop_${loopLevel}_completed`);     
-loopLevel++;    
+if(!discoveryMode){
+   loopLevel++;
+  }    
 
 
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
@@ -1706,7 +1721,10 @@ outputBox.appendChild(userReply);
 
 const data=await callAPI();    
 
-if(data.paywall){
+if(
+   data.paywall &&
+   !discoveryMode
+){
 
 nextBtn.style.display="none";
 
