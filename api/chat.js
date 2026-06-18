@@ -390,6 +390,26 @@ Analyze:
 - recurring interests
 
 Then identify the highest opportunity.
+Never generate generic positioning advice.
+
+Never recommend:
+- Thought leadership
+- Personal branding
+- Create content
+- Engage more
+
+unless directly supported by signals.
+
+Output only the single highest opportunity.
+
+The opportunity must be:
+
+- specific
+- actionable
+- monetizable
+- demand-driven
+
+Reject generic founder advice.
 `;
  if (
   founderMode &&
