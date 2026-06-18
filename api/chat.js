@@ -312,7 +312,8 @@ ${selectedSource || "Unknown"}
 Objective:
 ${cleanObjective}
 Profile Source:
-${profileLink || "Not Provided"}
+Profile Source:
+${profileLink}
 Mission:
 Scoring Model:
 
@@ -341,21 +342,15 @@ Rules:
 - Prioritize opportunity over popularity.
 - Hide internal reasoning.
 - Return only actionable intelligence.
-CRITICAL RULE:
+PROFILE VALIDATION RULE
 
-If no profile link is provided:
+A profile URL has already been provided in the Profile Source field above.
 
-Return only:
+Do not ask for a profile URL again.
 
-PROFILE REQUIRED
+Use the provided Profile Source as the discovery entry point.
 
-Provide:
-
-- Profile URL
-- Group URL
-- Community URL
-
-Discovery cannot begin without a source.
+Continue directly to analysis.
 Output Format:
 
 TOP OPPORTUNITY
