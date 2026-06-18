@@ -108,16 +108,7 @@ Discovery Sources Available
 Type a source name.`
 
   });
-if (
- founderMode &&
- lowerMsg.includes("linkedin.com")
-){
 
- return res.status(200).json({
-   reply:"DEBUG URL DETECTED"
- });
-
-}
   }
  if (
   founderMode &&
@@ -499,27 +490,7 @@ ANALYZE
   });
 
   }
-  if (
-  founderMode &&
-  lowerMsg === "analyze"
-){
-return res.status(200).json({
-reply: `
-TEST
-
-Profile:
-${profileLink}
-
-HasProfile:
-${hasProfile}
-
-Objective:
-${cleanObjective}
-
-Source:
-${selectedSource}
-`
-});
+  
 const discoveryCompletion =
   await fetch(
     "https://api.groq.com/openai/v1/chat/completions",
@@ -578,7 +549,25 @@ let opportunityScore =
    BLOCK 7
    SCAN TRIGGER
 ========================= */
+if (
+  founderMode &&
+  lowerMsg === "scan" &&
+  !hasProfile
+){
 
+  return res.status(200).json({
+    reply: `SOURCE REQUIRED
+
+Please provide:
+
+- Profile URL
+- Group URL
+- Community URL
+
+Discovery cannot begin without a source.`
+  });
+
+}
 if (
   founderMode &&
   lowerMsg === "scan"
