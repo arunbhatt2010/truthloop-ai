@@ -256,8 +256,8 @@ const objectiveMessage =
           "x",
           "google",
           "indie hackers",
-          "scan"
-          "analyze"
+          "scan",
+"analyze"
         ].includes(
           m.content.trim().toLowerCase()
         ) &&
