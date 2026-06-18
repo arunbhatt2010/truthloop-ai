@@ -333,6 +333,30 @@ Rules:
 - Prioritize opportunity over popularity.
 - Hide internal reasoning.
 - Return only actionable intelligence.
+CRITICAL OBJECTIVE RULE:
+
+The selected objective is the primary filter.
+
+Every opportunity must directly support:
+
+${cleanObjective}
+
+Reject opportunities that do not advance
+the selected objective.
+
+Do not return generic founder advice.
+
+Do not recommend:
+- Personal branding
+- Thought leadership
+- Create content
+- Engage more
+
+unless directly supported by the objective
+and profile signals.
+
+Return only the highest probability
+opportunity that helps achieve the objective.
 CRITICAL RULE:
 
 If no profile link is provided:
