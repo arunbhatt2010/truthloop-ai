@@ -108,17 +108,8 @@ Discovery Sources Available
 Type a source name.`
 
   });
-if (
- founderMode &&
- lowerMsg.includes("linkedin.com")
-){
-
- return res.status(200).json({
-   reply:"DEBUG URL DETECTED"
- });
-
-}
   }
+
  if (
   founderMode &&
   lowerMsg === "linkedin"
@@ -237,10 +228,12 @@ SCAN`
 
     }
     
-=========================
-BLOCK 6A
-OPPORTUNITY TYPE
-=========================
+}
+
+/* =========================
+   BLOCK 6A
+   OPPORTUNITY TYPE
+========================= */
 
 const opportunityTypes = [
   "gtm",
@@ -251,7 +244,6 @@ const opportunityTypes = [
   "community",
   "custom"
 ];
-
 if (
   founderMode &&
   selectedSource &&
