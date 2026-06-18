@@ -196,7 +196,20 @@ const selectedSource =
       m.content.trim().toLowerCase()
     )
   )?.content;
+return res.status(200).json({
+reply: `
+DEBUG
 
+Source:
+${selectedSource}
+
+Objective:
+${cleanObjective}
+
+Profile:
+${profileLink}
+`
+});
 if (
   founderMode &&
   selectedSource &&
