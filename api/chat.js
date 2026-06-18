@@ -429,7 +429,7 @@ ANALYZE
   });
 
   }
-    
+    /*
   if (
   founderMode &&
   lowerMsg === "analyze"
@@ -456,7 +456,7 @@ Type your topic.
 
 `
 });
-
+*/
 /*
 const discoveryCompletion =
   await fetch(
