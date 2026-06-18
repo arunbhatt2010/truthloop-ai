@@ -433,7 +433,29 @@ ANALYZE
   founderMode &&
   lowerMsg === "analyze"
 ){
+return res.status(200).json({
+  reply: `
 
+TOPIC REQUIRED
+
+What GTM opportunity
+should be analyzed?
+
+Examples:
+
+• TruthLoop AI
+• EarnWithTrusts
+• Book Funnel
+
+Or type:
+
+AUTO
+
+Type your topic.
+
+`
+});
+/*
 const discoveryCompletion =
   await fetch(
     "https://api.groq.com/openai/v1/chat/completions",
@@ -469,8 +491,7 @@ const opportunityReply =
 return res.status(200).json({
   reply: opportunityReply
 });
-
-    }  
+*/
     /* =========================
    BLOCK 8F
    DISCOVERY SCORING ENGINE
