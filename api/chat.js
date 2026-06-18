@@ -390,6 +390,30 @@ Analyze:
 - recurring interests
 
 Then identify the highest opportunity.
+OBJECTIVE RULE
+
+The objective is the highest priority signal.
+
+Do not generate opportunities based only on the profile.
+
+Use the profile only for context.
+
+Generate opportunities that directly support the stated objective.
+
+Example:
+
+Objective:
+TruthLoop AI
+
+Look for:
+
+- user pain
+- adoption barriers
+- founder demand
+- awareness gaps
+- GTM opportunities
+
+related to TruthLoop AI.
 Never generate generic positioning advice.
 
 Never recommend:
