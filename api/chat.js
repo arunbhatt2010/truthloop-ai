@@ -236,10 +236,11 @@ SCAN`
   });
 
     }
-    /* =========================
-   BLOCK 6A
-   OPPORTUNITY TYPE
-========================= */
+    /*
+=========================
+BLOCK 6A
+OPPORTUNITY TYPE
+=========================
 
 const opportunityTypes = [
   "gtm",
@@ -276,7 +277,9 @@ Examples:
 • Book Funnel`
   });
 
-      }
+}
+
+*/
     /* =========================
    BLOCK 8A
    DISCOVERY OBJECTIVE
