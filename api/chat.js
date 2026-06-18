@@ -415,7 +415,26 @@ Suggested Action:
 Discussion Link:
 N/A
 `;
- 
+ if (
+  founderMode &&
+  hasProfile
+){
+
+  return res.status(200).json({
+    reply: `
+PROFILE RECEIVED
+
+Platform:
+${selectedSource || "Unknown"}
+
+Objective:
+${cleanObjective}
+
+Discovery scan ready.
+`
+  });
+
+                    }
     
     /* =========================
    BLOCK 8F
