@@ -108,16 +108,7 @@ Discovery Sources Available
 Type a source name.`
 
   });
-if (
- founderMode &&
- lowerMsg.includes("linkedin.com")
-){
 
- return res.status(200).json({
-   reply:"DEBUG URL DETECTED"
- });
-
-}
   }
  if (
   founderMode &&
@@ -280,10 +271,12 @@ const profileLink =
         (
           m.content.includes("linkedin.com") ||
           m.content.includes("facebook.com") ||
+          m.content.includes("reddit.com") ||
           m.content.includes("x.com") ||
-          m.content.includes("reddit.com")
+          m.content.includes("indiehackers.com") ||
+          m.content.includes("google.com")
         )
-    )?.content || "";
+    )?.content?.trim() || "";
     /* =========================
    BLOCK 8E
    PROFILE VALIDATION
@@ -372,7 +365,7 @@ Suggested Action:
 ...
 
 Discussion Link:
-N/A
+${profileLink}
 PROFILE ANALYSIS RULE
 
 The profile URL is only an entry point.
