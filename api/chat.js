@@ -196,20 +196,7 @@ const selectedSource =
       m.content.trim().toLowerCase()
     )
   )?.content;
-return res.status(200).json({
-reply: `
-DEBUG
 
-Source:
-${selectedSource}
-
-Objective:
-${cleanObjective}
-
-Profile:
-${profileLink}
-`
-});
 if (
   founderMode &&
   selectedSource &&
@@ -478,7 +465,23 @@ ANALYZE
   founderMode &&
   lowerMsg === "analyze"
 ){
+return res.status(200).json({
+reply: `
+TEST
 
+Profile:
+${profileLink}
+
+HasProfile:
+${hasProfile}
+
+Objective:
+${cleanObjective}
+
+Source:
+${selectedSource}
+`
+});
 const discoveryCompletion =
   await fetch(
     "https://api.groq.com/openai/v1/chat/completions",
