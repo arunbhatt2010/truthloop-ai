@@ -59,7 +59,26 @@ const founderMode =
       m.content.trim().toLowerCase() ===
       "admin gopi"
   );
-  const discoverySources = [
+
+/* =========================
+   GTM DISCOVERY MODE
+========================= */
+
+const discoveryMode =
+  messages.some(
+    m =>
+      m.role === "assistant" &&
+      (
+        m.content.includes(
+          "DISCOVERY STARTED"
+        ) ||
+        m.content.includes(
+          "DISCOVERY OBJECTIVE SET"
+        )
+      )
+  );
+
+const discoverySources = [
   "linkedin",
   "facebook",
   "reddit",
@@ -67,7 +86,8 @@ const founderMode =
   "indie hackers",
   "google"
 ];
-    if (
+
+if (
   lastUserMessage.trim() ===
   "Admin Gopi"
 ){
