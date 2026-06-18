@@ -1833,13 +1833,17 @@ paywall:false
 
   catch (error) {
 
-    console.error(
-      "Server error:",
-      error
-    );
+  return res.status(500).json({
+    reply: `
+ERROR
 
-    return res.status(500).json({
-      reply: "Server error"
-    });
+${error.message}
+
+STACK
+
+${error.stack}
+`
+  });
+
   }
         }
