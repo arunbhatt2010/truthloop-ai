@@ -373,10 +373,28 @@ Suggested Action:
 
 Discussion Link:
 N/A
+PROFILE ANALYSIS RULE
+
+The profile URL is only an entry point.
+
+Do not treat the profile itself as the opportunity.
+
+Analyze:
+
+- network positioning
+- follower patterns
+- following patterns
+- community proximity
+- audience signals
+- demand clusters
+- recurring interests
+
+Then identify the highest opportunity.
 `;
  if (
   founderMode &&
-  hasProfile
+  hasProfile &&
+  lowerMsg.includes(".com")
 ){
 
   return res.status(200).json({
@@ -389,12 +407,57 @@ ${selectedSource || "Unknown"}
 Objective:
 ${cleanObjective}
 
-Discovery scan ready.
+Network analysis initialized.
+
+Type:
+
+ANALYZE
 `
   });
 
-                    }
-    
+  }
+  if (
+  founderMode &&
+  lowerMsg === "analyze"
+){
+
+const discoveryCompletion =
+  await fetch(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:
+          `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body:JSON.stringify({
+        model:"llama-3.3-70b-versatile",
+        messages:[
+          {
+            role:"system",
+            content:discoveryPrompt
+          }
+        ],
+        temperature:0.7,
+        max_tokens:700
+      })
+    }
+  );
+
+const discoveryData =
+  await discoveryCompletion.json();
+
+const opportunityReply =
+  discoveryData?.choices?.[0]
+    ?.message?.content ||
+  "No opportunity found.";
+
+return res.status(200).json({
+  reply: opportunityReply
+});
+
+    }  
     /* =========================
    BLOCK 8F
    DISCOVERY SCORING ENGINE
