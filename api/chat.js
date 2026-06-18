@@ -224,7 +224,7 @@ Scanning for:
 
 Type:
 
-SCAN`
+PROFILE
   });
 
     }
@@ -241,15 +241,18 @@ const objectiveMessage =
         m.role === "user" &&
 
         ![
-          "admin gopi",
-          "linkedin",
-          "facebook",
-          "reddit",
-          "x",
-          "google",
-          "indie hackers",
-          "scan"
-        ].includes(
+ "admin gopi",
+ "linkedin",
+ "facebook",
+ "reddit",
+ "x",
+ "google",
+ "indie hackers",
+ "scan",
+ "analyze",
+ "founder",
+ "profile"
+].includes(
           m.content.trim().toLowerCase()
         ) &&
 
