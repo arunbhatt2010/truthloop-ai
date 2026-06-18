@@ -202,7 +202,7 @@ if (
   selectedSource &&
   !discoverySources.includes(lowerMsg) &&
   lowerMsg !== "scan" &&
-
+  lowerMsg !== "analyze" &&
   !lastUserMessage.includes("linkedin.com") &&
   !lastUserMessage.includes("facebook.com") &&
   !lastUserMessage.includes("reddit.com") &&
@@ -257,6 +257,7 @@ const objectiveMessage =
           "google",
           "indie hackers",
           "scan"
+          "analyze"
         ].includes(
           m.content.trim().toLowerCase()
         ) &&
