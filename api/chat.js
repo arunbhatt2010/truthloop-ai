@@ -226,7 +226,7 @@ Scanning for:
 
 Type:
 
-PROFILE
+PROFILE,
   });
 
     }
@@ -430,7 +430,7 @@ Network analysis initialized.
 
 Type:
 
-ANALYZE
+TOPIC
 `
   });
 
