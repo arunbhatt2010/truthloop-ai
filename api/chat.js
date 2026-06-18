@@ -192,9 +192,11 @@ if (
   founderMode &&
   selectedSource &&
   !discoverySources.includes(lowerMsg) &&
-  
   lowerMsg !== "scan" &&
 lowerMsg !== "analyze" &&
+lowerMsg !== "founder" &&
+lowerMsg !== "profile" &&
+  
 !lastUserMessage.includes("linkedin.com") &&
 !lastUserMessage.includes("facebook.com") &&
 !lastUserMessage.includes("reddit.com") &&
