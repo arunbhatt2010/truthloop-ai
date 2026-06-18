@@ -108,7 +108,16 @@ Discovery Sources Available
 Type a source name.`
 
   });
+if (
+ founderMode &&
+ lowerMsg.includes("linkedin.com")
+){
 
+ return res.status(200).json({
+   reply:"DEBUG URL DETECTED"
+ });
+
+}
   }
  if (
   founderMode &&
