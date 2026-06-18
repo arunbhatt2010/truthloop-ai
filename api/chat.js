@@ -291,48 +291,7 @@ const profileLink =
 
 const hasProfile =
   profileLink.length > 0;
-if (
-  founderMode &&
-  hasProfile
-){
 
-  const discoveryCompletion =
-    await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          Authorization:
-            `Bearer ${process.env.GROQ_API_KEY}`
-        },
-        body:JSON.stringify({
-          model:"llama-3.3-70b-versatile",
-          messages:[
-            {
-              role:"system",
-              content:discoveryPrompt
-            }
-          ],
-          temperature:0.7,
-          max_tokens:500
-        })
-      }
-    );
-
-  const discoveryData =
-    await discoveryCompletion.json();
-
-  const opportunityReply =
-    discoveryData?.choices?.[0]
-      ?.message?.content ||
-    "No opportunity found.";
-
-  return res.status(200).json({
-    reply: opportunityReply
-  });
-
-}
 const cleanObjective =
   objectiveMessage &&
   !objectiveMessage.includes(".com")
