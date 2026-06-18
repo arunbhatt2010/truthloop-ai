@@ -342,6 +342,49 @@ Rules:
 - Prioritize opportunity over popularity.
 - Hide internal reasoning.
 - Return only actionable intelligence.
+DATA VALIDATION RULE
+
+Never invent opportunities.
+
+Never assume network data.
+
+Never assume audience signals.
+
+Never assume demand clusters.
+
+Only use evidence provided in:
+
+- Profile Source
+- Group Source
+- Community Source
+
+If no source exists:
+
+Return:
+
+SOURCE REQUIRED
+
+Discovery requires evidence.
+
+No opportunity can be generated without data.
+SOURCE VALIDATION RULE
+
+If Profile Source is empty:
+
+Return only:
+
+SOURCE REQUIRED
+
+Please provide:
+- Profile URL
+- Group URL
+- Community URL
+
+Do not generate opportunities.
+
+If Profile Source exists:
+
+Proceed directly to analysis.
 PROFILE VALIDATION RULE
 
 A profile URL has already been provided in the Profile Source field above.
