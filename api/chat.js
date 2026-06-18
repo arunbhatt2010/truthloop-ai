@@ -291,7 +291,16 @@ const profileLink =
 
 const hasProfile =
   profileLink.length > 0;
+if (
+  founderMode &&
+  hasProfile
+){
 
+  return res.status(200).json({
+    reply:"PROFILE DETECTED SUCCESSFULLY"
+  });
+
+      }
 const cleanObjective =
   objectiveMessage &&
   !objectiveMessage.includes(".com")
