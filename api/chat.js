@@ -236,7 +236,7 @@ SCAN`
   });
 
     }
-    /*
+    
 =========================
 BLOCK 6A
 OPPORTUNITY TYPE
@@ -255,7 +255,7 @@ const opportunityTypes = [
 if (
   founderMode &&
   selectedSource &&
-  cleanObjective !== "Unknown" &&
+  
   opportunityTypes.includes(lowerMsg)
 ){
 
@@ -279,7 +279,7 @@ Examples:
 
 }
 
-*/
+
     /* =========================
    BLOCK 8A
    DISCOVERY OBJECTIVE
