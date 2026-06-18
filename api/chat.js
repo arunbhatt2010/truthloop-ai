@@ -194,12 +194,12 @@ if (
   !discoverySources.includes(lowerMsg) &&
   
   lowerMsg !== "scan" &&
-lowerMsg !== "analyze"
-  !lastUserMessage.includes("linkedin.com") &&
-  !lastUserMessage.includes("facebook.com") &&
-  !lastUserMessage.includes("reddit.com") &&
-  !lastUserMessage.includes("x.com") &&
-  !lastUserMessage.includes("google.com")
+lowerMsg !== "analyze" &&
+!lastUserMessage.includes("linkedin.com") &&
+!lastUserMessage.includes("facebook.com") &&
+!lastUserMessage.includes("reddit.com") &&
+!lastUserMessage.includes("x.com") &&
+!lastUserMessage.includes("google.com")
 ) {
 
   return res.status(200).json({
