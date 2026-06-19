@@ -273,6 +273,9 @@ let actions = [
   "Collect feedback",
   "Improve positioning"
 ];
+ let score = 60;
+let confidence = "Medium";
+let difficulty = "Medium"; 
 if (
   text.includes("ai") ||
   text.includes("tool") ||
@@ -285,6 +288,9 @@ if (
     "Launch a beta waitlist",
     "Join 5 niche communities"
   ];
+  score = 88;
+confidence = "High";
+difficulty = "Medium";
 }
 if (
   text.includes("book") ||
@@ -297,6 +303,9 @@ if (
     "Build an email list",
     "Collect reader reviews"
   ];
+  score = 75;
+confidence = "Medium";
+difficulty = "Medium";
 }
 if (
   text.includes("website") ||
@@ -309,6 +318,9 @@ if (
     "Build newsletter signup flow",
     "Promote content weekly"
   ];
+  score = 82;
+confidence = "High";
+difficulty = "Low";
 }  
 if (
   text.includes("ai") ||
@@ -410,7 +422,14 @@ ${distribution}
 
 MONETIZATION:
 ${monetization}
+OPPORTUNITY SCORE:
+${score}/100
 
+CONFIDENCE:
+${confidence}
+
+DIFFICULTY:
+${difficulty}
 TOP ACTIONS:
 
 1. ${actions[0]}
