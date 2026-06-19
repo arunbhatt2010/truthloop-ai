@@ -64,13 +64,29 @@ Use Admin Override
 
 const brain = {
 
-version: "1.0",
+version: "1.1",
 
-entryGate: "profile",
+entryGate: "multi-source",
 
 position: "",
 
+supportedEntryTypes: [
+
+  "TruthLoop Context",
+  "LinkedIn Profile",
+  "Website",
+  "YouTube Channel",
+  "X/Twitter Profile",
+  "Newsletter",
+  "Business Idea",
+  "Skill Stack",
+  "AI Project",
+  "Founder Mode"
+
+],
+
 allowedDomains: [
+
   "growth",
   "business",
   "ownership",
@@ -82,18 +98,38 @@ allowedDomains: [
   "distribution",
   "gtm",
   "ai"
+
 ],
 
 ignoredDomains: [
+
   "politics",
   "religion",
   "relationships",
   "health",
   "entertainment",
   "personal drama"
+
 ]
 
 };
+  /* =========================
+ENTRY DETECTOR
+Current Version:
+LinkedIn Only
+
+Future Versions:
+
+- TruthLoop Context
+- Website
+- YouTube
+- X/Twitter
+- Newsletter
+- Business Idea
+- Skill Stack
+- AI Project
+- Founder Mode
+========================= */
    
    
 /* =========================
