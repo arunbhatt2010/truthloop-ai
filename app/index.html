@@ -979,7 +979,10 @@ font-weight:bold;
     
 <script>    
     
-const API_URL="/api/chat";    
+const API_URL = () =>
+  discoveryMode
+    ? "/api/chat/gtm-opportunity-brain"
+    : "/api/chat";  
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
 const outputBox=document.getElementById("outputBox");    
@@ -1001,7 +1004,7 @@ let payment49=false;
 let payment199=false;
 let userCountry = "IN";  
 let currentCategory="";
-let discoveryMode = false;
+let discoveryMode = true;
 let isLoading=false;
 
 const questionMap = {
@@ -1087,7 +1090,7 @@ async function callAPI(){
     
 try{    
     
-const res=await fetch(API_URL,{    
+const res = await fetch(API_URL(),{    
 method:"POST",    
 headers:{    
 "Content-Type":"application/json"    
