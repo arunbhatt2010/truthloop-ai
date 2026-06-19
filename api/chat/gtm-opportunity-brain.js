@@ -267,6 +267,49 @@ let opportunity = "Hidden Opportunity";
 let audience = "Professionals";
 let distribution = "LinkedIn";
 let monetization = "Consulting";
+let actions = [
+  "Validate demand with 5 real users",
+  "Publish one focused offer",
+  "Collect feedback",
+  "Improve positioning"
+];
+if (
+  text.includes("ai") ||
+  text.includes("tool") ||
+  text.includes("saas")
+) {
+
+  actions = [
+    "Publish daily founder updates",
+    "Interview 20 potential users",
+    "Launch a beta waitlist",
+    "Join 5 niche communities"
+  ];
+}
+if (
+  text.includes("book") ||
+  text.includes("kindle")
+) {
+
+  actions = [
+    "Audit book title and cover",
+    "Create content around key chapters",
+    "Build an email list",
+    "Collect reader reviews"
+  ];
+}
+if (
+  text.includes("website") ||
+  text.includes("blog")
+) {
+
+  actions = [
+    "Publish one pillar article",
+    "Improve internal linking",
+    "Build newsletter signup flow",
+    "Promote content weekly"
+  ];
+}  
 if (
   text.includes("ai") ||
   text.includes("tool") ||
@@ -368,11 +411,12 @@ ${distribution}
 MONETIZATION:
 ${monetization}
 
-NEXT ACTION:
+TOP ACTIONS:
 
-Focus on a single channel,
-validate demand,
-and build a repeatable growth loop.
+1. ${actions[0]}
+2. ${actions[1]}
+3. ${actions[2]}
+4. ${actions[3]}
 
 `
 
