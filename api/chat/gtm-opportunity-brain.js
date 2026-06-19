@@ -24,13 +24,7 @@ const isAdmin =
 const activated =
   isAdmin ||
   loopLevel >= 7;
-  return res.status(200).json({
-  debug: {
-    passcode,
-    isAdmin,
-    loopLevel
-  }
-});
+  
 /* =========================
    ACTIVATION SOURCE
 ========================= */
