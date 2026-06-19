@@ -275,7 +275,10 @@ let actions = [
 ];
  let score = 60;
 let confidence = "Medium";
-let difficulty = "Medium"; 
+let difficulty = "Medium";
+ let pain = "Unknown";
+let goal = "Unknown";
+let asset = "Unknown"; 
 if (
   text.includes("ai") ||
   text.includes("tool") ||
@@ -402,6 +405,68 @@ if (
   opportunity =
   "Audience Expansion";
 }
+/* SIGNAL EXTRACTION */
+
+if (
+  text.includes("users") ||
+  text.includes("audience")
+){
+  pain = "User Acquisition";
+}
+
+if (
+  text.includes("sales") ||
+  text.includes("customers")
+){
+  pain = "Revenue Growth";
+}
+
+if (
+  text.includes("traffic")
+){
+  pain = "Traffic Generation";
+}
+
+if (
+  text.includes("tool") ||
+  text.includes("app") ||
+  text.includes("product")
+){
+  asset = "Working Product";
+}
+
+if (
+  text.includes("website") ||
+  text.includes("blog")
+){
+  asset = "Content Asset";
+}
+
+if (
+  text.includes("book") ||
+  text.includes("kindle")
+){
+  asset = "Knowledge Asset";
+}
+
+if (
+  text.includes("grow") ||
+  text.includes("growth")
+){
+  goal = "Business Growth";
+}
+
+if (
+  text.includes("users")
+){
+  goal = "Acquire Users";
+}
+
+if (
+  text.includes("sales")
+){
+  goal = "Increase Revenue";
+}  
 return res.status(200).json({
 
 reply: `
@@ -410,7 +475,14 @@ GTM OPPORTUNITY REPORT
 
 INTENT:
 ${intent}
+PAIN:
+${pain}
 
+ASSET:
+${asset}
+
+GOAL:
+${goal}
 OPPORTUNITY:
 ${opportunity}
 
