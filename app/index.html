@@ -1611,41 +1611,9 @@ if(text === "Admin Gopi"){
   GTM Opportunity Engine Active
   </div>
   `;
-if(
-  loopLevel >= 7 &&
-  text.trim().toLowerCase() === "yes"
-){
 
-  activeEngine = "gtm";
-  discoveryMode = true;
-
-  outputBox.innerHTML += `
-  <div style="
-  margin:12px 0;
-  padding:14px;
-  border:1px solid orange;
-  border-radius:12px;
-  color:orange;
-  ">
-  🟠 GTM OPPORTUNITY ENGINE ACTIVATED
-  </div>
-  `;
-
-  }
-if(!text){
-
-mainInput.focus();
-
-mainInput.style.borderColor = "orange";
-
-setTimeout(()=>{
-mainInput.style.borderColor = "#262626";
-},1000);
-
-return;
-
+  return;
 }
-
 document.getElementById("guideText").style.display="none";
 
 if (isLoading) return;
