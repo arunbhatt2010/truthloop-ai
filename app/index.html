@@ -1005,6 +1005,7 @@ let payment199=false;
 let userCountry = "IN";  
 let currentCategory="";
 let discoveryMode = true;
+let activeEngine = "truthloop";  
 let isLoading=false;
 
 const questionMap = {
@@ -1091,9 +1092,9 @@ async function callAPI(){
 try{
 
 const apiRoute =
-(loopLevel >= 7)
-? "/api/chat/gtm-opportunity-brain"
-: "/api/chat";
+  activeEngine === "gtm"
+    ? "/api/chat/gtm-opportunity-brain"
+    : "/api/chat";
 
 const res = await fetch(apiRoute,{
   method:"POST",
@@ -1590,7 +1591,45 @@ mainInput.focus();
 getBtn.onclick=async()=>{
 
 const text = mainInput.value.trim();
+if(text === "Admin Gopi"){
 
+  activeEngine = "gtm";
+  discoveryMode = true;
+
+  outputBox.innerHTML += `
+  <div style="
+  margin:12px 0;
+  padding:14px;
+  border:1px solid orange;
+  border-radius:12px;
+  color:orange;
+  ">
+  🟠 ADMIN OVERRIDE ACTIVATED
+  <br>
+  GTM Opportunity Engine Active
+  </div>
+  `;
+if(
+  loopLevel >= 7 &&
+  text.trim().toLowerCase() === "yes"
+){
+
+  activeEngine = "gtm";
+  discoveryMode = true;
+
+  outputBox.innerHTML += `
+  <div style="
+  margin:12px 0;
+  padding:14px;
+  border:1px solid orange;
+  border-radius:12px;
+  color:orange;
+  ">
+  🟠 GTM OPPORTUNITY ENGINE ACTIVATED
+  </div>
+  `;
+
+  }
 if(!text){
 
 mainInput.focus();
@@ -1758,7 +1797,22 @@ content:data.reply
 saveJourney();    
 typeEffect(data.reply);    
 if(loopLevel >= 7){
+outputBox.innerHTML += `
+<div style="
+margin:16px 0;
+padding:16px;
+border:1px solid orange;
+border-radius:14px;
+color:#fff;
+">
+<h3 style="color:orange;">
+OPPORTUNITY ENGINE UNLOCKED
+</h3>
 
+Reply YES to activate
+GTM Opportunity Engine.
+</div>
+`;
 document.getElementById("articleBlock").style.display="block";
 showShareCard(data.reply);
 if(window.isRestoredJourney){
