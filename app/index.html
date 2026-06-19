@@ -1095,13 +1095,14 @@ method:"POST",
 headers:{    
 "Content-Type":"application/json"    
 },    
-body:JSON.stringify({    
-messages,    
-loopLevel,    
-paid49:payment49,    
-paid199:payment199,    
-currentCategory    
-})    
+body:JSON.stringify({
+  messages,
+  loopLevel,
+  passcode:"Admin Gopi",
+  paid49:payment49,
+  paid199:payment199,
+  currentCategory
+})
 });    
     
 if(!res.ok){    
