@@ -1,15 +1,25 @@
 export default async function handler(req, res) {
 const body = req.body || {};
-  
-/* =========================
-   ACTIVATION GATE
+  /* =========================
+   ADMIN PASSCODE GATE
 ========================= */
+
+const ADMIN_PASSCODE =
+  "Admin Gopi";
 
 const {
   messages = [],
   loopLevel = 1,
-  isAdmin = false
+  passcode = ""
 } = body || {};
+
+const isAdmin =
+  passcode === ADMIN_PASSCODE;
+/* =========================
+   ACTIVATION GATE
+========================= */
+
+
 
 const activated =
   isAdmin ||
