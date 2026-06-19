@@ -1,3 +1,52 @@
+export default async function handler(req, res) {
+const body = req.body || {};
+  
+/* =========================
+   ACTIVATION GATE
+========================= */
+
+const {
+  messages = [],
+  loopLevel = 1,
+  isAdmin = false
+} = body || {};
+
+const activated =
+  isAdmin ||
+  loopLevel >= 7;
+/* =========================
+   ACTIVATION SOURCE
+========================= */
+
+const activationSource =
+  isAdmin
+    ? "ADMIN OVERRIDE"
+    : "LOOP 7 UNLOCK";
+if (!activated) {
+
+  return res.status(200).json({
+
+    reply: `
+
+GTM OPPORTUNITY ENGINE
+
+STATUS:
+LOCKED
+
+REQUIREMENT:
+
+Complete Loop 7
+
+OR
+
+Use Admin Override
+
+`
+
+  });
+
+}
+
 /* =========================
    GTM OPPORTUNITY BRAIN
 ========================= */
@@ -34,6 +83,52 @@ ignoredDomains: [
 ]
 
 };
+   const networkMap = {
+
+  entryProfile: profileLink,
+
+  position: position,
+
+  observationTargets: [
+
+    "founders",
+    "builders",
+    "creators",
+    "freelancers",
+    "job seekers",
+    "professionals",
+    "business owners"
+
+  ],
+
+  observationSources: [
+
+    "posts",
+    "comments",
+    "discussions",
+    "communities",
+    "followers",
+    "engagement clusters"
+
+  ],
+
+  signalSources: [
+
+    "repeated complaints",
+    "repeated questions",
+    "repeated failures",
+    "repeated confusion",
+    "repeated requests for help",
+    "recurring behavior patterns"
+
+  ],
+
+  allowedDomains: brain.allowedDomains,
+
+  ignoredDomains: brain.ignoredDomains
+
+};
+   
 /* =========================
    PROFILE ENTRY GATE
 ========================= */
@@ -97,6 +192,9 @@ GTM OPPORTUNITY BRAIN
 STATUS:
 READY
 
+ACTIVATION:
+${activationSource}
+
 ENTRY PROFILE:
 ${profileLink}
 
@@ -124,3 +222,4 @@ Network Mapping
 `
 
 });
+}
