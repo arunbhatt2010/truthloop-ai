@@ -979,10 +979,13 @@ font-weight:bold;
     
 <script>    
     
-const API_URL = () =>
-  discoveryMode
-    ? "/api/chat/gtm-opportunity-brain"
-    : "/api/chat";  
+const apiRoute =
+(
+  loopLevel >= 7 ||
+  passcode === "Admin Gopi"
+)
+? "/api/chat/gtm-opportunity-brain"
+: "/api/chat";
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
 const outputBox=document.getElementById("outputBox");    
@@ -1091,7 +1094,10 @@ async function callAPI(){
 try{
 
 const apiRoute =
-(loopLevel >= 7)
+(
+  loopLevel >= 7 ||
+  passcode === "Admin Gopi"
+)
 ? "/api/chat/gtm-opportunity-brain"
 : "/api/chat";
 
