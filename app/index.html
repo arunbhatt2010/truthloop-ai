@@ -1102,13 +1102,15 @@ const res = await fetch(apiRoute,{
     "Content-Type":"application/json"
   },
   body:JSON.stringify({
-    messages,
-    loopLevel,
-    passcode:"",
-    paid49:payment49,
-    paid199:payment199,
-    currentCategory
-  })
+  messages,
+  loopLevel,
+  passcode: activeEngine === "gtm"
+    ? "Admin Gopi"
+    : "",
+  paid49:payment49,
+  paid199:payment199,
+  currentCategory
+})
 });
 
 if(!res.ok){
@@ -1677,7 +1679,7 @@ font-size:16px;
 ${text}
 </div>
 `;
-  
+  }
 
     
 /* smooth scroll */    
