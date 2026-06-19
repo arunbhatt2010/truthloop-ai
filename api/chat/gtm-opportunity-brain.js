@@ -141,15 +141,45 @@ const profileLink =
     ?.content
     ?.trim() || "";
 
+/* =========================
+ENTRY DETECTOR
+========================= */
+
+const userInput =
+  messages[messages.length - 1]
+    ?.content
+    ?.trim() || "";
+
+let entryType = "TruthLoop Context";
+
 if (
-  !profileLink.includes("linkedin.com")
+  userInput.includes("linkedin.com")
 ) {
 
-  return res.status(200).json({
-    reply: `PROFILE REQUIRED
+  entryType = "LinkedIn Profile";
 
-Provide a LinkedIn profile URL.`
-  });
+}
+else if (
+  userInput.includes("youtube.com") ||
+  userInput.includes("youtu.be")
+) {
+
+  entryType = "YouTube Channel";
+
+}
+else if (
+  userInput.includes("twitter.com") ||
+  userInput.includes("x.com")
+) {
+
+  entryType = "X/Twitter Profile";
+
+}
+else if (
+  userInput.includes("http")
+) {
+
+  entryType = "Website";
 
 }
 /* =========================
@@ -245,7 +275,8 @@ ${activationSource}
 
 ENTRY PROFILE:
 ${profileLink}
-
+ENTRY TYPE:
+${entryType}
 POSITION:
 ${position}
 
