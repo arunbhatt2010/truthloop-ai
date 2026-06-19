@@ -94,51 +94,7 @@ ignoredDomains: [
 ]
 
 };
-   const networkMap = {
-
-  entryProfile: profileLink,
-
-  position: position,
-
-  observationTargets: [
-
-    "founders",
-    "builders",
-    "creators",
-    "freelancers",
-    "job seekers",
-    "professionals",
-    "business owners"
-
-  ],
-
-  observationSources: [
-
-    "posts",
-    "comments",
-    "discussions",
-    "communities",
-    "followers",
-    "engagement clusters"
-
-  ],
-
-  signalSources: [
-
-    "repeated complaints",
-    "repeated questions",
-    "repeated failures",
-    "repeated confusion",
-    "repeated requests for help",
-    "recurring behavior patterns"
-
-  ],
-
-  allowedDomains: brain.allowedDomains,
-
-  ignoredDomains: brain.ignoredDomains
-
-};
+   
    
 /* =========================
    PROFILE ENTRY GATE
@@ -190,6 +146,51 @@ else if (
   position = "freelancer";
 
 }
+  const networkMap = {
+
+  entryProfile: profileLink,
+
+  position: position,
+
+  observationTargets: [
+
+    "founders",
+    "builders",
+    "creators",
+    "freelancers",
+    "job seekers",
+    "professionals",
+    "business owners"
+
+  ],
+
+  observationSources: [
+
+    "posts",
+    "comments",
+    "discussions",
+    "communities",
+    "followers",
+    "engagement clusters"
+
+  ],
+
+  signalSources: [
+
+    "repeated complaints",
+    "repeated questions",
+    "repeated failures",
+    "repeated confusion",
+    "repeated requests for help",
+    "recurring behavior patterns"
+
+  ],
+
+  allowedDomains: brain.allowedDomains,
+
+  ignoredDomains: brain.ignoredDomains
+
+};
 /* =========================
    NETWORK DISCOVERY READY
 ========================= */
