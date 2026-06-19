@@ -260,43 +260,119 @@ else if (
 /* =========================
    NETWORK DISCOVERY READY
 ========================= */
+const text = (profileLink || "").toLowerCase();
 
+let intent = "General Growth";
+let opportunity = "Hidden Opportunity";
+let audience = "Professionals";
+let distribution = "LinkedIn";
+let monetization = "Consulting";
+if (
+  text.includes("ai") ||
+  text.includes("tool") ||
+  text.includes("saas")
+) {
+
+  intent = "AI Product Growth";
+
+  audience =
+  "Founders, Builders, Creators";
+
+  distribution =
+  "LinkedIn + X + Communities";
+
+  monetization =
+  "SaaS + Membership + Consulting";
+}
+
+if (
+  text.includes("book") ||
+  text.includes("kindle")
+) {
+
+  intent =
+  "Knowledge Product Growth";
+
+  audience =
+  "Readers, Learners, Professionals";
+
+  distribution =
+  "Website + Newsletter + LinkedIn";
+
+  monetization =
+  "Book Sales + Courses + Coaching";
+}
+
+if (
+  text.includes("website") ||
+  text.includes("blog")
+) {
+
+  intent =
+  "Audience Growth";
+
+  audience =
+  "Organic Search Audience";
+
+  distribution =
+  "SEO + Newsletter + Social";
+
+  monetization =
+  "Ads + Affiliate + Products";
+    }
+  if (
+  text.includes("users")
+) {
+  opportunity =
+  "Audience Acquisition";
+}
+
+if (
+  text.includes("traffic")
+) {
+  opportunity =
+  "Traffic Monetization";
+}
+
+if (
+  text.includes("sales")
+) {
+  opportunity =
+  "Conversion Optimization";
+}
+
+if (
+  text.includes("audience")
+) {
+  opportunity =
+  "Audience Expansion";
+}
 return res.status(200).json({
 
 reply: `
 
-GTM OPPORTUNITY BRAIN
+GTM OPPORTUNITY REPORT
 
-STATUS:
-READY
+INTENT:
+${intent}
 
-ACTIVATION:
-${activationSource}
+OPPORTUNITY:
+${opportunity}
 
-ENTRY PROFILE:
-${profileLink}
-ENTRY TYPE:
-${entryType}
-POSITION:
-${position}
+AUDIENCE:
+${audience}
 
-ALLOWED DOMAINS:
+DISTRIBUTION:
+${distribution}
 
-• Growth
-• Business
-• Ownership
-• Jobs
-• Freelancing
-• Audience Building
-• Lead Generation
-• Monetization
-• Distribution
-• GTM
-• AI
+MONETIZATION:
+${monetization}
 
-NEXT PHASE:
+NEXT ACTION:
 
-Network Mapping
+Focus on a single channel,
+validate demand,
+and build a repeatable growth loop.
 
 `
 
