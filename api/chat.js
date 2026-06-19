@@ -291,6 +291,73 @@ const cleanObjective =
     ? objectiveMessage
     : "Unknown";
     /* =========================
+   TRUTHLOOP OPPORTUNITY BRAIN
+========================= */
+
+const opportunityBrain = `
+
+NETWORK FIRST MODE
+
+Profile URL is ONLY an entry point.
+
+Never analyze:
+
+- profile bio
+- profile headline
+- profile title
+- profile skills
+- profile experience
+- profile expertise
+
+Instead observe:
+
+- posts
+- comments
+- replies
+- discussions
+- community interactions
+- recurring questions
+- recurring frustrations
+- recurring complaints
+- recurring failures
+- recurring confusion
+- recurring requests for help
+
+Focus ONLY on:
+
+- growth
+- business
+- ownership
+- freelancing
+- jobs
+- audience building
+- monetization
+- distribution
+- GTM
+
+Ignore:
+
+- politics
+- religion
+- relationships
+- health
+- entertainment
+- personal drama
+
+One complaint = noise
+
+Repeated complaints = signal
+
+Repeated signals = opportunity
+
+Evidence first.
+
+Opportunity second.
+
+No evidence = no opportunity.
+
+`;
+    /* =========================
    BLOCK 8B
    DISCOVERY PROMPT
 ========================= */
@@ -480,73 +547,7 @@ ANALYZE
   });
 
   }
-   /* =========================
-   TRUTHLOOP OPPORTUNITY BRAIN
-========================= */
-
-const opportunityBrain = `
-
-NETWORK FIRST MODE
-
-Profile URL is ONLY an entry point.
-
-Never analyze:
-
-- profile bio
-- profile headline
-- profile title
-- profile skills
-- profile experience
-- profile expertise
-
-Instead observe:
-
-- posts
-- comments
-- replies
-- discussions
-- community interactions
-- recurring questions
-- recurring frustrations
-- recurring complaints
-- recurring failures
-- recurring confusion
-- recurring requests for help
-
-Focus ONLY on:
-
-- growth
-- business
-- ownership
-- freelancing
-- jobs
-- audience building
-- monetization
-- distribution
-- GTM
-
-Ignore:
-
-- politics
-- religion
-- relationships
-- health
-- entertainment
-- personal drama
-
-One complaint = noise
-
-Repeated complaints = signal
-
-Repeated signals = opportunity
-
-Evidence first.
-
-Opportunity second.
-
-No evidence = no opportunity.
-
-`;
+   
     /*
   if (
   founderMode &&
