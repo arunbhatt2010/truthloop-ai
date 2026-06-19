@@ -1091,10 +1091,7 @@ async function callAPI(){
 try{
 
 const apiRoute =
-(
-  passcode === "Admin Gopi" ||
-  loopLevel >= 7
-)
+(loopLevel >= 7)
 ? "/api/chat/gtm-opportunity-brain"
 : "/api/chat";
 
@@ -1106,7 +1103,7 @@ const res = await fetch(apiRoute,{
   body:JSON.stringify({
     messages,
     loopLevel,
-    passcode,
+    passcode:"",
     paid49:payment49,
     paid199:payment199,
     currentCategory
