@@ -1524,12 +1524,22 @@ primaryLoop =
 profile.primaryLoop || "";
 
 emotionalDriver =
-profile.emotionalDriver || "";
+profile.emotionalDriver &&
+profile.emotionalDriver !== "unknown"
+? profile.emotionalDriver
+: "";
 
 avoidanceStyle =
-profile.avoidanceStyle || "";
+profile.avoidanceStyle &&
+profile.avoidanceStyle !== "unknown"
+? profile.avoidanceStyle
+: "";
+
 hiddenAssumption =
-profile.hiddenAssumption || "";
+profile.hiddenAssumption &&
+profile.hiddenAssumption !== "unknown"
+? profile.hiddenAssumption
+: "";
 }catch(e){
 
 primaryLoop = "";
