@@ -597,13 +597,40 @@ Stay in evidence collection mode.
 Pattern discovery starts only after enough context exists.
 `;
         }
+    const investigationPrompt = `
+CURRENT INVESTIGATION STATE
+
+Topic:
+${investigationState.topic}
+
+Confirmed Facts:
+${investigationState.confirmedFacts.join(", ")}
+
+Goals:
+${investigationState.statedGoals.join(", ")}
+
+Results:
+${investigationState.results.join(", ")}
+
+Contradictions:
+${investigationState.contradictions.join(", ")}
+
+Open Questions:
+${investigationState.openQuestions.join(", ")}
+
+Working Hypothesis:
+${investigationState.workingHypothesis}
+
+Confidence:
+${investigationState.confidence}
+`;
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
 
     const systemPrompt = `
 You are TruthLoop.
-
+${investigationPrompt}
 You are not a coach.
 You are not a therapist.
 You are not a motivational AI.
