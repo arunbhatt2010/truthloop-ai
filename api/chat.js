@@ -519,12 +519,26 @@ You are the TruthLoop Profile Engine.
 
 Analyze the complete conversation.
 
-Generate:
+Generate only what is supported by evidence.
+
+Fields:
 
 PRIMARY_LOOP
 EMOTIONAL_DRIVER
 AVOIDANCE_STYLE
 HIDDEN_ASSUMPTION
+
+If evidence is insufficient:
+
+return:
+
+"unknown"
+
+Never guess.
+Never infer missing facts.
+Never create emotional states without evidence.
+Never create avoidance styles without evidence.
+Prefer "unknown" over speculation.
 
 Rules:
 
@@ -540,10 +554,10 @@ Rules:
 Return ONLY valid JSON.
 
 {
-"primaryLoop":"",
-"emotionalDriver":"",
-"avoidanceStyle":"",
-"hiddenAssumption":""
+"primaryLoop":"unknown",
+"emotionalDriver":"unknown",
+"avoidanceStyle":"unknown",
+"hiddenAssumption":"unknown"
 }
 `;
  let contextInstruction = "";
