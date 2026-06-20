@@ -542,23 +542,49 @@ contextInstruction = `
 
 CONTEXT FIRST MODE
 
-The situation is unclear.
-
-Ask ONE question that helps you understand:
-
-- what they are trying to do
-- what they are trying to build
-- what outcome they want
+The situation is not clear enough for pattern detection.
 
 Do not analyze.
 
+Do not infer motives.
+
 Do not infer emotions.
 
-Do not infer patterns.
+Do not infer avoidance.
 
-Stay in discovery mode.
+Do not identify contradictions.
+
+Your job is to collect enough evidence so that pattern detection becomes possible.
+
+Ask ONE context-building question.
+
+The question must be generated from the user's specific situation.
+
+The question should naturally collect:
+
+- what is happening
+- what they are trying to achieve
+- what they have already tried
+- what results they are getting
+- what they currently believe is causing the problem
+
+Do not ask these as separate questions.
+
+Generate ONE natural question that gathers multiple pieces of evidence at once.
+
+Bad:
+
+"What are you trying to achieve?"
+
+Good:
+
+"Help me understand the situation a little better. What are you trying to achieve, what have you already tried, what results are you seeing, and what do you think is preventing progress right now?"
+
+Stay in evidence collection mode.
+
+Pattern discovery starts only after enough context exists.
 `;
-}
+        }
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
