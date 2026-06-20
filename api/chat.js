@@ -1627,27 +1627,30 @@ paywall: true
   !reply.trim().endsWith("?")
 ) {
 
-      const questions = [
+      /*
+const questions = [
 
-        "What are you emotionally protecting?",
+"What are you emotionally protecting?",
 
-        "What becomes uncomfortable the moment this gets real?",
+"What becomes uncomfortable the moment this gets real?",
 
-        "What are you still trying to control before acting?",
+"What are you still trying to control before acting?",
 
-        "What changes if you stop optimizing and start exposing the work?",
+"What changes if you stop optimizing and start exposing the work?",
 
-        "Where does the hesitation appear every time?"
-      ];
+"Where does the hesitation appear every time?"
 
-      const q =
-        questions[
-          Math.floor(
-            Math.random() * questions.length
-          )
-        ];
+];
 
-      reply += "\n\n" + q;
+const q =
+questions[
+Math.floor(
+Math.random() * questions.length
+)
+];
+
+reply += "\n\n" + q;
+*/
     }
 
     /* =========================
