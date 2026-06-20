@@ -152,7 +152,19 @@ Now commit.`,
       avoidance: 0,
       confused: 0
     };
-
+let investigationState = {
+  topic: "",
+  confirmedFacts: [],
+  statedGoals: [],
+  attempts: [],
+  results: [],
+  beliefs: [],
+  contradictions: [],
+  openQuestions: [],
+  repeatedPatterns: [],
+  workingHypothesis: "",
+  confidence: "low"
+};
     const practicalWords = [
       "seo",
       "traffic",
