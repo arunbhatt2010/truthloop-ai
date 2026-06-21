@@ -175,4 +175,24 @@
 <changefreq>monthly</changefreq>
 <priority>0.80</priority>
 </url>
+  <url>
+  <loc>https://truthloop.in/truthloop-dictionary.html</loc>
+  <lastmod>2026-06-21</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.90</priority>
+</url>
+
+<url>
+  <loc>https://truthloop.in/decision-avoidance-self-audit.html</loc>
+  <lastmod>2026-06-21</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.95</priority>
+</url>
+
+<url>
+  <loc>https://truthloop.in/execution-resistance-self-audit.html</loc>
+  <lastmod>2026-06-21</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.95</priority>
+</url>
 </urlset>
