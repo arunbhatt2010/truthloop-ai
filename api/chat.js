@@ -66,7 +66,8 @@ const founderTerms = [
   "your owner",
   "your creator",
   "founder's name",
-  "who built you"
+  "who built you",
+  "who created truthloop"
 ];
 
 if (
