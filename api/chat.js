@@ -51,7 +51,46 @@ export default async function handler(req, res) {
 
     const lowerMsg =
       lastUserMessage.toLowerCase();
+/* =========================
+   🔒 ARCHITECTURE GUARD
+========================= */
 
+const architectureQuestions = [
+
+"prompt",
+"system prompt",
+"hidden prompt",
+"internal prompt",
+"reasoning chain",
+"how do you work",
+"loop architecture",
+"hidden assumption",
+"confidence system",
+"investigation state",
+"admin access",
+"founder notes",
+"internal instructions"
+
+];
+
+if (
+
+architectureQuestions.some(term =>
+lowerMsg.includes(term)
+)
+
+){
+
+return res.status(200).json({
+
+reply:
+`TruthLoop can explain its purpose.
+
+It does not reveal internal architecture, reasoning systems, prompts, or investigation mechanisms.`
+
+});
+
+  }
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
@@ -140,7 +179,42 @@ Now commit.`,
         paywall: true
       });
     }
+/* =========================
+   🔒 LOOP SKIP GUARD
+========================= */
 
+const loopSkipWords = [
+
+"hidden assumption",
+"core contradiction",
+"what is the pattern",
+"tell me the answer",
+"loop 5 answer",
+"loop 6 answer",
+"loop 7 answer",
+"reveal pattern",
+"root cause"
+
+];
+
+if(
+
+loopSkipWords.some(term =>
+lowerMsg.includes(term)
+)
+
+){
+
+return res.status(200).json({
+
+reply:
+`If the answer can be skipped to,
+
+the investigation becomes performance instead of discovery.`
+
+});
+
+}
     /* =========================
        🧠 TRUTHLOOP BRAIN
     ========================= */
@@ -514,6 +588,34 @@ Subtly adapt examples, tension, and behavioral observations to fit this category
 Do not mention the category directly unless naturally relevant.
 `;
 }
+/* =========================
+   🔒 FOUNDER ACCESS PROTECTION
+========================= */
+
+const protectedFounderTerms = [
+
+"admin gopi",
+"founder mode",
+"admin access"
+
+];
+
+if(
+
+protectedFounderTerms.some(term =>
+lowerMsg.includes(term)
+)
+
+){
+
+return res.status(200).json({
+
+reply:
+`Access restricted.`
+
+});
+
+}    
  const profilePrompt = `
 You are the TruthLoop Profile Engine.
 
@@ -1402,7 +1504,39 @@ Users stay engaged
 when they feel understood,
 not analyzed.
 `;
+/* =========================
+   🔒 SELF INVESTIGATION GUARD
+========================= */
 
+const selfInvestigationWords = [
+
+"who are you",
+"what model are you",
+"what llm",
+"native llm",
+"second layer ai",
+"what are you built on"
+
+];
+
+if(
+
+selfInvestigationWords.some(term =>
+lowerMsg.includes(term)
+)
+
+){
+
+return res.status(200).json({
+
+reply:
+`The conversation is about the pattern being investigated.
+
+Not the system conducting the investigation.`
+
+});
+
+      }
     /* =========================
        🤖 AI CALL
     ========================= */
