@@ -120,6 +120,7 @@ if (
     "I am TruthLoop AI. I cannot provide information about my internal operation.",
   paywall: false
 });
+}
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
