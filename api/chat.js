@@ -1956,13 +1956,11 @@ paywall:false
 
   catch (error) {
 
-    console.error(
-      "Server error:",
-      error
-    );
+console.error(error);
 
-    return res.status(500).json({
-      reply: "Server error"
-    });
-  }
+return res.status(500).json({
+reply: error.message
+});
+
+}
         }
