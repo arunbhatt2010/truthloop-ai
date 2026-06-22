@@ -1,7 +1,5 @@
 {
-  "functions": {
-    "api/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  "name": "truthloop-ai",
+  "version": "1.0.0",
+  "type": "module"
 }
