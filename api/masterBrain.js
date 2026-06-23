@@ -1305,6 +1305,82 @@ function trackInvestigationState(
 
          }
 /* =========================
+   🎯 LOOP PROGRESS ENGINE
+========================= */
+
+function calculateLoopProgress(
+  investigationState
+) {
+
+  const stage =
+    investigationState?.stage;
+
+  let currentLoop =
+    1;
+
+  let loopName =
+    "Surface Observation";
+
+  switch (stage) {
+
+    case "surface-level":
+
+      currentLoop = 1;
+
+      loopName =
+        "Surface Observation";
+
+      break;
+
+    case "pattern-recognition":
+
+      currentLoop = 3;
+
+      loopName =
+        "Pattern Recognition";
+
+      break;
+
+    case "root-cause":
+
+      currentLoop = 5;
+
+      loopName =
+        "Root Cause Analysis";
+
+      break;
+
+    case "core-contradiction":
+
+      currentLoop = 7;
+
+      loopName =
+        "Core Contradiction";
+
+      break;
+
+    default:
+
+      currentLoop = 1;
+
+      loopName =
+        "Surface Observation";
+
+  }
+
+  return {
+
+    currentLoop,
+
+    loopName,
+
+    loopComplete:
+      currentLoop >= 7
+
+  };
+
+         }
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -1364,6 +1440,10 @@ const conflictResolution =
     loopNavigation
 
   );
+   const loopProgress =
+  calculateLoopProgress(
+    investigationState
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -1378,6 +1458,7 @@ selectedBrain,
      generatedQuestion,
      loopNavigation,
      investigationState,
+     loopProgress,
     communityPatterns,
 
     organizationPatterns,
