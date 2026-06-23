@@ -522,14 +522,113 @@ function scanOrganizationPatterns(text) {
 
      }
 /* =========================
-   🧩 PATTERN INTELLIGENCE
+   🌐 PATTERN INTELLIGENCE
 ========================= */
 
 function scanPatternSignals(text) {
 
-  return [];
+  const input =
+    text.toLowerCase();
 
-}
+  const patterns = [];
+
+  /* Cross-System Pattern */
+
+  if (
+    input.includes("same problem") ||
+    input.includes("keeps repeating") ||
+    input.includes("everywhere")
+  ) {
+
+    patterns.push({
+
+      pattern:
+        "Cross-System Pattern",
+
+      confidence: 0.90
+
+    });
+
+  }
+
+  /* Multi-Environment Loop */
+
+  if (
+    input.includes("founders and employees") ||
+    input.includes("community and company") ||
+    input.includes("customers and team")
+  ) {
+
+    patterns.push({
+
+      pattern:
+        "Multi-Environment Loop",
+
+      confidence: 0.95
+
+    });
+
+  }
+
+  /* Systemic Contradiction */
+
+  if (
+    input.includes("say") &&
+    input.includes("but")
+  ) {
+
+    patterns.push({
+
+      pattern:
+        "Systemic Contradiction",
+
+      confidence: 0.90
+
+    });
+
+  }
+
+  /* Pattern Layer */
+
+  if (
+    input.includes("root cause") ||
+    input.includes("underlying pattern") ||
+    input.includes("deeper issue")
+  ) {
+
+    patterns.push({
+
+      pattern:
+        "Pattern Layer",
+
+      confidence: 0.85
+
+    });
+
+  }
+
+  /* Pattern Intelligence */
+
+  if (
+    input.includes("hidden pattern") ||
+    input.includes("recurring pattern") ||
+    input.includes("pattern behind")
+  ) {
+
+    patterns.push({
+
+      pattern:
+        "Pattern Intelligence",
+
+      confidence: 0.95
+
+    });
+
+  }
+
+  return patterns;
+
+                  }
 
 /* =========================
    🎯 CONFIDENCE ENGINE
