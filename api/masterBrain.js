@@ -912,6 +912,182 @@ function mergeSignals(
 
      }
 /* =========================
+   ❓ QUESTION GENERATOR
+========================= */
+
+function generateQuestion(
+  mergedSignals
+) {
+
+  const primary =
+    mergedSignals
+      ?.primaryPattern
+      ?.pattern;
+
+  if (!primary) {
+
+    return {
+
+      question:
+
+        "What feels most important about this situation right now?",
+
+      source:
+        "fallback"
+
+    };
+
+  }
+
+  switch (primary) {
+
+    case "Group Avoidance":
+
+      return {
+
+        question:
+
+          "What topic does everyone know exists but rarely discusses openly?",
+
+        source:
+          primary
+
+      };
+
+    case "Community Blind Spot":
+
+      return {
+
+        question:
+
+          "What problem has become so normal that people no longer question it?",
+
+        source:
+          primary
+
+      };
+
+    case "Collective Contradiction":
+
+      return {
+
+        question:
+
+          "Where is the biggest gap between what people say and what they repeatedly do?",
+
+        source:
+          primary
+
+      };
+
+    case "Decision Bottleneck":
+
+      return {
+
+        question:
+
+          "Which decision depends on a small number of people before progress can happen?",
+
+        source:
+          primary
+
+      };
+
+    case "Leadership Contradiction":
+
+      return {
+
+        question:
+
+          "Where does leadership behavior differ from leadership messaging?",
+
+        source:
+          primary
+
+      };
+
+    case "Execution Drift":
+
+      return {
+
+        question:
+
+          "Where is day-to-day execution drifting away from the original goal?",
+
+        source:
+          primary
+
+      };
+
+    case "Strategic Avoidance":
+
+      return {
+
+        question:
+
+          "What important decision keeps getting delayed through activity?",
+
+        source:
+          primary
+
+      };
+
+    case "Cross-System Pattern":
+
+      return {
+
+        question:
+
+          "Where else do you notice this same pattern appearing?",
+
+        source:
+          primary
+
+      };
+
+    case "Systemic Contradiction":
+
+      return {
+
+        question:
+
+          "What contradiction keeps recreating the same outcome?",
+
+        source:
+          primary
+
+      };
+
+    case "Pattern Intelligence":
+
+      return {
+
+        question:
+
+          "What hidden pattern might explain these repeated events?",
+
+        source:
+          primary
+
+      };
+
+    default:
+
+      return {
+
+        question:
+
+          "What do you think is driving this pattern underneath the surface?",
+
+        source:
+          "generic"
+
+      };
+
+  }
+
+       }
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -953,6 +1129,10 @@ const conflictResolution =
     patternSignals
 
   );
+   const generatedQuestion =
+  generateQuestion(
+    mergedSignals
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -964,6 +1144,7 @@ selectedBrain,
      conflictResolution,
      patternRoute,
      mergedSignals,
+     generatedQuestion,
     communityPatterns,
 
     organizationPatterns,
