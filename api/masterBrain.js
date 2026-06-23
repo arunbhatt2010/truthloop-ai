@@ -199,6 +199,7 @@ function detectEnvironment(text) {
     signals: []
 
   };
+}
 /* =========================
    🫀 BRAIN SELECTOR
 ========================= */
@@ -1323,50 +1324,50 @@ function calculateLoopProgress(
 
   switch (stage) {
 
-    case "surface-level":
+  case "surface-level":
 
-      currentLoop = 1;
+    currentLoop = 1;
 
-      loopName =
-        "Surface Observation";
+    loopName =
+      "Context Collection";
 
-      break;
+    break;
 
-    case "pattern-recognition":
+  case "pattern-recognition":
 
-      currentLoop = 3;
+    currentLoop = 3;
 
-      loopName =
-        "Pattern Recognition";
+    loopName =
+      "Pattern Strengthening";
 
-      break;
+    break;
 
-    case "root-cause":
+  case "root-cause":
 
-      currentLoop = 5;
+    currentLoop = 5;
 
-      loopName =
-        "Root Cause Analysis";
+    loopName =
+      "Root Pattern Reveal";
 
-      break;
+    break;
 
-    case "core-contradiction":
+  case "core-contradiction":
 
-      currentLoop = 7;
+    currentLoop = 7;
 
-      loopName =
-        "Core Contradiction";
+    loopName =
+      "Resolution";
 
-      break;
+    break;
 
-    default:
+  default:
 
-      currentLoop = 1;
+    currentLoop = 1;
 
-      loopName =
-        "Surface Observation";
+    loopName =
+      "Context Collection";
 
-  }
+}
 
   return {
 
