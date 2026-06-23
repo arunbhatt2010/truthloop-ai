@@ -361,7 +361,83 @@ function calculateConfidence(
   return 0.25;
 
 }
+/* =========================
+   ⚖️ CONFLICT RESOLVER
+========================= */
 
+function resolveConflict(
+  environment,
+  selectedBrain
+) {
+
+  const env =
+    environment.environment;
+
+  let primaryPattern = null;
+
+  let conflictDetected =
+    false;
+
+  let conflictReason =
+    null;
+
+  switch (env) {
+
+    case "individual":
+
+      primaryPattern =
+        "individual-pattern";
+
+      break;
+
+    case "community":
+
+      primaryPattern =
+        "community-pattern";
+
+      break;
+
+    case "organization":
+
+      primaryPattern =
+        "organization-pattern";
+
+      break;
+
+    case "multi-environment":
+
+      primaryPattern =
+        "cross-system-pattern";
+
+      conflictDetected =
+        true;
+
+      conflictReason =
+        "Multiple environments detected";
+
+      break;
+
+    default:
+
+      primaryPattern =
+        "unknown";
+
+  }
+
+  return {
+
+    primaryPattern,
+
+    conflictDetected,
+
+    conflictReason,
+
+    selectedBrain:
+      selectedBrain.selectedBrain
+
+  };
+
+}
 /* =========================
    🧠 MASTER BRAIN
 ========================= */
@@ -385,7 +461,11 @@ const selectedBrain =
   calculateConfidence(
     environment
   );
-
+const conflictResolution =
+  resolveConflict(
+    environment,
+    selectedBrain
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -394,6 +474,7 @@ const selectedBrain =
 
     environment,
 selectedBrain,
+     conflictResolution,
     communityPatterns,
 
     organizationPatterns,
