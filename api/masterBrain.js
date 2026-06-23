@@ -1240,6 +1240,71 @@ function navigateLoop(
 
   }
 /* =========================
+   📊 INVESTIGATION STATE ENGINE
+========================= */
+
+function trackInvestigationState(
+
+  mergedSignals,
+
+  generatedQuestion,
+
+  loopNavigation
+
+) {
+
+  const signalCount =
+    mergedSignals?.totalSignals || 0;
+
+  const currentLoop =
+    loopNavigation?.nextLoop ||
+    "unknown";
+
+  let stage =
+    "surface-level";
+
+  if (
+    signalCount >= 2
+  ) {
+
+    stage =
+      "pattern-recognition";
+
+  }
+
+  if (
+    signalCount >= 4
+  ) {
+
+    stage =
+      "root-cause";
+
+  }
+
+  if (
+    signalCount >= 6
+  ) {
+
+    stage =
+      "core-contradiction";
+
+  }
+
+  return {
+
+    stage,
+
+    currentLoop,
+
+    signalCount,
+
+    investigationActive:
+      true
+
+  };
+
+         }
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -1289,6 +1354,16 @@ const conflictResolution =
   navigateLoop(
     mergedSignals
   );
+   const investigationState =
+  trackInvestigationState(
+
+    mergedSignals,
+
+    generatedQuestion,
+
+    loopNavigation
+
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -1302,6 +1377,7 @@ selectedBrain,
      mergedSignals,
      generatedQuestion,
      loopNavigation,
+     investigationState,
     communityPatterns,
 
     organizationPatterns,
