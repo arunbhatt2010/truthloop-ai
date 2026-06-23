@@ -1470,6 +1470,66 @@ function determineLoopTransition(
 
 }
 /* =========================
+   👑 EXECUTIVE DECISION ENGINE
+========================= */
+
+function buildExecutiveDecision(
+
+  environment,
+
+  mergedSignals,
+
+  generatedQuestion,
+
+  loopProgress,
+
+  loopTransition,
+
+  confidence
+
+) {
+
+  const primaryPattern =
+    mergedSignals?.primaryPattern?.pattern ||
+    "Unknown";
+
+  const currentLoop =
+    loopProgress?.currentLoop || 1;
+
+  const nextLoop =
+    loopTransition?.recommendedLoop || 1;
+
+  const isFinalLoop =
+    currentLoop >= 7;
+
+  return {
+
+    primaryEnvironment:
+      environment.environment,
+
+    primaryPattern,
+
+    currentLoop,
+
+    nextLoop,
+
+    confidence,
+
+    investigationComplete:
+      isFinalLoop,
+
+    allowFollowUpQuestions:
+      !isFinalLoop,
+
+    recommendedQuestion:
+      isFinalLoop
+        ? null
+        : generatedQuestion?.question || null
+
+  };
+
+     }
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -1541,6 +1601,22 @@ const conflictResolution =
     confidence
 
   );
+   const executiveDecision =
+  buildExecutiveDecision(
+
+    environment,
+
+    mergedSignals,
+
+    generatedQuestion,
+
+    loopProgress,
+
+    loopTransition,
+
+    confidence
+
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -1557,6 +1633,7 @@ selectedBrain,
      investigationState,
      loopProgress,
      loopTransition,
+     executiveDecision,
     communityPatterns,
 
     organizationPatterns,
