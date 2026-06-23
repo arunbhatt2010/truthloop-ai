@@ -396,10 +396,131 @@ function scanCommunityPatterns(text) {
 
 function scanOrganizationPatterns(text) {
 
-  return [];
+  const input =
+    text.toLowerCase();
 
-}
+  const patterns = [];
 
+  /* Organizational Blind Spot */
+
+  if (
+    input.includes("nobody notices") ||
+    input.includes("hidden problem") ||
+    input.includes("keeps happening")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Organizational Blind Spot",
+
+      confidence: 0.80
+    });
+
+  }
+
+  /* Decision Bottleneck */
+
+  if (
+    input.includes("waiting for approval") ||
+    input.includes("all decisions") ||
+    input.includes("one person decides")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Decision Bottleneck",
+
+      confidence: 0.90
+    });
+
+  }
+
+  /* Information Fracture */
+
+  if (
+    input.includes("communication gap") ||
+    input.includes("teams don't know") ||
+    input.includes("information not shared")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Information Fracture",
+
+      confidence: 0.85
+    });
+
+  }
+
+  /* Accountability Gap */
+
+  if (
+    input.includes("nobody owns") ||
+    input.includes("not my responsibility") ||
+    input.includes("ownership unclear")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Accountability Gap",
+
+      confidence: 0.90
+    });
+
+  }
+
+  /* Leadership Contradiction */
+
+  if (
+    input.includes("leadership says") &&
+    input.includes("but")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Leadership Contradiction",
+
+      confidence: 0.95
+    });
+
+  }
+
+  /* Execution Drift */
+
+  if (
+    input.includes("strategy") &&
+    input.includes("execution")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Execution Drift",
+
+      confidence: 0.85
+    });
+
+  }
+
+  /* Strategic Avoidance */
+
+  if (
+    input.includes("avoid decision") ||
+    input.includes("postpone") ||
+    input.includes("keep delaying")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Strategic Avoidance",
+
+      confidence: 0.85
+    });
+
+  }
+
+  return patterns;
+
+     }
 /* =========================
    🧩 PATTERN INTELLIGENCE
 ========================= */
