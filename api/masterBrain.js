@@ -841,6 +841,77 @@ function routePattern(
 
   }
 /* =========================
+   🧠 SIGNAL MERGER
+========================= */
+
+function mergeSignals(
+
+  communityPatterns,
+
+  organizationPatterns,
+
+  patternSignals
+
+) {
+
+  const allSignals = [
+
+    ...communityPatterns,
+
+    ...organizationPatterns,
+
+    ...patternSignals
+
+  ];
+
+  if (
+    allSignals.length === 0
+  ) {
+
+    return {
+
+      primaryPattern:
+        null,
+
+      supportingPatterns:
+        [],
+
+      totalSignals:
+        0
+
+    };
+
+  }
+
+  const sortedSignals =
+    allSignals.sort(
+
+      (a, b) =>
+
+        b.confidence -
+        a.confidence
+
+    );
+
+  const primaryPattern =
+    sortedSignals[0];
+
+  const supportingPatterns =
+    sortedSignals.slice(1);
+
+  return {
+
+    primaryPattern,
+
+    supportingPatterns,
+
+    totalSignals:
+      allSignals.length
+
+  };
+
+     }
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -872,6 +943,16 @@ const conflictResolution =
   routePattern(
     selectedBrain
   );
+   const mergedSignals =
+  mergeSignals(
+
+    communityPatterns,
+
+    organizationPatterns,
+
+    patternSignals
+
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -882,6 +963,7 @@ const conflictResolution =
 selectedBrain,
      conflictResolution,
      patternRoute,
+     mergedSignals,
     communityPatterns,
 
     organizationPatterns,
