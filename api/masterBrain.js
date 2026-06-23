@@ -1088,6 +1088,158 @@ function generateQuestion(
 
        }
 /* =========================
+   🧭 LOOP NAVIGATOR
+========================= */
+
+function navigateLoop(
+  mergedSignals
+) {
+
+  const primary =
+    mergedSignals
+      ?.primaryPattern
+      ?.pattern;
+
+  if (!primary) {
+
+    return {
+
+      nextLoop:
+        "exploration",
+
+      reason:
+        "No primary pattern detected"
+
+    };
+
+  }
+
+  switch (primary) {
+
+    case "Group Avoidance":
+
+      return {
+
+        nextLoop:
+          "hidden-topic-investigation",
+
+        reason:
+          "Avoided topics detected"
+
+      };
+
+    case "Community Blind Spot":
+
+      return {
+
+        nextLoop:
+          "blind-spot-investigation",
+
+        reason:
+          "Normalized issue detected"
+
+      };
+
+    case "Collective Contradiction":
+
+      return {
+
+        nextLoop:
+          "contradiction-investigation",
+
+        reason:
+          "Values and behavior conflict"
+
+      };
+
+    case "Decision Bottleneck":
+
+      return {
+
+        nextLoop:
+          "decision-analysis",
+
+        reason:
+          "Progress depends on few people"
+
+      };
+
+    case "Leadership Contradiction":
+
+      return {
+
+        nextLoop:
+          "leadership-analysis",
+
+        reason:
+          "Leadership inconsistency detected"
+
+      };
+
+    case "Execution Drift":
+
+      return {
+
+        nextLoop:
+          "execution-analysis",
+
+        reason:
+          "Strategy and execution diverging"
+
+      };
+
+    case "Strategic Avoidance":
+
+      return {
+
+        nextLoop:
+          "avoidance-investigation",
+
+        reason:
+          "Important decisions delayed"
+
+      };
+
+    case "Cross-System Pattern":
+
+      return {
+
+        nextLoop:
+          "cross-system-analysis",
+
+        reason:
+          "Pattern appears in multiple environments"
+
+      };
+
+    case "Systemic Contradiction":
+
+      return {
+
+        nextLoop:
+          "system-contradiction-analysis",
+
+        reason:
+          "Recurring contradiction detected"
+
+      };
+
+    default:
+
+      return {
+
+        nextLoop:
+          "general-investigation",
+
+        reason:
+          "Continue exploration"
+
+      };
+
+  }
+
+  }
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -1133,6 +1285,10 @@ const conflictResolution =
   generateQuestion(
     mergedSignals
   );
+   const loopNavigation =
+  navigateLoop(
+    mergedSignals
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -1145,6 +1301,7 @@ selectedBrain,
      patternRoute,
      mergedSignals,
      generatedQuestion,
+     loopNavigation,
     communityPatterns,
 
     organizationPatterns,
