@@ -280,7 +280,113 @@ function selectBrain(environment) {
 
 function scanCommunityPatterns(text) {
 
-  return [];
+  const input =
+    text.toLowerCase();
+
+  const patterns = [];
+
+  /* Community Blind Spot */
+
+  if (
+    input.includes("everyone") ||
+    input.includes("nobody notices") ||
+    input.includes("normal here")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Community Blind Spot",
+
+      confidence: 0.80
+    });
+
+  }
+
+  /* Group Avoidance */
+
+  if (
+    input.includes("avoid") ||
+    input.includes("nobody talks") ||
+    input.includes("uncomfortable")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Group Avoidance",
+
+      confidence: 0.85
+    });
+
+  }
+
+  /* Shared Narrative */
+
+  if (
+    input.includes("people say") ||
+    input.includes("everyone believes") ||
+    input.includes("common belief")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Shared Narrative",
+
+      confidence: 0.75
+    });
+
+  }
+
+  /* Collective Contradiction */
+
+  if (
+    input.includes("say") &&
+    input.includes("do")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Collective Contradiction",
+
+      confidence: 0.90
+    });
+
+  }
+
+  /* Community Drift */
+
+  if (
+    input.includes("used to") ||
+    input.includes("not anymore") ||
+    input.includes("changed over time")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Community Drift",
+
+      confidence: 0.80
+    });
+
+  }
+
+  /* Social Reinforcement Loop */
+
+  if (
+    input.includes("validation") ||
+    input.includes("approval") ||
+    input.includes("likes")
+  ) {
+
+    patterns.push({
+      pattern:
+        "Social Reinforcement Loop",
+
+      confidence: 0.85
+    });
+
+  }
+
+  return patterns;
 
 }
 
