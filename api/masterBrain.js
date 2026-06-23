@@ -1381,6 +1381,95 @@ function calculateLoopProgress(
 
          }
 /* =========================
+   🏁 LOOP TRANSITION ENGINE
+========================= */
+
+function determineLoopTransition(
+
+  loopProgress,
+
+  confidence
+
+) {
+
+  const currentLoop =
+    loopProgress?.currentLoop || 1;
+
+  let recommendedLoop =
+    currentLoop;
+
+  let action =
+    "stay";
+
+  let reason =
+    "More investigation needed";
+
+  /* High confidence */
+
+  if (
+    confidence >= 0.85
+  ) {
+
+    recommendedLoop =
+      Math.min(
+        currentLoop + 1,
+        7
+      );
+
+    action =
+      "advance";
+
+    reason =
+      "High confidence detected";
+
+  }
+
+  /* Medium confidence */
+
+  else if (
+    confidence >= 0.60
+  ) {
+
+    recommendedLoop =
+      currentLoop;
+
+    action =
+      "continue";
+
+    reason =
+      "Investigation progressing";
+
+  }
+
+  /* Low confidence */
+
+  else {
+
+    recommendedLoop =
+      currentLoop;
+
+    action =
+      "stay";
+
+    reason =
+      "More evidence required";
+
+  }
+
+  return {
+
+    currentLoop,
+
+    recommendedLoop,
+
+    action,
+
+    reason
+
+  };
+
+}
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -1444,6 +1533,14 @@ const conflictResolution =
   calculateLoopProgress(
     investigationState
   );
+   const loopTransition =
+  determineLoopTransition(
+
+    loopProgress,
+
+    confidence
+
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -1459,6 +1556,7 @@ selectedBrain,
      loopNavigation,
      investigationState,
      loopProgress,
+     loopTransition,
     communityPatterns,
 
     organizationPatterns,
