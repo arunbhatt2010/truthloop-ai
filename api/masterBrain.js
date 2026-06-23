@@ -199,7 +199,80 @@ function detectEnvironment(text) {
     signals: []
 
   };
+/* =========================
+   🫀 BRAIN SELECTOR
+========================= */
 
+function selectBrain(environment) {
+
+  const env =
+    environment.environment;
+
+  switch (env) {
+
+    case "individual":
+
+      return {
+
+        selectedBrain:
+          "truthloop-core",
+
+        reason:
+          "Individual environment detected"
+
+      };
+
+    case "community":
+
+      return {
+
+        selectedBrain:
+          "community-brain",
+
+        reason:
+          "Community environment detected"
+
+      };
+
+    case "organization":
+
+      return {
+
+        selectedBrain:
+          "organization-brain",
+
+        reason:
+          "Organization environment detected"
+
+      };
+
+    case "multi-environment":
+
+      return {
+
+        selectedBrain:
+          "pattern-intelligence-brain",
+
+        reason:
+          "Multiple environments detected"
+
+      };
+
+    default:
+
+      return {
+
+        selectedBrain:
+          "truthloop-core",
+
+        reason:
+          "Unknown environment"
+
+      };
+
+  }
+
+}
                             }
 /* =========================
    👥 COMMUNITY SCANNER
@@ -249,7 +322,8 @@ export function runMasterBrain(text) {
 
   const environment =
     detectEnvironment(text);
-
+const selectedBrain =
+  selectBrain(environment);
   const communityPatterns =
     scanCommunityPatterns(text);
 
@@ -269,7 +343,7 @@ export function runMasterBrain(text) {
     version: VERSION,
 
     environment,
-
+selectedBrain,
     communityPatterns,
 
     organizationPatterns,
