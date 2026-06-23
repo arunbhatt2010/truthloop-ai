@@ -1,4 +1,30 @@
 /* =========================
+   MASTER BRAIN PURPOSE
+=========================
+
+INPUT:
+
+- User Message
+- Loop Level
+- Current Category
+- Conversation History
+
+OUTPUT:
+
+- Environment
+- Selected Brain
+- Detected Signals
+- Conflict Detected
+- Response Strategy
+
+RULE:
+
+Master Brain never generates analysis.
+
+Master Brain only routes intelligence.
+
+========================= */
+/* =========================
    🧠 MASTER BRAIN v1
 ========================= */
 
