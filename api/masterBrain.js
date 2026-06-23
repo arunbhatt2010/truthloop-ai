@@ -439,6 +439,82 @@ function resolveConflict(
 
 }
 /* =========================
+   🚦 PATTERN ROUTER
+========================= */
+
+function routePattern(
+  selectedBrain
+) {
+
+  const brain =
+    selectedBrain.selectedBrain;
+
+  switch (brain) {
+
+    case "truthloop-core":
+
+      return {
+
+        route:
+          "individual-scanner",
+
+        scanner:
+          "TruthLoop Core"
+
+      };
+
+    case "community-brain":
+
+      return {
+
+        route:
+          "community-scanner",
+
+        scanner:
+          "Community Scanner"
+
+      };
+
+    case "organization-brain":
+
+      return {
+
+        route:
+          "organization-scanner",
+
+        scanner:
+          "Organization Scanner"
+
+      };
+
+    case "pattern-intelligence-brain":
+
+      return {
+
+        route:
+          "pattern-intelligence-scanner",
+
+        scanner:
+          "Pattern Intelligence Scanner"
+
+      };
+
+    default:
+
+      return {
+
+        route:
+          "unknown",
+
+        scanner:
+          "Unknown"
+
+      };
+
+  }
+
+  }
+/* =========================
    🧠 MASTER BRAIN
 ========================= */
 
@@ -466,6 +542,10 @@ const conflictResolution =
     environment,
     selectedBrain
   );
+   const patternRoute =
+  routePattern(
+    selectedBrain
+  );
   return {
 
     brain: BRAIN_NAME,
@@ -475,6 +555,7 @@ const conflictResolution =
     environment,
 selectedBrain,
      conflictResolution,
+     patternRoute,
     communityPatterns,
 
     organizationPatterns,
