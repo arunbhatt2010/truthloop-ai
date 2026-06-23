@@ -308,9 +308,57 @@ function scanPatternSignals(text) {
    🎯 CONFIDENCE ENGINE
 ========================= */
 
-function calculateConfidence() {
+function calculateConfidence(
+  environment
+) {
 
-  return 0;
+  const signalCount =
+    environment.signals.length;
+
+  const env =
+    environment.environment;
+
+  if (
+    env === "unknown"
+  ) {
+
+    return 0.10;
+
+  }
+
+  if (
+    signalCount >= 5
+  ) {
+
+    return 0.95;
+
+  }
+
+  if (
+    signalCount >= 3
+  ) {
+
+    return 0.85;
+
+  }
+
+  if (
+    signalCount >= 2
+  ) {
+
+    return 0.75;
+
+  }
+
+  if (
+    signalCount >= 1
+  ) {
+
+    return 0.60;
+
+  }
+
+  return 0.25;
 
 }
 
@@ -334,7 +382,9 @@ const selectedBrain =
     scanPatternSignals(text);
 
   const confidence =
-    calculateConfidence();
+  calculateConfidence(
+    environment
+  );
 
   return {
 
