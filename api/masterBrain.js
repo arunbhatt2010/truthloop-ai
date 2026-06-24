@@ -1598,7 +1598,26 @@ function buildExecutiveDecision(
 
   const isFinalLoop =
     currentLoop === 7;
+const loop7 = isFinalLoop
+  ? {
 
+      patternSummary:
+        mergedSignals?.primaryPattern?.pattern ||
+        primaryPattern,
+
+      coreContradiction:
+        conflictResolution?.contradiction ||
+        "Growth desired but safety prioritized",
+
+      behaviorProtection:
+        conflictResolution?.protection ||
+        "Protecting certainty and emotional safety",
+
+      oneAction:
+        "Take one uncomfortable action without retreating"
+
+    }
+  : null;
   return {
 
     primaryEnvironment:
@@ -1621,7 +1640,8 @@ function buildExecutiveDecision(
     recommendedQuestion:
       isFinalLoop
         ? null
-        : generatedQuestion?.question || null
+        : generatedQuestion?.question || null,
+     loop7
 
   };
 
