@@ -322,7 +322,7 @@ function selectBrain(environment) {
   }
 
 }
-                            }
+                            
 /* =========================
    👥 COMMUNITY SCANNER
 ========================= */
