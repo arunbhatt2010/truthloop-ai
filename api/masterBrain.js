@@ -1393,16 +1393,29 @@ function trackInvestigationState(
 
   return {
 
-    stage,
+  stage,
 
-    currentLoop,
+  currentLoop,
 
-    signalCount,
+  signalCount,
 
-    investigationActive:
-      true
+  investigationActive: true,
 
-  };
+  evidenceCount: signalCount,
+
+  patternDetected:
+    signalCount >= 2,
+
+  patternValidated:
+    signalCount >= 4,
+
+  rootMechanismFound:
+    signalCount >= 5,
+
+  contradictionFound:
+    signalCount >= 6
+
+};
 
          }
 /* =========================
