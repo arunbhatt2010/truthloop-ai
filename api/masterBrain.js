@@ -1693,11 +1693,7 @@ const conflictResolution =
   );
    const loopTransition =
   determineLoopTransition(
-
-    loopProgress,
-
-    confidence
-
+    investigationState
   );
    const executiveDecision =
   buildExecutiveDecision(
