@@ -1730,7 +1730,9 @@ const conflictResolution =
 
     loopTransition,
 
-    confidence
+    confidence,
+
+    conflictResolution
 
   );
   return {
