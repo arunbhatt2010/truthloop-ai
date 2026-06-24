@@ -1376,6 +1376,10 @@ font-size:13px;
 
 `;
   }
+}else{
+
+if(userCountry === "IN"){
+
 paySub.innerHTML += `
 
 <div style="
@@ -1383,53 +1387,90 @@ margin-top:18px;
 padding-top:16px;
 border-top:1px solid rgba(168,85,247,.25);
 text-align:left;
-">
-
-<div style="
+"><div style="
 color:#22c55e;
 font-weight:700;
 font-size:15px;
 margin-bottom:10px;
 ">
-✓ Root Driver Found
-</div>
-
-<div style="
+✓ Root Pattern Fully Exposed
+</div><div style="
 color:#cbd5e1;
 font-size:14px;
-margin-bottom:12px;
+margin-bottom:16px;
+line-height:1.8;
 ">
-70% Clarity Reached
-</div>
-
-<div style="
+You now know what's been driving this cycle.
+</div><div style="
 color:#fbbf24;
 font-size:14px;
 font-weight:600;
 margin-bottom:14px;
 ">
-Unlock Final 30%
-</div>
-
-<div style="color:#94a3b8;margin-bottom:8px;">
-🔒 Core Contradiction
-</div>
-
-<div style="color:#94a3b8;margin-bottom:8px;">
-🔒 What The Behavior Protects
-</div>
-
-<div style="color:#94a3b8;margin-bottom:8px;">
-🔒 Personalized Action Path
-</div>
-
-<div style="color:#94a3b8;">
+Unlock:
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Core Contradiction
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 What This Behavior Protects
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Personalized Action Path
+</div><div style="color:#94a3b8;margin-bottom:10px;">
 🔒 Final TruthLoop Summary
-</div>
+</div><div style="
+margin-top:14px;
+color:#22c55e;
+font-size:13px;
+">
+🔒 100% Secure Payment with UPI
+</div></div>`;
 
-</div>
+}else{
 
-`;
+paySub.innerHTML += `
+
+<div style="
+margin-top:18px;
+padding-top:16px;
+border-top:1px solid rgba(168,85,247,.25);
+text-align:left;
+"><div style="
+color:#22c55e;
+font-weight:700;
+font-size:15px;
+margin-bottom:10px;
+">
+✓ Root Pattern Fully Exposed
+</div><div style="
+color:#cbd5e1;
+font-size:14px;
+margin-bottom:16px;
+line-height:1.8;
+">
+You now know what's been driving this cycle.
+</div><div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-bottom:14px;
+">
+Unlock:
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Core Contradiction
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 What This Behavior Protects
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Personalized Action Path
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Final TruthLoop Summary
+</div><div style="
+margin-top:14px;
+color:#22c55e;
+font-size:13px;
+">
+🔒 100% Secure Payment with PayPal
+</div></div>`;
+
+}
 
 }
 if(userCountry === "IN"){
