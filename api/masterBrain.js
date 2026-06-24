@@ -1358,10 +1358,10 @@ function trackInvestigationState(
     mergedSignals?.totalSignals || 0;
 
   const currentLoop =
-
-    loopNavigation?.nextLoop ||
-
-    1;
+  determineLoopStage(
+    signalCount,
+    signalCount >= 6 ? 2 : 0
+  );
 
   let stage =
     "surface-level";
