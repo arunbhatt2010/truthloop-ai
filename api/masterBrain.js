@@ -1441,86 +1441,111 @@ function calculateLoopProgress(
 ========================= */
 
 function determineLoopTransition(
+  state
+){
 
-  loopProgress,
+  switch(
+    state.currentLoop
+  ){
 
-  confidence
+    case 1:
 
-) {
+      if(
+        state.evidenceCount >= 2
+      ){
 
-  const currentLoop =
-    loopProgress?.currentLoop || 1;
+        return {
+          action:"advance",
+          nextLoop:2
+        };
 
-  let recommendedLoop =
-    currentLoop;
+      }
 
-  let action =
-    "stay";
+      break;
 
-  let reason =
-    "More investigation needed";
+    case 2:
 
-  /* High confidence */
+      if(
+        state.evidenceCount >= 4
+      ){
 
-  if (
-    confidence >= 0.85
-  ) {
+        return {
+          action:"advance",
+          nextLoop:3
+        };
 
-    recommendedLoop =
-      Math.min(
-        currentLoop + 1,
-        7
-      );
+      }
 
-    action =
-      "advance";
+      break;
 
-    reason =
-      "High confidence detected";
+    case 3:
 
-  }
+      if(
+        state.patternDetected
+      ){
 
-  /* Medium confidence */
+        return {
+          action:"advance",
+          nextLoop:4
+        };
 
-  else if (
-    confidence >= 0.60
-  ) {
+      }
 
-    recommendedLoop =
-      currentLoop;
+      break;
 
-    action =
-      "continue";
+    case 4:
 
-    reason =
-      "Investigation progressing";
+      if(
+        state.patternValidated
+      ){
 
-  }
+        return {
+          action:"advance",
+          nextLoop:5
+        };
 
-  /* Low confidence */
+      }
 
-  else {
+      break;
 
-    recommendedLoop =
-      currentLoop;
+    case 5:
 
-    action =
-      "stay";
+      if(
+        state.rootMechanismFound
+      ){
 
-    reason =
-      "More evidence required";
+        return {
+          action:"advance",
+          nextLoop:6
+        };
+
+      }
+
+      break;
+
+    case 6:
+
+      if(
+        state.contradictionFound
+      ){
+
+        return {
+          action:"advance",
+          nextLoop:7
+        };
+
+      }
+
+      break;
 
   }
 
   return {
 
-    currentLoop,
+    action:"stay",
 
-    recommendedLoop,
-
-    action,
-
-    reason
+    nextLoop:
+      state.currentLoop
 
   };
 
