@@ -49,7 +49,8 @@ export default async function handler(req, res) {
 
     const lastUserMessage =
       messages[messages.length - 1]?.content || "";
-
+const masterBrain =
+runMasterBrain(lastUserMessage);
     const lowerMsg =
       lastUserMessage.toLowerCase();
 /* =========================
