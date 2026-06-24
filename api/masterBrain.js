@@ -1581,7 +1581,7 @@ function buildExecutiveDecision(
     loopTransition?.recommendedLoop || 1;
 
   const isFinalLoop =
-    currentLoop >= 7;
+    nextLoop >= 7;
 
   return {
 
