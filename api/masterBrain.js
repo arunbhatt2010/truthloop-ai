@@ -1610,6 +1610,21 @@ function buildExecutiveDecision(
   };
 
      }
+if(
+  currentLoop === 7
+){
+
+  return {
+
+    investigationComplete:true,
+
+    allowFollowUpQuestions:false,
+
+    recommendedQuestion:null
+
+  };
+
+}
 /* =========================
    🧠 MASTER BRAIN
 ========================= */
