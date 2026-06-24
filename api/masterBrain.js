@@ -30,7 +30,55 @@ Master Brain only routes intelligence.
 
 const BRAIN_NAME = "Master Brain";
 const VERSION = "1.0";
+/* =========================
+   🧭 OFFICIAL LOOP MAP v2
+========================= */
 
+const LOOP_MAP = {
+
+  1: {
+    name: "Context Discovery",
+    goal: "Understand situation",
+    next: 2
+  },
+
+  2: {
+    name: "Evidence Collection",
+    goal: "Collect proof",
+    next: 3
+  },
+
+  3: {
+    name: "Pattern Recognition",
+    goal: "Detect repetition",
+    next: 4
+  },
+
+  4: {
+    name: "Pattern Validation",
+    goal: "Challenge hypothesis",
+    next: 5
+  },
+
+  5: {
+    name: "Root Mechanism",
+    goal: "Understand survival logic",
+    next: 6
+  },
+
+  6: {
+    name: "Core Contradiction",
+    goal: "Expose tension",
+    next: 7
+  },
+
+  7: {
+    name: "Executive Summary",
+    goal: "Close investigation",
+    next: null
+  }
+
+};
 /* =========================
    🌍 ENVIRONMENT DETECTOR
 ========================= */
@@ -1240,6 +1288,58 @@ function navigateLoop(
   }
 
   }
+function determineLoopStage(
+  evidenceCount,
+  contradictionCount
+){
+
+  if(evidenceCount < 2){
+
+    return 1;
+
+  }
+
+  if(evidenceCount < 4){
+
+    return 2;
+
+  }
+
+  if(evidenceCount < 6){
+
+    return 3;
+
+  }
+
+  if(
+    evidenceCount >= 6 &&
+    contradictionCount === 0
+  ){
+
+    return 4;
+
+  }
+
+  if(
+    contradictionCount >= 1 &&
+    contradictionCount < 2
+  ){
+
+    return 5;
+
+  }
+
+  if(
+    contradictionCount >= 2
+  ){
+
+    return 6;
+
+  }
+
+  return 1;
+
+}
 /* =========================
    📊 INVESTIGATION STATE ENGINE
 ========================= */
@@ -1306,81 +1406,36 @@ function trackInvestigationState(
 
          }
 /* =========================
-   🎯 LOOP PROGRESS ENGINE
+   🔴 LOOP PROGRESS ENGINE
 ========================= */
 
 function calculateLoopProgress(
   investigationState
-) {
+){
 
-  const stage =
-    investigationState?.stage;
-
-  let currentLoop =
-    1;
-
-  let loopName =
-    "Surface Observation";
-
-  switch (stage) {
-
-  case "surface-level":
-
-    currentLoop = 1;
-
-    loopName =
-      "Context Collection";
-
-    break;
-
-  case "pattern-recognition":
-
-    currentLoop = 3;
-
-    loopName =
-      "Pattern Strengthening";
-
-    break;
-
-  case "root-cause":
-
-    currentLoop = 5;
-
-    loopName =
-      "Root Pattern Reveal";
-
-    break;
-
-  case "core-contradiction":
-
-    currentLoop = 7;
-
-    loopName =
-      "Resolution";
-
-    break;
-
-  default:
-
-    currentLoop = 1;
-
-    loopName =
-      "Context Collection";
-
-}
+  const currentLoop =
+    investigationState.currentLoop || 1;
 
   return {
 
     currentLoop,
 
-    loopName,
+    loopName:
+      LOOP_MAP[currentLoop]?.name ||
 
-    loopComplete:
-      currentLoop >= 7
+      "Unknown Loop",
+
+    nextLoop:
+      LOOP_MAP[currentLoop]?.next ||
+
+      null,
+
+    investigationComplete:
+      currentLoop === 7
 
   };
 
-         }
+}
 /* =========================
    🏁 LOOP TRANSITION ENGINE
 ========================= */
