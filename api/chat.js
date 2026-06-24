@@ -49,8 +49,21 @@ export default async function handler(req, res) {
 
     const lastUserMessage =
       messages[messages.length - 1]?.content || "";
-const masterBrain =
-runMasterBrain(lastUserMessage);
+let masterBrain = {};
+
+try {
+
+  masterBrain =
+    runMasterBrain(lastUserMessage);
+
+} catch (e) {
+
+  console.error(
+    "MASTER_BRAIN_ERROR",
+    e
+  );
+
+    }
     const executiveDecision =
 masterBrain?.executiveDecision || {};
     console.log(
