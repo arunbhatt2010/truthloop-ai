@@ -1358,8 +1358,10 @@ function trackInvestigationState(
     mergedSignals?.totalSignals || 0;
 
   const currentLoop =
+
     loopNavigation?.nextLoop ||
-    "unknown";
+
+    1;
 
   let stage =
     "surface-level";
@@ -1591,10 +1593,11 @@ function buildExecutiveDecision(
     loopProgress?.currentLoop || 1;
 
   const nextLoop =
-    loopTransition?.recommendedLoop || 1;
+    loopTransition?.nextLoop ||
+    currentLoop;
 
   const isFinalLoop =
-    nextLoop >= 7;
+    currentLoop === 7;
 
   return {
 
@@ -1623,21 +1626,7 @@ function buildExecutiveDecision(
   };
 
      }
-if(
-  currentLoop === 7
-){
 
-  return {
-
-    investigationComplete:true,
-
-    allowFollowUpQuestions:false,
-
-    recommendedQuestion:null
-
-  };
-
-}
 /* =========================
    🧠 MASTER BRAIN
 ========================= */
