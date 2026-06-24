@@ -51,6 +51,8 @@ export default async function handler(req, res) {
       messages[messages.length - 1]?.content || "";
 const masterBrain =
 runMasterBrain(lastUserMessage);
+    const executiveDecision =
+masterBrain?.executiveDecision || {};
     console.log(
 "MASTER_BRAIN",
 JSON.stringify(masterBrain, null, 2)
@@ -811,6 +813,11 @@ Do not elaborate.
 Do not justify.
 Do not provide partial information.
 ${investigationPrompt}
+Current Loop:
+${executiveDecision.currentLoop || 1}
+
+Investigation Complete:
+${executiveDecision.investigationComplete || false}
 You are not a coach.
 You are not a therapist.
 You are not a motivational AI.
