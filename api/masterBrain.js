@@ -1330,15 +1330,19 @@ function determineLoopStage(
   }
 
   if(
-    contradictionCount >= 2
-  ){
+  evidenceCount >= 8 &&
+  contradictionCount >= 2
+){
+  return 7;
+}
 
-    return 6;
+if(
+  contradictionCount >= 2
+){
+  return 6;
+}
 
-  }
-
-  return 1;
-
+return 1;
 }
 /* =========================
    📊 INVESTIGATION STATE ENGINE
