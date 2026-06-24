@@ -1581,7 +1581,9 @@ function buildExecutiveDecision(
 
   loopTransition,
 
-  confidence
+  confidence,
+
+  conflictResolution
 
 ) {
 
