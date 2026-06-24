@@ -1,4 +1,5 @@
-
+import { runMasterBrain }
+from "./masterBrain.js";
 export default async function handler(req, res) {
 
   /* =========================
