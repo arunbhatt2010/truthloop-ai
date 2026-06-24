@@ -1630,8 +1630,25 @@ max_tokens:120
 }
 );
 
-const profileData =
-await profileResponse.json();
+let profileData = {};
+
+try {
+
+  if (profileResponse.ok) {
+
+    profileData =
+      await profileResponse.json();
+
+  }
+
+} catch (e) {
+
+  console.error(
+    "PROFILE_ENGINE_ERROR",
+    e
+  );
+
+}
     let reply =
       data?.choices?.[0]?.message?.content || "";
 const contentLeakWords = [
