@@ -35,7 +35,16 @@ const unique =
 const prioritized =
     this.prioritizeSignals(unique);
 
-return this.filterSpamSignals(prioritized);
+const filtered =
+    this.filterSpamSignals(prioritized);
+
+const stats =
+    this.getCollectionStats(filtered);
+
+// Future use
+// console.log(stats);
+
+return filtered;
 
   async collectLinkedIn(context = {}) {
 
@@ -326,4 +335,39 @@ removeDuplicateSignals(signals = []) {
     });
 
     }
+  handleCollectionError(source, error) {
+
+    console.error(
+        `[SignalCollector] ${source}`,
+        error
+    );
+
+    return [];
+
+  }
+  getCollectionStats(signals = []) {
+
+    return {
+
+        total: signals.length,
+
+        byPlatform: signals.reduce(
+            (stats, signal) => {
+
+                stats[
+                    signal.platform
+                ] =
+                    (stats[
+                        signal.platform
+                    ] || 0) + 1;
+
+                return stats;
+
+            },
+            {}
+        )
+
+    };
+
+  }
 module.exports = SignalCollector;
