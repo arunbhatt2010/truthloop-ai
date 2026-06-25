@@ -1,6 +1,7 @@
 import { runMasterBrain }
 from "./masterBrain.js";
 import CommunityBrain from "./CommunityBrain.js";
+import SignalCollector from "./SignalCollector.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -41,10 +42,7 @@ export default async function handler(req, res) {
   currentCategory = ""
 } = body;
     const communityBrain = new CommunityBrain({
-  signalCollector: {
-    collect: async (context) => ({ context })
-  },
-
+  signalCollector: new SignalCollector(),
   communityMemory: {
     build: async (signals) => ({ signals })
   },
