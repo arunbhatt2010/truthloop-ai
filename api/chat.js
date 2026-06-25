@@ -1,3 +1,4 @@
+throw new Error("CHAT_JS_LOADED");
 import { runMasterBrain }
 from "./masterBrain.js";
 import CommunityBrain from "./CommunityBrain.js";
