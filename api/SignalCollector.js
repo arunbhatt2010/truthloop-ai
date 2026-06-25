@@ -32,7 +32,10 @@ const validated =
 const unique =
     this.removeDuplicateSignals(validated);
 
-return this.prioritizeSignals(unique);
+const prioritized =
+    this.prioritizeSignals(unique);
+
+return this.filterSpamSignals(prioritized);
 
   async collectLinkedIn(context = {}) {
 
@@ -301,4 +304,26 @@ removeDuplicateSignals(signals = []) {
     });
 
           }
+  filterSpamSignals(signals = []) {
+
+    const spamWords = [
+        "buy now",
+        "click here",
+        "free money",
+        "subscribe",
+        "winner",
+        "earn fast"
+    ];
+
+    return signals.filter(signal => {
+
+        const text = signal.text.toLowerCase();
+
+        return !spamWords.some(word =>
+            text.includes(word)
+        );
+
+    });
+
+    }
 module.exports = SignalCollector;
