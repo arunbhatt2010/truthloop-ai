@@ -2,6 +2,7 @@ import { runMasterBrain }
 from "./masterBrain.js";
 import CommunityBrain from "./CommunityBrain.js";
 import SignalCollector from "./SignalCollector.js";
+import SecurityGuard from "./SecurityGuard.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -72,40 +73,57 @@ export default async function handler(req, res) {
     }
 
     const lastUserMessage =
-      messages[messages.length - 1]?.content || "";
-    const communityResult =
-  await communityBrain.analyze({
-    messages,
-    lastUserMessage
-  });
+    messages[messages.length - 1]?.content || "";
+
+const lowerMsg =
+    lastUserMessage.toLowerCase();
+
+const securityGuard =
+    new SecurityGuard();
+
+const security =
+    securityGuard.check(lowerMsg);
+
+if (security.blocked) {
+    return res.status(200).json(
+        security.response
+    );
+}
+
+const communityResult =
+    await communityBrain.analyze({
+        messages,
+        lastUserMessage
+    });
 
 console.log(
-  "COMMUNITY_BRAIN",
-  JSON.stringify(communityResult, null, 2)
+    "COMMUNITY_BRAIN",
+    JSON.stringify(communityResult, null, 2)
 );
+
 let masterBrain = {};
 
 try {
 
-  masterBrain =
-    runMasterBrain(lastUserMessage);
+    masterBrain =
+        runMasterBrain(lastUserMessage);
 
 } catch (e) {
 
-  console.error(
-    "MASTER_BRAIN_ERROR",
-    e
-  );
+    console.error(
+        "MASTER_BRAIN_ERROR",
+        e
+    );
 
-    }
-    const executiveDecision =
-masterBrain?.executiveDecision || {};
-    console.log(
-"MASTER_BRAIN",
-JSON.stringify(masterBrain, null, 2)
+}
+
+const executiveDecision =
+    masterBrain?.executiveDecision || {};
+
+console.log(
+    "MASTER_BRAIN",
+    JSON.stringify(masterBrain, null, 2)
 );
-    const lowerMsg =
-      lastUserMessage.toLowerCase();
 /* =========================
    🔒 FOUNDER PROTECTION
 ========================= */
