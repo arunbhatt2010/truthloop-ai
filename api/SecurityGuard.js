@@ -19,7 +19,12 @@
 class SecurityGuard {
 
     check(message = "") {
-
+return {
+    blocked: true,
+    response: {
+        reply: "SECURITY_GUARD_ACTIVE"
+    }
+};
         const lowerMsg = message.toLowerCase();
 
         const founder =
