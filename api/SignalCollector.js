@@ -23,11 +23,16 @@ class SignalCollector {
 
   ];
 
-  return this.normalizeSignals(
-    sources.flat()
-  );
+  const normalized =
+    this.normalizeSignals(sources.flat());
 
-  }
+const validated =
+    this.validateSignals(normalized);
+
+const unique =
+    this.removeDuplicateSignals(validated);
+
+return this.prioritizeSignals(unique);
 
   async collectLinkedIn(context = {}) {
 
@@ -218,5 +223,82 @@ normalizeSignals(signals = []) {
     }));
 
 }
+validateSignals(signals = []) {
 
+    return signals.filter(signal => {
+
+        if (!signal) return false;
+
+        if (!signal.platform) return false;
+
+        if (!signal.text) return false;
+
+        if (signal.text.trim().length === 0) return false;
+
+        return true;
+
+    });
+
+}
+removeDuplicateSignals(signals = []) {
+
+    const seen = new Set();
+
+    return signals.filter(signal => {
+
+        const key = [
+            signal.platform,
+            signal.author,
+            signal.text
+        ].join("|");
+
+        if (seen.has(key)) {
+            return false;
+        }
+
+        seen.add(key);
+
+        return true;
+
+    });
+
+                          }
+  prioritizeSignals(signals = []) {
+
+    return signals.map(signal => {
+
+        let priority = "LOW";
+        let score = 1;
+
+        const text = signal.text.toLowerCase();
+
+        if (
+            text.includes("problem") ||
+            text.includes("issue") ||
+            text.includes("need") ||
+            text.includes("help")
+        ) {
+            priority = "MEDIUM";
+            score = 5;
+        }
+
+        if (
+            text.includes("urgent") ||
+            text.includes("can't") ||
+            text.includes("frustrated") ||
+            text.includes("stuck")
+        ) {
+            priority = "HIGH";
+            score = 10;
+        }
+
+        return {
+            ...signal,
+            priority,
+            score
+        };
+
+    });
+
+          }
 module.exports = SignalCollector;
