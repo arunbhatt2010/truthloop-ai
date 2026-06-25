@@ -130,9 +130,10 @@ const founderTerms = [
 ];
 
 if (
-  founderTerms.some(term =>
-    lowerMsg.includes(term)
-  )
+  founderTerms.some(term => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${escaped}\\b`, "i").test(lowerMsg);
+  })
 ) {
 
   return res.status(200).json({
