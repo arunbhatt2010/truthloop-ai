@@ -197,7 +197,7 @@ if (
   analysis: "",
   question: "",
   reply:
-    "I am TruthLoop AI. I cannot provide information about my internal operation.",
+    "🔥 TEST_REPLY_123 🔥",
   paywall: false
 });
 }
