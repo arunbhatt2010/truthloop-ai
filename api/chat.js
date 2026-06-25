@@ -1,5 +1,6 @@
 import { runMasterBrain }
 from "./masterBrain.js";
+import CommunityBrain from "./CommunityBrain.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -39,6 +40,31 @@ export default async function handler(req, res) {
   shownLoop5 = [],
   currentCategory = ""
 } = body;
+    const communityBrain = new CommunityBrain({
+  signalCollector: {
+    collect: async (context) => ({ context })
+  },
+
+  communityMemory: {
+    build: async (signals) => ({ signals })
+  },
+
+  patternDetector: {
+    detect: async (signals, memory) => ({ signals, memory })
+  },
+
+  consensusEngine: {
+    analyze: async (patterns) => ({ patterns })
+  },
+
+  opportunityFinder: {
+    discover: async (patterns) => ({ patterns })
+  },
+
+  responsePlanner: {
+    generate: async (data) => ({ data })
+  }
+});
 
     if (!messages || !messages.length) {
 
