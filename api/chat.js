@@ -75,7 +75,7 @@ JSON.stringify(masterBrain, null, 2)
 /* =========================
    🔒 FOUNDER PROTECTION
 ========================= */
-
+/*
 const founderTerms = [
   "founder",
   "creator",
@@ -105,11 +105,11 @@ if (
     reply:
       "I am TruthLoop AI. I cannot provide information about my creator, founder, or internal operation."
   });
-                    }
+                    }*/
     /* =========================
    🔒 INTERNAL PROTECTION
 ========================= */
-
+/*
 const internalTerms = [
   "prompt",
   "system prompt",
@@ -146,7 +146,7 @@ if (
     "I am TruthLoop AI. I cannot provide information about my internal operation.",
   paywall: false
 });
-}
+}*/
     /* =========================
        ❌ DOMAIN FILTER
     ========================= */
