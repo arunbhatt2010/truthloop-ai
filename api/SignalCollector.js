@@ -45,7 +45,7 @@ const stats =
 // console.log(stats);
 
 return filtered;
-
+  }
   async collectLinkedIn(context = {}) {
 
     if (!context.linkedin) {
@@ -370,4 +370,4 @@ removeDuplicateSignals(signals = []) {
     };
 
   }
-module.exports = SignalCollector;
+export default SignalCollector;
