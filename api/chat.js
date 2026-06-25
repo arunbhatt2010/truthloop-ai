@@ -75,6 +75,16 @@ export default async function handler(req, res) {
 
     const lastUserMessage =
       messages[messages.length - 1]?.content || "";
+    const communityResult =
+  await communityBrain.analyze({
+    messages,
+    lastUserMessage
+  });
+
+console.log(
+  "COMMUNITY_BRAIN",
+  JSON.stringify(communityResult, null, 2)
+);
 let masterBrain = {};
 
 try {
