@@ -1,7 +1,7 @@
 
 import { runMasterBrain }
 from "./masterBrain.js";
-import CommunityBrain from "./CommunityBrain.js";
+import CommunityBrain from "./lib/CommunityBrain.js";
 import SignalCollector from "./SignalCollector.js";
 import SecurityGuard from "./SecurityGuard.js";
 export default async function handler(req, res) {
