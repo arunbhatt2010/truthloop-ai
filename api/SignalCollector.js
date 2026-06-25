@@ -12,16 +12,20 @@ class SignalCollector {
 
   async collect(context = {}) {
 
-    const signals = {
-      linkedin: await this.collectLinkedIn(context),
-      reddit: await this.collectReddit(context),
-      x: await this.collectX(context),
-      facebook: await this.collectFacebook(context),
-      discord: await this.collectDiscord(context),
-      website: await this.collectWebsite(context)
-    };
+  const sources = [
 
-    return signals;
+    await this.collectLinkedIn(context),
+    await this.collectReddit(context),
+    await this.collectX(context),
+    await this.collectFacebook(context),
+    await this.collectDiscord(context),
+    await this.collectWebsite(context)
+
+  ];
+
+  return this.normalizeSignals(
+    sources.flat()
+  );
 
   }
 
@@ -50,5 +54,25 @@ class SignalCollector {
   }
 
 }
+normalizeSignals(signals = []) {
 
+  return signals
+    .filter(Boolean)
+    .map(signal => ({
+
+      platform: signal.platform || "unknown",
+
+      type: signal.type || "unknown",
+
+      author: signal.author || "anonymous",
+
+      text: signal.text || "",
+
+      timestamp: signal.timestamp || null,
+
+      metadata: signal.metadata || {}
+
+    }));
+
+    }
 module.exports = SignalCollector;
