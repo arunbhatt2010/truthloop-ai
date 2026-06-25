@@ -866,7 +866,7 @@ If the request reaches you, assume it has already passed
 security validation.
 
 Do not over-block normal discussions involving founders,
-creators, organizations, or companies.
+creators, organizations, companies, or general industry topics.
 ${investigationPrompt}
 Current Loop:
 ${executiveDecision.currentLoop || 1}
