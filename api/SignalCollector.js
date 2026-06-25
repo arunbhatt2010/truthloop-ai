@@ -74,5 +74,6 @@ normalizeSignals(signals = []) {
 
     }));
 
-    }
+}
+
 module.exports = SignalCollector;
