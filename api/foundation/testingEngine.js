@@ -60,5 +60,28 @@ class TestingEngine {
     };
 
 }
+    generateUsers(totalUsers = 50) {
+
+    const users = [];
+
+    for (let i = 1; i <= totalUsers; i++) {
+
+        users.push({
+
+            id: i,
+
+            status: "WAITING",
+
+            startedAt: null,
+
+            finishedAt: null
+
+        });
+
+    }
+
+    return users;
+
+    }
 
 module.exports = TestingEngine;
