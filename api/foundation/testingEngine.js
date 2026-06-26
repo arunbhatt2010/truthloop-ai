@@ -114,5 +114,18 @@ class TestingEngine {
     return Promise.all(requests);
 
                   }
+    collectResponses(responses) {
+
+    return responses.map(response => ({
+
+        ok: response.ok,
+
+        status: response.status,
+
+        receivedAt: Date.now()
+
+    }));
+
+                           }
 
 module.exports = TestingEngine;
