@@ -77,24 +77,21 @@ JSON.stringify(masterBrain, null, 2)
 ========================= */
 
 const FOUNDATION_TEST_ENABLED = true;
+
 if (FOUNDATION_TEST_ENABLED) {
 
   if (lastUserMessage.trim() === "TLF26::END") {
 
-    const testingEngine = new TestingEngine();
-
-    const report =
-      await testingEngine.run("/api/chat", 50);
-
-    return res.status(200).json(report);
+    return res.status(200).json({
+      reply: "🟢 Foundation Mode Activated"
+    });
 
   }
 
   if (lastUserMessage.trim() === "TLF26::START") {
 
     return res.status(200).json({
-      reply:
-        "🔒 Foundation Mode Deactivated"
+      reply: "🔒 Foundation Mode Deactivated"
     });
 
   }
