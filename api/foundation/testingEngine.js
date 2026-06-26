@@ -39,6 +39,29 @@ class TestingEngine {
         recovery: "PENDING",
         security: "PENDING"
     };
+        this.metrics = {
+
+    passRate: 0,
+
+    memory: null,
+
+    cpu: null,
+
+    latency: null,
+
+    queue: null,
+
+    timeout: 0,
+
+    error: 0,
+
+    session: 0,
+
+    recovery: 0,
+
+    security: "UNKNOWN"
+
+};
     }
 
     async startTest() {
@@ -140,6 +163,11 @@ class TestingEngine {
     });
 
     return users;
+
+    }
+    calculateMetrics() {
+
+    return this.metrics;
 
     }
 
