@@ -70,6 +70,33 @@ masterBrain?.executiveDecision || {};
 "MASTER_BRAIN",
 JSON.stringify(masterBrain, null, 2)
 );
+    /* =========================
+   🧪 FOUNDATION SECURITY
+========================= */
+
+const FOUNDATION_TEST_ENABLED = false;
+
+if (FOUNDATION_TEST_ENABLED) {
+
+  if (lastUserMessage.trim() === "TLF26::END") {
+
+    return res.status(200).json({
+      reply:
+        "🟢 Foundation Mode Activated"
+    });
+
+  }
+
+  if (lastUserMessage.trim() === "TLF26::START") {
+
+    return res.status(200).json({
+      reply:
+        "🔒 Foundation Mode Deactivated"
+    });
+
+  }
+
+  }
     const lowerMsg =
       lastUserMessage.toLowerCase();
 /* =========================
