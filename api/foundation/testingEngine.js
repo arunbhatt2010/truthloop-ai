@@ -188,5 +188,24 @@ class TestingEngine {
     };
             }
             }
+async run(endpoint, userCount = 50) {
+
+    this.startTest();
+
+    const users = this.generateUsers(userCount);
+
+    const runningUsers = this.runUsers(users);
+
+    const responses = await this.dispatchRequests(runningUsers, endpoint);
+
+    const collectedResponses = this.collectResponses(responses);
+
+    this.completeRequests(runningUsers, collectedResponses);
+
+    this.calculateMetrics();
+
+    return this.evaluateGate();
+
+    }
 
 module.exports = TestingEngine;
