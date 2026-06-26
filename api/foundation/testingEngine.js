@@ -188,7 +188,31 @@ class TestingEngine {
     return users;
 
     }
-    calculateMetrics() {
+    calculateMetrics(users, responses) {
+
+    const totalUsers = users.length;
+
+    const passedUsers = responses.filter(r => r.ok).length;
+
+    const failedUsers = totalUsers - passedUsers;
+
+    const totalLatency = responses.reduce((sum, response) => {
+        return sum + response.latency;
+    }, 0);
+
+    const averageLatency =
+        totalUsers > 0
+            ? Math.round(totalLatency / totalUsers)
+            : 0;
+
+    this.metrics.passRate =
+        totalUsers > 0
+            ? Math.round((passedUsers / totalUsers) * 100)
+            : 0;
+
+    this.metrics.error = failedUsers;
+
+    this.metrics.latency = averageLatency;
 
     return this.metrics;
 
@@ -226,7 +250,10 @@ async run(endpoint, userCount = 50) {
 
     this.completeRequests(runningUsers, collectedResponses);
 
-    this.calculateMetrics();
+    this.calculateMetrics(
+    runningUsers,
+    collectedResponses
+);
 
     return this.evaluateGate();
 
