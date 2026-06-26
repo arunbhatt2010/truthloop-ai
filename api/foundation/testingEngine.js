@@ -95,5 +95,24 @@ class TestingEngine {
     return users;
 
     }
+    async dispatchRequests(users, endpoint) {
+
+    const requests = users.map(user => {
+
+        return fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                userId: user.id
+            })
+        });
+
+    });
+
+    return Promise.all(requests);
+
+                  }
 
 module.exports = TestingEngine;
