@@ -43,18 +43,21 @@ class TestingEngine {
 
     async startTest() {
 
-        this.status = "RUNNING";
-        this.startedAt = Date.now();
+    this.status = "RUNNING";
+    this.startedAt = Date.now();
 
-        return {
-            success: true,
-            version: this.version,
-            status: this.status,
-            startedAt: this.startedAt,
-            message: "TruthLoop Foundation Test Started"
-        };
+    Object.keys(this.tests).forEach(test => {
+        this.tests[test] = "RUNNING";
+    });
 
-    }
+    return {
+        success: true,
+        version: this.version,
+        status: this.status,
+        startedAt: this.startedAt,
+        tests: this.tests,
+        message: "TruthLoop Foundation Test Started"
+    };
 
 }
 
