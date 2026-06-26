@@ -83,5 +83,17 @@ class TestingEngine {
     return users;
 
     }
+    runUsers(users) {
+
+    users.forEach(user => {
+
+        user.status = "RUNNING";
+        user.startedAt = Date.now();
+
+    });
+
+    return users;
+
+    }
 
 module.exports = TestingEngine;
