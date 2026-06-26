@@ -270,7 +270,61 @@ class TestingEngine {
 
                                           }
     async controller(endpoint, userCount = 50) {
+const command = endpoint.trim().toUpperCase();
 
+if (command === "HELP") {
+
+    return {
+        status: "READY",
+        message: "Foundation Commands",
+        commands: [
+            "RUN",
+            "REPORT",
+            "STATUS",
+            "EXIT"
+        ]
+    };
+
+}
+
+if (command === "STATUS") {
+
+    return {
+        version: this.version,
+        status: this.status,
+        startedAt: this.startedAt,
+        tests: this.tests,
+        metrics: this.metrics
+    };
+
+}
+
+if (command === "REPORT") {
+
+    return this.evaluateGate();
+
+}
+
+if (command === "EXIT") {
+
+    this.status = "IDLE";
+
+    return {
+        status: "EXIT",
+        message: "🔒 Foundation Mode Deactivated"
+    };
+
+}
+
+if (command !== "RUN") {
+
+    return {
+        status: "INVALID_COMMAND",
+        message: "Unknown Foundation Command",
+        hint: "Type HELP"
+    };
+
+}
     this.startTest();
 
     const users = this.generateUsers(userCount);
