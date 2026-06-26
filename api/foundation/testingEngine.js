@@ -127,5 +127,20 @@ class TestingEngine {
     }));
 
                            }
+    completeRequests(users, responses) {
+
+    users.forEach((user, index) => {
+
+        user.status = responses[index]?.ok
+            ? "COMPLETED"
+            : "FAILED";
+
+        user.finishedAt = Date.now();
+
+    });
+
+    return users;
+
+    }
 
 module.exports = TestingEngine;
