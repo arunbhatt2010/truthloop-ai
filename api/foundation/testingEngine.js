@@ -154,19 +154,25 @@ class TestingEngine {
 
 }
     
-    collectResponses(responses) {
+    collectResponses(users, responses) {
 
-    return responses.map(response => ({
+    const finishedAt = Date.now();
+
+    return responses.map((response, index) => ({
 
         ok: response.ok,
 
         status: response.status,
 
-        receivedAt: Date.now()
+        startedAt: users[index].startedAt,
+
+        finishedAt: finishedAt,
+
+        latency: finishedAt - users[index].startedAt
 
     }));
 
-                           }
+            }
     completeRequests(users, responses) {
 
     users.forEach((user, index) => {
@@ -215,7 +221,8 @@ async run(endpoint, userCount = 50) {
 
     const responses = await this.dispatchRequests(runningUsers, endpoint);
 
-    const collectedResponses = this.collectResponses(responses);
+    const collectedResponses =
+    this.collectResponses(runningUsers, responses);
 
     this.completeRequests(runningUsers, collectedResponses);
 
