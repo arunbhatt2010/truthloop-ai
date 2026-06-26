@@ -292,5 +292,6 @@ async run(endpoint, userCount = 50) {
     return this.evaluateGate();
 
     }
+}
 
 export default TestingEngine;
