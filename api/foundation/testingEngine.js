@@ -365,5 +365,6 @@ async run(endpoint, userCount = 50) {
     );
 
 }
+}
 
 export default TestingEngine;
