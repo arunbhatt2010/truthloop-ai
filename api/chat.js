@@ -72,6 +72,71 @@ masterBrain?.executiveDecision || {};
 JSON.stringify(masterBrain, null, 2)
 );
     /* =========================
+   🧪 FOUNDATION CONTROLLER
+========================= */
+
+const testingEngine = new TestingEngine();
+
+const command =
+    lastUserMessage.trim().toUpperCase();
+
+if (command === "HELP") {
+
+    return res.status(200).json({
+        reply:
+`🧪 Foundation Commands
+
+RUN
+→ Start 50-user stress test
+
+REPORT
+→ Show latest report
+
+STATUS
+→ Show current engine status
+
+EXIT
+→ Exit Foundation Mode`
+    });
+
+}
+
+if (command === "RUN") {
+
+    const report =
+        await testingEngine.run("/api/chat", 50);
+
+    return res.status(200).json(report);
+
+}
+
+if (command === "REPORT") {
+
+    return res.status(200).json({
+        reply: testingEngine.evaluateGate()
+    });
+
+}
+
+if (command === "STATUS") {
+
+    return res.status(200).json({
+        version: testingEngine.version,
+        tests: testingEngine.tests,
+        metrics: testingEngine.metrics
+    });
+
+}
+
+if (command === "EXIT") {
+
+    return res.status(200).json({
+        reply:
+        "🔒 Foundation Mode Deactivated"
+    });
+
+  }
+    /* =========================
    🧪 FOUNDATION SECURITY
 ========================= */
 
