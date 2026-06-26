@@ -122,21 +122,38 @@ class TestingEngine {
 
     const requests = users.map(user => {
 
+        const controller = new AbortController();
+
+        const timeout = setTimeout(() => {
+            controller.abort();
+        }, 15000);
+
         return fetch(endpoint, {
+
+            signal: controller.signal,
+
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
                 userId: user.id
             })
+
+        }).finally(() => {
+
+            clearTimeout(timeout);
+
         });
 
     });
 
     return Promise.all(requests);
 
-                  }
+}
+    
     collectResponses(responses) {
 
     return responses.map(response => ({
