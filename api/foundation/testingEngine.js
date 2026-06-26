@@ -219,22 +219,56 @@ class TestingEngine {
     }
     evaluateGate() {
 
-    const pass =
-        this.metrics.passRate === 100 &&
-        this.metrics.timeout === 0 &&
-        this.metrics.error === 0;
+    this.tests.passRate =
+        this.metrics.passRate === 100 ? "PASS" : "FAIL";
+
+    this.tests.latency =
+        this.metrics.latency !== null ? "PASS" : "PENDING";
+
+    this.tests.error =
+        this.metrics.error === 0 ? "PASS" : "FAIL";
+
+    this.tests.timeout =
+        this.metrics.timeout === 0 ? "PASS" : "PENDING";
+
+    this.tests.memory =
+        this.metrics.memory !== null ? "PASS" : "PENDING";
+
+    this.tests.cpu =
+        this.metrics.cpu !== null ? "PASS" : "PENDING";
+
+    this.tests.queue =
+        this.metrics.queue !== null ? "PASS" : "PENDING";
+
+    this.tests.session =
+        this.metrics.session > 0 ? "PASS" : "PENDING";
+
+    this.tests.recovery =
+        this.metrics.recovery > 0 ? "PASS" : "PENDING";
+
+    this.tests.security =
+        this.metrics.security === "PASS"
+            ? "PASS"
+            : "PENDING";
+
+    const foundationPass =
+        Object.values(this.tests).every(
+            status => status === "PASS"
+        );
 
     return {
 
-        status: pass ? "PASS" : "FAIL",
+        status: foundationPass ? "PASS" : "FAIL",
 
-        color: pass ? "🟢" : "🔴",
+        color: foundationPass ? "🟢" : "🔴",
+
+        tests: this.tests,
 
         metrics: this.metrics
 
     };
-            }
-            }
+
+                                          }
 async run(endpoint, userCount = 50) {
 
     this.startTest();
