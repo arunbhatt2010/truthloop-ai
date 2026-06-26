@@ -76,16 +76,17 @@ JSON.stringify(masterBrain, null, 2)
    🧪 FOUNDATION SECURITY
 ========================= */
 
-const FOUNDATION_TEST_ENABLED = false;
-
+const FOUNDATION_TEST_ENABLED = true;
 if (FOUNDATION_TEST_ENABLED) {
 
   if (lastUserMessage.trim() === "TLF26::END") {
 
-    return res.status(200).json({
-      reply:
-        "🟢 Foundation Mode Activated"
-    });
+    const testingEngine = new TestingEngine();
+
+    const report =
+      await testingEngine.run("/api/chat", 50);
+
+    return res.status(200).json(report);
 
   }
 
@@ -98,7 +99,7 @@ if (FOUNDATION_TEST_ENABLED) {
 
   }
 
-  }
+}
     const lowerMsg =
       lastUserMessage.toLowerCase();
 /* =========================
