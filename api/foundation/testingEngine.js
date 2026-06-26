@@ -186,7 +186,7 @@ class TestingEngine {
         metrics: this.metrics
 
     };
-
+            }
             }
 
 module.exports = TestingEngine;
