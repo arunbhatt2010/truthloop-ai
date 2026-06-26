@@ -293,4 +293,4 @@ async run(endpoint, userCount = 50) {
 
     }
 
-module.exports = TestingEngine;
+export default TestingEngine;
