@@ -271,7 +271,7 @@ class TestingEngine {
                                           }
     async controller(endpoint, userCount = 50) {
 const command = endpoint.trim().toUpperCase();
-
+console.log("🔥 FOUNDATION_CONTROLLER", endpoint);
 if (command === "HELP") {
 
     return {
