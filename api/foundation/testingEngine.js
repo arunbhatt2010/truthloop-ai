@@ -170,5 +170,23 @@ class TestingEngine {
     return this.metrics;
 
     }
+    evaluateGate() {
+
+    const pass =
+        this.metrics.passRate === 100 &&
+        this.metrics.timeout === 0 &&
+        this.metrics.error === 0;
+
+    return {
+
+        status: pass ? "PASS" : "FAIL",
+
+        color: pass ? "🟢" : "🔴",
+
+        metrics: this.metrics
+
+    };
+
+            }
 
 module.exports = TestingEngine;
