@@ -1616,3 +1616,227 @@ Responsibilities
         };
 
                 }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 10 : Recommendation Engine
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Generate intelligent recommendations.
+
+Responsibilities
+
+- Analyze Metrics
+- Prioritize Issues
+- Suggest Next Action
+- Build Recommendation List
+
+==================================================
+*/
+
+
+    generateRecommendations(){
+
+        const recommendations=[];
+
+
+
+        if(
+
+            this.metrics.successRate<95
+
+        ){
+
+            recommendations.push({
+
+                priority:"HIGH",
+
+                title:"Improve Success Rate",
+
+                message:
+
+                "Investigate failed requests before increasing traffic."
+
+            });
+
+        }
+
+
+
+        if(
+
+            this.metrics.averageLatency>1000
+
+        ){
+
+            recommendations.push({
+
+                priority:"HIGH",
+
+                title:"Reduce Response Time",
+
+                message:
+
+                "Average response time exceeded one second."
+
+            });
+
+        }
+
+
+
+        if(
+
+            this.metrics.timeoutCount>0
+
+        ){
+
+            recommendations.push({
+
+                priority:"HIGH",
+
+                title:"Review Timeout Configuration",
+
+                message:
+
+                "Timeout events were detected during testing."
+
+            });
+
+        }
+
+
+
+        if(
+
+            this.metrics.serverErrors>0
+
+        ){
+
+            recommendations.push({
+
+                priority:"HIGH",
+
+                title:"Investigate Server Errors",
+
+                message:
+
+                "Server returned one or more 5xx responses."
+
+            });
+
+        }
+
+
+
+        if(
+
+            this.metrics.networkErrors>0
+
+        ){
+
+            recommendations.push({
+
+                priority:"MEDIUM",
+
+                title:"Review Network Stability",
+
+                message:
+
+                "Network related failures were detected."
+
+            });
+
+        }
+
+
+
+        if(
+
+            this.metrics.successRate>=99 &&
+
+            this.metrics.timeoutCount===0 &&
+
+            this.metrics.serverErrors===0
+
+        ){
+
+            recommendations.push({
+
+                priority:"LOW",
+
+                title:"Increase Test Load",
+
+                message:
+
+                "Current configuration is stable. Run a higher user count."
+
+            });
+
+        }
+
+
+
+        if(
+
+            recommendations.length===0
+
+        ){
+
+            recommendations.push({
+
+                priority:"INFO",
+
+                title:"No Recommendations",
+
+                message:
+
+                "No significant issues detected from the collected metrics."
+
+            });
+
+        }
+
+
+
+        this.recommendations=
+
+            recommendations;
+
+
+
+        return recommendations;
+
+    }
+
+
+
+    getRecommendations(){
+
+        return this.recommendations;
+
+    }
+
+
+
+    clearRecommendations(){
+
+        this.recommendations=[];
+
+
+
+        return{
+
+            success:true,
+
+            message:
+
+            "Recommendations cleared."
+
+        };
+
+            }
