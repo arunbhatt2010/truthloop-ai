@@ -1,403 +1,182 @@
 /*
-===========================================
-TruthLoop Foundation Testing Engine v1
-===========================================
+==================================================
+Foundation Testing Engine v2
+Block 01 : Constructor
+Version : 2.0.0
+Status : COMPLETE
+==================================================
 
-Purpose:
-Simulate real users.
-Measure system stability.
-Generate PASS / FAIL report.
+Purpose
 
-This file NEVER modifies production logic.
+Initialize complete engine state.
 
-It only:
-- Tests
-- Measures
-- Reports
+This block contains only engine state.
 
-Priority:
-Reliability > Stability > Security > Scalability > Intelligence
+No business logic.
 
-===========================================
+No request logic.
+
+No report logic.
+
+==================================================
 */
+
 class TestingEngine {
 
     constructor() {
-    this.version = "1.1.0";
-    this.status = "IDLE";
-    this.startedAt = null;
 
-    this.tests = {
-        passRate: "PENDING",
-        memory: "PENDING",
-        cpu: "PENDING",
-        latency: "PENDING",
-        queue: "PENDING",
-        timeout: "PENDING",
-        error: "PENDING",
-        session: "PENDING",
-        recovery: "PENDING",
-        security: "PENDING"
-    };
+        /* ==========================
+           ENGINE
+        ========================== */
+
+        this.name = "Foundation Testing Engine";
+
+        this.version = "2.0.0";
+
+        this.status = "IDLE";
+
+
+
+        /* ==========================
+           SESSION
+        ========================== */
+
+        this.session = {
+
+            id: null,
+
+            active: false,
+
+            startedAt: null,
+
+            finishedAt: null
+
+        };
+
+
+
+        /* ==========================
+           TARGET ENDPOINT
+        ========================== */
+
+        this.endpoint = null;
+
+        this.endpointValidated = false;
+
+
+
+        /* ==========================
+           USER SETTINGS
+        ========================== */
+
+        this.selectedUsers = null;
+
+        this.trafficProfile = null;
+
+
+
+        /* ==========================
+           RUNTIME
+        ========================== */
+
+        this.isRunning = false;
+
+        this.progress = 0;
+
+
+
+        /* ==========================
+           CONFIGURATION
+        ========================== */
+
+        this.config = {
+
+            timeout: 15000,
+
+            retryLimit: 1,
+
+            batchSize: 50,
+
+            maxUsers: 1000,
+
+            allowCustomUsers: true
+
+        };
+
+
+
+        /* ==========================
+           REQUEST CACHE
+        ========================== */
+
+        this.requests = [];
+
+        this.responses = [];
+
+
+
+        /* ==========================
+           METRICS
+        ========================== */
+
         this.metrics = {
 
-totalUsers:0,
+            requestedUsers: 0,
 
-completedUsers:0,
+            completedUsers: 0,
 
-failedUsers:0,
+            failedUsers: 0,
 
-passRate:0,
+            successRate: 0,
 
-averageLatency:0,
+            averageLatency: 0,
 
-minLatency:0,
+            minimumLatency: 0,
 
-maxLatency:0,
+            maximumLatency: 0,
 
-memory:null,
+            p95Latency: 0,
 
-cpu:null,
+            throughput: 0,
 
-queue:0,
+            timeoutCount: 0,
 
-timeout:0,
+            serverErrors: 0,
 
-error:0,
+            networkErrors: 0,
 
-session:0,
+            queueDepth: 0,
 
-recovery:0,
+            peakConcurrency: 0,
 
-security:"UNKNOWN",
+            duration: 0
 
-duration:0
+        };
 
-};
-    }
 
-    async startTest() {
 
-    this.status = "RUNNING";
-    this.startedAt = Date.now();
+        /* ==========================
+           REPORT
+        ========================== */
 
-    Object.keys(this.tests).forEach(test => {
-        this.tests[test] = "RUNNING";
-    });
+        this.lastReport = null;
 
-    return {
-        success: true,
-        version: this.version,
-        status: this.status,
-        startedAt: this.startedAt,
-        tests: this.tests,
-        message: "TruthLoop Foundation Test Started"
-    };
 
-}
-    generateUsers(totalUsers = 50) {
 
-    const users = [];
+        /* ==========================
+           RECOMMENDATIONS
+        ========================== */
 
-    for (let i = 1; i <= totalUsers; i++) {
+        this.recommendations = [];
 
-        users.push({
 
-id:i,
 
-sessionId:
-crypto.randomUUID(),
+        /* ==========================
+           DEBUG
+        ========================== */
 
-status:"WAITING",
-
-startedAt:null,
-
-finishedAt:null,
-
-delay:
-Math.floor(Math.random()*3000),
-
-retry:false,
-
-aborted:false
-
-});
+        this.debug = [];
 
     }
 
-    return users;
-
-    }
-    runUsers(users) {
-
-    users.forEach(user => {
-
-        user.status = "RUNNING";
-        user.startedAt = Date.now();
-
-    });
-
-    return users;
-
-    }
-    async dispatchRequests(users, endpoint) {
-
-    const requests = users.map(user => {
-
-        const controller = new AbortController();
-
-        const timeout = setTimeout(() => {
-            controller.abort();
-        }, 15000);
-
-        return fetch(endpoint, {
-
-            signal: controller.signal,
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-                userId: user.id
-            })
-
-        }).finally(() => {
-
-            clearTimeout(timeout);
-
-        });
-
-    });
-
-    return Promise.allSettled(requests);
-
 }
-    
-    collectResponses(users, responses) {
-
-    const finishedAt = Date.now();
-
-    return responses.map((response, index) => ({
-
-    ok:
-        response.status === "fulfilled"
-            ? response.value.ok
-            : false,
-
-    status:
-        response.status === "fulfilled"
-            ? response.value.status
-            : 500,
-
-    error:
-        response.status === "rejected",
-
-    startedAt:
-        users[index].startedAt,
-
-    finishedAt,
-
-    latency:
-        finishedAt - users[index].startedAt
-
-}));
-
-            }
-    completeRequests(users, responses) {
-
-    users.forEach((user, index) => {
-
-        user.status = responses[index]?.ok
-            ? "COMPLETED"
-            : "FAILED";
-
-        user.finishedAt = Date.now();
-
-    });
-
-    return users;
-
-    }
-    calculateMetrics(users, responses) {
-
-    const totalUsers = users.length;
-
-    const passedUsers = responses.filter(r => r.ok).length;
-
-    const failedUsers = totalUsers - passedUsers;
-
-    const totalLatency = responses.reduce((sum, response) => {
-        return sum + response.latency;
-    }, 0);
-
-    const averageLatency =
-        totalUsers > 0
-            ? Math.round(totalLatency / totalUsers)
-            : 0;
-
-    this.metrics.passRate =
-        totalUsers > 0
-            ? Math.round((passedUsers / totalUsers) * 100)
-            : 0;
-
-    this.metrics.error = failedUsers;
-
-    this.metrics.latency = averageLatency;
-
-    return this.metrics;
-
-    }
-    evaluateGate() {
-
-    this.tests.passRate =
-        this.metrics.passRate === 100 ? "PASS" : "FAIL";
-
-    this.tests.latency =
-        this.metrics.latency !== null ? "PASS" : "PENDING";
-
-    this.tests.error =
-        this.metrics.error === 0 ? "PASS" : "FAIL";
-
-    this.tests.timeout =
-        this.metrics.timeout === 0 ? "PASS" : "PENDING";
-
-    this.tests.memory =
-        this.metrics.memory !== null ? "PASS" : "PENDING";
-
-    this.tests.cpu =
-        this.metrics.cpu !== null ? "PASS" : "PENDING";
-
-    this.tests.queue =
-        this.metrics.queue !== null ? "PASS" : "PENDING";
-
-    this.tests.session =
-        this.metrics.session > 0 ? "PASS" : "PENDING";
-
-    this.tests.recovery =
-        this.metrics.recovery > 0 ? "PASS" : "PENDING";
-
-    this.tests.security =
-        this.metrics.security === "PASS"
-            ? "PASS"
-            : "PENDING";
-
-    const foundationPass =
-        Object.values(this.tests).every(
-            status => status === "PASS"
-        );
-
-    return {
-
-        status: foundationPass ? "PASS" : "FAIL",
-
-        color: foundationPass ? "🟢" : "🔴",
-
-        tests: this.tests,
-
-        metrics: this.metrics
-
-    };
-
-                                          }
-    async controller(endpoint, userCount = 50) {
-const command = endpoint.trim().toUpperCase();
-console.log("🔥 FOUNDATION_CONTROLLER", endpoint);
-if (command === "HELP") {
-
-    return {
-        status: "READY",
-        message: "Foundation Commands",
-        commands: [
-            "RUN",
-            "REPORT",
-            "STATUS",
-            "EXIT"
-        ]
-    };
-
-}
-
-if (command === "STATUS") {
-
-    return {
-        version: this.version,
-        status: this.status,
-        startedAt: this.startedAt,
-        tests: this.tests,
-        metrics: this.metrics
-    };
-
-}
-
-if (command === "REPORT") {
-
-    return this.evaluateGate();
-
-}
-
-if (command === "EXIT") {
-
-    this.status = "IDLE";
-
-    return {
-        status: "EXIT",
-        message: "🔒 Foundation Mode Deactivated"
-    };
-
-}
-
-if (command !== "RUN") {
-
-    return {
-        status: "INVALID_COMMAND",
-        message: "Unknown Foundation Command",
-        hint: "Type HELP"
-    };
-
-}
-    this.startTest();
-
-    const users = this.generateUsers(userCount);
-
-    const runningUsers =
-        this.runUsers(users);
-
-    const responses =
-        await this.dispatchRequests(
-            runningUsers,
-            endpoint
-        );
-
-    const collectedResponses =
-        this.collectResponses(
-            runningUsers,
-            responses
-        );
-
-    this.completeRequests(
-        runningUsers,
-        collectedResponses
-    );
-
-    this.calculateMetrics(
-        runningUsers,
-        collectedResponses
-    );
-
-    return this.evaluateGate();
-
-        }
-async run(endpoint, userCount = 50) {
-
-    return await this.controller(
-        endpoint,
-        userCount
-    );
-
-}
-}
-
-export default TestingEngine;
