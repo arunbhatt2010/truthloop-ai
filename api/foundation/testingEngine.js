@@ -1840,3 +1840,293 @@ Responsibilities
         };
 
             }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 11 : Command Controller
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Control complete Foundation workflow.
+
+Responsibilities
+
+- HELP
+- Endpoint Detection
+- User Selection
+- Traffic Selection
+- RUN
+- REPORT
+- STATUS
+- EXIT
+
+==================================================
+*/
+
+
+async controller(input){
+
+    input=(input||"").trim();
+
+
+
+    /* HELP */
+
+    if(input.toUpperCase()==="HELP"){
+
+        return{
+
+            status:"READY",
+
+            title:"Foundation Testing Engine",
+
+            workflow:[
+
+                "1. Paste Endpoint",
+
+                "2. Select Users",
+
+                "3. Select Traffic",
+
+                "4. RUN",
+
+                "5. REPORT",
+
+                "6. EXIT"
+
+            ]
+
+        };
+
+    }
+
+
+
+    /* EXIT */
+
+    if(input.toUpperCase()==="EXIT"){
+
+        this.resetSession();
+
+        return{
+
+            status:"EXIT",
+
+            message:
+
+            "Foundation Testing Engine Closed."
+
+        };
+
+    }
+
+
+
+    /* STATUS */
+
+    if(input.toUpperCase()==="STATUS"){
+
+        return{
+
+            engine:this.name,
+
+            version:this.version,
+
+            status:this.status,
+
+            endpoint:this.endpoint,
+
+            users:this.selectedUsers,
+
+            traffic:this.trafficProfile
+
+        };
+
+    }
+
+
+
+    /* REPORT */
+
+    if(input.toUpperCase()==="REPORT"){
+
+        return this.getLastReport();
+
+    }
+
+
+
+    /* RUN */
+
+    if(input.toUpperCase()==="RUN"){
+
+        if(!this.hasEndpoint()){
+
+            return{
+
+                success:false,
+
+                message:
+
+                "Please provide a valid endpoint first."
+
+            };
+
+        }
+
+
+
+        if(!this.selectedUsers){
+
+            return{
+
+                success:false,
+
+                message:
+
+                "Please select virtual users."
+
+            };
+
+        }
+
+
+
+        if(!this.trafficProfile){
+
+            return{
+
+                success:false,
+
+                message:
+
+                "Please select a traffic profile."
+
+            };
+
+        }
+
+
+
+        this.startSession();
+
+
+
+        this.generateVirtualUsers();
+
+
+
+        this.simulateTraffic();
+
+
+
+        await this.dispatchRequests();
+
+
+
+        this.collectResponses();
+
+
+
+        this.finishSession();
+
+
+
+        this.calculateMetrics();
+
+
+
+        this.generateRecommendations();
+
+
+
+        return this.generateReport();
+
+    }
+
+
+
+    /* ENDPOINT */
+
+    if(
+
+        input.startsWith("http://") ||
+
+        input.startsWith("https://")
+
+    ){
+
+        return this.setEndpoint(input);
+
+    }
+
+
+
+    /* USER SELECTION */
+
+    if(
+
+        /^[0-9]+$/.test(input)
+
+    ){
+
+        return this.selectUsers(
+
+            Number(input)
+
+        );
+
+    }
+
+
+
+    /* TRAFFIC */
+
+    const traffic=[
+
+        "NORMAL",
+
+        "MIXED",
+
+        "HEAVY",
+
+        "EXTREME"
+
+    ];
+
+
+
+    if(
+
+        traffic.includes(
+
+            input.toUpperCase()
+
+        )
+
+    ){
+
+        return this.selectTraffic(
+
+            input.toUpperCase()
+
+        );
+
+    }
+
+
+
+    return{
+
+        success:false,
+
+        message:
+
+        "Unknown command. Type HELP."
+
+    };
+
+}
