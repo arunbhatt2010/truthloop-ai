@@ -853,3 +853,160 @@ Responsibilities
         ) + min;
 
     }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 06 : Request Dispatcher
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Dispatch requests safely.
+
+Responsibilities
+
+- Validation
+- Request Dispatch
+- Timeout
+- Abort
+- Promise Collection
+
+==================================================
+*/
+
+
+    async dispatchRequests() {
+
+        if (!this.hasEndpoint()) {
+
+            return {
+
+                success:false,
+
+                message:"Target endpoint not configured."
+
+            };
+
+        }
+
+        if (!this.hasVirtualUsers()) {
+
+            return {
+
+                success:false,
+
+                message:"No virtual users available."
+
+            };
+
+        }
+
+        this.startSession();
+
+        const requests =
+
+            this.requests.map(user =>
+
+                this.dispatchSingleRequest(user)
+
+            );
+
+        const responses =
+
+            await Promise.allSettled(requests);
+
+        this.responses = responses;
+
+        return responses;
+
+    }
+
+
+
+    async dispatchSingleRequest(user){
+
+        const controller =
+
+            new AbortController();
+
+        const timeout =
+
+            setTimeout(
+
+                ()=>controller.abort(),
+
+                this.config.timeout
+
+            );
+
+        try{
+
+            if(user.delay){
+
+                await new Promise(resolve=>
+
+                    setTimeout(
+
+                        resolve,
+
+                        user.delay
+
+                    )
+
+                );
+
+            }
+
+            user.startedAt = Date.now();
+
+            const response =
+
+                await fetch(
+
+                    this.endpoint,
+
+                    {
+
+                        method:"POST",
+
+                        signal:controller.signal,
+
+                        headers:{
+
+                            "Content-Type":
+
+                            "application/json"
+
+                        },
+
+                        body:JSON.stringify({
+
+                            sessionId:user.sessionId,
+
+                            userId:user.id
+
+                        })
+
+                    }
+
+                );
+
+            user.finishedAt = Date.now();
+
+            clearTimeout(timeout);
+
+            return response;
+
+        }
+
+        catch(error){
+
+            clearTimeout(timeout);
+
+            return Promise.reject(error);
+
+        }
+
+                }
