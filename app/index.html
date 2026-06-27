@@ -1068,7 +1068,25 @@ gtag('event',event,data);
 }    
     
 /* API */    
-    
+async function callFoundation(input){
+
+    const response = await fetch("/api/foundation",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            input
+        })
+
+    });
+
+    return await response.json();
+
+  }    
 async function callAPI(){    
     
 try{    
@@ -1708,6 +1726,55 @@ track("start_clicked");
 track("question_submitted",{
   question_length:text.length
 });
+  /* ==========================
+   FOUNDATION ROUTER
+========================== */
+
+const foundationCommands = [
+"HELP",
+"LINK",
+"RUN",
+"REPORT",
+"STATUS",
+"EXIT",
+"NORMAL",
+"MIXED",
+"HEAVY",
+"EXTREME"
+];
+
+const upperInput = text.toUpperCase();
+
+const isFoundationCommand =
+foundationCommands.includes(upperInput) ||
+["50","100","250","500","1000"].includes(text);
+
+if (isFoundationCommand) {
+
+    const data = await callFoundation(text);
+
+    outputBox.innerHTML = `
+    <div style="
+    background:#111;
+    padding:18px;
+    border-radius:14px;
+    border:1px solid #222;
+    margin-bottom:18px;
+    line-height:1.8;
+    font-size:16px;
+    ">
+    <b style="color:orange;">You:</b><br><br>
+    ${text}
+    </div>
+    `;
+
+    typeEffect(data.reply);
+
+    isLoading = false;
+    getBtn.disabled = false;
+
+    return;
+  }
 messages=[{    
 role:"user",    
 content:text    
