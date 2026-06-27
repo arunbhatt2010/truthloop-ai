@@ -344,7 +344,7 @@ Responsibilities
             finishedAt:null
 
         };
-
+    }
             
 /*
 ==================================================
@@ -492,7 +492,7 @@ Responsibilities
 
         };
 
-            
+    }   
 /*
 ==================================================
 Foundation Testing Engine v2
@@ -656,7 +656,7 @@ Responsibilities
         };
 
     
-
+    }
 
 
     hasVirtualUsers() {
@@ -852,7 +852,7 @@ Responsibilities
 
         ) + min;
 
-    
+    }
 /*
 ==================================================
 Foundation Testing Engine v2
@@ -1008,7 +1008,7 @@ Responsibilities
             return Promise.reject(error);
 
         }
-
+    }
                 
 /*
 ==================================================
@@ -1184,7 +1184,7 @@ Responsibilities
 
         };
 
-
+    }
 /*
 ==================================================
 Foundation Testing Engine v2
@@ -1374,7 +1374,7 @@ Responsibilities
 
         });
 
-            
+    } 
 /*
 ==================================================
 Foundation Testing Engine v2
@@ -1615,7 +1615,7 @@ Responsibilities
 
         };
 
-                
+    }        
 /*
 ==================================================
 Foundation Testing Engine v2
@@ -1839,7 +1839,7 @@ Responsibilities
 
         };
 
-            
+    }  
 /*
 ==================================================
 Foundation Testing Engine v2
@@ -2129,7 +2129,7 @@ async controller(input){
 
     };
 
-
+}
 /*
 ==================================================
 Foundation Testing Engine v2
