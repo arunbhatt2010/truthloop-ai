@@ -346,3 +346,150 @@ Responsibilities
         };
 
             }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 03 : Endpoint Manager
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Manage target endpoint.
+
+Responsibilities
+
+- Accept Endpoint
+- Validate Endpoint
+- Store Endpoint
+- Show Current Endpoint
+- Clear Endpoint
+
+==================================================
+*/
+
+
+    setEndpoint(endpoint) {
+
+        if (!endpoint) {
+
+            return {
+
+                success: false,
+
+                message: "No endpoint provided."
+
+            };
+
+        }
+
+        endpoint = endpoint.trim();
+
+        if (
+            !endpoint.startsWith("http://") &&
+            !endpoint.startsWith("https://")
+        ) {
+
+            this.endpoint = null;
+
+            this.endpointValidated = false;
+
+            return {
+
+                success: false,
+
+                message:
+                    "Invalid endpoint. Only HTTP/HTTPS URLs are allowed."
+
+            };
+
+        }
+
+        this.endpoint = endpoint;
+
+        this.endpointValidated = true;
+
+        return {
+
+            success: true,
+
+            message: "Endpoint accepted.",
+
+            endpoint: this.endpoint
+
+        };
+
+    }
+
+
+
+    getEndpoint() {
+
+        return {
+
+            endpoint: this.endpoint,
+
+            validated: this.endpointValidated
+
+        };
+
+    }
+
+
+
+    hasEndpoint() {
+
+        return (
+
+            this.endpoint !== null &&
+
+            this.endpointValidated
+
+        );
+
+    }
+
+
+
+    clearEndpoint() {
+
+        this.endpoint = null;
+
+        this.endpointValidated = false;
+
+        return {
+
+            success: true,
+
+            message: "Endpoint cleared."
+
+        };
+
+    }
+
+
+
+    validateEndpoint() {
+
+        if (!this.endpoint) {
+
+            return {
+
+                success: false,
+
+                message: "Target endpoint not found."
+
+            };
+
+        }
+
+        return {
+
+            success: true,
+
+            message: "Endpoint validated."
+
+        };
+
+            }
