@@ -1139,14 +1139,15 @@ return { reply:"Network error 😃" };
     
 }    
     
-/* TYPE EFFECT */    
-    
+/* TYPE EFFECT */
+
 function typeEffect(text){
 
 text = text.replace(
  /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
  `<span class="truthHighlight">$1</span>`
 );
+
 text = text.replace(/\n/g,"<br>");
 
 const div = document.createElement("div");
@@ -1154,12 +1155,16 @@ div.className = "aiResponse";
 outputBox.appendChild(div);
 
 let i = 0;
-
 const speed = 4;
 
 const interval = setInterval(()=>{
 
-div.innerHTML = text.substring(0,i);
+const partial = text.substring(0,i);
+
+// Don't render incomplete HTML tags
+if((partial.match(/</g)||[]).length === (partial.match(/>/g)||[]).length){
+    div.innerHTML = partial;
+}
 
 outputBox.scrollTop = outputBox.scrollHeight;
 
@@ -1169,22 +1174,24 @@ if(i > text.length){
 
 clearInterval(interval);
 
-div.innerHTML = text;
-const match = div.innerHTML.match(/([^.!?]*\?)/g);
+// Work on original text instead of div.innerHTML
+let finalHtml = text;
+
+const match = text.match(/([^.!?]*\?)/g);
 
 if(match && match.length){
 
-const lastQuestion = match[match.length - 1];
+const lastQuestion = match[match.length-1];
 
-div.innerHTML = div.innerHTML.replace(
+finalHtml = finalHtml.replace(
 lastQuestion,
 `
 <div style="
 margin-top:20px;
 padding:16px;
 border-radius:14px;
-background:rgba(255,140,0,0.08);
-border:1px solid rgba(255,140,0,0.25);
+background:rgba(255,140,0,.08);
+border:1px solid rgba(255,140,0,.25);
 text-align:center;
 ">
 
@@ -1204,6 +1211,9 @@ font-size:20px;
 font-weight:700;
 line-height:1.7;
 color:#fff;
+white-space:normal;
+overflow-wrap:anywhere;
+word-break:break-word;
 ">
 ${lastQuestion}
 </div>
@@ -1213,18 +1223,23 @@ ${lastQuestion}
 );
 
 }
+
+div.innerHTML = finalHtml;
+
 reflectionInput.style.display = "block";
 
-setTimeout(() => {
-  // reflectionInput.focus();
-}, 300);
+setTimeout(()=>{
+// reflectionInput.focus();
+},300);
 
 nextBtn.style.display = "block";
+
 }
 
 },speed);
 
-}
+  }
+
     
 /* SHARE */    
     
