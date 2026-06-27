@@ -1010,3 +1010,178 @@ Responsibilities
         }
 
                 }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 07 : Response Collector
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Collect and normalize responses.
+
+Responsibilities
+
+- Parse Responses
+- Calculate Latency
+- Detect Success
+- Detect Failures
+- Build Runtime Dataset
+
+==================================================
+*/
+
+
+    collectResponses() {
+
+        if (
+
+            !this.responses ||
+
+            this.responses.length === 0
+
+        ) {
+
+            return [];
+
+        }
+
+        const collected = [];
+
+        this.responses.forEach((response,index)=>{
+
+            const user = this.requests[index];
+
+            const finishedAt =
+
+                user.finishedAt ||
+
+                Date.now();
+
+            const latency =
+
+                user.startedAt
+
+                ? finishedAt-user.startedAt
+
+                : 0;
+
+            if(
+
+                response.status==="fulfilled"
+
+            ){
+
+                collected.push({
+
+                    userId:user.id,
+
+                    sessionId:user.sessionId,
+
+                    success:
+
+                        response.value.ok,
+
+                    httpStatus:
+
+                        response.value.status,
+
+                    latency,
+
+                    timeout:false,
+
+                    networkError:false,
+
+                    startedAt:user.startedAt,
+
+                    finishedAt
+
+                });
+
+            }
+
+            else{
+
+                collected.push({
+
+                    userId:user.id,
+
+                    sessionId:user.sessionId,
+
+                    success:false,
+
+                    httpStatus:0,
+
+                    latency,
+
+                    timeout:
+
+                        response.reason?.name===
+
+                        "AbortError",
+
+                    networkError:true,
+
+                    error:
+
+                        response.reason?.message ||
+
+                        "Unknown Error",
+
+                    startedAt:user.startedAt,
+
+                    finishedAt
+
+                });
+
+            }
+
+        });
+
+        this.responses = collected;
+
+        return collected;
+
+    }
+
+
+
+    getCollectedResponses(){
+
+        return this.responses;
+
+    }
+
+
+
+    hasResponses(){
+
+        return (
+
+            this.responses &&
+
+            this.responses.length>0
+
+        );
+
+    }
+
+
+
+    clearResponses(){
+
+        this.responses=[];
+
+        return{
+
+            success:true,
+
+            message:
+
+            "Collected responses cleared."
+
+        };
+
+}
