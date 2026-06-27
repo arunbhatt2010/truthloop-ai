@@ -23,7 +23,7 @@ Reliability > Stability > Security > Scalability > Intelligence
 class TestingEngine {
 
     constructor() {
-    this.version = "1.0.0";
+    this.version = "1.1.0";
     this.status = "IDLE";
     this.startedAt = null;
 
@@ -41,25 +41,37 @@ class TestingEngine {
     };
         this.metrics = {
 
-    passRate: 0,
+totalUsers:0,
 
-    memory: null,
+completedUsers:0,
 
-    cpu: null,
+failedUsers:0,
 
-    latency: null,
+passRate:0,
 
-    queue: null,
+averageLatency:0,
 
-    timeout: 0,
+minLatency:0,
 
-    error: 0,
+maxLatency:0,
 
-    session: 0,
+memory:null,
 
-    recovery: 0,
+cpu:null,
 
-    security: "UNKNOWN"
+queue:0,
+
+timeout:0,
+
+error:0,
+
+session:0,
+
+recovery:0,
+
+security:"UNKNOWN",
+
+duration:0
 
 };
     }
@@ -91,15 +103,25 @@ class TestingEngine {
 
         users.push({
 
-            id: i,
+id:i,
 
-            status: "WAITING",
+sessionId:
+crypto.randomUUID(),
 
-            startedAt: null,
+status:"WAITING",
 
-            finishedAt: null
+startedAt:null,
 
-        });
+finishedAt:null,
+
+delay:
+Math.floor(Math.random()*3000),
+
+retry:false,
+
+aborted:false
+
+});
 
     }
 
@@ -150,7 +172,7 @@ class TestingEngine {
 
     });
 
-    return Promise.all(requests);
+    return Promise.allSettled(requests);
 
 }
     
@@ -160,17 +182,28 @@ class TestingEngine {
 
     return responses.map((response, index) => ({
 
-        ok: response.ok,
+    ok:
+        response.status === "fulfilled"
+            ? response.value.ok
+            : false,
 
-        status: response.status,
+    status:
+        response.status === "fulfilled"
+            ? response.value.status
+            : 500,
 
-        startedAt: users[index].startedAt,
+    error:
+        response.status === "rejected",
 
-        finishedAt: finishedAt,
+    startedAt:
+        users[index].startedAt,
 
-        latency: finishedAt - users[index].startedAt
+    finishedAt,
 
-    }));
+    latency:
+        finishedAt - users[index].startedAt
+
+}));
 
             }
     completeRequests(users, responses) {
