@@ -493,3 +493,174 @@ Responsibilities
         };
 
             }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 04 : Virtual User Generator
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Generate realistic virtual users.
+
+Responsibilities
+
+- User Selection
+- User Validation
+- Virtual User Generation
+- Unique Session IDs
+- Runtime Initialization
+
+==================================================
+*/
+
+
+    selectUsers(count) {
+
+        const allowed = [
+
+            50,
+
+            100,
+
+            250,
+
+            500,
+
+            1000
+
+        ];
+
+        if (
+
+            !allowed.includes(count) &&
+
+            !(this.config.allowCustomUsers && count > 0)
+
+        ) {
+
+            return {
+
+                success:false,
+
+                message:"Invalid user selection."
+
+            };
+
+        }
+
+        this.selectedUsers = count;
+
+        return {
+
+            success:true,
+
+            users:this.selectedUsers,
+
+            message:"Virtual users selected."
+
+        };
+
+    }
+
+
+
+    generateVirtualUsers() {
+
+        if (
+
+            !this.selectedUsers ||
+
+            this.selectedUsers <= 0
+
+        ) {
+
+            return [];
+
+        }
+
+        const users = [];
+
+        for (
+
+            let i = 1;
+
+            i <= this.selectedUsers;
+
+            i++
+
+        ) {
+
+            users.push({
+
+                id:i,
+
+                sessionId:
+
+                    crypto.randomUUID(),
+
+                status:"WAITING",
+
+                startedAt:null,
+
+                finishedAt:null,
+
+                responseTime:0,
+
+                retryCount:0,
+
+                timeout:false,
+
+                success:false,
+
+                error:null
+
+            });
+
+        }
+
+        this.requests = users;
+
+        this.metrics.requestedUsers =
+
+            users.length;
+
+        return users;
+
+    }
+
+
+
+    getVirtualUsers() {
+
+        return this.requests;
+
+    }
+
+
+
+    clearVirtualUsers() {
+
+        this.requests = [];
+
+        this.metrics.requestedUsers = 0;
+
+        return {
+
+            success:true,
+
+            message:"Virtual users cleared."
+
+        };
+
+    }
+
+
+
+    hasVirtualUsers() {
+
+        return this.requests.length > 0;
+
+                }
