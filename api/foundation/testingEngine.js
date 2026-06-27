@@ -2130,3 +2130,72 @@ async controller(input){
     };
 
 }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 12 : Public API
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Public interface for Foundation Testing Engine.
+
+Responsibilities
+
+- Receive Input
+- Execute Controller
+- Return Response
+- Handle Unexpected Errors
+
+==================================================
+*/
+
+
+    async run(input){
+
+        try{
+
+            return await this.controller(input);
+
+        }
+
+        catch(error){
+
+            return{
+
+                success:false,
+
+                engine:this.name,
+
+                version:this.version,
+
+                status:"ERROR",
+
+                message:
+
+                    error.message ||
+
+                    "Unexpected engine error.",
+
+                timestamp:
+
+                    new Date().toISOString()
+
+            };
+
+        }
+
+    }
+
+}
+
+/*
+==================================================
+Foundation Testing Engine v2
+Engine Export
+==================================================
+*/
+
+export default TestingEngine;
