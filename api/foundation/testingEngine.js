@@ -1185,3 +1185,193 @@ Responsibilities
         };
 
 }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 08 : Metrics Engine
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Calculate runtime metrics.
+
+Responsibilities
+
+- Success Rate
+- Error Rate
+- Latency
+- Throughput
+- Duration
+- Peak Concurrency
+
+==================================================
+*/
+
+
+    calculateMetrics(){
+
+        if(!this.hasResponses()){
+
+            return this.metrics;
+
+        }
+
+        const total=this.responses.length;
+
+        const success=this.responses.filter(
+
+            r=>r.success
+
+        ).length;
+
+        const failed=total-success;
+
+        const latency=this.responses.map(
+
+            r=>r.latency
+
+        );
+
+        const totalLatency=
+
+            latency.reduce(
+
+                (a,b)=>a+b,
+
+                0
+
+            );
+
+        this.metrics.requestedUsers=total;
+
+        this.metrics.completedUsers=success;
+
+        this.metrics.failedUsers=failed;
+
+        this.metrics.successRate=
+
+            total===0
+
+            ?0
+
+            :Number(
+
+                (
+
+                    success/
+
+                    total
+
+                )*100
+
+            ).toFixed(2);
+
+        this.metrics.averageLatency=
+
+            total===0
+
+            ?0
+
+            :Math.round(
+
+                totalLatency/
+
+                total
+
+            );
+
+        this.metrics.minimumLatency=
+
+            total===0
+
+            ?0
+
+            :Math.min(...latency);
+
+        this.metrics.maximumLatency=
+
+            total===0
+
+            ?0
+
+            :Math.max(...latency);
+
+        this.metrics.timeoutCount=
+
+            this.responses.filter(
+
+                r=>r.timeout
+
+            ).length;
+
+        this.metrics.networkErrors=
+
+            this.responses.filter(
+
+                r=>r.networkError
+
+            ).length;
+
+        this.metrics.serverErrors=
+
+            this.responses.filter(
+
+                r=>
+
+                r.httpStatus>=500
+
+            ).length;
+
+        this.metrics.peakConcurrency=
+
+            this.selectedUsers;
+
+        this.metrics.throughput=
+
+            this.metrics.duration>0
+
+            ?Math.round(
+
+                total/
+
+                (
+
+                    this.metrics.duration/
+
+                    1000
+
+                )
+
+            )
+
+            :0;
+
+        return this.metrics;
+
+    }
+
+
+
+    getMetrics(){
+
+        return this.metrics;
+
+    }
+
+
+
+    resetMetrics(){
+
+        Object.keys(
+
+            this.metrics
+
+        ).forEach(key=>{
+
+            this.metrics[key]=0;
+
+        });
+
+            }
