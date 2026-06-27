@@ -1768,13 +1768,19 @@ if (isFoundationCommand) {
     </div>
     `;
 
-    typeEffect(data.reply);
+    const output =
+    data.reply ||
+    data.message ||
+    (data.workflow
+        ? data.workflow.join("\n")
+        : JSON.stringify(data, null, 2));
 
-    isLoading = false;
-    getBtn.disabled = false;
+typeEffect(output);
 
-    return;
-  }
+isLoading = false;
+getBtn.disabled = false;
+
+return;
 messages=[{    
 role:"user",    
 content:text    
