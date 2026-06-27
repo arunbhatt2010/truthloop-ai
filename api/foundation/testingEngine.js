@@ -664,3 +664,192 @@ Responsibilities
         return this.requests.length > 0;
 
                 }
+/*
+==================================================
+Foundation Testing Engine v2
+Block 05 : Traffic Simulator
+Version : 2.0.0
+Status : COMPLETE
+==================================================
+
+Purpose
+
+Simulate realistic user behaviour.
+
+Responsibilities
+
+- Traffic Profile Selection
+- User Delay
+- Retry Behaviour
+- Random Jitter
+- Behaviour Assignment
+
+==================================================
+*/
+
+
+    selectTraffic(profile) {
+
+        const profiles = [
+
+            "NORMAL",
+
+            "MIXED",
+
+            "HEAVY",
+
+            "EXTREME"
+
+        ];
+
+        profile = profile.toUpperCase();
+
+        if (!profiles.includes(profile)) {
+
+            return {
+
+                success:false,
+
+                message:"Invalid traffic profile."
+
+            };
+
+        }
+
+        this.trafficProfile = profile;
+
+        return {
+
+            success:true,
+
+            profile,
+
+            message:"Traffic profile selected."
+
+        };
+
+    }
+
+
+
+    simulateTraffic() {
+
+        if (
+
+            !this.requests ||
+
+            this.requests.length === 0
+
+        ) {
+
+            return [];
+
+        }
+
+        this.requests.forEach(user => {
+
+            switch(this.trafficProfile){
+
+                case "NORMAL":
+
+                    user.delay =
+
+                        this.random(100,500);
+
+                    user.retryChance = 0.02;
+
+                    break;
+
+
+
+                case "MIXED":
+
+                    user.delay =
+
+                        this.random(50,1500);
+
+                    user.retryChance = 0.08;
+
+                    break;
+
+
+
+                case "HEAVY":
+
+                    user.delay =
+
+                        this.random(0,300);
+
+                    user.retryChance = 0.15;
+
+                    break;
+
+
+
+                case "EXTREME":
+
+                    user.delay =
+
+                        this.random(0,50);
+
+                    user.retryChance = 0.25;
+
+                    break;
+
+
+
+                default:
+
+                    user.delay = 100;
+
+                    user.retryChance = 0;
+
+            }
+
+        });
+
+        return this.requests;
+
+    }
+
+
+
+    getTrafficProfile() {
+
+        return {
+
+            profile:this.trafficProfile
+
+        };
+
+    }
+
+
+
+    clearTrafficProfile() {
+
+        this.trafficProfile = null;
+
+        return {
+
+            success:true,
+
+            message:"Traffic profile cleared."
+
+        };
+
+    }
+
+
+
+    random(min,max){
+
+        return Math.floor(
+
+            Math.random() *
+
+            (max-min+1)
+
+        ) + min;
+
+    }
