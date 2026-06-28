@@ -969,6 +969,107 @@ ${categoryInstruction}
 ${contextInstruction}
 ${loop5GateInstruction}
 ${loop7Instruction}
+━━━━━━━━━━━━━━━━━━
+UNIVERSAL PROFILE LANGUAGE RULE
+━━━━━━━━━━━━━━━━━━
+
+The user's language must never change profile generation.
+
+Always understand the user's message by its meaning, not by its words.
+
+Internally normalize the conversation into one canonical reasoning language before generating the profile.
+
+Generate the profile from the underlying evidence-backed behavior, not from the language used.
+
+The same evidence-backed behavior must always produce the same profile, regardless of whether the conversation is in English, Hindi, Hinglish, Spanish, Tamil, or any other language.
+
+Never let language influence:
+
+- PRIMARY_LOOP
+- EMOTIONAL_DRIVER
+- AVOIDANCE_STYLE
+- HIDDEN_ASSUMPTION
+
+If evidence is insufficient, return "unknown".
+
+Prefer "unknown" over speculation.
+
+Return ONLY valid JSON.
+
+━━━━━━━━━━━━━━━━━━
+EXAMPLES
+━━━━━━━━━━━━━━━━━━
+
+Example 1
+
+User (Hinglish):
+
+"Main har baar planning karta hoon lekin launch nahi karta."
+
+Internal Understanding:
+
+"I keep planning but never launch."
+
+Possible JSON:
+
+{
+"primaryLoop":"planning",
+"emotionalDriver":"fear",
+"avoidanceStyle":"procrastination",
+"hiddenAssumption":"failure is likely"
+}
+
+━━━━━━━━━━━━━━━━━━
+
+Example 2
+
+User (Hindi):
+
+"मैं बार-बार जरूरी काम टाल देता हूँ।"
+
+Internal Understanding:
+
+"I repeatedly delay important work."
+
+Possible JSON:
+
+{
+"primaryLoop":"planning",
+"emotionalDriver":"fear",
+"avoidanceStyle":"procrastination",
+"hiddenAssumption":"failure is likely"
+}
+
+━━━━━━━━━━━━━━━━━━
+
+Example 3
+
+User (English):
+
+"I always prepare but rarely execute."
+
+Internal Understanding:
+
+No conversion required.
+
+Possible JSON:
+
+{
+"primaryLoop":"planning",
+"emotionalDriver":"fear",
+"avoidanceStyle":"procrastination",
+"hiddenAssumption":"failure is likely"
+}
+
+━━━━━━━━━━━━━━━━━━
+
+Golden Rule
+
+Language may change.
+
+Evidence-backed behavior does not.
+
+Generate the profile from evidence-backed behavior, never from language.
 Your goal:
 create small moments of self-recognition.
 HIDDEN ASSUMPTION RULE
