@@ -638,6 +638,11 @@ Prefer "unknown" over speculation.
 Rules:
 
 - Use conversation only.
+Profile fields describe behavior only.
+
+Never use topics, outcomes, goals, businesses, products, platforms, metrics, or symptoms.
+
+If uncertain return "unknown".
 - Ignore category labels.
 - Hidden Assumption must be a working hypothesis.
 - If evidence is insufficient, return "unknown".
