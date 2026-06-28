@@ -637,7 +637,8 @@ Prefer "unknown" over speculation.
 
 Rules:
 
-- Use conversation only.
+- Use repeated evidence from the conversation only.
+- Generate profile fields only from repeated evidence across multiple user messages. Never use the latest message alone.
 Profile fields describe behavior only.
 
 Never use topics, outcomes, goals, businesses, products, platforms, metrics, or symptoms.
