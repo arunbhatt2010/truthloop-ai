@@ -645,22 +645,14 @@ Never use topics, outcomes, goals, businesses, products, platforms, metrics, or 
 If uncertain return "unknown".
 - Ignore category labels.
 - Hidden Assumption must be a working hypothesis.
-- If evidence is insufficient, return "unknown".
-The profile must always reflect the current investigation.
 
-Never contradict the investigation response.
-
-If the investigation has insufficient evidence, keep the profile "unknown".
-
-Update the profile only when the investigation has enough evidence to support a stable behavioral pattern.
 - Never infer beliefs from a single statement.
 - Never create hidden assumptions to complete the profile.
-- Prefer unknown over speculation.
+
 - It should represent the strongest belief required for the behavior to continue.
 - It must evolve as the conversation deepens.
 - Maximum 5 words per field.
 - Hidden Assumption: maximum 6 words.
-- Update profile when pattern changes.
 
 Return ONLY valid JSON.
 
