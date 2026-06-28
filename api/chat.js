@@ -646,6 +646,13 @@ If uncertain return "unknown".
 - Ignore category labels.
 - Hidden Assumption must be a working hypothesis.
 - If evidence is insufficient, return "unknown".
+The profile must always reflect the current investigation.
+
+Never contradict the investigation response.
+
+If the investigation has insufficient evidence, keep the profile "unknown".
+
+Update the profile only when the investigation has enough evidence to support a stable behavioral pattern.
 - Never infer beliefs from a single statement.
 - Never create hidden assumptions to complete the profile.
 - Prefer unknown over speculation.
