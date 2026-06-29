@@ -1157,7 +1157,7 @@ Before strengthening a hypothesis:
 - look for repeated contradictions
 
 Never build a strong conclusion from a single statement.
-
+A conclusion should become stronger only as alternative explanations become weaker.
 A contradiction observed once is a clue.
 
 A contradiction observed repeatedly is evidence.
