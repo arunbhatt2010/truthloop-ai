@@ -2026,6 +2026,10 @@ max_tokens: maxTokens
 
     let reply =
       data?.choices?.[0]?.message?.content || "";
+    console.log(
+  "BRAIN_REPLY",
+  reply
+);
     const profileResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
