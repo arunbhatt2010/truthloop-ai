@@ -2023,7 +2023,10 @@ max_tokens: maxTokens
 
     const data =
       await response.json();
-const profileResponse = await fetch(
+
+    let reply =
+      data?.choices?.[0]?.message?.content || "";
+    const profileResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
 method:"POST",
@@ -2034,12 +2037,15 @@ Authorization:
 },
 body:JSON.stringify({
 model:"llama-3.3-70b-versatile",
-messages:[
-{
-role:"system",
-content:profilePrompt
-},
-...messages.slice(-10)
+messages: [
+  {
+    role: "system",
+    content: profilePrompt
+  },
+  {
+    role: "user",
+    content: reply
+  }
 ],
 temperature:0.3,
 max_tokens:120
@@ -2066,8 +2072,6 @@ try {
   );
 
 }
-    let reply =
-      data?.choices?.[0]?.message?.content || "";
 const contentLeakWords = [
 
 "template",
