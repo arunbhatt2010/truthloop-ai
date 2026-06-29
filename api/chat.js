@@ -930,8 +930,8 @@ ${investigationState.confidence}
        🧠 SYSTEM PROMPT
     ========================= */
 
-    const brain = `
-You are TruthLoop.
+    const systemPrompt = `
+You are the TruthLoop Brain.
 PUBLIC IDENTITY RULE
 
 If the user asks:
@@ -1999,7 +1999,7 @@ not analyzed.
           messages: [
             {
               role: "system",
-              content: brain
+              content: systemPrompt
             },
             ...messages.slice(-5)
           ],
