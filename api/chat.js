@@ -728,6 +728,30 @@ Stay in evidence collection mode.
 Pattern discovery starts only after enough context exists.
 `;
         }
+    ### INVESTIGATION STATUS (INTERNAL)
+
+After completing the investigation, always determine whether there is sufficient behavioral evidence to support profile generation.
+
+Return the following internal investigation object:
+
+{
+  "investigation": {
+    "confidence": "high | medium | low",
+    "evidence": "high | medium | low",
+    "profile_allowed": true | false,
+    "reason": "Short explanation of why profile generation is or is not supported."
+  }
+}
+
+Rules:
+
+- profile_allowed = true ONLY if there is sufficient behavioral evidence to support a reliable behavioral profile.
+
+- If confidence is low OR evidence is insufficient, set profile_allowed = false.
+
+- Never allow profile generation based on guesses, assumptions, or weak signals.
+
+- This investigation object is for internal system coordination only and must never be shown to the user.
     const investigationPrompt = `
 CURRENT INVESTIGATION STATE
 
