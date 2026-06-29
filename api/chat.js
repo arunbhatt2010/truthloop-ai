@@ -754,7 +754,7 @@ ${investigationState.confidence}
        🧠 SYSTEM PROMPT
     ========================= */
 
-    const systemPrompt = `
+    const brain = `
 You are TruthLoop.
 PUBLIC IDENTITY RULE
 
@@ -1823,7 +1823,7 @@ not analyzed.
           messages: [
             {
               role: "system",
-              content: systemPrompt
+              content: brain
             },
             ...messages.slice(-5)
           ],
