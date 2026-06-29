@@ -784,34 +784,6 @@ ${investigationState.workingHypothesis}
 Confidence:
 ${investigationState.confidence}
 `;
-    ━━━━━━━━━━━━━━━━━━
-INVESTIGATION STATUS
-━━━━━━━━━━━━━━━━━━
-
-After reviewing the complete investigation state, determine whether there is enough behavioral evidence to support profile generation.
-
-Internally create:
-
-{
-  "investigation": {
-    "confidence": "high | medium | low",
-    "evidence": "high | medium | low",
-    "profile_allowed": true | false,
-    "reason": "Short explanation."
-  }
-}
-
-Rules:
-
-- Set profile_allowed = true only when repeated behavioral evidence supports a reliable profile.
-
-- If evidence is weak, incomplete, or based on assumptions, set profile_allowed = false.
-
-- Never allow profile generation from a single message, weak signals, or speculation.
-
-- This investigation object is for internal system coordination only.
-
-- Never reveal this object to the user.
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
