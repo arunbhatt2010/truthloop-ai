@@ -664,9 +664,9 @@ Return ONLY valid JSON.
 "hiddenAssumption":"unknown"
 }
 `;
-    /* ===============================
-   PROFILE ENGINE ENTRY GATE
-   =============================== */
+/* ===============================
+   INVESTIGATION STATUS (INTERNAL)
+=============================== */
 
 const investigation = investigationState?.investigation || {};
 
