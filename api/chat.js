@@ -2072,6 +2072,15 @@ try {
   );
 
 }
+    console.log(
+  "PROFILE_RAW",
+  JSON.stringify(profileData, null, 2)
+);
+
+console.log(
+  "PROFILE_TEXT",
+  profileData?.choices?.[0]?.message?.content
+);
 const contentLeakWords = [
 
 "template",
