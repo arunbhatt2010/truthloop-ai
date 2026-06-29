@@ -2043,9 +2043,15 @@ messages: [
     content: profilePrompt
   },
   {
-    role: "user",
-    content: reply
-  }
+  role: "user",
+  content: `BEGIN TRUTHLOOP BRAIN RESPONSE
+
+${reply}
+
+END TRUTHLOOP BRAIN RESPONSE
+
+Update the Profile Card only from the response above.`
+}
 ],
 temperature:0.3,
 max_tokens:120
