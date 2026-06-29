@@ -756,7 +756,7 @@ Stay in evidence collection mode.
 Pattern discovery starts only after enough context exists.
 `;
         }
-    ### INVESTIGATION STATUS (INTERNAL)
+    INVESTIGATION STATUS (INTERNAL)
 
 After completing the investigation, always determine whether there is sufficient behavioral evidence to support profile generation.
 
