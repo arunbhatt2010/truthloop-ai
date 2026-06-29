@@ -664,6 +664,34 @@ Return ONLY valid JSON.
 "hiddenAssumption":"unknown"
 }
 `;
+    /* ===============================
+   PROFILE ENGINE ENTRY GATE
+   =============================== */
+
+const investigation = investigationState?.investigation || {};
+
+const profileAllowed =
+  investigation.profile_allowed === true &&
+  investigation.evidence === "high" &&
+  (investigation.confidence ?? 0) >= 0.80;
+
+if (!profileAllowed) {
+  return {
+    profileEngine: {
+      status: "SKIPPED",
+      reason:
+        investigation.reason ||
+        "Insufficient behavioral evidence collected.",
+      primaryLoop: "unknown",
+      emotionalDriver: "unknown",
+      coreContradiction: "unknown",
+      hiddenPattern: "unknown",
+      avoidancePattern: "unknown"
+    }
+  };
+}
+
+/* Continue normal profile analysis below */
  let contextInstruction = "";
 
 if (contextMissing) {
