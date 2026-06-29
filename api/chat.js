@@ -609,6 +609,7 @@ Subtly adapt examples, tension, and behavioral observations to fit this category
 Do not mention the category directly unless naturally relevant.
 `;
 }
+    const profilePrompt = `
  You are the TruthLoop Profile Engine.
 
 You are NOT the Brain.
@@ -833,6 +834,7 @@ Return ONLY valid JSON.
 "avoidanceStyle":"unknown",
 "hiddenAssumption":"unknown"
 }
+`;
  let contextInstruction = "";
 
 if (contextMissing) {
