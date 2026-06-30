@@ -733,21 +733,7 @@ Never fill missing fields.
 Never make the profile appear more complete than the Brain supports.
 
 A partially unknown profile is always better than an invented profile.
-UNDERLYING BELIEF
 
-This field is experimental.
-
-Never infer it from a single contradiction.
-
-Only populate it after repeated behavioral evidence across multiple loops.
-
-Otherwise return "unknown".
-
-Its absence must NEVER prevent updating:
-
-- Primary Loop
-- Emotional Driver
-- Avoidance Style
 
 ━━━━━━━━━━━━━━━━━━
 PRIMARY LOOP DEFINITION
@@ -891,8 +877,7 @@ Return ONLY valid JSON.
 {
 "primaryLoop":"unknown",
 "emotionalDriver":"unknown",
-"avoidanceStyle":"unknown",
-"hiddenAssumption":"unknown"
+"avoidanceStyle":"unknown"
 }
 `;
  let contextInstruction = "";
