@@ -1715,7 +1715,7 @@ Output only the final response for the user.
        🤖 AI CALL
     ========================= */
     const maxTokens =
-  loopLevel === 7 ? 400 : 220;
+loopLevel === 7 ? 1000 : 800;
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
