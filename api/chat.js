@@ -2193,17 +2193,13 @@ profile.avoidanceStyle !== "unknown"
 ? profile.avoidanceStyle
 : "";
 
-hiddenAssumption =
-profile.hiddenAssumption &&
-profile.hiddenAssumption !== "unknown"
-? profile.hiddenAssumption
-: "";
+
 }catch(e){
 
 primaryLoop = "";
 emotionalDriver = "";
 avoidanceStyle = "";
-hiddenAssumption = "";
+
 
   }
     /* =========================
