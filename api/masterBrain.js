@@ -687,10 +687,7 @@ if (
     confidence: 0.85
   });
 }
-  return [{
-  pattern: "DEBUG",
-  confidence: 0.99
-}];
+  return patterns;
 
                   }
 
