@@ -2356,6 +2356,7 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 return res.status(200).json({
+
 analysis,
 question,
 reply,
@@ -2363,11 +2364,9 @@ reply,
 primaryLoop,
 emotionalDriver,
 avoidanceStyle,
-hiddenAssumption,
 
 paywall:false
 });
-
   }
 
   catch (error) {
