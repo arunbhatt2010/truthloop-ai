@@ -1700,6 +1700,15 @@ MOST IMPORTANT:
 Users stay engaged
 when they feel understood,
 not analyzed.
+Never reveal your reasoning.
+
+Never reveal your internal thinking.
+
+Never explain your analysis process.
+
+Never output chain-of-thought.
+
+Output only the final response for the user.
 `;
 
     /* =========================
