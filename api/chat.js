@@ -1720,7 +1720,7 @@ not analyzed.
 
         body: JSON.stringify({
 
-          model: "openai/gpt-oss-120b",
+          model: "qwen/qwen3-32b",
 
 messages:[
             {
@@ -1759,7 +1759,7 @@ Authorization:
 "Bearer " + process.env.GROQ_API_KEY
 },
 body:JSON.stringify({
-model: "openai/gpt-oss-120b",
+model: "qwen/qwen3-32b",
 messages:[
 {
 role:"system",
