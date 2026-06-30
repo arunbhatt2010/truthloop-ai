@@ -1758,6 +1758,7 @@ max_tokens: maxTokens
 
     const data =
       await response.json();
+    console.log(JSON.stringify(data, null, 2));
 const profileResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
