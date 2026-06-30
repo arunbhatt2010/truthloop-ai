@@ -717,7 +717,6 @@ Update ONLY these fields:
 - PRIMARY_LOOP
 - EMOTIONAL_DRIVER
 - AVOIDANCE_STYLE
-- HIDDEN_ASSUMPTION
 
 Update a field ONLY when the Brain has already established sufficient behavioral evidence.
 
