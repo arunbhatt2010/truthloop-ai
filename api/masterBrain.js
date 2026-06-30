@@ -674,7 +674,19 @@ function scanPatternSignals(text) {
     });
 
   }
-
+if (
+  input.includes("delay") ||
+  input.includes("delaying") ||
+  input.includes("procrastinate") ||
+  input.includes("stuck") ||
+  input.includes("can't decide") ||
+  input.includes("decision")
+) {
+  patterns.push({
+    pattern: "Decision Delay",
+    confidence: 0.85
+  });
+}
   return patterns;
 
                   }
