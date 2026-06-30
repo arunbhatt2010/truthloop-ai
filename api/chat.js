@@ -1720,9 +1720,9 @@ not analyzed.
 
         body: JSON.stringify({
 
-          model: "openai/gpt-oss-120b"
+          model: "openai/gpt-oss-120b",
 
-          messages: [
+messages:[
             {
               role: "system",
               content: systemPrompt
@@ -1759,7 +1759,7 @@ Authorization:
 "Bearer " + process.env.GROQ_API_KEY
 },
 body:JSON.stringify({
-model: "openai/gpt-oss-120b"
+model: "openai/gpt-oss-120b",
 messages:[
 {
 role:"system",
