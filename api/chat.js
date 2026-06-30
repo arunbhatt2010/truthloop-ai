@@ -1777,8 +1777,8 @@ content:profilePrompt
 },
 ...messages.slice(-10)
 ],
-temperature:0.3,
-max_tokens:120
+temperature: 0.3,
+max_tokens: maxTokens
 })
 }
 );
