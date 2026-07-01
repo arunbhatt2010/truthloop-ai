@@ -1101,11 +1101,13 @@ const razorpayBtn=document.getElementById("razorpayBtn");
  mainInput.addEventListener("focus", () => {
     window.hasStartedJourney = true;
 
+    disableWelcome();
+
     const overlay = document.getElementById("idleGuide");
     if (overlay) {
         overlay.style.display = "none";
     }
-});   
+});
 let loopLevel=1;
 let messages=[];
 let payment49=false;
