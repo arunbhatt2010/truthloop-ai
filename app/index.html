@@ -83,7 +83,8 @@ color:#ffffff;
 margin-bottom:12px;
 
 text-shadow:0 0 15px rgba(168,85,247,.12);
-
+transition: opacity .35s ease;
+min-height: 90px;
   }
 
 .heroTitle span{
@@ -621,7 +622,7 @@ START NEW PATTERN
 <div id="mainApp">
 
 <div class="container">    
-<h1 class="heroTitle">
+<h1 id="heroTitle" class="heroTitle">
 Find what you're <span>avoiding.</span>
 </h1>
 
@@ -2401,7 +2402,43 @@ document.addEventListener("copy",(e)=>{
 activateProtectedMode();
   showCopyGate();
 
-});  
+});
+  const heroTitle = document.getElementById("heroTitle");
+
+const heroTranslations = [
+
+'Find what you\'re <span>avoiding.</span>',
+'जानिए कि आप <span>किससे बच रहे हैं।</span>',
+'Encuentra lo que <span>estás evitando.</span>',
+'Trouvez ce que vous <span>évitez.</span>',
+'Finde heraus, was du <span>vermeidest.</span>',
+'Trova ciò che <span>stai evitando.</span>',
+'Encontre o que você <span>está evitando.</span>',
+'あなたが<span>避けているもの</span>を見つけよう。',
+'당신이 <span>피하고 있는 것</span>을 찾아보세요.',
+'找出你正在<span>回避的东西</span>。',
+'اكتشف ما <span>الذي تتجنبه.</span>',
+'Найди то, <span>чего ты избегаешь.</span>'
+
+];
+
+let heroIndex = 0;
+
+setInterval(() => {
+
+    heroTitle.style.opacity = "0";
+
+    setTimeout(() => {
+
+        heroIndex = (heroIndex + 1) % heroTranslations.length;
+
+        heroTitle.innerHTML = heroTranslations[heroIndex];
+
+        heroTitle.style.opacity = "1";
+
+    }, 350);
+
+}, 5000);
 </script>    
 </div>
   <footer style="
