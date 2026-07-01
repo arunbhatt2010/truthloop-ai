@@ -1097,7 +1097,22 @@ const shareText=document.getElementById("shareText");
     
 const paywallBox=document.getElementById("paywallBox");    
 const paySub=document.getElementById("paySub");    
-const razorpayBtn=document.getElementById("razorpayBtn");    
+const razorpayBtn=document.getElementById("razorpayBtn");
+  const welcomeOverlay = document.getElementById("welcomeOverlay");
+
+let welcomeShown = false;
+let welcomeDisabled = false;
+
+function disableWelcome() {
+    welcomeDisabled = true;
+
+    const overlay = document.getElementById("idleGuide");
+    if (overlay) overlay.style.display = "none";
+
+    if (welcomeOverlay) {
+        welcomeOverlay.classList.add("hidden");
+    }
+  }
  mainInput.addEventListener("focus", () => {
     window.hasStartedJourney = true;
 
