@@ -107,6 +107,67 @@ margin-inline:auto;
 margin-bottom:24px;
 
 }
+ .welcomeOverlay{
+
+width:100%;
+
+margin:20px 0;
+
+text-align:center;
+
+transition:.35s ease;
+
+}
+
+.hidden{
+
+display:none;
+
+}
+
+.translatedSlogan{
+
+font-size:clamp(26px,6vw,38px);
+
+font-weight:800;
+
+color:#a855f7;
+
+margin-bottom:20px;
+
+}
+
+.welcomeMessage{
+
+font-size:clamp(16px,4vw,20px);
+
+line-height:1.9;
+
+color:#ddd;
+
+animation:fadeIn .35s ease;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(10px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+  } 
 .heroLine{
 
 width:100%;
