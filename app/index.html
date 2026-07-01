@@ -1098,7 +1098,14 @@ const shareText=document.getElementById("shareText");
 const paywallBox=document.getElementById("paywallBox");    
 const paySub=document.getElementById("paySub");    
 const razorpayBtn=document.getElementById("razorpayBtn");    
-    
+ mainInput.addEventListener("focus", () => {
+    window.hasStartedJourney = true;
+
+    const overlay = document.getElementById("idleGuide");
+    if (overlay) {
+        overlay.style.display = "none";
+    }
+});   
 let loopLevel=1;
 let messages=[];
 let payment49=false;
