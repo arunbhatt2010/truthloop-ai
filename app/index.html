@@ -1817,30 +1817,27 @@ mainInput.focus();
 
 /* START */
     
-getBtn.onclick=async()=>{
-const welcomeOverlay = document.getElementById("welcomeOverlay");
-const mainInput = document.getElementById("mainInput");
-const getBtn = document.getElementById("getBtn");
+getBtn.onclick = async () => {
 
-let welcomeShown = false;
-let welcomeDisabled = false;
+disableWelcome();
+
 const text = mainInput.value.trim();
 
 if(!text){
 
-mainInput.focus();
+    mainInput.focus();
 
-mainInput.style.borderColor = "orange";
+    mainInput.style.borderColor = "orange";
 
-setTimeout(()=>{
-mainInput.style.borderColor = "#262626";
-},1000);
+    setTimeout(()=>{
+        mainInput.style.borderColor = "#262626";
+    },1000);
 
-return;
+    return;
 
 }
 
-document.getElementById("guideText").style.display="none";
+document.getElementById("guideText").style.display = "none";
 
 if (isLoading) return;
 
@@ -1851,14 +1848,15 @@ getBtn.disabled = true;
 track("start_clicked");
 
 track("question_submitted",{
-  question_length:text.length
+    question_length:text.length
 });
-messages=[{    
-role:"user",    
-content:text    
-}];    
-    
-/* hide intro screen */    
+
+messages=[{
+    role:"user",
+    content:text
+}];
+
+/* hide intro screen */
 outputBox.innerHTML = `
 <div style="
 background:#111;
