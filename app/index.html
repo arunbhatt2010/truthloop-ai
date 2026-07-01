@@ -168,13 +168,9 @@ width:min(100%,720px);
 
 margin:auto;
 
-padding:
+padding:clamp(14px,4vw,28px);
 
-clamp(14px,4vw,28px);
-
-padding-bottom:
-
-max(120px,env(safe-area-inset-bottom));
+padding-bottom:max(120px,env(safe-area-inset-bottom));
 
 box-sizing:border-box;
 
@@ -237,19 +233,20 @@ min-height:520px;
     
 }    
     
-input,button{    
-width:100%;    
-padding:14px;    
-margin-top:10px;    
-border-radius:10px;    
-border:none;    
-box-sizing:border-box;    
-}    
+input,button{
+width:100%;
+padding:clamp(14px,3vw,18px);
+font-size:clamp(15px,3.5vw,17px);
+margin-top:10px;
+border-radius:10px;
+border:none;
+box-sizing:border-box;
+}
     
 input{    
 background:#111;    
 color:#fff;    
-font-size:15px;    
+font-size:clamp(15px,3.5vw,17px);    
 }    
     
 button{    
