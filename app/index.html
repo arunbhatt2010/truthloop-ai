@@ -1123,6 +1123,32 @@ function disableWelcome() {
         overlay.style.display = "none";
     }
 });
+  document.addEventListener("pointerdown", (e) => {
+
+    if (welcomeDisabled) return;
+
+    // Input ya button touch hua to kuch mat karo
+    if (
+        mainInput.contains(e.target) ||
+        getBtn.contains(e.target)
+    ) {
+        return;
+    }
+
+    // Sirf pehle dead touch par
+    if (!welcomeShown) {
+
+        welcomeShown = true;
+
+        const overlay = document.getElementById("idleGuide");
+
+        if (overlay) {
+            overlay.style.display = "block";
+        }
+
+    }
+
+});
 let loopLevel=1;
 let messages=[];
 let payment49=false;
