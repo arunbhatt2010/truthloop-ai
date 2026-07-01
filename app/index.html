@@ -149,16 +149,29 @@ opacity:.45;
 body{
 background:#050816;
 color:#fff;
-  }
+margin:0;
+padding:0;
+min-height:100dvh;
+overflow-x:hidden;
+}
     
-.container{    
-width:100%;    
-max-width:680px;    
-margin:0 auto;    
-padding:14px;    
-padding-bottom:120px;    
-box-sizing:border-box;    
-}    
+.container{
+
+width:min(100%,720px);
+
+margin:auto;
+
+padding:
+
+clamp(14px,4vw,28px);
+
+padding-bottom:
+
+max(120px,env(safe-area-inset-bottom));
+
+box-sizing:border-box;
+
+}
 #mainInput:focus{    
     
 outline:none;    
