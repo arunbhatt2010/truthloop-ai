@@ -1811,7 +1811,12 @@ mainInput.focus();
 /* START */
     
 getBtn.onclick=async()=>{
+const welcomeOverlay = document.getElementById("welcomeOverlay");
+const mainInput = document.getElementById("mainInput");
+const getBtn = document.getElementById("getBtn");
 
+let welcomeShown = false;
+let welcomeDisabled = false;
 const text = mainInput.value.trim();
 
 if(!text){
