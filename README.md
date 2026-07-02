@@ -1,44 +1,105 @@
-# Arun Bhatt
-TruthLoop is an AI clarity system that progressively notices emotional and behavioral patterns hidden inside hesitation, overthinking, procrastination, validation loops, and repeated avoidance behaviors.
+<p align="center">
+  <img src="public/logo.png" alt="TruthLoop AI Logo" width="380">
+</p>
 
+<h1 align="center">TruthLoop AI</h1>
 
-TruthLoop AI — Find what you're avoiding.
+<p align="center">
+<b>Find what you're avoiding.</b>
+</p>
 
-I study the hidden behavioral and psychological patterns that quietly influence decisions, growth, execution, and performance.
+---
 
-Most people think they have an information problem.
+## What is TruthLoop AI?
 
-Often, they have a pattern problem.
+TruthLoop AI is a behavioral clarity system designed to uncover the hidden emotional and psychological patterns that quietly influence decisions.
 
-## What I Work On
+Most AI tools focus on providing answers.
 
-### TruthLoop AI
-A behavioral clarity system designed to help individuals, founders, communities, and organizations identify hidden emotional and behavioral patterns.
+TruthLoop AI focuses on revealing the pattern behind the question.
 
-### Areas of Interest
+Because better advice rarely changes behavior.
 
-- Behavioral Psychology
-- Decision Making
+Better awareness does.
+
+---
+
+## Why TruthLoop Exists
+
+People often believe they have an information problem.
+
+In reality, they may be repeating the same hidden behavioral loop.
+
+TruthLoop AI helps identify those invisible loops before they become visible problems.
+
+Instead of asking:
+
+> "What should I do?"
+
+TruthLoop AI asks:
+
+> "What pattern keeps creating this outcome?"
+
+---
+
+## Core Philosophy
+
+- Diagnosis before advice
+- Awareness before action
+- Patterns before solutions
+- Clarity before confidence
+
+---
+
+## What TruthLoop AI Helps Discover
+
+- Hidden Behavioral Patterns
+- Emotional Drivers
+- Decision Blind Spots
+- Avoidance Loops
+- Validation Patterns
+- Founder Thinking Traps
 - System Thinking
-- Founder Growth
-- Digital Strategy
-- AI-Powered Insight Systems
+- Behavioral Psychology
+
+---
 
 ## Current Focus
 
-Building TruthLoop AI to help people move beyond surface-level advice and uncover the deeper patterns driving repeated outcomes.
+Building an AI system that helps founders, creators, professionals, and individuals recognize the hidden patterns shaping their choices.
 
-## Philosophy
+The goal isn't to generate more information.
 
-More information rarely creates change.
+The goal is to generate deeper clarity.
 
-Clear awareness of the real pattern often does.
+---
 
-## Explore TruthLoop
+## TruthLoop Framework
 
-https://truthloop.in/app
+TruthLoop AI is built around a seven-loop behavioral discovery process.
+
+Each loop moves from surface thinking toward deeper awareness, helping users identify the psychological patterns influencing their actions.
+
+---
+
+## Explore TruthLoop AI
+
+🌐 https://truthloop.in/app
+
+---
 
 ## Connect
 
-LinkedIn:
+**LinkedIn**
+
 https://linkedin.com/in/arunbhatt2010
+
+---
+
+<p align="center">
+
+### TruthLoop AI
+
+**Find what you're avoiding.**
+
+</p>
