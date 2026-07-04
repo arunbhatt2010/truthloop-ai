@@ -557,7 +557,7 @@ const claritySignals = [
 
 ];
 
-export default claritySignals;
+
 
 /*
 ==================================================
@@ -851,7 +851,7 @@ failSafe:{
 };
 
 
-export default clarityBrainRules;
+
 /*
 ==================================================
 CLARITY DISTANCE ENGINE
@@ -1205,7 +1205,7 @@ movement:s.trend
 
 
 
-export default ClarityObserver;
+
 /*
 ==================================================
 CLARITY DISTANCE ENGINE
@@ -1647,7 +1647,7 @@ limits[loop] || 5
 
 
 
-export default ClarityBrain;
+
 /*
 ==================================================
 CLARITY DISTANCE ENGINE
@@ -1922,7 +1922,7 @@ Because users can:
 */
 
 
-export default progressiveRevealRules;
+
 /*
 ==================================================
 CLARITY DISTANCE ENGINE
@@ -2208,4 +2208,4 @@ return label
 
 
 
-export default ClarityOutputContract;
+export default ClarityDistanceEngine;
