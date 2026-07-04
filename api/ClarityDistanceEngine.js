@@ -242,7 +242,7 @@ Never modifies TruthLoop response or loop.
 */
 
 
-analyze({
+build({
  userMessage,
  aiResponse,
  loopLevel
