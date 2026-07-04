@@ -184,7 +184,7 @@ Ask something involving avoidance, contradiction, hesitation, or a difficult dec
 
    /* =========================
    🔥 LOOP 1 INTELLIGENT ENTRY CHECK
-   (Protects quality without blocking users)
+   (TruthLoop Pattern Gate)
 ========================= */
 
 if (loopLevel === 1) {
@@ -234,6 +234,11 @@ if (loopLevel === 1) {
       lowerMsg.includes(signal)
     );
 
+
+  /* =========================
+     🚫 LOW CONTEXT REDIRECT
+  ========================= */
+
   if (
     words < 4 &&
     !hasMeaning
@@ -241,14 +246,41 @@ if (loopLevel === 1) {
 
     return res.status(200).json({
       reply:
-`I need the real situation, not the label.
+`I need the real situation, not just a short label.
 
-TruthLoop works by finding the pattern behind what keeps repeating.
+TruthLoop does not give generic motivation or surface advice.
 
-Tell me one thing:
+It looks for the hidden loop behind repeated thoughts, decisions, and behaviors.
 
-What are you trying to do, change, or decide —
-and what keeps getting in the way?`
+Tell me:
+
+What keeps happening that you expected yourself to change by now?`
+    });
+
+  }
+
+
+  /* =========================
+     🧠 SHORT BUT MEANINGFUL INPUT
+     Prevent generic AI replies
+  ========================= */
+
+  if (
+    words < 5 &&
+    hasMeaning
+  ) {
+
+    return res.status(200).json({
+      reply:
+`I cannot define you from one sentence.
+
+TruthLoop does not guess who you are.
+
+It helps uncover the repeated patterns behind your actions, hesitation, decisions, and reactions.
+
+Start with this:
+
+What is one pattern that keeps showing up in your life even though you want it to change?`
     });
 
   }
