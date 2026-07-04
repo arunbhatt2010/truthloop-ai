@@ -182,27 +182,78 @@ Ask something involving avoidance, contradiction, hesitation, or a difficult dec
       });
     }
 
-    /* =========================
-       🔥 LOOP 1 STRICT
-    ========================= */
+   /* =========================
+   🔥 LOOP 1 INTELLIGENT ENTRY CHECK
+   (Protects quality without blocking users)
+========================= */
 
-    if (loopLevel === 1) {
+if (loopLevel === 1) {
 
-      const words =
-        lastUserMessage
-          .trim()
-          .split(/\s+/).length;
+  const words =
+    lastUserMessage
+      .trim()
+      .split(/\s+/).length;
 
-      if (words < 4) {
+  const meaningfulSignals = [
+    "who",
+    "what",
+    "why",
+    "how",
+    "when",
 
-        return res.status(200).json({
-          reply:
-`Too vague.
+    "i am",
+    "i feel",
+    "i want",
+    "i need",
+    "i keep",
+    "i can't",
 
-What exactly keeps repeating?`
-        });
-      }
-    }
+    "stuck",
+    "confused",
+    "afraid",
+    "fear",
+    "delay",
+    "avoid",
+    "overthink",
+    "procrastinate",
+
+    "trying",
+    "building",
+    "creating",
+    "launch",
+    "business",
+    "project",
+    "goal",
+    "decision",
+    "relationship",
+    "career"
+  ];
+
+  const hasMeaning =
+    meaningfulSignals.some(signal =>
+      lowerMsg.includes(signal)
+    );
+
+  if (
+    words < 4 &&
+    !hasMeaning
+  ) {
+
+    return res.status(200).json({
+      reply:
+`I need the real situation, not the label.
+
+TruthLoop works by finding the pattern behind what keeps repeating.
+
+Tell me one thing:
+
+What are you trying to do, change, or decide —
+and what keeps getting in the way?`
+    });
+
+  }
+
+}
 
  
 
