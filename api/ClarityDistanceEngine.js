@@ -217,7 +217,122 @@ new ClarityOutputContract();
 }
 
 
+/*
+==================================================
+CLARITY DISTANCE ENGINE
+Block 07 : Public Analyze Controller
+Version : 1.0.0
+Status : LOCKED
+
+Purpose:
+Single entry point for TruthLoop Core.
+
+Receives:
+- User input
+- AI response
+- Current loop state
+
+Returns:
+- Frontend ready clarity reflection
+
+IMPORTANT:
+Read only.
+Never modifies TruthLoop response or loop.
+==================================================
+*/
+
+
+analyze({
+ userMessage,
+ aiResponse,
+ loopLevel
+}){
+
+
+/*
+==============================
+SEND DATA TO REFLECTION BRAIN
+==============================
+*/
+
+
+const brainResult =
+this.brain.think({
+
+ userMessage,
+
+ aiResponse,
+
+ loopLevel,
+
+ availableSignals:
+ this.signals
+
+});
+
+
+
+
+
+/*
+==============================
+FORMAT FINAL OUTPUT
+==============================
+*/
+
+
+const finalOutput =
+this.output.build({
+
+
+ loopLevel,
+
+
+ signals:
+ brainResult.clarityDistance.signals
+
+
+});
+
+
+
+
+
+/*
+==============================
+SAVE OBSERVATION HISTORY
+==============================
+*/
+
+
+this.history.push({
+
+
+loopLevel,
+
+
+signals:
+finalOutput.clarityDistance.elements,
+
+
+time:
+Date.now()
+
+
+});
+
+
+
+
+
+return finalOutput;
+
+
 }
+
+
+
+ }
 /*
 ==================================================
 CLARITY DISTANCE ENGINE
