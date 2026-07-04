@@ -242,12 +242,11 @@ Never modifies TruthLoop response or loop.
 */
 
 
-build({
- userMessage,
- aiResponse,
- loopLevel
+static build({
+  userMessage,
+  aiResponse,
+  loopLevel
 }){
-
 
 /*
 ==============================
@@ -2351,7 +2350,7 @@ return label
 
 
 export function analyzeClarityDistance(data) {
-  return ClarityDistanceEngine.analyze(data);
+  return ClarityDistanceEngine.build(data);
 }
 
 export default ClarityDistanceEngine;
