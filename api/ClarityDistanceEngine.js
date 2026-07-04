@@ -185,7 +185,34 @@ blocked:[
 
 
 };
+/*
+==========================
+ENGINE COMPONENTS
+==========================
+*/
 
+
+this.signals =
+claritySignals;
+
+
+this.rules =
+clarityBrainRules;
+
+
+this.observer =
+new ClarityObserver(
+this.signals,
+this.rules
+);
+
+
+this.brain =
+new ClarityBrain();
+
+
+this.output =
+new ClarityOutputContract();
 
 }
 
