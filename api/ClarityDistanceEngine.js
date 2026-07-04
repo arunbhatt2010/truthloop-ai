@@ -2350,4 +2350,8 @@ return label
 
 
 
+export function analyzeClarityDistance(data) {
+  return ClarityDistanceEngine.analyze(data);
+}
+
 export default ClarityDistanceEngine;
