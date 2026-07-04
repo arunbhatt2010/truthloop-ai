@@ -242,12 +242,11 @@ Never modifies TruthLoop response or loop.
 */
 
 
-static build({
+build({
   userMessage,
   aiResponse,
   loopLevel
 }){
-
 /*
 ==============================
 SEND DATA TO REFLECTION BRAIN
@@ -2349,8 +2348,11 @@ return label
 
 
 
+const clarityDistanceEngine =
+new ClarityDistanceEngine();
+
 export function analyzeClarityDistance(data) {
-  return ClarityDistanceEngine.build(data);
+  return clarityDistanceEngine.build(data);
 }
 
-export default ClarityDistanceEngine;
+export default clarityDistanceEngine;
