@@ -1,5 +1,7 @@
 import { runMasterBrain }
 from "./masterBrain.js";
+import { analyzeClarityDistance }
+from "./ClarityDistanceEngine.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -2099,12 +2101,17 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 }
-
+const clarityDistance =
+analyzeClarityDistance({
+  userInput: lastUserMessage,
+  aiResponse: reply,
+  loopLevel
+});
 return res.status(200).json({
 analysis,
 question,
 reply,
-
+clarityDistance,
 primaryLoop,
 emotionalDriver,
 avoidanceStyle,
