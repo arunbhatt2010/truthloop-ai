@@ -2351,7 +2351,8 @@ return label
 
 
 export function analyzeClarityDistance(data) {
-  return ClarityDistanceEngine.analyze(data);
+  const engine = new ClarityDistanceEngine();
+  return engine.buildContext(data);
 }
 
 export default ClarityDistanceEngine;
