@@ -201,4 +201,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.90</priority>
 </url>
+  <url>
+  <loc>https://truthloop.in/why-founders-delay-launching-products.html</loc>
+  <lastmod>2026-07-04</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
 </urlset>
