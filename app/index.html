@@ -1571,25 +1571,8 @@ console.log("API RESPONSE:", data);
           ↓
    Frontend Painter 🎨
 ============================== */
-document.body.insertAdjacentHTML(
- "beforeend",
- `<pre style="
- position:fixed;
- bottom:20px;
- left:10px;
- right:10px;
- z-index:99999;
- background:black;
- color:#00ff88;
- padding:10px;
- font-size:12px;
- max-height:200px;
- overflow:auto;">
- ${JSON.stringify(data.clarityDistance, null, 2)}
- </pre>`
-);
 paintClarityDistance(
- data.clarityDistance?.clarityDistance
+ data.clarityDistance
 );
 if(data.primaryLoop){
 
