@@ -70,6 +70,9 @@ masterBrain?.executiveDecision || {};
 "MASTER_BRAIN",
 JSON.stringify(masterBrain, null, 2)
 );
+    return res.status(200).json({
+ reply:"Brain passed"
+});
     const lowerMsg =
       lastUserMessage.toLowerCase();
 /* =========================
