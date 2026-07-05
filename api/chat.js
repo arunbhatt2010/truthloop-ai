@@ -1811,7 +1811,7 @@ not analyzed.
               role: "system",
               content: systemPrompt
             },
-            ...messages.slice(-5)
+            ...messages.slice(-2)
           ],
 
           temperature: 0.7,
