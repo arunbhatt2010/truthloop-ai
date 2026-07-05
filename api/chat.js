@@ -2103,13 +2103,13 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 const clarityResult =
 analyzeClarityDistance({
-  userMessage: lastUserMessage,
-  aiResponse: reply,
+  userMessage: lastUserMessage || "",
+  aiResponse: reply || "",
   loopLevel
-});
+}) || {};
 
 const clarityDistance =
-clarityResult.clarityDistance;
+clarityResult.clarityDistance || {};
 return res.status(200).json({
 analysis,
 question,
