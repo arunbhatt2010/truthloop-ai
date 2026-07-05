@@ -1791,15 +1791,14 @@ selected.push({
 
 label:"Discovering Pattern",
 
-value:"",
+value:"PENDING",
 
-direction:"",
+direction:"WAITING",
 pending:true
 
 });
 
  }
-
 
 
 return selected;
