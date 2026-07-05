@@ -1781,7 +1781,20 @@ a.value.replace("%","")
 limit
 );
 
+while(selected.length < limit){
 
+selected.push({
+
+label:"Discovering Pattern",
+
+value:"",
+
+direction:"",
+pending:true
+
+});
+
+ }
 
 
 
