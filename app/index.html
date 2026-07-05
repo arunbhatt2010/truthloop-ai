@@ -1463,8 +1463,9 @@ document.getElementById(
 );
 
 const elements =
- distance?.elements || [];
-
+ distance?.signals ||
+ distance?.elements ||
+ [];
 if(
 elements.length === 0
 ){
@@ -1573,15 +1574,9 @@ console.log("API RESPONSE:", data);
           ↓
    Frontend Painter 🎨
 ============================== */
-paintClarityDistance({
- engine: data.clarityDistance?.engine,
- mode: data.clarityDistance?.mode,
- loop: data.clarityDistance?.loop,
- display: data.clarityDistance?.display,
-
- elements: data.clarityDistance?.elements || [],
- metrics: data.clarityDistance?.metrics || {}
-});
+paintClarityDistance(
+ data.clarityDistance
+);
 if(data.primaryLoop){
 
 document.getElementById(
