@@ -1756,7 +1756,10 @@ const limits={
 
 
 
-return signals
+const limit = limits[loop] || 5;
+
+const selected =
+signals
 
 .sort(
 (a,b)=>
@@ -1775,9 +1778,26 @@ a.value.replace("%","")
 
 .slice(
 0,
-limits[loop] || 5
+limit
 );
 
+
+while(selected.length < limit){
+
+selected.push({
+
+label:"Discovering Pattern",
+
+value:"0%",
+
+direction:"NEW 📍"
+
+});
+
+}
+
+
+return selected;
 
 }
 
