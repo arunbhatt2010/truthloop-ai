@@ -2109,22 +2109,24 @@ analyzeClarityDistance({
 });
 
 const clarityDistance =
-clarityResult.clarityDistance;
+clarityResult?.clarityDistance || {};
 return res.status(200).json({
+
 analysis,
 question,
 reply,
+
 clarityDistance,
-primaryLoop,
-emotionalDriver,
-avoidanceStyle,
-hiddenAssumption,
+
+primaryLoop: clarityDistance?.primaryLoop || "",
+emotionalDriver: clarityDistance?.emotionalDriver || "",
+avoidanceStyle: clarityDistance?.avoidanceStyle || "",
+hiddenAssumption: clarityDistance?.hiddenAssumption || "",
 
 paywall:false
+
 });
-
   }
-
   catch (error) {
 
     console.error(
