@@ -1450,23 +1450,21 @@ failure:[
 
 function paintClarityDistance(distance){
 
-
 const box =
 document.getElementById(
 "clarityDistanceFloat"
 );
-
 
 const holder =
 document.getElementById(
 "distanceElements"
 );
 
+const elements =
+distance?.signals || [];
 
 if(
-!distance ||
-!distance.elements ||
-distance.elements.length === 0
+elements.length === 0
 ){
 
 box.style.display="none";
@@ -1475,11 +1473,10 @@ return;
 
 }
 
-
 holder.innerHTML="";
 
 
-distance.elements.forEach(
+elements.forEach(
 element=>{
 
 
@@ -1495,21 +1492,21 @@ card.innerHTML = `
 
 <div class="distance-title">
 
-${element.name || element.type}
+${element.label || element.name}
 
 </div>
 
 
 <div class="distance-value">
 
-${element.value || element.signal}
+${element.value}
 
 </div>
 
 
 <div class="distance-score">
 
-${element.score || 0}% 📈
+${element.direction || element.movement || "📍"}
 
 </div>
 
@@ -1525,7 +1522,7 @@ holder.appendChild(card);
 box.style.display="block";
 
 
-  }    
+}
 function track(event,data={}){    
 if(typeof gtag!=="undefined"){    
 gtag('event',event,data);    
