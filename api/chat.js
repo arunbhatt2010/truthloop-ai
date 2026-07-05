@@ -1822,10 +1822,15 @@ max_tokens: maxTokens
 
     if (!response.ok) {
 
-      return res.status(500).json({
-        reply: "API error"
-      });
-    }
+ const errorText =
+ await response.text();
+
+ return res.status(200).json({
+  reply:
+  "GROQ FAILED: " + errorText
+ });
+
+}
 
     /* =========================
        📤 RESPONSE
