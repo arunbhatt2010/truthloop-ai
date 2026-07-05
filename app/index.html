@@ -1572,9 +1572,9 @@ console.log("API RESPONSE:", data);
    Frontend Painter 🎨
 ============================== */
 
-paintClarityDistance({
- elements: data.patternSignals || data.mergedSignals?.supportingPatterns || []
-});
+paintClarityDistance(
+ data.clarityDistance
+);
 if(data.primaryLoop){
 
 document.getElementById(
