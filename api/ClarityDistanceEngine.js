@@ -1535,11 +1535,10 @@ signals
 ){
 
 
-return signals.map(signal=>{
+const detected = signals.map(signal=>{
 
 
 let confidence = 0;
-
 
 
 signal.observes.forEach(item=>{
@@ -1561,7 +1560,6 @@ confidence += 25;
 });
 
 
-
 return {
 
 ...signal,
@@ -1577,15 +1575,9 @@ confidence
 s=>s.confidence>0
 );
 
-signals = signals.map(s=>({
 
- ...s,
+return detected;
 
- value: s.confidence + "%",
-
- direction: "📈"
-
-}));
 }
 
 
