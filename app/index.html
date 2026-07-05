@@ -233,6 +233,113 @@ padding:0;
 min-height:100dvh;
 overflow-x:hidden;
 }
+/* ==============================
+   CLARITY DISTANCE FLOATING UI
+   Painter Layer Only
+============================== */
+
+#clarityDistanceFloat{
+
+position:fixed;
+
+right:40px;
+top:180px;
+
+width:280px;
+
+z-index:50;
+
+pointer-events:none;
+
+}
+
+
+.distance-card{
+
+background:
+linear-gradient(
+145deg,
+rgba(35,15,70,.95),
+rgba(20,15,45,.95)
+);
+
+border:
+1px solid rgba(168,85,247,.45);
+
+border-radius:18px;
+
+padding:14px;
+
+margin-bottom:14px;
+
+color:#c084fc;
+
+box-shadow:
+0 0 25px rgba(168,85,247,.18);
+
+animation:
+clarityFloat 4s ease-in-out infinite;
+
+}
+
+
+.distance-title{
+
+color:#c084fc;
+
+font-size:13px;
+
+font-weight:700;
+
+}
+
+
+.distance-value{
+
+margin-top:6px;
+
+color:white;
+
+font-size:14px;
+
+}
+
+
+.distance-score{
+
+margin-top:8px;
+
+color:#ff9f1c;
+
+font-weight:bold;
+
+}
+
+
+@keyframes clarityFloat{
+
+0%,100%{
+transform:translateY(0);
+}
+
+50%{
+transform:translateY(-8px);
+}
+
+}
+
+
+/* Mobile: keep TruthLoop clean */
+
+@media(max-width:900px){
+
+#clarityDistanceFloat{
+
+display:none !important;
+
+}
+
+  }  
     
 .container{
 
@@ -610,7 +717,15 @@ line-height:1.9;
 </script>    
 </head>    
     
-<body>    
+<body>
+
+<!-- CLARITY DISTANCE FLOATING LAYER -->
+<div id="clarityDistanceFloat" style="display:none;">
+
+  <div id="distanceElements"></div>
+
+</div>
+
 <div id="restoreScreen" style="display:none;">
 
 <h2>Journey Found</h2>
@@ -1321,7 +1436,96 @@ failure:[
 
 };
 /* Analytics */    
-    
+/* ==============================
+   CLARITY DISTANCE PAINTER
+
+   Role:
+   Frontend = Painter Only 🎨
+
+   - No calculation
+   - No decisions
+   - Only display engine output
+============================== */
+
+
+function paintClarityDistance(distance){
+
+
+const box =
+document.getElementById(
+"clarityDistanceFloat"
+);
+
+
+const holder =
+document.getElementById(
+"distanceElements"
+);
+
+
+if(
+!distance ||
+!distance.elements ||
+distance.elements.length === 0
+){
+
+box.style.display="none";
+
+return;
+
+}
+
+
+holder.innerHTML="";
+
+
+distance.elements.forEach(
+element=>{
+
+
+const card =
+document.createElement("div");
+
+
+card.className =
+"distance-card";
+
+
+card.innerHTML = `
+
+<div class="distance-title">
+
+${element.name || element.type}
+
+</div>
+
+
+<div class="distance-value">
+
+${element.value || element.signal}
+
+</div>
+
+
+<div class="distance-score">
+
+${element.score || 0}% 📈
+
+</div>
+
+`;
+
+
+holder.appendChild(card);
+
+
+});
+
+
+box.style.display="block";
+
+
+  }    
 function track(event,data={}){    
 if(typeof gtag!=="undefined"){    
 gtag('event',event,data);    
@@ -1362,7 +1566,18 @@ currentCategory
 });  
 const data = await res.json();  
   
-console.log("API RESPONSE:", data);  
+console.log("API RESPONSE:", data);
+  /* ==============================
+   CLARITY DISTANCE CONNECTOR
+
+   Backend Engine
+          ↓
+   Frontend Painter 🎨
+============================== */
+
+paintClarityDistance(
+data.clarityDistance
+);
 if(data.primaryLoop){
 
 document.getElementById(
