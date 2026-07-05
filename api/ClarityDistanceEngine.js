@@ -1577,7 +1577,15 @@ confidence
 s=>s.confidence>0
 );
 
+signals = signals.map(s=>({
 
+ ...s,
+
+ value: s.confidence + "%",
+
+ direction: "📈"
+
+}));
 }
 
 
@@ -1782,19 +1790,7 @@ limit
 );
 
 
-while(selected.length < limit){
 
-selected.push({
-
-label:"Discovering Pattern",
-
-value:"0%",
-
-direction:"NEW 📍"
-
-});
-
-}
 
 
 return selected;
