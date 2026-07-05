@@ -2245,6 +2245,9 @@ signal.value,
 movement:
 signal.direction,
 
+direction:
+signal.direction,
+
 
 type:
 "REFLECTION_SIGNAL",
@@ -2357,13 +2360,11 @@ ELEMENT ID GENERATOR
 
 createId(label){
 
-
-return label
+return (label || "discovering_pattern")
 
 .toLowerCase()
 
 .replaceAll(" ","_");
-
 
 }
 
