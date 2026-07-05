@@ -1908,7 +1908,26 @@ if(contentLeakDetected){
 reply =
 "Interesting. You moved from understanding the problem to creating an answer.\n\nWhat feels unfinished if the answer never gets created?";
 
-}    
+}
+let clarityDistance = {};
+
+try {
+
+ const clarityResult =
+ analyzeClarityDistance({
+  userMessage:lastUserMessage,
+  aiResponse:reply,
+  loopLevel
+ });
+
+ clarityDistance =
+ clarityResult.clarityDistance || {};
+
+} catch(e){
+
+ clarityDistance = {};
+
+   }    
 let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
@@ -2106,7 +2125,7 @@ return res.status(200).json({
 analysis,
 question,
 reply,
-
+clarityDistance,
 primaryLoop,
 emotionalDriver,
 avoidanceStyle,
