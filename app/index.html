@@ -1460,8 +1460,28 @@ document.getElementById(
 "distanceElements"
 );
 
-const elements =
-distance?.signals || [];
+const elements = [
+ {
+  label: "Engine",
+  value: distance?.engine
+ },
+ {
+  label: "Mode",
+  value: distance?.mode
+ },
+ {
+  label: "Loop",
+  value: distance?.loop?.current
+ },
+ {
+  label: "Position",
+  value: distance?.display?.position
+ },
+ {
+  label: "Animation",
+  value: distance?.display?.animation
+ }
+].filter(e => e.value);
 
 if(
 elements.length === 0
