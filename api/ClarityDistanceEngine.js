@@ -1675,10 +1675,10 @@ const previous =
 
 this.memory
 
-.flatMap(m=>m.signals)
+.flatMap(m=>m.signals || [])
 
 .find(
-s=>s.label===name
+s=>s && s.label===name
 );
 
 
