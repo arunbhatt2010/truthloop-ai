@@ -1462,41 +1462,8 @@ document.getElementById(
 "distanceElements"
 );
 
-const elements = [
- {
-  label: "Engine",
-  value: distance?.engine
- },
- {
-  label: "Mode",
-  value: distance?.mode
- },
- 
-  {
- label:"Primary Loop",
- value: distance?.primaryLoop
-},
-{
- label:"Emotional Driver",
- value: distance?.emotionalDriver
-},
-{
- label:"Avoidance Style",
- value: distance?.avoidanceStyle
-},
-{
- label:"Underlying Belief",
- value: distance?.hiddenAssumption
-},
- {
-  label: "Position",
-  value: distance?.display?.position
- },
- {
-  label: "Animation",
-  value: distance?.display?.animation
- }
-].filter(e => e.value);
+const elements =
+ distance?.elements || [];
 
 if(
 elements.length === 0
