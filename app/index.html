@@ -1612,10 +1612,8 @@ paintClarityDistance({
  loop: data.clarityDistance?.loop,
  display: data.clarityDistance?.display,
 
- primaryLoop: data.primaryLoop,
- emotionalDriver: data.emotionalDriver,
- avoidanceStyle: data.avoidanceStyle,
- hiddenAssumption: data.hiddenAssumption
+ elements: data.clarityDistance?.elements || [],
+ metrics: data.clarityDistance?.metrics || {}
 });
 if(data.primaryLoop){
 
