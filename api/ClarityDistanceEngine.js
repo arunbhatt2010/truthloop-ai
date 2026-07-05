@@ -1693,9 +1693,8 @@ return "NEW 📍";
 let old =
 
 Number(
-previous.value.replace("%","")
+(previous.value || "0%").replace("%","")
 );
-
 
 
 if(current>old){
