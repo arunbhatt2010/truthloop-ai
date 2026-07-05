@@ -70,9 +70,7 @@ masterBrain?.executiveDecision || {};
 "MASTER_BRAIN",
 JSON.stringify(masterBrain, null, 2)
 );
-    return res.status(200).json({
- reply:"Brain passed"
-});
+    
     const lowerMsg =
       lastUserMessage.toLowerCase();
 /* =========================
@@ -1835,6 +1833,9 @@ max_tokens: maxTokens
 
     const data =
       await response.json();
+    return res.status(200).json({
+ reply:"Groq passed"
+});
 const profileResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
