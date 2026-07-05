@@ -2117,13 +2117,15 @@ paywall:false
 
   catch (error) {
 
-    console.error(
-      "Server error:",
-      error
-    );
+ return res.status(500).json({
 
-    return res.status(500).json({
-      reply: "Server error"
-    });
+  reply:"SERVER CRASH",
+
+  error:error.message,
+
+  stack:error.stack
+
+ });
+
   }
         }
