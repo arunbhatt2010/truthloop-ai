@@ -1769,13 +1769,13 @@ signals
 (a,b)=>
 
 Number(
-b.value.replace("%","")
+ (b.value || "0%").replace("%","")
 )
 
 -
 
 Number(
-a.value.replace("%","")
+ (a.value || "0%").replace("%","")
 )
 
 )
@@ -1791,15 +1791,15 @@ selected.push({
 
 label:"Discovering Pattern",
 
-value:"PENDING",
+value:null,
 
-direction:"WAITING",
+direction:null,
+
 pending:true
 
 });
 
  }
-
 
 return selected;
 
