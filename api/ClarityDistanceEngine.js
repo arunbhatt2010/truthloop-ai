@@ -1734,7 +1734,11 @@ selectSignals(
 signals,
 loop
 ){
+if(!signals){
 
+signals = [];
+
+}
 
 const limits={
 
