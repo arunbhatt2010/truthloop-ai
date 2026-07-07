@@ -308,7 +308,7 @@ const deepCaseFile = caseFileBrain(
 
   });
 
-     }
+     
 
   /* DOMAIN FILTER */
 
@@ -411,7 +411,7 @@ What keeps happening that you expected yourself to change by now?`
 
   };
 
-
+}
 
 
 /* =====================================================
