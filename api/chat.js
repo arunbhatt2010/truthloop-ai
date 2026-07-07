@@ -852,12 +852,28 @@ STYLE:
 - No motivation speeches.
 - No over-explaining.
 
-Highlight the strongest recognition sentence using exactly:
+Highlight ONLY the deepest recognition insight.
+
+Highlight must contain:
+- hidden pattern
+- contradiction
+- repeated behavior loop
+- uncomfortable truth
+
+Do NOT highlight:
+- support statements
+- explanations
+- questions
+- summaries
+
+Highlight maximum:
+one sentence under 20 words.
+
+Format:
 
 [[highlight]]
 sentence
 [[end]]
-
 FINAL REVIEW:
 Before answering check:
 - Is it evidence based?
