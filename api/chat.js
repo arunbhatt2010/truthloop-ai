@@ -982,7 +982,57 @@ brainCouncil({
  oldCase
 });
 
+/* =================================
+   🧠 AI PACKAGE BRAIN
+   TruthLoop Revealed
+   API Needed: NO
 
+   Job:
+   - Compress brain signals
+   - Prepare final AI context
+   - Reduce token usage
+================================= */
+const aiPackage =
+ aiPackageBrain(
+  council
+ );
+function aiPackageBrain(council){
+
+
+ return {
+
+  loop:
+   council.loop?.data || {},
+
+
+  userCase:
+   council.caseFile?.data?.caseFile || {},
+
+
+  evidence:
+   council.evidence?.data || {},
+
+
+  clarity:
+   {
+    missing:
+    council.clarity?.data?.missing,
+
+    score:
+    council.clarity?.confidence
+   },
+
+
+  lens:
+   council.lens?.data || {},
+
+
+  instruction:
+   "Generate one recognition, one deeper insight, and one uncertainty reducing question."
+
+ };
+
+ }
 const {
  caseFile,
  evidence,
@@ -991,8 +1041,16 @@ const {
  lens
 } = council;
 
- return {
 
+/* AI PACKAGE CREATION */
+
+const aiPackage =
+ aiPackageBrain(
+  council
+ );
+
+
+return {
 
  loop,
 
@@ -1004,42 +1062,9 @@ const {
 
  lens,
 
+ aiPackage
 
- aiPackage:{
-
-
- currentLoop:
- loop.name,
-
-
- mission:
- loop.mission,
-
-
- confidence:
- evidence.confidence,
-
-
- missing:
- clarity.missing,
-
-
- lens:
- lens.active,
-
-
- evidence:
- caseFile.evidence,
-
-
- latest:
- caseFile.latestInput
-
-
- }
-
-
- };
+};
 
 }
 /* =====================================================
