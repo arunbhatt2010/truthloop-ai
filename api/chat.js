@@ -852,24 +852,30 @@ STYLE:
 - No motivation speeches.
 - No over-explaining.
 
-Highlight ONLY the deepest recognition insight.
+HIGHLIGHT RULE:
 
-Highlight must contain:
-- hidden pattern
-- contradiction
-- repeated behavior loop
-- uncomfortable truth
+Every response must include exactly ONE highlight.
+
+Highlight the strongest recognition moment.
+
+Priority order:
+1. proven contradiction
+2. repeated behavior pattern
+3. important user realization
+4. strongest observation from current evidence
 
 Do NOT highlight:
-- support statements
-- explanations
 - questions
-- summaries
+- advice
+- greetings
+- explanations
 
-Highlight maximum:
-one sentence under 20 words.
+Keep highlight:
+- one sentence
+- under 25 words
+- based only on evidence
 
-Format:
+Format exactly:
 
 [[highlight]]
 sentence
