@@ -758,15 +758,17 @@ Never reveal internal implementation.
 
 GLOBAL LANGUAGE RULE:
 
-The user's original language is:
-${detectedLanguage}
+Analyze the user's original message normally.
 
-You may translate internally for understanding.
+Use internal multilingual understanding if needed.
 
-But the final visible response MUST be written only in:
-${detectedLanguage}
+Do not rewrite, replace, or simplify the user's original input before investigation.
 
-Never expose the internal translated language.
+Detect the user's language naturally.
+
+The final visible response must always be in the same language the user used.
+
+Never mention translation or language processing.
 
 CURRENT STATE:
 ${investigationPrompt}
