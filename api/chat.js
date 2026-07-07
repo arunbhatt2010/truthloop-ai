@@ -1033,40 +1033,7 @@ function aiPackageBrain(council){
  };
 
  }
-const {
- caseFile,
- evidence,
- clarity,
- loop,
- lens
-} = council;
 
-
-/* AI PACKAGE CREATION */
-
-const aiPackage =
- aiPackageBrain(
-  council
- );
-
-
-return {
-
- loop,
-
- caseFile,
-
- evidence,
-
- clarity,
-
- lens,
-
- aiPackage
-
-};
-
-}
 /* =====================================================
    🧠 RESPONSE BRAIN
    Human Generation Layer
