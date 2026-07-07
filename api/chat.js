@@ -1079,10 +1079,8 @@ return {
 
 
 async function responseBrain(
- aiPackage,
- messages
+ aiPackage
 ){
-
 
  const responsePrompt = `
 
@@ -1092,7 +1090,7 @@ Do not investigate from zero.
 
 Use only the provided case.
 
-Current System:
+Current Case Package:
 
 Loop:
 ${aiPackage.currentLoop}
@@ -1103,46 +1101,26 @@ ${aiPackage.mission}
 Confidence:
 ${aiPackage.confidence}
 
-Missing:
+Missing Clarity:
 ${aiPackage.missing}
 
-Lens:
+Active Lens:
 ${aiPackage.lens}
 
 Evidence:
-${JSON.stringify(
-aiPackage.evidence
-)}
+${JSON.stringify(aiPackage.evidence)}
 
-User Message:
+Latest User Input:
 ${aiPackage.latest}
 
 
 Your job:
 
-Create:
-
-1. One recognition moment.
-2. One observation.
-3. One next question.
-
-Rules:
-
-- Do not diagnose.
-- Do not motivate.
-- Do not give generic advice.
-- Stay within current loop depth.
-- Reveal only one layer.
-- Use user's language.
-
-Loop 7 exception:
-
-If final loop:
-summarize pattern,
-contradiction,
-protection,
-and one action.
-
+1. Create one recognition moment.
+2. Reveal only the current loop depth.
+3. Do not jump ahead.
+4. Ask one uncertainty reducing question.
+5. Never restart investigation.
 `;
 
 
@@ -1432,11 +1410,7 @@ export default async function handler(
 
  let reply =
  await responseBrain(
-
- brain.aiPackage,
-
- messages
-
+  brain.aiPackage
  );
 
 
