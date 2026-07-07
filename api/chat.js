@@ -895,45 +895,101 @@ function lensBrain(caseFile){
    API Needed: NO
 ===================================================== */
 
+/* ==================================================
+   👑 BRAIN COUNCIL
+   TruthLoop Revealed
 
-function mainBrain({
+   Collects all mini brain signals
+   API Needed: NO
+================================================== */
+
+function brainCouncil({
+  input,
+  state = {}
+}) {
+
+
+  const guard =
+    guardBrain(
+      input,
+      state
+    );
+
+
+  if (
+    guard?.signals?.stop ||
+    guard?.stop
+  ) {
+
+    return {
+      blocked:true,
+      guard
+    };
+
+  }
+
+
+  const memory =
+    memoryBrain(
+      input,
+      state
+    );
+
+
+  const evidence =
+    evidenceBrain(
+      memory
+    );
+
+
+  const council =
+    mergeSignals([
+
+      guard,
+
+      memory,
+
+      evidence
+
+    ]);
+
+
+  return {
+
+    blocked:false,
+
+    council,
+
+
+    reports:{
+
+      guard,
+
+      memory,
+
+      evidence
+
+    }
+
+  };
+
+
+}
+const council =
+brainCouncil({
  messages,
  loopLevel,
  oldCase
-}){
+});
 
 
- const caseFile =
- memoryBrain(
- messages,
- oldCase
- );
-
-
- const evidence =
- evidenceBrain(
- caseFile
- );
-
-
- const clarity =
- clarityBrain(
+const {
  caseFile,
- evidence
- );
-
-
- const loop =
- loopBrain(
- loopLevel
- );
-
-
- const lens =
- lensBrain(
- caseFile
- );
-
+ evidence,
+ clarity,
+ loop,
+ lens
+} = council;
 
  return {
 
