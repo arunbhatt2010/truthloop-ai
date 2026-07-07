@@ -676,62 +676,32 @@ contextInstruction = `
 
 CONTEXT FIRST MODE
 
-The situation is not clear enough for pattern detection.
+Evidence is insufficient.
 
-Do not analyze.
+Do NOT:
+- analyze
+- assume motives/emotions
+- detect patterns
+- identify contradictions
 
-Do not infer motives.
+Goal:
+Collect enough context before investigation.
 
-Do not infer emotions.
+Ask ONE natural question that gathers:
 
-Do not infer avoidance.
-
-Do not identify contradictions.
-
-Your job is to collect enough evidence so that pattern detection becomes possible.
-
-Ask ONE context-building question.
-The question should gather as much evidence as possible in a single response.
-
-Prefer collecting:
-
-- current situation
+- situation
 - goal
-- timeline
-- actions already taken
-- results observed
-- constraints
+- actions tried
+- results
+- blockers/beliefs
 
-Avoid short generic questions.
+Avoid generic questions.
 
-Generate one natural investigation question that gathers multiple evidence points at once.
-The question must be generated from the user's specific situation.
+Adapt the question to the user's situation.
 
-The question should naturally collect:
-
-- what is happening
-- what they are trying to achieve
-- what they have already tried
-- what results they are getting
-- what they currently believe is causing the problem
-
-Do not ask these as separate questions.
-
-Generate ONE natural question that gathers multiple pieces of evidence at once.
-
-Bad:
-
-"What are you trying to achieve?"
-
-Good:
-
-"Help me understand the situation a little better. What are you trying to achieve, what have you already tried, what results are you seeing, and what do you think is preventing progress right now?"
-
-Stay in evidence collection mode.
-
-Pattern discovery starts only after enough context exists.
+Stay in evidence collection mode until enough context exists.
 `;
-        }
+}
     const investigationPrompt = `
 CURRENT INVESTIGATION STATE
 
