@@ -226,6 +226,89 @@ function guardBrain(input, state = {}) {
 
 }
 
+/* ==================================================
+   📁 MEMORY BRAIN
+   TruthLoop Revealed
+   API Needed: NO
+
+   Job:
+   - Maintain case state
+   - Track loop journey
+   - Store user signals
+   - Prepare memory package
+================================================== */
+
+function memoryBrain(input, state = {}) {
+
+  const history = state.history || [];
+
+  const currentLoop =
+    state.loopLevel || 1;
+
+
+  const userSignals = {
+
+    messageCount:
+      history.length,
+
+    repeatedThemes:
+      state.repeatedThemes || [],
+
+    previousInsight:
+      state.previousInsight || null,
+
+    lastQuestion:
+      state.lastQuestion || null
+
+  };
+
+const deepCaseFile = caseFileBrain(
+  state.history || [],
+  state.caseFile || {}
+);
+  const caseFile = {
+
+    currentLoop,
+
+    userInput:
+      input,
+
+    journeyDepth:
+      history.length,
+
+    knownPatterns:
+      state.patterns || [],
+
+    unresolved:
+      state.unresolved || []
+
+  };
+
+
+  return createSignal({
+
+    brain:"memory",
+
+    allowed:true,
+    stop:false,
+
+    confidence:
+      history.length > 2 ? 85 : 60,
+
+
+    data:{
+  caseFile,
+  deepCaseFile,
+      userSignals,
+
+      instruction:
+      "Continue investigation using existing evidence."
+
+    }
+
+  });
+
+     }
 
   /* DOMAIN FILTER */
 
@@ -338,7 +421,7 @@ What keeps happening that you expected yourself to change by now?`
 ===================================================== */
 
 
-function memoryBrain(
+function caseFileBrain(
  messages = [],
  oldCase = {}
 ){
@@ -394,70 +477,136 @@ function memoryBrain(
 
 
 
-/* =====================================================
+/* ==================================================
    ⚖️ EVIDENCE BRAIN
-   Truth Filter Engine
+   TruthLoop Revealed
    API Needed: NO
-===================================================== */
+
+   Job:
+   - Separate evidence from assumptions
+   - Detect contradictions
+   - Calculate confidence
+================================================== */
+
+function evidenceBrain(memorySignal) {
 
 
-function evidenceBrain(caseFile){
-
- let score = 0;
-
-
- if(
- caseFile.confirmedFacts.length
- ){
-   score += 25;
- }
+  const data =
+    memorySignal?.data || {};
 
 
- if(
- caseFile.repeatedPatterns.length
- ){
-   score += 25;
- }
+  const caseFile =
+    data.caseFile || {};
 
 
- if(
- caseFile.contradictions.length
- ){
-   score += 25;
- }
+  let facts = [];
+
+  let assumptions = [];
+
+  let contradictions = [];
 
 
- if(
- caseFile.evidence.length >= 3
- ){
-   score += 25;
- }
+  const input =
+    (caseFile.userInput || "")
+    .toLowerCase();
 
 
- let confidence =
- score >= 75
- ? "high"
- : score >= 40
- ? "medium"
- : "low";
+
+  /* FACT SIGNALS */
+
+  if (
+    input.includes("i tried") ||
+    input.includes("i did") ||
+    input.includes("happened")
+  ){
+
+    facts.push(
+      "User provided experience evidence"
+    );
+
+  }
 
 
- return {
 
- confidence,
+  /* ASSUMPTION SIGNALS */
 
- evidenceScore:score,
+  if (
+    input.includes("maybe") ||
+    input.includes("i think") ||
+    input.includes("probably")
+  ){
 
- facts:
- caseFile.confirmedFacts,
+    assumptions.push(
+      "Possible assumption detected"
+    );
 
- contradictions:
- caseFile.contradictions,
+  }
 
- missing:
- confidence === "low"
 
- };
+
+  /* CONTRADICTION SIGNALS */
+
+  if (
+    (
+     input.includes("want") ||
+     input.includes("need")
+    )
+    &&
+    (
+     input.includes("but") ||
+     input.includes("still")
+    )
+  ){
+
+    contradictions.push(
+      "Desire vs behavior gap detected"
+    );
+
+  }
+
+
+
+  const confidence =
+
+    facts.length * 30 +
+
+    contradictions.length * 40 -
+
+    assumptions.length * 10;
+
+
+
+  return createSignal({
+
+    brain:"evidence",
+
+    confidence:
+      Math.max(
+       20,
+       Math.min(
+        confidence,
+        100
+       )
+      ),
+
+
+    data:{
+
+      facts,
+
+      assumptions,
+
+      contradictions,
+
+      evidenceReady:
+        facts.length +
+        contradictions.length
+        > 0
+
+    }
+
+  });
+
 
 }
 /* =====================================================
