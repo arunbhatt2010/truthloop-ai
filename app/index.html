@@ -438,6 +438,54 @@ box-shadow:
 margin-bottom:18px;
 color:#f0f0f0;
   }
+  /* ==========================
+   TruthLoop Live Pattern Card
+   Sticky During Loop Journey
+========================== */
+
+#patternProfile{
+
+position:sticky;
+
+top:14px;
+
+z-index:50;
+
+backdrop-filter:blur(14px);
+
+transition:
+all .35s ease;
+
+}
+
+/* subtle living AI effect */
+
+#patternProfile{
+
+animation:
+patternPulse 4s ease infinite;
+
+}
+
+@keyframes patternPulse{
+
+0%,100%{
+
+box-shadow:
+0 0 25px rgba(168,85,247,.12),
+inset 0 0 20px rgba(168,85,247,.05);
+
+}
+
+50%{
+
+box-shadow:
+0 0 35px rgba(255,140,0,.22),
+inset 0 0 25px rgba(168,85,247,.08);
+
+}
+
+  }
 .floating-dot{
 
 position:absolute;
