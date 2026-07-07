@@ -973,8 +973,6 @@ function brainCouncil({
 
   };
 
-
-}
 const council =
 brainCouncil({
  messages,
