@@ -837,9 +837,6 @@ ${investigationState.confidence}
     /* =========================
        🧠 SYSTEM PROMPT
     ========================= */
-
-    - 
-- do 
 Before const systemPrompt = `
 You are TruthLoop AI.
 
