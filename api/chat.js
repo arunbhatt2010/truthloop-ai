@@ -973,27 +973,7 @@ function brainCouncil({
 
   };
 
-const council =
-brainCouncil({
- messages,
- loopLevel,
- oldCase
-});
 
-/* =================================
-   🧠 AI PACKAGE BRAIN
-   TruthLoop Revealed
-   API Needed: NO
-
-   Job:
-   - Compress brain signals
-   - Prepare final AI context
-   - Reduce token usage
-================================= */
-const aiPackage =
- aiPackageBrain(
-  council
- );
 function aiPackageBrain(council){
 
 
