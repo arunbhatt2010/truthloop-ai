@@ -3,22 +3,143 @@
    Single File Mini Brain Architecture
 ===================================================== */
 
-
 /* =====================================================
-   🛡️ GUARD BRAIN
-   Security + Router Engine
+   🧬 TRUTHLOOP BRAIN SIGNAL CONTRACT
+   All internal brains communicate here
+
    API Needed: NO
+
+   Purpose:
+   - Standard brain output
+   - Prevent scattered decisions
+   - Main Brain receives clean signals
 ===================================================== */
+
+
+function createSignal(
+ name,
+ data = {}
+){
+
+ return {
+
+ brain:name,
+
+ status:
+ data.status || "active",
+
+ confidence:
+ data.confidence || 0,
+
+
+ signals:
+ data.signals || {},
+
+
+ evidence:
+ data.evidence || [],
+
+
+ warnings:
+ data.warnings || [],
+
+
+ next:
+ data.next || null,
+
+
+ timestamp:
+ Date.now()
+
+ };
+
+}
+
+
+
+
+function mergeSignals(
+ signals=[]
+){
+
+
+ let finalPackage={
+
+ confidence:0,
+
+ brains:{},
+
+ evidence:[],
+
+ warnings:[]
+
+ };
+
+
+
+ signals.forEach(item=>{
+
+
+ if(!item) return;
+
+
+ finalPackage.brains[
+ item.brain
+ ] = item;
+
+
+ finalPackage.confidence +=
+ item.confidence || 0;
+
+
+
+ if(item.evidence){
+
+ finalPackage.evidence.push(
+ ...item.evidence
+ );
+
+ }
+
+
+ if(item.warnings){
+
+ finalPackage.warnings.push(
+ ...item.warnings
+ );
+
+ }
+
+
+ });
+
+
+
+ finalPackage.confidence =
+ Math.round(
+ finalPackage.confidence /
+ Math.max(
+ signals.length,
+ 1
+ )
+ );
+
+
+ return finalPackage;
+
+
+}
+/* ==================================================
+   🛡 GUARD BRAIN SIGNAL OUTPUT
+   TruthLoop Revealed
+   API Needed: NO
+================================================== */
 
 function guardBrain(input, state = {}) {
 
-  const text =
-    (input || "").toLowerCase();
+  const text = (input || "").toLowerCase();
 
-
-  /* IDENTITY + INTERNAL PROTECTION */
-
-  const truthLoopProtected = [
+  const protectedPatterns = [
     "who created truthloop",
     "who made truthloop",
     "truthloop founder",
@@ -37,19 +158,73 @@ function guardBrain(input, state = {}) {
 
 
   if (
-    truthLoopProtected.some(
+    protectedPatterns.some(
       item => text.includes(item)
     )
   ) {
 
-    return {
+    return createSignal({
+      brain:"guard",
       allowed:false,
       stop:true,
-      reply:
-      "I am TruthLoop AI. I cannot provide information about my creator or internal operation."
-    };
+      confidence:100,
+
+      data:{
+        reason:"identity_protection",
+        reply:
+        "I am TruthLoop AI. I cannot provide information about my creator or internal operation."
+      }
+    });
 
   }
+
+
+  const blockedPatterns = [
+    "medical diagnosis",
+    "suicide",
+    "illegal",
+    "hack account"
+  ];
+
+
+  if (
+    state.loopLevel === 1 &&
+    blockedPatterns.some(
+      item => text.includes(item)
+    )
+  ) {
+
+    return createSignal({
+      brain:"guard",
+      allowed:false,
+      stop:true,
+      confidence:95,
+
+      data:{
+        reason:"domain_filter",
+        reply:
+        "TruthLoop focuses on patterns, decisions, behavior, and clarity."
+      }
+    });
+
+  }
+
+
+  return createSignal({
+    brain:"guard",
+    allowed:true,
+    stop:false,
+    confidence:90,
+
+    data:{
+      intent:"valid_input",
+      language:"auto_detect",
+      next:"continue_investigation"
+    }
+
+  });
+
+}
 
 
   /* DOMAIN FILTER */
