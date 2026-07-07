@@ -856,30 +856,24 @@ HIGHLIGHT RULE:
 
 Every response must include exactly ONE highlight.
 
-Highlight the strongest recognition moment.
+HIGHLIGHT RULE:
 
-Priority order:
-1. proven contradiction
-2. repeated behavior pattern
-3. important user realization
-4. strongest observation from current evidence
+Find the one sentence in your response that creates the strongest user recognition.
 
-Do NOT highlight:
-- questions
-- advice
-- greetings
-- explanations
-
-Keep highlight:
-- one sentence
-- under 25 words
-- based only on evidence
-
-Format exactly:
+Wrap only that sentence:
 
 [[highlight]]
 sentence
 [[end]]
+
+The highlighted sentence should be the moment where the user understands something new about their own pattern.
+
+Do not highlight:
+- questions
+- instructions
+- generic explanations
+
+Use exactly one highlight.
 FINAL REVIEW:
 Before answering check:
 - Is it evidence based?
