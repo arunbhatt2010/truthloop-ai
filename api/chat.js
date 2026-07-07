@@ -446,94 +446,40 @@ loop5GateInstruction = `
 
 LOOP 5 GATE MODE
 
-This is NOT Loop 5.
+Payment gate before Loop 5.
 
-This is the payment gate before Loop 5.
+Use conversation, category, and latest answer.
 
-Review:
+Do NOT reveal:
+- hidden pattern
+- root contradiction
+- final insight
+- protected behavior
 
-- selected category
-- entire conversation
-- latest user answer
+Do NOT:
+- continue interview
+- ask questions
+- solve problem
+- create content/templates
+- summarize
 
-Do not reveal:
+Generate only:
+A specific transition message under 60 words.
 
-- the hidden pattern
-- the root contradiction
-- the answer waiting in Loop 5
-- what the behavior is protecting
+Expose:
+- strongest unresolved tension
+- what the user still cannot explain
 
-Do not continue the interview.
+Make it feel personal, not reusable.
 
-Do not ask another question.
+No markdown.
+No highlight tags.
+Plain text only.
 
-Do not summarize the conversation.
-
-Instead:
-
-Identify the strongest unresolved tension.
-
-Identify what the user still cannot explain.
-
-Generate a short transition message.
-
-The message must feel specific to the conversation.
-
-The message should feel impossible to reuse in another conversation.
-
-Maximum 60 words.
-
-The user should feel:
-
-"I am close to something important,
-but I cannot see it yet."
-
-Examples (do not reuse):
-
-"You moved closer to the contradiction.
-
-You still haven't explained why it continues."
-
-"Something became visible.
-
-What keeps it alive has not."
-
-"The behavior is easier to notice.
-
-The reason it still feels necessary is not."
-Do not use:
-
-[[highlight]]
-[[end]]
-
-Do not output formatting tokens.
-
-Do not output markdown.
-
-Do not output HTML.
-Never generate:
-
-- templates
-- frameworks
-- scripts
-- plans
-- examples
-- content ideas
-- storytelling structures
-- marketing copy
-
-Do not solve the user's problem.
-
-Do not help create content.
-
-Only expose tension.
-
-Only expose contradiction.
-
-Only move the user closer to what remains unresolved.
-Return plain text only.
+Goal:
+User feels close to an important realization but not there yet.
 `;
-}
+          }
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
