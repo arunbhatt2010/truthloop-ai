@@ -2125,11 +2125,10 @@ content:data.reply
 saveJourney();    
 typeEffect(data.reply);
 
-// Every loop share
+if(loopLevel >= 1){
 showShareCard(data.reply);
+}
 
-
-// Only after Loop 7
 if(loopLevel >= 7){
 
 document.getElementById("articleBlock").style.display="block";
