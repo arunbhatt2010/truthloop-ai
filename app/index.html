@@ -1520,30 +1520,39 @@ nextBtn.style.display = "block";
     
 /* SHARE */    
     
-function showShareCard(text){    
-  shareBox.style.display="block";  
-const clean=text.replace(/<[^>]*>?/gm,'').trim();    
-    
-shareText.innerText=    
-`This hit me harder than expected.    
-    
-${clean}    
-    
-Most people avoid this.    
-    
-https://truthloop.in`;    
-    
-shareBox.style.display="block";    
-    
-}    
-    
-function copyShare(){    
-navigator.clipboard.writeText(shareText.innerText);    
-}    
-    
-function whatsappShare(){    
-window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);    
-}    
+function showShareCard(text){
+
+const clean = text
+.replace(/<[^>]*>?/gm,"")
+.replace(/\[\[|\]\]/g,"")
+.split("?")[0]
+.trim();
+
+shareText.innerText =
+`I thought this was the problem...
+
+${clean}
+
+TruthLoop AI helped me see the hidden pattern behind it.
+
+Find what you're avoiding 👇
+https://truthloop.in`;
+
+shareBox.style.display="block";
+
+}
+
+function copyShare(){
+
+navigator.clipboard.writeText(shareText.innerText);
+
+}
+
+function whatsappShare(){
+
+window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
+
+  }
     
 /* PAYWALL */    
     
