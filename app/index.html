@@ -2124,10 +2124,11 @@ content:data.reply
 });    
 saveJourney();    
 typeEffect(data.reply);    
+showShareCard(data.reply);
+
 if(loopLevel >= 7){
 
 document.getElementById("articleBlock").style.display="block";
-showShareCard(data.reply);
 if(window.isRestoredJourney){
 nextBtn.innerText = "Select New Pattern";
 }
