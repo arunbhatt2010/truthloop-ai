@@ -2123,12 +2123,18 @@ role:"assistant",
 content:data.reply    
 });    
 saveJourney();    
-typeEffect(data.reply);    
+typeEffect(data.reply);
+
+// Every loop share
 showShareCard(data.reply);
 
+
+// Only after Loop 7
 if(loopLevel >= 7){
 
 document.getElementById("articleBlock").style.display="block";
+
+  }
 if(window.isRestoredJourney){
 nextBtn.innerText = "Select New Pattern";
 }
