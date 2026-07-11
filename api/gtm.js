@@ -44,24 +44,22 @@ export default async function handler(req, res) {
 
   const {
 
-    truthLoopPackage = null,
+  category,
 
-    userProfile = {},
+  conversation,
 
-    selectedPlatforms = [],
+  socialMediaLinks = []
 
-    assets = {}
+} = body;
 
-  } = body;
+  if (!conversation || conversation.length === 0) {
 
-  if (!truthLoopPackage) {
+  return res.status(400).json({
 
-    return res.status(400).json({
+    reply:
+      "Conversation Required"
 
-      reply:
-      "TruthLoop Package Required"
-
-    });
+  });
 
   }
 /* ============================================================
@@ -972,16 +970,13 @@ Return JSON only.
 
   const gtmPackage = {
 
-    truthLoopPackage,
+  category,
 
-    userProfile,
+  conversation,
 
-    selectedPlatforms,
+  socialMediaLinks
 
-    assets
-
-  };
-
+};
   /* ============================================================
      5. LOAD BRAINS
      (Future)
