@@ -646,6 +646,261 @@ async function loadScopePositionBrain(
 
               }
   /* ============================================================
+   GTM MODEL HELPER
+============================================================ */
+
+async function callGTMModel({
+
+    systemPrompt,
+
+    compressedInput
+
+}) {
+
+    const response = await fetch(
+
+        "https://api.cerebras.ai/v1/chat/completions",
+
+        {
+
+            method: "POST",
+
+            headers: {
+
+                "Content-Type": "application/json",
+
+                "Authorization":
+                    `Bearer ${process.env.CEREBRAS_API_KEY}`
+
+            },
+
+            body: JSON.stringify({
+
+                model: "gpt-oss-120b",
+
+                temperature: 0.2,
+
+                messages: [
+
+                    {
+
+                        role: "system",
+
+                        content: systemPrompt
+
+                    },
+
+                    {
+
+                        role: "user",
+
+                        content: compressedInput
+
+                    }
+
+                ]
+
+            })
+
+        }
+
+    );
+
+    if (!response.ok) {
+
+        throw new Error(
+
+            `Cerebras API Error: ${response.status}`
+
+        );
+
+    }
+
+    return await response.json();
+
+  }
+  /* ============================================================
+   4. GTM INTELLIGENCE BRAIN
+============================================================ */
+
+async function loadGTMIntelligenceBrain(
+
+    socialReport = {},
+
+    scopeReport = {},
+
+    userProfile = {}
+
+) {
+
+    const gtmReport = {
+
+        success: false,
+
+        currentPosition: {},
+
+        hiddenOpportunities: [],
+
+        positioningGap: {},
+
+        messagingDirection: {},
+
+        contentDirection: {},
+
+        offerDirection: {},
+
+        actionPlan: [],
+
+        confidence: 0,
+
+        compressedContext: {},
+
+        llmResponse: null
+
+    };
+
+    try {
+
+        const {
+
+            identity,
+
+            authoritySignals,
+
+            trustSignals,
+
+            audienceSignals,
+
+            contentSignals
+
+        } = socialReport;
+
+        const {
+
+            detectedCategory,
+
+            primaryScope,
+
+            secondaryScope,
+
+            categorySignals
+
+        } = scopeReport;
+      /* ==========================================
+           BUILD COMPRESSED CONTEXT
+        ========================================== */
+
+        gtmReport.compressedContext = {
+
+            category: detectedCategory,
+
+            identity,
+
+            authoritySignals,
+
+            trustSignals,
+
+            audienceSignals,
+
+            contentSignals,
+
+            primaryScope,
+
+            secondaryScope,
+
+            categorySignals,
+
+            userProfile
+
+        };
+
+        const intelligenceContext = {
+
+            social: {
+
+                identity,
+
+                authority: authoritySignals,
+
+                trust: trustSignals,
+
+                audience: audienceSignals,
+
+                content: contentSignals
+
+            },
+
+            scope: {
+
+                category: detectedCategory,
+
+                primary: primaryScope,
+
+                secondary: secondaryScope,
+
+                signals: categorySignals
+
+            },
+
+            profile: userProfile
+
+        };
+
+        const compressedInput = JSON.stringify(
+
+            intelligenceContext,
+
+            null,
+
+            2
+
+        );
+      /* ==========================================
+           BUILD LLM PROMPT & REASONING
+        ========================================== */
+
+        const systemPrompt = `
+
+You are TruthLoop GTM Intelligence Brain.
+
+Use ONLY the supplied context.
+
+Never invent information.
+
+Your task:
+
+1. Identify the user's current market position.
+
+2. Find the biggest positioning gap.
+
+3. Detect hidden opportunities.
+
+4. Recommend messaging direction.
+
+5. Recommend content direction.
+
+6. Recommend offer direction.
+
+7. Create the highest-impact first action.
+
+8. Return confidence score (0-100).
+
+Return JSON only.
+
+`;
+
+        const llmResponse = await callGTMModel({
+
+            systemPrompt,
+
+            compressedInput
+
+        });
+
+        gtmReport.llmResponse = llmResponse;
+
+        gtmReport.success = true;
+  /* ============================================================
      3. LOGIN VALIDATION
      (Future)
   ============================================================ */
