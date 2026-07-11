@@ -390,6 +390,262 @@ async function loadSocialPositionBrain(gtmPackage = {}) {
 
         }
   /* ============================================================
+   2. SCOPE POSITION BRAIN
+============================================================ */
+
+async function loadScopePositionBrain(
+    truthLoopPackage = {}
+) {
+
+    const scopeReport = {
+
+        success: false,
+
+        detectedCategory: null,
+
+        categoryConfidence: 0,
+
+        primaryScope: {},
+
+        secondaryScope: {},
+
+        categorySignals: [],
+
+        evidence: [],
+
+        recommendations: [],
+
+        rawContext: truthLoopPackage
+
+    };
+
+    try {
+
+        const {
+
+            loopLevel,
+
+            detectedPattern,
+
+            primaryLoop,
+
+            userGoal,
+
+            userProblem,
+
+            userCategory,
+
+            productType,
+
+            niche,
+
+            audience,
+
+            truthLoopSummary
+
+        } = truthLoopPackage;
+      /* ==========================================
+           CATEGORY SIGNAL COLLECTION
+        ========================================== */
+
+        const categorySignals = [];
+
+        if (userCategory) {
+
+            categorySignals.push({
+                source: "userCategory",
+                value: userCategory
+            });
+
+        }
+
+        if (productType) {
+
+            categorySignals.push({
+                source: "productType",
+                value: productType
+            });
+
+        }
+
+        if (niche) {
+
+            categorySignals.push({
+                source: "niche",
+                value: niche
+            });
+
+        }
+
+        if (audience) {
+
+            categorySignals.push({
+                source: "audience",
+                value: audience
+            });
+
+        }
+
+        if (userGoal) {
+
+            categorySignals.push({
+                source: "goal",
+                value: userGoal
+            });
+
+        }
+
+        if (userProblem) {
+
+            categorySignals.push({
+                source: "problem",
+                value: userProblem
+            });
+
+        }
+
+        if (detectedPattern) {
+
+            categorySignals.push({
+                source: "pattern",
+                value: detectedPattern
+            });
+
+        }
+
+        if (primaryLoop) {
+
+            categorySignals.push({
+                source: "loop",
+                value: primaryLoop
+            });
+
+        }
+
+        scopeReport.categorySignals =
+            categorySignals;
+
+        scopeReport.categoryConfidence =
+            categorySignals.length;
+      /* ==========================================
+           SCOPE POSITION DETECTION
+        ========================================== */
+
+        const detectedScope = {
+
+            category: "Unknown",
+
+            confidence: scopeReport.categoryConfidence,
+
+            primaryFocus: null,
+
+            summary: null
+
+        };
+
+        const scopeText = JSON.stringify(
+            categorySignals
+        ).toLowerCase();
+
+        if (
+            scopeText.includes("founder") ||
+            scopeText.includes("startup")
+        ) {
+
+            detectedScope.category = "Founder";
+
+        } else if (
+            scopeText.includes("product") ||
+            scopeText.includes("saas")
+        ) {
+
+            detectedScope.category = "Product";
+
+        } else if (
+            scopeText.includes("service") ||
+            scopeText.includes("agency")
+        ) {
+
+            detectedScope.category = "Service";
+
+        } else if (
+            scopeText.includes("creator") ||
+            scopeText.includes("content")
+        ) {
+
+            detectedScope.category = "Creator";
+
+        } else if (
+            scopeText.includes("career") ||
+            scopeText.includes("job")
+        ) {
+
+            detectedScope.category = "Career";
+
+        } else if (
+            scopeText.includes("student") ||
+            scopeText.includes("education")
+        ) {
+
+            detectedScope.category = "Education";
+
+        }
+
+        detectedScope.primaryFocus =
+            userGoal ||
+            productType ||
+            niche ||
+            userCategory ||
+            "Unknown";
+
+        detectedScope.summary =
+            `${detectedScope.category} Position Detected`;
+
+        scopeReport.detectedCategory =
+            detectedScope.category;
+
+        scopeReport.primaryScope =
+            detectedScope;
+
+        scopeReport.success = true;
+      scopeReport.secondaryScope = {
+
+            loopLevel,
+
+            truthLoopSummary
+
+        };
+
+        scopeReport.recommendations = [
+
+            "Validate detected category",
+
+            "Compare with Social Position Brain",
+
+            "Send compressed context to GTM Intelligence Brain"
+
+        ];
+
+        return scopeReport;
+
+    }
+
+    catch (error) {
+
+        console.error(
+
+            "[Scope Position Brain]",
+
+            error
+
+        );
+
+        return scopeReport;
+
+    }
+
+              }
+  /* ============================================================
      3. LOGIN VALIDATION
      (Future)
   ============================================================ */
