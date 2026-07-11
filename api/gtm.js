@@ -900,6 +900,54 @@ Return JSON only.
         gtmReport.llmResponse = llmResponse;
 
         gtmReport.success = true;
+      const aiMessage =
+            llmResponse?.choices?.[0]?.message?.content || "";
+
+        try {
+
+            Object.assign(
+                gtmReport,
+                JSON.parse(aiMessage)
+            );
+
+        } catch {
+
+            gtmReport.rawResponse =
+                aiMessage;
+
+        }
+
+        gtmReport.provider =
+            "Cerebras";
+
+        gtmReport.model =
+            "gpt-oss-120b";
+
+        if (
+            typeof gtmReport.confidence !== "number"
+        ) {
+
+            gtmReport.confidence = 50;
+
+        }
+
+        return gtmReport;
+
+    } catch (error) {
+
+        console.error(
+
+            "[GTM Intelligence Brain]",
+
+            error
+
+        );
+
+        return gtmReport;
+
+    }
+
+      }
   /* ============================================================
      3. LOGIN VALIDATION
      (Future)
