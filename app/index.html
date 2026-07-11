@@ -2310,20 +2310,20 @@ content:data.reply
 });    
 saveJourney();    
 typeEffect(data.reply);
-try{
-  showShareCard(data.reply);
-}catch(e){
-  console.log("share error", e);
-  }
-showShareCard(data.reply);
+
+try {
+    showShareCard(data.reply);
+} catch (e) {
+    console.log("share error", e);
+}
+
 console.log(data.reply);
-if(loopLevel >= 7){
+
+if (loopLevel >= 7) {
 
     document.getElementById("articleBlock").style.display = "block";
 
-    
-
-}
+  }
 if(window.isRestoredJourney){
 nextBtn.innerText = "Select New Pattern";
 }
