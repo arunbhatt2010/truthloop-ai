@@ -1090,7 +1090,22 @@ placeholder="Answer honestly..."/>
 <button id="nextBtn" style="display:none;">
 Go deeper
 </button>
-    
+ <!-- ==========================================
+     GTM CONTINUE CTA
+========================================== -->
+
+<div id="gtmContinueBox" style="display:none; margin-top:20px;">
+
+    <button
+        id="gtmContinueBtn"
+        onclick="startGTMJourney()"
+        class="primary-btn">
+
+        Continue ⏩ Unlock Your Next Phase
+
+    </button>
+
+</div>   
 <!-- SHARE BOX -->    
     
 <div id="shareBox">    
@@ -1105,7 +1120,65 @@ Copy
 WhatsApp    
 </button>    
     
-</div>    
+</div>
+    <!-- ==========================================
+     GTM SCREEN
+========================================== -->
+
+<div id="gtmScreen" style="display:none;">
+
+    <h2>
+        Unlock Your Next Phase
+    </h2>
+
+    <p>
+        TruthLoop has identified your hidden pattern.
+
+        Continue by adding the platforms you want analyzed.
+    </p>
+<div id="platformSelector">
+
+    <button onclick="selectPlatform('linkedin')">
+        LinkedIn
+    </button>
+
+    <button onclick="selectPlatform('github')">
+        GitHub
+    </button>
+
+    <button onclick="selectPlatform('website')">
+        Website
+    </button>
+
+    <button onclick="selectPlatform('x')">
+        X
+    </button>
+
+</div>
+  <div id="platformInputBox" style="display:none;">
+
+    <input
+        id="platformLinkInput"
+        type="url"
+        placeholder="Paste your profile URL..."
+    />
+
+    <button onclick="addPlatformLink()">
+        Add Profile
+    </button>
+
+    <div id="selectedPlatforms"></div>
+
+    <button
+        id="startAnalysisBtn"
+        onclick="runGTMAnalysis()">
+
+        Analyze My Position
+
+    </button>
+
+  </div>
+</div>
 <div id="articleBlock" style="    
 display:none;    
 margin-top:22px;    
@@ -1255,7 +1328,17 @@ let payment49=false;
 let payment199=false;
 let userCountry = "IN";  
 let currentCategory="";
+/* ==========================================
+   GTM FRONTEND STATE
+========================================== */
 
+let gtmMode = false;
+
+let truthLoopPackage = null;
+
+let selectedPlatforms = [];
+
+let platformLinks = {};
 let isLoading=false;
 const UI_TEXT = {
   en: {
@@ -1553,7 +1636,114 @@ function whatsappShare(){
 window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 
   }
-    
+  /* ==========================================
+   START GTM JOURNEY
+========================================== */
+
+function startGTMJourney() {
+
+    gtmMode = true;
+
+    truthLoopPackage = {
+
+        category: currentCategory,
+
+        conversation: [...messages]
+
+    };
+
+    console.log(
+
+        "[GTM]",
+
+        truthLoopPackage
+
+    );
+
+  }  
+ /* ==========================================
+   SELECT PLATFORM
+========================================== */
+
+function selectPlatform(platform) {
+
+    if (!selectedPlatforms.includes(platform)) {
+
+        selectedPlatforms.push(platform);
+
+    }
+
+    document.getElementById("platformInputBox").style.display = "block";
+
+    document.getElementById("platformLinkInput").focus();
+
+}
+  /* ==========================================
+   ADD PLATFORM LINK
+========================================== */
+
+function addPlatformLink() {
+
+    const input = document.getElementById("platformLinkInput");
+
+    const link = input.value.trim();
+
+    if (!link) return;
+
+    const platform = selectedPlatforms[
+        selectedPlatforms.length - 1
+    ];
+
+    platformLinks[platform] = link;
+
+    document.getElementById(
+        "selectedPlatforms"
+    ).innerHTML = Object.entries(platformLinks)
+        .map(([name, url]) =>
+            `<div>✅ ${name}: ${url}</div>`
+        )
+        .join("");
+
+    input.value = "";
+
+  }
+  /* ==========================================
+   RUN GTM ANALYSIS
+========================================== */
+
+async function runGTMAnalysis() {
+
+    truthLoopPackage.platformLinks = platformLinks;
+
+    try {
+
+        const response = await fetch("/api/gtm", {
+
+            method: "POST",
+
+            headers: {
+
+                "Content-Type": "application/json"
+
+            },
+
+            body: JSON.stringify(truthLoopPackage)
+
+        });
+
+        const data = await response.json();
+
+        console.log("[GTM RESULT]", data);
+
+    }
+
+    catch (error) {
+
+        console.error("[GTM]", error);
+
+    }
+
+}
 /* PAYWALL */    
     
 function showPaywall(message,amount){
