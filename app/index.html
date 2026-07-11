@@ -1136,38 +1136,30 @@ WhatsApp
 
         Continue by adding the platforms you want analyzed.
     </p>
-<div id="platformSelector">
+<div id="socialMediaSection">
 
-    <button onclick="selectPlatform('linkedin')">
-        LinkedIn
-    </button>
+    <h3>Social Media Links</h3>
 
-    <button onclick="selectPlatform('github')">
-        GitHub
-    </button>
-
-    <button onclick="selectPlatform('website')">
-        Website
-    </button>
-
-    <button onclick="selectPlatform('x')">
-        X
-    </button>
+    <p>
+        Add the public social media profiles you want TruthLoop GTM to analyze.
+    </p>
 
 </div>
-  <div id="platformInputBox" style="display:none;">
+  <div id="socialMediaInputBox">
 
     <input
-        id="platformLinkInput"
+        id="socialMediaLinkInput"
         type="url"
-        placeholder="Paste your profile URL..."
+        placeholder="Paste a public social media profile link..."
     />
 
-    <button onclick="addPlatformLink()">
-        Add Profile
+    <button onclick="addSocialMediaLink()">
+
+        Add Link
+
     </button>
 
-    <div id="selectedPlatforms"></div>
+    <div id="socialMediaLinksList"></div>
 
     <button
         id="startAnalysisBtn"
@@ -1178,7 +1170,6 @@ WhatsApp
     </button>
 
   </div>
-</div>
 <div id="articleBlock" style="    
 display:none;    
 margin-top:22px;    
@@ -1336,9 +1327,7 @@ let gtmMode = false;
 
 let truthLoopPackage = null;
 
-let selectedPlatforms = [];
-
-let platformLinks = {};
+let socialMediaLinks = [];
 let isLoading=false;
 const UI_TEXT = {
   en: {
@@ -1648,72 +1637,71 @@ function startGTMJourney() {
 
         category: currentCategory,
 
-        conversation: [...messages]
+        conversation: [...messages],
+
+        socialMediaLinks: []
 
     };
 
-    console.log(
+    document.getElementById("outputBox").style.display = "none";
 
-        "[GTM]",
+    document.getElementById("reflectionInput").style.display = "none";
 
-        truthLoopPackage
+    document.getElementById("nextBtn").style.display = "none";
 
-    );
+    document.getElementById("gtmContinueBox").style.display = "none";
 
-  }  
+    document.getElementById("gtmScreen").style.display = "block";
+
+  }
  /* ==========================================
-   SELECT PLATFORM
+   ADD SOCIAL MEDIA LINK
 ========================================== */
 
-function selectPlatform(platform) {
+function addSocialMediaLink() {
 
-    if (!selectedPlatforms.includes(platform)) {
-
-        selectedPlatforms.push(platform);
-
-    }
-
-    document.getElementById("platformInputBox").style.display = "block";
-
-    document.getElementById("platformLinkInput").focus();
-
-}
-  /* ==========================================
-   ADD PLATFORM LINK
-========================================== */
-
-function addPlatformLink() {
-
-    const input = document.getElementById("platformLinkInput");
+    const input = document.getElementById(
+        "socialMediaLinkInput"
+    );
 
     const link = input.value.trim();
 
     if (!link) return;
 
-    const platform = selectedPlatforms[
-        selectedPlatforms.length - 1
+    socialMediaLinks.push(link);
+
+    truthLoopPackage.socialMediaLinks = [
+        ...socialMediaLinks
     ];
 
-    platformLinks[platform] = link;
-
     document.getElementById(
-        "selectedPlatforms"
-    ).innerHTML = Object.entries(platformLinks)
-        .map(([name, url]) =>
-            `<div>✅ ${name}: ${url}</div>`
-        )
+        "socialMediaLinksList"
+    ).innerHTML = socialMediaLinks
+        .map(link => `<div>✅ ${link}</div>`)
         .join("");
 
     input.value = "";
 
-  }
+    input.focus();
+
+}
   /* ==========================================
    RUN GTM ANALYSIS
 ========================================== */
 
 async function runGTMAnalysis() {
 
-    truthLoopPackage.platformLinks = platformLinks;
+    if (socialMediaLinks.length === 0) {
+
+        alert("Please add at least one public social media profile.");
+
+        return;
+
+    }
+
+    truthLoopPackage.socialMediaLinks = [
+        ...socialMediaLinks
+    ];
 
     try {
 
