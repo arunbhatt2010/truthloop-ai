@@ -1997,78 +1997,106 @@ document.getElementById(
 
 }    
     
-razorpayBtn.onclick=function(){    
-track("payment_started",{
-  amount:amount,
-  loop:loopLevel
-});    
-const options = {    
-    
-key: RAZORPAY_KEY_ID,    
-    
-amount: amount * 100,    
-    
-currency: "INR",    
-    
-name: "TruthLoop",    
-    
-description:    
-amount === 49    
-? "Unlock Loop 5"    
-: "Unlock Loop 7",    
-    
-image: "https://truthloop.in/truthloop-hook.jpg",    
-    
-prefill: {    
-name: "",    
-email: "",    
-contact: ""    
-},    
-    
-theme: {    
-color: "#ff7a00"    
-},    
-    
+razorpayBtn.onclick = async function () {
 
+    track("payment_started", {
+        amount,
+        loop: loopLevel
+    });
 
-retry: {
-  enabled: true,
-  max_count: 2
-},
+    const orderRes = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            amount: amount * 100
+        })
+    });
 
-modal: {
-  backdropclose: false,
-  escape: true,
-  handleback: true
-},
-    
+    const order = await orderRes.json();
 
-    
+    if (!order.id) {
+        alert("Unable to create payment.");
+        return;
+    }
 
-    
-handler: function (response) {    
-    
-if(amount===49) payment49=true;    
-if(amount===199) payment199=true;    
-    
-track("payment_success",{    
-method:"razorpay",    
-value:amount    
-});    
-    
-alert("Payment successful 😄");    
-    
-paywallBox.style.display="none";    
-    
-}    
-    
-};    
-    
-const rzp = new Razorpay(options);    
-    
-rzp.open();    
-    
-};    
+    const options = {
+
+        key: RAZORPAY_KEY_ID,
+
+        order_id: order.id,
+
+        amount: order.amount,
+
+        currency: order.currency,
+
+        name: "TruthLoop",
+
+        description:
+            amount === 49
+                ? "Unlock Loop 5"
+                : "Unlock Loop 7",
+
+        image: "https://truthloop.in/truthloop-hook.jpg",
+
+        retry: {
+            enabled: true,
+            max_count: 2
+        },
+
+        modal: {
+            backdropclose: false,
+            escape: true,
+            handleback: true
+        },
+
+        theme: {
+            color: "#ff7a00"
+        },
+
+        handler: async function (response) {
+
+            const verifyRes = await fetch("/api/razorpay/verify", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(response)
+
+            });
+
+            const verify = await verifyRes.json();
+
+            if (!verify.success) {
+                alert("Payment verification failed.");
+                return;
+            }
+
+            if (amount === 49) payment49 = true;
+            if (amount === 199) payment199 = true;
+
+            track("payment_success", {
+                method: "razorpay",
+                value: amount
+            });
+
+            alert("Payment successful 🎉");
+
+            paywallBox.style.display = "none";
+
+        }
+
+    };
+
+    const rzp = new Razorpay(options);
+
+    rzp.open();
+
+};
     
 document.getElementById("paypal-button").innerHTML="";    
     
