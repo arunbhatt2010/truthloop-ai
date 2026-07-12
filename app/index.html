@@ -2060,11 +2060,16 @@ razorpayBtn.onclick = async function () {
       upi: {
         name: "Pay using UPI",
         instruments: [
-          { method: "upi" }
+          {
+            method: "upi",
+            flows: ["intent"]
+          }
         ]
       }
     },
+
     sequence: ["block.upi"],
+
     preferences: {
       show_default_blocks: true
     }
