@@ -2054,6 +2054,22 @@ razorpayBtn.onclick = async function () {
         theme: {
             color: "#ff7a00"
         },
+      config: {
+  display: {
+    blocks: {
+      upi: {
+        name: "Pay using UPI",
+        instruments: [
+          { method: "upi" }
+        ]
+      }
+    },
+    sequence: ["block.upi"],
+    preferences: {
+      show_default_blocks: true
+    }
+  }
+},
 
         handler: async function (response) {
 
