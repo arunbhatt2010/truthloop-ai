@@ -2112,8 +2112,31 @@ razorpayBtn.onclick = async function () {
 
             alert("Payment successful 🎉");
 
-            paywallBox.style.display = "none";
+paywallBox.style.display = "none";
 
+// Resume TruthLoop
+const data = await callAPI();
+
+messages.push({
+    role: "assistant",
+    content: data.reply
+});
+
+saveJourney();
+
+typeEffect(data.reply);
+
+try{
+    showShareCard(data.reply);
+}catch(e){
+    console.log(e);
+}
+
+reflectionInput.value = "";
+
+nextBtn.style.display = "block";
+nextBtn.disabled = false;
+isLoading = false;
         }
 
     };
