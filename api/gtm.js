@@ -981,7 +981,17 @@ Return JSON only.
      5. LOAD BRAINS
      (Future)
   ============================================================ */
+const socialReport =
+    await loadSocialPositionBrain(gtmPackage);
 
+const scopeReport =
+    await loadScopePositionBrain(gtmPackage);
+
+const gtmReport =
+    await loadGTMIntelligenceBrain({
+        socialReport,
+        scopeReport
+    });
   // Social Position Brain
 
   // Scope Position Brain
@@ -992,15 +1002,7 @@ Return JSON only.
      6. RETURN PLACEHOLDER
   ============================================================ */
 
-  return res.status(200).json({
-
-    status: "READY",
-
-    message:
-      "GTM Engine Skeleton Loaded",
-
-    package: gtmPackage
-
-  });
+  return res.status(200).json(gtmReport);
+  
 
 }
