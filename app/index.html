@@ -2329,7 +2329,15 @@ getBtn.disabled = false;
 nextBtn.onclick=async()=>{
 
 if (isLoading) return;
+if (loopLevel >= 7 && nextBtn.innerText === "Exit") {
 
+    clearJourney();
+
+    location.reload();
+
+    return;
+
+  }
 isLoading = true;
 
 nextBtn.disabled = true;
