@@ -2416,11 +2416,13 @@ if (loopLevel >= 7) {
     document.getElementById("articleBlock").style.display = "block";
 
     nextBtn.style.display = "block";
+    nextBtn.innerText = "Exit";
 
-}
-if(window.isRestoredJourney){
-nextBtn.innerText = "Exit";
-}
+} else {
+
+    document.getElementById("gtmContinueBox").style.display = "none";
+
+  }
 
 
 reflectionInput.value="";    
