@@ -2436,15 +2436,17 @@ document.getElementById("mainApp").style.display = "block";
 };
 document.getElementById("newPatternBtn").onclick = () => {
 
-clearJourney();
+    clearJourney();
 
-loopLevel = 1;
-messages = [];
-currentCategory = "";
+    messages = [];
+    loopLevel = 1;
+    currentCategory = "";
+    payment49 = false;
+    payment199 = false;
 
-location.reload();
+    location.reload();
 
-};  
+};
 /* JOURNEY MEMORY */
 async function detectCountry(){
 
