@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         ? JSON.parse(req.body)
         : req.body;
 
-    const {
+    let {
   messages,
   loopLevel = 1,
   paid49 = false,
@@ -39,7 +39,16 @@ export default async function handler(req, res) {
   shownLoop5 = [],
   currentCategory = ""
 } = body;
+/* =========================
+   🧪 TEMP DEV GATE
+========================= */
 
+const DEV_GATE = true;
+
+if (DEV_GATE) {
+  paid49 = true;
+  paid199 = true;
+}
     if (!messages || !messages.length) {
 
       return res.status(400).json({
