@@ -758,7 +758,8 @@ async function loadGTMIntelligenceBrain(
     };
 
     try {
-
+console.log("SOCIAL REPORT:", JSON.stringify(socialReport, null, 2));
+console.log("SCOPE REPORT:", JSON.stringify(scopeReport, null, 2));
         const {
 
             identity,
