@@ -1733,8 +1733,13 @@ console.log(document.getElementById("outputBox"));
 // Hide GTM screen
 document.getElementById("gtmScreen").style.display = "none";
 
+
 // Show output
-document.getElementById("outputBox").style.display = "block";
+const outputBox = document.getElementById("outputBox");
+outputBox.style.display = "block";
+
+// Support both old and new response formats
+const report = data.gtmReport || data;
 
 // Render report
 outputBox.innerHTML = `
@@ -1743,36 +1748,45 @@ outputBox.innerHTML = `
 <h2>📊 Your Market Position</h2>
 
 <p><b>Current Position</b><br>
-${data.currentPosition || data.marketPosition || "Unknown"}
+${report.currentPosition || report.marketPosition || "Unknown"}
 </p>
 
 <p><b>Positioning Gap</b><br>
-${data.positioningGap || ""}
+${report.positioningGap || "No positioning gap detected."}
 </p>
 
 <p><b>Hidden Opportunities</b></p>
 
 <ul>
-${(data.hiddenOpportunities || []).map(x => `<li>${x}</li>`).join("")}
+${
+  (report.hiddenOpportunities || [])
+    .map(item => `<li>${item}</li>`)
+    .join("") || "<li>No opportunities found.</li>"
+}
 </ul>
 
 <p><b>Messaging Direction</b></p>
-<p>${data.messagingDirection || ""}</p>
+<p>${report.messagingDirection || "Not available."}</p>
 
 <p><b>Content Direction</b></p>
-<p>${data.contentDirection || ""}</p>
+<p>${report.contentDirection || "Not available."}</p>
 
 <p><b>Offer Direction</b></p>
-<p>${data.offerDirection || ""}</p>
+<p>${report.offerDirection || "Not available."}</p>
 
 <p><b>Action Plan</b></p>
 
 <ul>
-${(data.actionPlan || []).map(x => `<li>${x}</li>`).join("")}
+${
+  (report.actionPlan || [])
+    .map(item => `<li>${item}</li>`)
+    .join("") || "<li>No action plan available.</li>"
+}
 </ul>
 
 </div>
 `;
+      alert("4");
     }
 
     catch (error) {
