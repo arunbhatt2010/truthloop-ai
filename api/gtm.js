@@ -1029,17 +1029,19 @@ Return JSON only.
   ============================================================ */
 const socialReport =
     await loadSocialPositionBrain(gtmPackage);
-console.log(
-  "AFTER loadSocialPositionBrain",
-  JSON.stringify(socialReport, null, 2)
-);
 
 console.log(
-  "AFTER loadScopePositionBrain",
-  JSON.stringify(scopeReport, null, 2)
+    "AFTER loadSocialPositionBrain",
+    JSON.stringify(socialReport, null, 2)
 );
+
 const scopeReport =
     await loadScopePositionBrain(gtmPackage);
+
+console.log(
+    "AFTER loadScopePositionBrain",
+    JSON.stringify(scopeReport, null, 2)
+);
 
 const gtmReport =
     await loadGTMIntelligenceBrain({
