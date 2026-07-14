@@ -1725,54 +1725,55 @@ console.log("[GTM PACKAGE]", truthLoopPackage);
         });
 alert("2");
         const data = await response.json();
+      const report = data.gtmReport || data;
       alert("3");
-alert(JSON.stringify(data));
+alert(JSON.stringify(data, null, 2));
         console.log("[GTM RESULT]", data);
       console.log(document.getElementById("gtmScreen"));
 console.log(document.getElementById("outputBox"));
 // Hide GTM screen
 document.getElementById("gtmScreen").style.display = "none";
 
-
+const outputBox = document.getElementById("outputBox");
 // Show output  
 document.getElementById("outputBox").style.display = "block";  
   
 // Render report  
-outputBox.innerHTML = `  
-<div class="aiResponse">  
-  
-<h2>📊 Your Market Position</h2>  
-  
-<p><b>Current Position</b><br>  
-${data.currentPosition || data.marketPosition || "Unknown"}  
-</p>  
-  
-<p><b>Positioning Gap</b><br>  
-${data.positioningGap || ""}  
-</p>  
-  
-<p><b>Hidden Opportunities</b></p>  
-  
-<ul>  
-${(data.hiddenOpportunities || []).map(x => `<li>${x}</li>`).join("")}  
-</ul>  
-  
-<p><b>Messaging Direction</b></p>  
-<p>${data.messagingDirection || ""}</p>  
-  
-<p><b>Content Direction</b></p>  
-<p>${data.contentDirection || ""}</p>  
-  
-<p><b>Offer Direction</b></p>  
-<p>${data.offerDirection || ""}</p>  
-  
-<p><b>Action Plan</b></p>  
-  
-<ul>  
-${(data.actionPlan || []).map(x => `<li>${x}</li>`).join("")}  
-</ul>  
-  
-</div>  
+outputBox.innerHTML = `
+<div class="aiResponse">
+
+<h2>📊 Your Market Position</h2>
+
+<p><b>Current Position</b><br>
+${report.currentPosition || report.marketPosition || "Unknown"}
+</p>
+
+<p><b>Positioning Gap</b><br>
+${report.positioningGap || ""}
+</p>
+
+<p><b>Hidden Opportunities</b></p>
+
+<ul>
+${(report.hiddenOpportunities || []).map(x => `<li>${x}</li>`).join("")}
+</ul>
+
+<p><b>Messaging Direction</b></p>
+<p>${report.messagingDirection || ""}</p>
+
+<p><b>Content Direction</b></p>
+<p>${report.contentDirection || ""}</p>
+
+<p><b>Offer Direction</b></p>
+<p>${report.offerDirection || ""}</p>
+
+<p><b>Action Plan</b>
+
+<ul>
+${(report.actionPlan || []).map(x => `<li>${x}</li>`).join("")}
+</ul>
+
+</div>
 `;
     }
 
