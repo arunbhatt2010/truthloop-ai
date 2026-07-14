@@ -104,12 +104,12 @@ async function loadSocialPositionBrain(gtmPackage = {}) {
       assets = {}
 
     } = gtmPackage;
-
+console.log("selectedPlatforms:", selectedPlatforms);
+console.log("socialMediaLinks:", gtmPackage.socialMediaLinks);
     if (!selectedPlatforms.length) {
-
-      return socialReport;
-
-    }
+    console.log("EARLY RETURN - selectedPlatforms empty");
+    return socialReport;
+}
 
     /* ============================================================
        PLATFORM VALIDATION
