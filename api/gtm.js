@@ -136,12 +136,13 @@ const platforms = socialMediaLinks
         };
 
     });
-console.log("selectedPlatforms:", selectedPlatforms);
-console.log("socialMediaLinks:", gtmPackage.socialMediaLinks);
-    if (!platforms.length) {
-    console.log("EARLY RETURN - selectedPlatforms empty");
+console.log("platforms:", platforms);
+console.log("socialMediaLinks:", socialMediaLinks);
+
+if (!platforms.length) {
+    console.log("EARLY RETURN - platforms empty");
     return socialReport;
-}
+    }
 
     /* ============================================================
        PLATFORM VALIDATION
