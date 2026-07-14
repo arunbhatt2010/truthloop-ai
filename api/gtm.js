@@ -941,11 +941,25 @@ Return JSON only.
 
         });
 
-        gtmReport.llmResponse = llmResponse;
+        const llmResponse = await callGTMModel({
+    systemPrompt,
+    compressedInput
+});
 
-        gtmReport.success = true;
-      const aiMessage =
-            llmResponse?.choices?.[0]?.message?.content || "";
+console.log(
+    "RAW LLM RESPONSE:",
+    JSON.stringify(llmResponse, null, 2)
+);
+
+gtmReport.llmResponse = llmResponse;
+
+gtmReport.success = true;
+
+const aiMessage =
+    llmResponse?.choices?.[0]?.message?.content || "";
+
+console.log("AI MESSAGE:");
+console.log(aiMessage);
 
         try {
 
