@@ -1044,10 +1044,10 @@ console.log(
 );
 
 const gtmReport =
-    await loadGTMIntelligenceBrain({
+    await loadGTMIntelligenceBrain(
         socialReport,
         scopeReport
-    });
+    );
   // Social Position Brain
 
   // Scope Position Brain
