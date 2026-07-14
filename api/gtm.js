@@ -941,10 +941,7 @@ Return JSON only.
 
         });
 
-        const llmResponse = await callGTMModel({
-    systemPrompt,
-    compressedInput
-});
+        
 
 console.log(
     "RAW LLM RESPONSE:",
