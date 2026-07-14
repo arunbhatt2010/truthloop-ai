@@ -878,15 +878,21 @@ console.log("SCOPE REPORT:", JSON.stringify(scopeReport, null, 2));
 
         };
 
-        const compressedInput = JSON.stringify(
+        console.log(
+  "INTELLIGENCE CONTEXT:",
+  JSON.stringify(intelligenceContext, null, 2)
+);
 
-            intelligenceContext,
+const compressedInput = JSON.stringify(
+    intelligenceContext,
+    null,
+    2
+);
 
-            null,
-
-            2
-
-        );
+console.log(
+  "COMPRESSED INPUT:",
+  compressedInput
+);
       /* ==========================================
            BUILD LLM PROMPT & REASONING
         ========================================== */
