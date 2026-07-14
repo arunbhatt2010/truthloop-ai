@@ -99,14 +99,46 @@ async function loadSocialPositionBrain(gtmPackage = {}) {
 
     const {
 
-      selectedPlatforms = [],
+    socialMediaLinks = [],
 
-      assets = {}
+    assets = {}
 
-    } = gtmPackage;
+} = gtmPackage;
+
+const platforms = socialMediaLinks
+    .filter(url => typeof url === "string" && url.trim())
+    .map(url => {
+
+        let platform = "website";
+
+        try {
+
+            const host = new URL(url)
+                .hostname
+                .replace(/^www\./i, "");
+
+            platform = host
+                .split(".")[0]
+                .toLowerCase();
+
+        } catch {
+
+            platform = "unknown";
+
+        }
+
+        return {
+
+            name: platform,
+
+            url: url.trim()
+
+        };
+
+    });
 console.log("selectedPlatforms:", selectedPlatforms);
 console.log("socialMediaLinks:", gtmPackage.socialMediaLinks);
-    if (!selectedPlatforms.length) {
+    if (!platforms.length) {
     console.log("EARLY RETURN - selectedPlatforms empty");
     return socialReport;
 }
@@ -117,7 +149,7 @@ console.log("socialMediaLinks:", gtmPackage.socialMediaLinks);
 
     const validPlatforms = [];
 
-    for (const platform of selectedPlatforms) {
+    for (const platform of platforms) {
 
       if (!platform) {
         continue;
