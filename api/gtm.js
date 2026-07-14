@@ -404,7 +404,7 @@ if (!platforms.length) {
 
     socialReport.confidence = 10;
 
-    
+    return socialReport;
 
     }
 
