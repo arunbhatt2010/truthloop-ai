@@ -1728,7 +1728,49 @@ alert("2");
       alert("3");
 alert(JSON.stringify(data));
         console.log("[GTM RESULT]", data);
+// Hide GTM screen
+document.getElementById("gtmScreen").style.display = "none";
 
+// Show output
+document.getElementById("outputBox").style.display = "block";
+
+// Render report
+outputBox.innerHTML = `
+<div class="aiResponse">
+
+<h2>📊 Your Market Position</h2>
+
+<p><b>Current Position</b><br>
+${data.currentPosition || data.marketPosition || "Unknown"}
+</p>
+
+<p><b>Positioning Gap</b><br>
+${data.positioningGap || ""}
+</p>
+
+<p><b>Hidden Opportunities</b></p>
+
+<ul>
+${(data.hiddenOpportunities || []).map(x => `<li>${x}</li>`).join("")}
+</ul>
+
+<p><b>Messaging Direction</b></p>
+<p>${data.messagingDirection || ""}</p>
+
+<p><b>Content Direction</b></p>
+<p>${data.contentDirection || ""}</p>
+
+<p><b>Offer Direction</b></p>
+<p>${data.offerDirection || ""}</p>
+
+<p><b>Action Plan</b></p>
+
+<ul>
+${(data.actionPlan || []).map(x => `<li>${x}</li>`).join("")}
+</ul>
+
+</div>
+`;
     }
 
     catch (error) {
