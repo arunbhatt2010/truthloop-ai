@@ -33,9 +33,32 @@ export async function loadProfileSystemBrain() {
    PLATFORM DISCOVERY ENGINE
 ============================================================ */
 
-async function PlatformDiscoveryEngine() {
+async function PlatformDiscoveryEngine(
+    socialMediaLinks
+) {
 
-    ...
+    const platform =
+        detectPlatform(
+            socialMediaLinks
+        );
+
+    const priority =
+        detectPriority(
+            platform
+        );
+
+    const platformRegistry =
+        buildPlatformRegistry({
+
+            socialMediaLinks,
+
+            platform,
+
+            priority
+
+        });
+
+    return platformRegistry;
 
 }
 
@@ -43,22 +66,71 @@ async function PlatformDiscoveryEngine() {
    DETECT PLATFORM
 ============================================================ */
 
-function detectPlatform() {
+function detectPlatform(url) {
 
-    ...
+    if (!url) return "unknown";
+
+    const value = url.toLowerCase();
+
+    if (value.includes("linkedin.com")) return "linkedin";
+    if (value.includes("github.com")) return "github";
+    if (value.includes("x.com")) return "x";
+    if (value.includes("twitter.com")) return "x";
+    if (value.includes("facebook.com")) return "facebook";
+    if (value.includes("instagram.com")) return "instagram";
+    if (value.includes("youtube.com")) return "youtube";
+    if (value.includes("youtu.be")) return "youtube";
+    if (value.includes("reddit.com")) return "reddit";
+    if (value.includes("medium.com")) return "medium";
+    if (value.includes("indiehackers.com")) return "indiehackers";
+
+    return "website";
 
 }
-
 /* ============================================================
    DETECT PRIORITY
 ============================================================ */
 
-function detectPriority() {
+function detectPriority(platform) {
 
-    ...
+    switch (platform) {
+
+        case "linkedin":
+            return 1;
+
+        case "github":
+            return 2;
+
+        case "website":
+            return 3;
+
+        case "x":
+            return 4;
+
+        case "reddit":
+            return 5;
+
+        case "youtube":
+            return 6;
+
+        case "medium":
+            return 7;
+
+        case "facebook":
+            return 8;
+
+        case "instagram":
+            return 9;
+
+        case "indiehackers":
+            return 10;
+
+        default:
+            return 999;
+
+    }
 
 }
-
     /* ============================================================
    STAGE 2
    EVIDENCE COLLECTION ENGINE
