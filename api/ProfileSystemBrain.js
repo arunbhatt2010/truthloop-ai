@@ -341,17 +341,47 @@ function buildRawEvidence({
 
 async function IdentityEngine(rawEvidence) {
 
-    ...
+    const primaryIdentity =
+        detectPrimaryIdentity(
+            rawEvidence
+        );
+
+    const secondaryIdentities =
+        detectSecondaryIdentities(
+            rawEvidence
+        );
+
+    const roleSignals =
+        detectRoleSignals(
+            rawEvidence
+        );
+
+    return buildIdentityProfile({
+
+        primaryIdentity,
+
+        secondaryIdentities,
+
+        roleSignals
+
+    });
 
 }
-
 /* ============================================================
    DETECT PRIMARY IDENTITY
 ============================================================ */
 
-function detectPrimaryIdentity() {
+function detectPrimaryIdentity(rawEvidence) {
 
-    ...
+    return {
+
+        type: null,
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
 
@@ -359,29 +389,63 @@ function detectPrimaryIdentity() {
    DETECT SECONDARY IDENTITIES
 ============================================================ */
 
-function detectSecondaryIdentities() {
+function detectSecondaryIdentities(rawEvidence) {
 
-    ...
+    return {
+
+        identities: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    DETECT ROLE SIGNALS
 ============================================================ */
 
-function detectRoleSignals() {
+function detectRoleSignals(rawEvidence) {
 
-    ...
+    return {
+
+        signals: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    BUILD IDENTITY PROFILE
 ============================================================ */
 
-function buildIdentityProfile() {
+function buildIdentityProfile({
 
-    ...
+    primaryIdentity,
+
+    secondaryIdentities,
+
+    roleSignals
+
+}) {
+
+    return {
+
+        primaryIdentity,
+
+        secondaryIdentities,
+
+        roleSignals,
+
+        profileVersion: "1.0",
+
+        generatedAt: new Date().toISOString()
+
+    };
 
 }
 
