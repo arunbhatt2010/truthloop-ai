@@ -782,27 +782,81 @@ function buildContentProfile({
 
 async function AudienceEngine(rawEvidence) {
 
-    ...
+    const audienceType =
+        detectAudienceType(
+            rawEvidence
+        );
+
+    const audienceQuality =
+        detectAudienceQuality(
+            rawEvidence
+        );
+
+    const decisionMakers =
+        detectDecisionMakers(
+            rawEvidence
+        );
+
+    const communitySignals =
+        detectCommunitySignals(
+            rawEvidence
+        );
+
+    return buildAudienceProfile({
+
+        audienceType,
+
+        audienceQuality,
+
+        decisionMakers,
+
+        communitySignals
+
+    });
 
 }
-
 /* ============================================================
    DETECT AUDIENCE TYPE
 ============================================================ */
 
-function detectAudienceType() {
+function detectAudienceType(rawEvidence) {
 
-    ...
+    return {
+
+        primaryAudience: [],
+
+        secondaryAudience: [],
+
+        audienceMix: null,
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    DETECT AUDIENCE QUALITY
 ============================================================ */
 
-function detectAudienceQuality() {
+function detectAudienceQuality(rawEvidence) {
 
-    ...
+    return {
+
+        quality: null,
+
+        engagementLevel: null,
+
+        audienceRelevance: null,
+
+        credibilitySignals: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
 
@@ -810,9 +864,21 @@ function detectAudienceQuality() {
    DETECT DECISION MAKERS
 ============================================================ */
 
-function detectDecisionMakers() {
+function detectDecisionMakers(rawEvidence) {
 
-    ...
+    return {
+
+        detectedRoles: [],
+
+        estimatedPresence: null,
+
+        decisionMakerSignals: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
 
@@ -820,9 +886,23 @@ function detectDecisionMakers() {
    DETECT COMMUNITY SIGNALS
 ============================================================ */
 
-function detectCommunitySignals() {
+function detectCommunitySignals(rawEvidence) {
 
-    ...
+    return {
+
+        communityStrength: null,
+
+        repeatContributors: [],
+
+        engagementPatterns: [],
+
+        relationshipSignals: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
 
@@ -830,9 +910,33 @@ function detectCommunitySignals() {
    BUILD AUDIENCE PROFILE
 ============================================================ */
 
-function buildAudienceProfile() {
+function buildAudienceProfile({
 
-    ...
+    audienceType,
+
+    audienceQuality,
+
+    decisionMakers,
+
+    communitySignals
+
+}) {
+
+    return {
+
+        audienceType,
+
+        audienceQuality,
+
+        decisionMakers,
+
+        communitySignals,
+
+        profileVersion: "1.0",
+
+        generatedAt: new Date().toISOString()
+
+    };
 
 }
 
