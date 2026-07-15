@@ -132,6 +132,26 @@ function detectPriority(platform) {
 
 }
 /* ============================================================
+   PLATFORM ADAPTER LAYER
+
+   This layer converts platform-specific public data
+   into a universal normalized format.
+
+   The rest of the Profile System Brain never accesses
+   platform-specific implementations directly.
+
+============================================================ */
+async function loadPlatformAdapter(platformRegistry) { ... }
+
+async function fetchPublicProfile(adapter) { ... }
+
+async function fetchPublicContent(adapter) { ... }
+
+async function fetchPublicActivity(adapter) { ... }
+
+async function fetchPublicAuthority(adapter) { ... }
+
+/* ============================================================
    ENGINEERING RULE
 
    Every collector must be platform-agnostic.
