@@ -1708,7 +1708,7 @@ async function runGTMAnalysis() {
     ];
 
     try {
-      alert("1");
+      
 console.log("[GTM PACKAGE]", truthLoopPackage);
         const response = await fetch("/api/gtm", {
 
@@ -1723,11 +1723,11 @@ console.log("[GTM PACKAGE]", truthLoopPackage);
             body: JSON.stringify(truthLoopPackage)
 
         });
-alert("2");
+
         const data = await response.json();
       const report = data.gtmReport || data;
-      alert("3");
-alert(JSON.stringify(data, null, 2));
+      
+
         console.log("[GTM RESULT]", data);
       console.log(document.getElementById("gtmScreen"));
 console.log(document.getElementById("outputBox"));
@@ -1778,7 +1778,7 @@ ${(report.actionPlan || []).map(x => `<li>${x}</li>`).join("")}
     }
 
     catch (error) {
-alert(error.message);
+
         console.error("[GTM]", error);
 
     }
