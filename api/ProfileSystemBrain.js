@@ -138,7 +138,37 @@ function detectPriority(platform) {
 
 async function EvidenceCollectionEngine(platformRegistry) {
 
-    ...
+    const profileEvidence =
+        await collectProfileEvidence(
+            platformRegistry
+        );
+
+    const contentEvidence =
+        await collectContentEvidence(
+            platformRegistry
+        );
+
+    const activityEvidence =
+        await collectActivityEvidence(
+            platformRegistry
+        );
+
+    const authorityEvidence =
+        await collectAuthorityEvidence(
+            platformRegistry
+        );
+
+    return buildRawEvidence({
+
+        profileEvidence,
+
+        contentEvidence,
+
+        activityEvidence,
+
+        authorityEvidence
+
+    });
 
 }
 
@@ -146,49 +176,161 @@ async function EvidenceCollectionEngine(platformRegistry) {
    COLLECT PROFILE EVIDENCE
 ============================================================ */
 
-async function collectProfileEvidence() {
+async function collectProfileEvidence(platformRegistry) {
 
-    ...
+    return {
+
+        headline: null,
+
+        about: null,
+
+        bio: null,
+
+        website: null,
+
+        featured: [],
+
+        pinnedContent: [],
+
+        products: [],
+
+        services: [],
+
+        projects: [],
+
+        profileImage: null,
+
+        cta: null,
+
+        sourcePlatforms: platformRegistry
+
+    };
 
 }
-
 /* ============================================================
    COLLECT CONTENT EVIDENCE
 ============================================================ */
 
-async function collectContentEvidence() {
+async function collectContentEvidence(platformRegistry) {
 
-    ...
+    return {
+
+        posts: [],
+
+        comments: [],
+
+        articles: [],
+
+        media: [],
+
+        primaryTopics: [],
+
+        secondaryTopics: [],
+
+        repeatedTopics: [],
+
+        ignoredTopics: [],
+
+        writingStyle: null,
+
+        teachingStyle: null,
+
+        contentFormats: [],
+
+        sourcePlatforms: platformRegistry
+
+    };
 
 }
-
 /* ============================================================
    COLLECT ACTIVITY EVIDENCE
 ============================================================ */
 
-async function collectActivityEvidence() {
+async function collectActivityEvidence(platformRegistry) {
 
-    ...
+    return {
+
+        postingFrequency: null,
+
+        commentFrequency: null,
+
+        lastActivity: null,
+
+        recent90Days: [],
+
+        consistency: null,
+
+        activityStatus: null,
+
+        platformUsage: {},
+
+        sourcePlatforms: platformRegistry
+
+    };
 
 }
-
 /* ============================================================
    COLLECT AUTHORITY EVIDENCE
 ============================================================ */
 
-async function collectAuthorityEvidence() {
+async function collectAuthorityEvidence(platformRegistry) {
 
-    ...
+    return {
+
+        projects: [],
+
+        products: [],
+
+        openSource: [],
+
+        speaking: [],
+
+        writing: [],
+
+        mediaMentions: [],
+
+        testimonials: [],
+
+        caseStudies: [],
+
+        authoritySignals: [],
+
+        sourcePlatforms: platformRegistry
+
+    };
 
 }
-
 /* ============================================================
    BUILD RAW EVIDENCE
 ============================================================ */
 
-function buildRawEvidence() {
+function buildRawEvidence({
 
-    ...
+    profileEvidence,
+
+    contentEvidence,
+
+    activityEvidence,
+
+    authorityEvidence
+
+}) {
+
+    return {
+
+        profile: profileEvidence,
+
+        content: contentEvidence,
+
+        activity: activityEvidence,
+
+        authority: authorityEvidence,
+
+        collectedAt: new Date().toISOString(),
+
+        version: "1.0"
+
+    };
 
 }
 
