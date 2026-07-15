@@ -1621,7 +1621,7 @@ function detectPositionAlignment({
 
 }
 /* ============================================================
-   BUILD POSITION PROFILE
+   DETECT POSITION EVIDENCE
 ============================================================ */
 
 function detectPositionEvidence({
