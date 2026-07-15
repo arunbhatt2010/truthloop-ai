@@ -131,6 +131,31 @@ function detectPriority(platform) {
     }
 
 }
+/* ============================================================
+   ENGINEERING RULE
+
+   Every collector must be platform-agnostic.
+
+   Input  : Platform Registry
+
+   Output : Normalized Evidence Object
+
+   Collectors never perform:
+
+   - Platform specific logic
+   - Hard-coded platform checks
+   - Identity inference
+   - Position inference
+   - Trust inference
+   - GTM reasoning
+
+   They only collect, normalize and validate
+   publicly available evidence.
+
+   Platform-specific implementations belong only
+   to the Platform Adapter Layer.
+
+============================================================ */
     /* ============================================================
    STAGE 2
    EVIDENCE COLLECTION ENGINE
