@@ -1345,57 +1345,249 @@ async function PositionEngine({
 
 }) {
 
-    ...
+    const currentPosition =
+        detectCurrentPosition({
+
+            identity,
+
+            activity,
+
+            authority
+
+        });
+
+    const marketPosition =
+        detectMarketPosition({
+
+            content,
+
+            audience,
+
+            authority
+
+        });
+
+    const perceivedPosition =
+        detectPerceivedPosition({
+
+            audience,
+
+            content,
+
+            trust
+
+        });
+
+    const claimedPosition =
+        detectClaimedPosition({
+
+            rawEvidence
+
+        });
+
+    const observedPosition =
+        detectObservedPosition({
+
+            rawEvidence,
+
+            identity,
+
+            activity,
+
+            authority
+
+        });
+
+    const positionAlignment =
+        detectPositionAlignment({
+
+            claimedPosition,
+
+            observedPosition,
+
+            perceivedPosition
+
+        });
+
+    const positionEvidence =
+        detectPositionEvidence({
+
+            rawEvidence
+
+        });
+
+    return buildPositionProfile({
+
+        currentPosition,
+
+        marketPosition,
+
+        perceivedPosition,
+
+        claimedPosition,
+
+        observedPosition,
+
+        positionAlignment,
+
+        positionEvidence
+
+    });
 
 }
-
 /* ============================================================
    DETECT CURRENT POSITION
 ============================================================ */
 
-function detectCurrentPosition() {
+function detectCurrentPosition({
 
-    ...
+    identity,
+
+    activity,
+
+    authority
+
+}) {
+
+    return {
+
+        currentRole: null,
+
+        currentIdentity: null,
+
+        currentAuthorityLevel: null,
+
+        currentVisibility: null,
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    DETECT MARKET POSITION
 ============================================================ */
 
-function detectMarketPosition() {
+function detectMarketPosition({
 
-    ...
+    content,
+
+    audience,
+
+    authority
+
+}) {
+
+    return {
+
+        category: null,
+
+        niche: null,
+
+        marketPresence: null,
+
+        differentiationSignals: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    DETECT PERCEIVED POSITION
 ============================================================ */
 
-function detectPerceivedPosition() {
+function detectPerceivedPosition({
 
-    ...
+    audience,
+
+    content,
+
+    trust
+
+}) {
+
+    return {
+
+        perceivedRole: null,
+
+        perceivedExpertise: null,
+
+        perceivedTrust: null,
+
+        perceptionSignals: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    DETECT CLAIMED POSITION
 ============================================================ */
 
-function detectClaimedPosition() {
+function detectClaimedPosition({
 
-    ...
+    rawEvidence
+
+}) {
+
+    return {
+
+        headline: null,
+
+        tagline: null,
+
+        claimedRole: null,
+
+        claimedExpertise: [],
+
+        valueProposition: null,
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    DETECT OBSERVED POSITION
 ============================================================ */
 
-function detectObservedPosition() {
+function detectObservedPosition({
 
-    ...
+    rawEvidence,
+
+    identity,
+
+    activity,
+
+    authority
+
+}) {
+
+    return {
+
+        observedRole: null,
+
+        observedExpertise: [],
+
+        observedStrengths: [],
+
+        observedFocus: null,
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
 
@@ -1403,31 +1595,101 @@ function detectObservedPosition() {
    DETECT POSITION ALIGNMENT
 ============================================================ */
 
-function detectPositionAlignment() {
+function detectPositionAlignment({
 
-    ...
+    claimedPosition,
+
+    observedPosition,
+
+    perceivedPosition
+
+}) {
+
+    return {
+
+        alignmentLevel: null,
+
+        alignmentSignals: [],
+
+        contradictions: [],
+
+        confidence: 0,
+
+        evidence: []
+
+    };
 
 }
-
 /* ============================================================
    BUILD POSITION PROFILE
 ============================================================ */
 
-function buildPositionProfile() {
+function detectPositionEvidence({
 
-    ...
+    rawEvidence
+
+}) {
+
+    return {
+
+        evidenceSources: [],
+
+        evidenceCount: 0,
+
+        evidenceQuality: null,
+
+        coverage: null,
+
+        confidence: 0
+
+    };
 
 }
 /* ============================================================
-   DETECT POSITION EVIDENCE
+   BUILD POSITION PROFILE 
 ============================================================ */
 
-function detectPositionEvidence() {
+function buildPositionProfile({
 
-    ...
+    currentPosition,
+
+    marketPosition,
+
+    perceivedPosition,
+
+    claimedPosition,
+
+    observedPosition,
+
+    positionAlignment,
+
+    positionEvidence
+
+}) {
+
+    return {
+
+        currentPosition,
+
+        marketPosition,
+
+        perceivedPosition,
+
+        claimedPosition,
+
+        observedPosition,
+
+        positionAlignment,
+
+        positionEvidence,
+
+        profileVersion: "1.0",
+
+        generatedAt: new Date().toISOString()
+
+    };
 
 }
-
     /* ============================================================
    STAGE 10
    PROFILE CARD BUILDER
