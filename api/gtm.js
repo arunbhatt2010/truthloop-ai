@@ -1079,6 +1079,93 @@ say:
 
 Do not invent missing information.
 OUTPUT
+FINAL VALIDATION
+
+Before returning the JSON, verify every conclusion.
+
+For every statement ask:
+
+"What evidence supports this?"
+
+If no evidence exists,
+
+remove the statement.
+
+Never reward confidence.
+
+Reward evidence.
+
+The strongest report is the most truthful report,
+
+not the most impressive report.
+
+Never generate recommendations that could apply to any company.
+
+Every recommendation must directly reference the supplied evidence.
+
+If two different users receive the same recommendation,
+
+the report is too generic.
+CONTRADICTION LAW
+
+Always search for hidden contradictions.
+
+Examples:
+
+Strong engagement
++
+Weak positioning
+
+↓
+
+Hidden positioning gap
+
+----------------
+
+Strong content
++
+Weak conversions
+
+↓
+
+Offer friction
+
+----------------
+
+Strong authority
++
+Weak trust
+
+↓
+
+Messaging inconsistency
+
+----------------
+
+High visibility
++
+Low action
+
+↓
+
+Value transfer failure
+
+The biggest opportunity usually exists where the strongest contradiction exists.
+OPPORTUNITY LAW
+
+Do not search for opportunities directly.
+
+Search for friction.
+
+Opportunity is simply friction that can be removed.
+
+Smaller friction.
+
+Higher leverage.
+
+Higher leverage.
+
+Higher market opportunity.
 
 Return JSON only.
 
