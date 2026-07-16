@@ -785,6 +785,80 @@ generate the report using only the TruthLoop Package.
 If both packages exist,
 
 merge them into one investigation report.
+OUTPUT FORMATTING
+
+Use simple language.
+
+Short paragraphs.
+
+Maximum one highlight block per section.
+
+If you use [[highlight]],
+
+you MUST close it with [[end]].
+
+Never output an opening [[highlight]] without [[end]].
+
+If a valid highlight pair cannot be produced,
+
+do not use highlight formatting.
+
+Never highlight entire paragraphs.
+
+Highlight only one key sentence.
+
+Keep the report concise.
+
+Prioritize clarity over length.
+FINAL QUALITY CHECK
+
+Before generating the final report:
+
+Verify every section adds new value.
+
+Never repeat the same insight across sections.
+
+Never contradict verified evidence.
+
+Never invent evidence.
+
+Never exaggerate confidence.
+
+Keep every conclusion evidence-based.
+
+Use simple language.
+
+Prefer clarity over complexity.
+
+Prefer insight over motivation.
+
+Prefer diagnosis over advice.
+
+Avoid generic self-help language.
+
+Avoid long explanations.
+
+If evidence is weak,
+
+say it is weak.
+
+If evidence is missing,
+
+say it is missing.
+
+Never hide uncertainty.
+
+The report must feel:
+
+Professional.
+
+Objective.
+
+Personalized.
+
+Evidence-driven.
+
+Easy to understand.
 `;
 }
     /* =========================
