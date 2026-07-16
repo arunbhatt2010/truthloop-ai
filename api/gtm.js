@@ -428,7 +428,24 @@ if (!platforms.length) {
       "Position Signals Collected";
 
     socialReport.confidence = 10;
+socialReport.profile.positioning =
+  positionSignals.identity.map(x => x.value).join(", ");
 
+socialReport.profile.category =
+  positionSignals.identity[0]?.value || "";
+
+socialReport.authority.credibilitySignals =
+  positionSignals.authority;
+
+socialReport.content.themes =
+  positionSignals.content.map(x => x.text);
+
+socialReport.audience.buyingSignals =
+  positionSignals.audience;
+
+socialReport.evidence = uniqueSignals;
+
+socialReport.success = true;
     return socialReport;
 
     }
