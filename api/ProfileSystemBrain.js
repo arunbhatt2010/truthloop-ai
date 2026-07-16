@@ -331,20 +331,148 @@ async function ProfileMainBrain({
 
     try {
 
-        // STEP 1
-        // Parse LLM JSON
+        /* ==========================================
+   STEP 1
+   Receive Profile Evidence
+========================================== */
 
-        // STEP 2
-        // Validate Evidence
+const rawEvidence =
 
-        // STEP 3
-        // Normalize Evidence
+    profileEvidence.evidence;
 
-        // STEP 4
-        // Refine Evidence
+if (!rawEvidence) {
 
-        // STEP 5
-        // Compress Evidence
+    throw new Error(
+
+        "No public profile evidence received."
+
+    );
+
+}
+
+        /* ==========================================
+   STEP 2
+   Validate Evidence
+========================================== */
+
+if (
+
+    typeof rawEvidence !== "string"
+
+) {
+
+    throw new Error(
+
+        "Invalid evidence format."
+
+    );
+
+}
+
+if (
+
+    !rawEvidence.trim()
+
+) {
+
+    throw new Error(
+
+        "Evidence is empty."
+
+    );
+
+   }
+
+        /* ==========================================
+   STEP 3
+   Normalize Evidence
+========================================== */
+
+const normalizedEvidence = {
+
+    profileLink:
+        profileEvidence.profileLink,
+
+    collectedAt:
+        profileEvidence.timestamp,
+
+    provider:
+        profileEvidence.provider,
+
+    model:
+        profileEvidence.model,
+
+    publicEvidence:
+        rawEvidence.trim(),
+
+    truthLoopPackage
+
+};
+
+        /* ==========================================
+   STEP 4
+   Refine Evidence
+========================================== */
+
+const refinedEvidence = {
+
+    mission:
+        "Build one verified public evidence package.",
+
+    rules: [
+
+        "Collect public evidence only.",
+
+        "Never guess.",
+
+        "Never invent information.",
+
+        "Validate every signal.",
+
+        "Normalize duplicate evidence.",
+
+        "Remove weak evidence.",
+
+        "Keep only reusable evidence.",
+
+        "Evidence first. Conclusions later."
+
+    ],
+
+    evidence:
+        normalizedEvidence
+
+};
+
+        /* ==========================================
+   STEP 5
+   Compress Evidence
+========================================== */
+
+evidencePackage.evidence = {
+
+    source: "ProfileSystemBrain",
+
+    provider:
+        normalizedEvidence.provider,
+
+    profileLink:
+        normalizedEvidence.profileLink,
+
+    collectedAt:
+        normalizedEvidence.collectedAt,
+
+    evidence:
+        refinedEvidence.evidence,
+
+    rules:
+        refinedEvidence.rules
+
+};
+
+evidencePackage.success = true;
+
+return evidencePackage;
 
         evidencePackage.success = true;
 
