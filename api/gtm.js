@@ -854,35 +854,55 @@ console.log("scopeReport.scopeReport:", scopeReport.scopeReport);
 
         const intelligenceContext = {
 
-            social: {
+    evidence: {
 
-                identity,
+        socialPosition: {
 
-                authority: authoritySignals,
+            identity,
 
-                trust: trustSignals,
+            authoritySignals,
 
-                audience: audienceSignals,
+            trustSignals,
 
-                content: contentSignals
+            audienceSignals,
 
-            },
+            contentSignals
 
-            scope: {
+        },
 
-                category: detectedCategory,
+        scopePosition: {
 
-                primary: primaryScope,
+            detectedCategory,
 
-                secondary: secondaryScope,
+            primaryScope,
 
-                signals: categorySignals
+            secondaryScope,
 
-            },
+            categorySignals
 
-            profile: userProfile
+        },
 
-        };
+        profile: userProfile
+
+    },
+
+    reasoningRules: {
+
+        evidenceFirst: true,
+
+        noAssumptions: true,
+
+        noGenericAdvice: true,
+
+        requireEvidence: true,
+
+        requireContradictions: true,
+
+        requireRepeatedSignals: true
+
+    }
+
+};
 
         console.log(
   "INTELLIGENCE CONTEXT:",
