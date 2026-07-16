@@ -474,10 +474,7 @@ evidencePackage.success = true;
 
 return evidencePackage;
 
-        evidencePackage.success = true;
-
-        return evidencePackage;
-
+        
     }
 
     catch (error) {
