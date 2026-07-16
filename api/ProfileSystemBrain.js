@@ -130,7 +130,176 @@ if (!evidencePackage.success) {
     // Return Evidence Package
 return evidencePackage;
 }
-async function ProfileIntelligenceAPI() {
+async function ProfileIntelligenceAPI({
+
+    profileLink,
+
+    truthLoopPackage,
+
+    currentLoop,
+
+    provider = "Cerebras"
+
+}) {
+
+    const intelligence = {
+
+        success: false,
+
+        provider,
+
+        model: null,
+
+        profileLink,
+
+        timestamp:
+
+            new Date().toISOString(),
+
+        rawResponse: null,
+
+        evidence: null,
+
+        errors: []
+
+    };
+
+    try {
+
+const model = "gpt-oss-120b";
+
+const endpoint =
+    "https://api.cerebras.ai/v1/chat/completions";
+
+intelligence.model = model;
+
+const systemPrompt = `
+You are TruthLoop Profile Intelligence.
+
+Mission:
+
+Collect only publicly available evidence.
+
+Never guess.
+
+Never infer.
+
+Never create stories.
+
+Never generate GTM.
+
+Never generate advice.
+
+Normalize all evidence.
+
+Validate every signal.
+
+Return only structured JSON.
+
+`;
+       const userPrompt = `
+PROFILE LINK
+
+${profileLink}
+
+CURRENT LOOP
+
+${currentLoop}
+
+TRUTHLOOP PACKAGE
+
+${JSON.stringify(truthLoopPackage, null, 2)}
+`;
+
+const requestBody = {
+
+    model,
+
+    messages: [
+
+        {
+            role: "system",
+            content: systemPrompt
+        },
+
+        {
+            role: "user",
+            content: userPrompt
+        }
+
+    ],
+
+    temperature: 0.1,
+
+    response_format: {
+        type: "json_object"
+    }
+
+};
+       const response = await fetch(endpoint, {
+
+    method: "POST",
+
+    headers: {
+
+        "Content-Type": "application/json",
+
+        "Authorization":
+            `Bearer ${process.env.CEREBRAS_API_KEY}`
+
+    },
+
+    body: JSON.stringify(requestBody)
+
+});
+
+if (!response.ok) {
+
+    intelligence.errors.push(
+
+        `HTTP ${response.status}`
+
+    );
+
+    return intelligence;
+
+}
+
+const result = await response.json();
+intelligence.rawResponse = result;
+
+const content =
+    result?.choices?.[0]?.message?.content;
+
+if (!content) {
+
+    intelligence.errors.push(
+        "No response content returned."
+    );
+
+    return intelligence;
+
+}
+
+intelligence.evidence = content;
+
+intelligence.success = true;
+
+return intelligence;
+
+    }
+
+    catch (error) {
+
+        intelligence.errors.push(
+
+            error.message
+
+        );
+
+        return intelligence;
+
+    }
 
 }
 
