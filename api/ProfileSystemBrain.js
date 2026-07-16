@@ -1057,27 +1057,58 @@ async function collectActivityEvidence(platformRegistry) {
 
 async function collectAuthorityEvidence(platformRegistry) {
 
+    const adapter =
+        await loadPlatformAdapter(
+            platformRegistry
+        );
+
+    const authority =
+        await fetchPublicAuthority(
+            adapter
+        );
+
     return {
 
-        projects: [],
+        success: true,
 
-        products: [],
+        platform:
+            adapter.platform,
 
-        openSource: [],
+        collectedAt:
+            new Date().toISOString(),
 
-        speaking: [],
+        projects:
+            authority.projects || [],
 
-        writing: [],
+        products:
+            authority.products || [],
 
-        mediaMentions: [],
+        openSource:
+            authority.openSource || [],
 
-        testimonials: [],
+        speaking:
+            authority.speaking || [],
 
-        caseStudies: [],
+        writing:
+            authority.writing || [],
 
-        authoritySignals: [],
+        mediaMentions:
+            authority.mediaMentions || [],
 
-        sourcePlatforms: platformRegistry
+        testimonials:
+            authority.testimonials || [],
+
+        caseStudies:
+            authority.caseStudies || [],
+
+        authoritySignals:
+            authority.authoritySignals || [],
+
+        credibilityScore:
+            authority.credibilityScore || null,
+
+        expertiseAreas:
+            authority.expertiseAreas || []
 
     };
 
@@ -1100,21 +1131,56 @@ function buildRawEvidence({
 
     return {
 
-        profile: profileEvidence,
+        success: true,
 
-        content: contentEvidence,
+        collectedAt:
+            new Date().toISOString(),
 
-        activity: activityEvidence,
+        version: "2.0",
 
-        authority: authorityEvidence,
+        profile:
+            profileEvidence,
 
-        collectedAt: new Date().toISOString(),
+        content:
+            contentEvidence,
 
-        version: "1.0"
+        activity:
+            activityEvidence,
+
+        authority:
+            authorityEvidence,
+
+        evidenceSummary: {
+
+            profile:
+                !!profileEvidence,
+
+            content:
+                !!contentEvidence,
+
+            activity:
+                !!activityEvidence,
+
+            authority:
+                !!authorityEvidence
+
+        },
+
+        metadata: {
+
+            normalized: false,
+
+            validated: false,
+
+            compressed: false,
+
+            source: "Profile System Brain"
+
+        }
 
     };
 
-}
+   }
 
   /* ============================================================
    STAGE 3
