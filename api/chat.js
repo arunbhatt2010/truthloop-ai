@@ -1190,17 +1190,47 @@ reply += "\n\n" + q;
        🔥 FINAL PUSH
     ========================= */
 
-    if (loopLevel === 6) {
-
     return res.status(200).json({
 
-        reply,
+    reply,
 
-        profileCard: true,
+    profileCard: {
 
-        loopCompleted: 6
+        enabled: true,
 
-    });
+        recommended: true,
+
+        allowSkip: true,
+
+        supportedSources: [
+
+            "LinkedIn",
+
+            "GitHub",
+
+            "Portfolio",
+
+            "Website",
+
+            "X",
+
+            "Facebook",
+
+            "Reddit",
+
+            "YouTube",
+
+            "Medium",
+
+            "Substack"
+
+        ]
+
+    },
+
+    loopCompleted: 6
+
+});
 
                     }
 
