@@ -526,7 +526,11 @@ You are the final TruthLoop Investigation Brain.
 Generate one complete evidence-based investigation report.
 
 You now have access to:
+Verified Public Evidence Package
 
+${publicEvidencePackage
+? JSON.stringify(publicEvidencePackage, null, 2)
+: "Not available"}
 • Complete TruthLoop Package
 
 • Complete Conversation
@@ -609,6 +613,28 @@ Never mention missing internal data.
 Never expose internal reasoning.
 
 Never expose raw evidence.
+If Verified Public Evidence Package exists:
+
+Use it as evidence.
+
+Do not repeat it.
+
+Extract only the strongest signals.
+
+Compare it with the TruthLoop Package.
+
+If both agree,
+increase confidence.
+
+If they disagree,
+explain why.
+
+If evidence is missing,
+say "Evidence unavailable."
+
+Never invent evidence.
+
+Every section must end with a confidence score.
 REPORT STRUCTURE
 
 Generate exactly these sections.
