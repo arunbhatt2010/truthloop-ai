@@ -75,25 +75,50 @@ async function loadSocialPositionBrain(gtmPackage = {}) {
 
   const socialReport = {
 
-    identity: "Unknown",
+  success: false,
 
-    currentPosition: "Unknown",
+  profile: {
+    headline: "",
+    bio: "",
+    category: "",
+    positioning: "",
+    niche: "",
+    audience: ""
+  },
 
-    authoritySignals: [],
+  authority: {
+    followers: null,
+    postingFrequency: "",
+    engagementLevel: "",
+    credibilitySignals: []
+  },
 
-    trustSignals: [],
+  content: {
+    themes: [],
+    repeatedTopics: [],
+    messagingStyle: "",
+    ctaStyle: "",
+    postingPattern: ""
+  },
 
-    audienceSignals: [],
+  audience: {
+    idealAudience: "",
+    engagementPattern: "",
+    commentsQuality: "",
+    buyingSignals: []
+  },
 
-    contentSignals: [],
+  opportunities: [],
 
-    confidence: 0,
+  evidence: [],
 
-    analyzedPlatforms: [],
+  confidence: 0,
 
-    rawSignals: []
+  analyzedPlatforms: [],
 
-  };
+  rawSignals: []
+
+};
 
   try {
 
