@@ -37,3 +37,37 @@
    during Loop 7.
 
 ============================================================ */
+
+export async function loadProfileSystemBrain({
+
+    truthLoopPackage = {},
+
+    profileLink = "",
+
+    currentLoop = 7
+
+} = {}) {
+
+    // STEP 1
+    // Security
+
+    // STEP 2
+    // Input Validation
+
+    // STEP 3
+    // Profile Intelligence API
+
+    // STEP 4
+    // Profile Main Brain
+
+    // STEP 5
+    // Return Evidence Package
+
+}
+async function ProfileIntelligenceAPI() {
+
+}
+
+async function ProfileMainBrain() {
+
+}
