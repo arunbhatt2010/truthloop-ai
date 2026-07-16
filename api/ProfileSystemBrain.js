@@ -662,7 +662,119 @@ function detectPriority(platform) {
    platform-specific implementations directly.
 
 ============================================================ */
-async function loadPlatformAdapter(platformRegistry) { ... }
+async function loadPlatformAdapter(platformRegistry) {
+
+    if (!platformRegistry) {
+
+        return {
+
+            success: false,
+
+            reason: "Platform Registry Missing"
+
+        };
+
+    }
+
+    const {
+
+        platform = "unknown",
+
+        priority = 999,
+
+        socialMediaLinks = []
+
+    } = platformRegistry;
+
+    const adapter = {
+
+        success: true,
+
+        platform,
+
+        priority,
+
+        source:
+
+            socialMediaLinks[0] || null,
+
+        provider: {
+
+            name: "Profile Intelligence API",
+
+            version: "1.0",
+
+            publicOnly: true
+
+        },
+
+        permissions: {
+
+            allowPublicProfile: true,
+
+            allowPublicContent: true,
+
+            allowPublicActivity: true,
+
+            allowPublicAuthority: true,
+
+            allowPrivateData: false,
+
+            allowAuthentication: false,
+
+            allowCookies: false,
+
+            allowLogin: false
+
+        },
+
+        capabilities: {
+
+            identity: true,
+
+            career: true,
+
+            activity: true,
+
+            content: true,
+
+            audience: true,
+
+            authority: true,
+
+            trust: true,
+
+            position: true,
+
+            timeline: true,
+
+            consistency: true,
+
+            professionalSignals: true,
+
+            communicationSignals: true,
+
+            businessSignals: true,
+
+            behavioralSignals: true,
+
+            businessCareerRelationshipSignals: true,
+
+            reputationSignals: true,
+
+            credibilitySignals: true,
+
+            expertiseSignals: true,
+
+            communitySignals: true
+
+        }
+
+    };
+
+    return adapter;
+
+}
 
 async function fetchPublicProfile(adapter) { ... }
 
@@ -744,31 +856,76 @@ async function EvidenceCollectionEngine(platformRegistry) {
 
 async function collectProfileEvidence(platformRegistry) {
 
+    const adapter =
+        await loadPlatformAdapter(
+            platformRegistry
+        );
+
+    const profile =
+        await fetchPublicProfile(
+            adapter
+        );
+
     return {
 
-        headline: null,
+        success: true,
 
-        about: null,
+        platform:
+            adapter.platform,
 
-        bio: null,
+        source:
+            adapter.source,
 
-        website: null,
+        collectedAt:
+            new Date().toISOString(),
 
-        featured: [],
+        identity: {
 
-        pinnedContent: [],
+            fullName:
+                profile.fullName || null,
 
-        products: [],
+            username:
+                profile.username || null,
 
-        services: [],
+            profileUrl:
+                profile.profileUrl || null,
 
-        projects: [],
+            profileImage:
+                profile.profileImage || null
 
-        profileImage: null,
+        },
 
-        cta: null,
+        profile: {
 
-        sourcePlatforms: platformRegistry
+            headline:
+                profile.headline || null,
+
+            bio:
+                profile.bio || null,
+
+            about:
+                profile.about || null,
+
+            website:
+                profile.website || null,
+
+            location:
+                profile.location || null
+
+        },
+
+        career: {
+
+            currentRole:
+                profile.currentRole || null,
+
+            organization:
+                profile.organization || null,
+
+            industry:
+                profile.industry || null
+
+        }
 
     };
 
@@ -779,31 +936,61 @@ async function collectProfileEvidence(platformRegistry) {
 
 async function collectContentEvidence(platformRegistry) {
 
+    const adapter =
+        await loadPlatformAdapter(
+            platformRegistry
+        );
+
+    const content =
+        await fetchPublicContent(
+            adapter
+        );
+
     return {
 
-        posts: [],
+        success: true,
 
-        comments: [],
+        platform:
+            adapter.platform,
 
-        articles: [],
+        collectedAt:
+            new Date().toISOString(),
 
-        media: [],
+        posts:
+            content.posts || [],
 
-        primaryTopics: [],
+        comments:
+            content.comments || [],
 
-        secondaryTopics: [],
+        articles:
+            content.articles || [],
 
-        repeatedTopics: [],
+        media:
+            content.media || [],
 
-        ignoredTopics: [],
+        primaryTopics:
+            content.primaryTopics || [],
 
-        writingStyle: null,
+        secondaryTopics:
+            content.secondaryTopics || [],
 
-        teachingStyle: null,
+        repeatedTopics:
+            content.repeatedTopics || [],
 
-        contentFormats: [],
+        ignoredTopics:
+            content.ignoredTopics || [],
 
-        sourcePlatforms: platformRegistry
+        writingStyle:
+            content.writingStyle || null,
+
+        teachingStyle:
+            content.teachingStyle || null,
+
+        contentFormats:
+            content.contentFormats || [],
+
+        publishingPattern:
+            content.publishingPattern || null
 
     };
 
@@ -814,23 +1001,52 @@ async function collectContentEvidence(platformRegistry) {
 
 async function collectActivityEvidence(platformRegistry) {
 
+    const adapter =
+        await loadPlatformAdapter(
+            platformRegistry
+        );
+
+    const activity =
+        await fetchPublicActivity(
+            adapter
+        );
+
     return {
 
-        postingFrequency: null,
+        success: true,
 
-        commentFrequency: null,
+        platform:
+            adapter.platform,
 
-        lastActivity: null,
+        collectedAt:
+            new Date().toISOString(),
 
-        recent90Days: [],
+        postingFrequency:
+            activity.postingFrequency || null,
 
-        consistency: null,
+        commentFrequency:
+            activity.commentFrequency || null,
 
-        activityStatus: null,
+        lastActivity:
+            activity.lastActivity || null,
 
-        platformUsage: {},
+        recent90Days:
+            activity.recent90Days || [],
 
-        sourcePlatforms: platformRegistry
+        consistency:
+            activity.consistency || null,
+
+        activityStatus:
+            activity.activityStatus || null,
+
+        platformUsage:
+            activity.platformUsage || {},
+
+        activeHours:
+            activity.activeHours || [],
+
+        activeDays:
+            activity.activeDays || []
 
     };
 
