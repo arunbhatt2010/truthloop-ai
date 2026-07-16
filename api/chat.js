@@ -1180,8 +1180,17 @@ reply += "\n\n" + q;
 
     if (loopLevel === 6) {
 
-reply += "\n\nNow act.";
-}
+    return res.status(200).json({
+
+        reply,
+
+        profileCard: true,
+
+        loopCompleted: 6
+
+    });
+
+                    }
 
 if (loopLevel === 7) {
 
