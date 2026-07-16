@@ -1520,24 +1520,20 @@ If you prefer, you can continue without adding one.
 
 </div>
 
-<button
-id="loop7BridgeBtn"
-style="
-margin-top:18px;
-width:100%;
-padding:14px;
-border:none;
-border-radius:10px;
-background:#ff8c00;
-color:#fff;
-font-size:16px;
-font-weight:700;
-cursor:pointer;
+<div style="
+margin-top:14px;
+font-size:12px;
+line-height:1.6;
+color:#999;
 ">
 
-Continue →
+TruthLoop analyzes only publicly available information from the link you provide.
 
-</button>
+Providing a profile is recommended because it improves the accuracy of your personalized Loop 7 report.
+
+If you prefer, you can continue without adding one.
+
+</div>
 
 </div>
 `;
@@ -1626,7 +1622,11 @@ ${lastQuestion}
 }
 
 div.innerHTML = finalHtml;
+if (loopLevel === 6 && data.loop7EntryBridge?.enabled) {
 
+    div.innerHTML += renderLoop7EntryBridge();
+
+  }
 reflectionInput.style.display = "block";
 
 setTimeout(()=>{
