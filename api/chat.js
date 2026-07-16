@@ -492,6 +492,28 @@ Goal:
 User feels close to an important realization but not there yet.
 `;
           }
+    let publicEvidencePackage = null;
+
+if (loopLevel === 7 && profileLink.trim()) {
+
+  try {
+
+    publicEvidencePackage =
+      await loadProfileSystemBrain({
+        profileLink
+      });
+
+  } catch (e) {
+
+    console.error(
+      "PROFILE_SYSTEM_BRAIN_ERROR",
+      e
+    );
+
+    publicEvidencePackage = null;
+  }
+
+          }
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
