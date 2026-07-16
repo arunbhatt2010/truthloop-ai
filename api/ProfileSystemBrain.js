@@ -50,19 +50,85 @@ export async function loadProfileSystemBrain({
 
     // STEP 1
     // Security
+if (currentLoop !== 7) {
 
+    return {
+
+        success: false,
+
+        stage: "Security",
+
+        reason:
+            "Profile System Brain is available only after Loop 6."
+
+    };
+
+}
     // STEP 2
     // Input Validation
+if (
+    typeof profileLink !== "string" ||
+    !profileLink.trim()
+) {
 
+    return {
+
+        success: false,
+
+        stage: "Input Validation",
+
+        reason: "Public profile or website link is required."
+
+    };
+
+}
+
+const normalizedProfileLink =
+    profileLink.trim();
     // STEP 3
     // Profile Intelligence API
+const profileEvidence =
 
+    await ProfileIntelligenceAPI({
+
+        profileLink:
+            normalizedProfileLink,
+
+        truthLoopPackage,
+
+        currentLoop,
+
+        provider: "Cerebras"
+
+    });
+
+if (!profileEvidence.success) {
+
+    return profileEvidence;
+
+       }
     // STEP 4
     // Profile Main Brain
+const evidencePackage =
 
+    await ProfileMainBrain({
+
+        profileEvidence,
+
+        truthLoopPackage,
+
+        currentLoop
+
+    });
+
+if (!evidencePackage.success) {
+
+    return evidencePackage;
+
+   }
     // STEP 5
     // Return Evidence Package
-
+return evidencePackage;
 }
 async function ProfileIntelligenceAPI() {
 
