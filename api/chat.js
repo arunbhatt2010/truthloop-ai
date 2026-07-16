@@ -1,5 +1,7 @@
 import { runMasterBrain }
 from "./masterBrain.js";
+import { loadProfileSystemBrain }
+from "./ProfileSystemBrain.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -37,7 +39,8 @@ export default async function handler(req, res) {
   paid49 = false,
   paid199 = false,
   shownLoop5 = [],
-  currentCategory = ""
+  currentCategory = "",
+  profileLink = ""    
 } = body;
 /* =========================
    🧪 TEMP DEV GATE
