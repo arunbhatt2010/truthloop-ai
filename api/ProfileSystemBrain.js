@@ -38,22 +38,175 @@ export async function loadProfileSystemBrain({
        SECURITY
     ============================================================ */
 
-    // Loop Authorization
+/* ============================================================
+   LOOP AUTHORIZATION
+============================================================ */
 
-    // Input Validation
+const security = {
 
-    // Permission Validation
+    authorized: false,
+
+    currentLoop,
+
+    requiredLoop: 7,
+
+    profileLinkProvided:
+        Boolean(profileLink),
+
+    timestamp:
+        new Date().toISOString()
+
+};
+
+if (currentLoop !== 7) {
+
+    return {
+
+        success: false,
+
+        stage: "Security",
+
+        reason:
+            "ProfileSystemBrain can only run after Loop 6 is complete.",
+
+        security
+
+    };
+
+}
+
+security.authorized = true;
+
+/* ============================================================
+   INPUT VALIDATION
+============================================================ */
+
+if (
+    typeof profileLink !== "string" ||
+    !profileLink.trim()
+) {
+
+    return {
+
+        success: false,
+
+        stage: "Input Validation",
+
+        reason:
+            "A public profile or website link is required.",
+
+        security
+
+    };
+
+}
+
+const normalizedProfileLink =
+    profileLink.trim();
+
+/* ============================================================
+   PERMISSION VALIDATION
+============================================================ */
+
+const permissions = {
+
+    allowPublicCollection: true,
+
+    allowPrivateCollection: false,
+
+    allowAuthentication: false,
+
+    allowCookies: false,
+
+    allowLogin: false,
+
+    source: "Public Signals Only"
+
+};
 
     /* ============================================================
        PHASE 2
        PROFILE INTELLIGENCE
     ============================================================ */
 
-    // Call Profile Intelligence API
+    /* ============================================================
+   PROFILE INTELLIGENCE API
+============================================================ */
 
-    // Validate API Response
+const intelligenceResponse =
+    await ProfileIntelligenceAPI({
 
-    // Build Shared Intelligence Dataset
+        profileLink:
+            normalizedProfileLink,
+
+        truthLoopPackage,
+
+        permissions,
+
+        security
+
+    });
+
+/* ============================================================
+   VALIDATE API RESPONSE
+============================================================ */
+
+if (
+    !intelligenceResponse ||
+    intelligenceResponse.success !== true
+) {
+
+    return {
+
+        success: false,
+
+        stage:
+            "Profile Intelligence",
+
+        reason:
+            "Unable to collect public profile signals.",
+
+        security,
+
+        permissions
+
+    };
+
+}
+
+    /* ============================================================
+   SHARED INTELLIGENCE DATASET
+============================================================ */
+
+const sharedIntelligence = {
+
+    success: true,
+
+    profileLink:
+        normalizedProfileLink,
+
+    collectedAt:
+        new Date().toISOString(),
+
+    truthLoopPackage,
+
+    security,
+
+    permissions,
+
+    intelligence:
+        intelligenceResponse,
+
+    rawData:
+        intelligenceResponse.rawData || {},
+
+    normalizedData:
+        intelligenceResponse.normalizedData || {},
+
+    metadata:
+        intelligenceResponse.metadata || {}
+
+};
 
     /* ============================================================
        PHASE 3
