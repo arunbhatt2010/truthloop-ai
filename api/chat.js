@@ -959,7 +959,7 @@ const vagueTerms = [
 ];
 
 if (
-  loopLevel <= 2 &&
+  loopLevel === 2 &&
   vagueTerms.some(term =>
     lowerMsg.includes(term)
   )
@@ -968,7 +968,7 @@ if (
 }
 
 if (
-  loopLevel <= 2 &&
+  loopLevel === 2 &&
   lastUserMessage.trim().split(/\s+/).length < 8
 ) {
   contextMissing = true;
