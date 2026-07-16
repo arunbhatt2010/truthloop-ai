@@ -1190,33 +1190,7 @@ reply += "\n\n" + q;
        🔥 FINAL PUSH
     ========================= */
 
-    return res.status(200).json({
-
-    reply,
-
-    loop7EntryBridge: {
-    enabled: true,
-    recommended: true,
-    allowSkip: true,
-    supportedSources: [
-        "LinkedIn",
-        "GitHub",
-        "Portfolio",
-        "Website",
-        "X",
-        "Facebook",
-        "Reddit",
-        "YouTube",
-        "Medium",
-        "Substack"
-    ]
-},
-
-    loopCompleted: 6
-
-});
-
-                    }
+    
 
 if (loopLevel === 7) {
 
@@ -1266,7 +1240,29 @@ primaryLoop,
 emotionalDriver,
 avoidanceStyle,
 hiddenAssumption,
+loop7EntryBridge:
+loopLevel === 6
+? {
+enabled: true,
+recommended: true,
+allowSkip: true,
+supportedSources: [
+"LinkedIn",
+"GitHub",
+"Portfolio",
+"Website",
+"X",
+"Facebook",
+"Reddit",
+"YouTube",
+"Medium",
+"Substack"
+]
+}
+: null,
 
+loopCompleted:
+loopLevel === 6 ? 6 : undefined,
 paywall:false
 });
 
