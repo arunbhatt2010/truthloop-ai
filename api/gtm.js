@@ -1083,17 +1083,45 @@ console.log(aiMessage);
 
         try {
 
-            Object.assign(
-                gtmReport,
-                JSON.parse(aiMessage)
-            );
+    const parsed = JSON.parse(aiMessage);
 
-        } catch {
+    gtmReport.evidenceSummary =
+        parsed.evidenceSummary || "";
 
-            gtmReport.rawResponse =
-                aiMessage;
+    gtmReport.currentReality =
+        parsed.currentReality || "";
 
-        }
+    gtmReport.hiddenConstraint =
+        parsed.hiddenConstraint || "";
+
+    gtmReport.marketOpportunity =
+        parsed.marketOpportunity || "";
+
+    gtmReport.reasoning =
+        parsed.reasoning || "";
+
+    gtmReport.highestImpactAction =
+        parsed.highestImpactAction || "";
+
+    gtmReport.confidence =
+        typeof parsed.confidence === "number"
+            ? parsed.confidence
+            : 50;
+
+    gtmReport.success = true;
+
+} catch (error) {
+
+    console.error(
+        "[GTM Parse Error]",
+        error
+    );
+
+    gtmReport.rawResponse = aiMessage;
+
+    gtmReport.success = false;
+
+}
 
         gtmReport.provider =
             "Cerebras";
