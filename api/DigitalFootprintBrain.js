@@ -269,7 +269,7 @@ function detectPlatform(profileLink) {
 }
 async function ProfileIntelligenceAPI({
 
-    profileLink,
+    publicContentPackage,
 
     truthLoopPackage,
 
@@ -507,9 +507,10 @@ The JSON schema is mandatory.
 This brain exists only to build one reusable public Evidence Package for TruthLoop Main Brain.
 `;
        const userPrompt = `
-PROFILE LINK
 
-${profileLink}
+PUBLIC CONTENT PACKAGE
+
+${JSON.stringify(publicContentPackage, null, 2)}
 
 CURRENT LOOP
 
