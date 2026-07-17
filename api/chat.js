@@ -1,7 +1,6 @@
 import { runMasterBrain }
 from "./masterBrain.js";
-import { loadProfileSystemBrain }
-from "./ProfileSystemBrain.js";
+import { loadDigitalFootprintBrain } from "./DigitalFootprintBrain.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -499,9 +498,9 @@ if (loopLevel === 7 && profileLink.trim()) {
   try {
 
     publicEvidencePackage =
-      await loadProfileSystemBrain({
-        profileLink
-      });
+await loadDigitalFootprintBrain({
+    profileLink
+});
 
   } catch (e) {
 
