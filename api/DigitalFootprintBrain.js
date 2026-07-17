@@ -162,6 +162,65 @@ if (!evidencePackage.success) {
     // Return Evidence Package
 return evidencePackage;
 }
+/* ==========================================
+   Platform Detector
+========================================== */
+
+function detectPlatform(profileLink) {
+
+    let hostname = "";
+
+    try {
+
+        hostname = new URL(profileLink)
+            .hostname
+            .replace(/^www\./, "")
+            .toLowerCase();
+
+    } catch {
+
+        return {
+            platform: "Unknown",
+            supported: true
+        };
+
+    }
+
+    const restrictedPlatforms = {
+
+        "linkedin.com": {
+
+            platform: "LinkedIn",
+
+            supported: false,
+
+            oauth: true,
+
+            reason:
+                "Direct LinkedIn profile analysis is currently unavailable.",
+
+            options: [
+                "Use another public website",
+                "Connect with LinkedIn (coming soon)"
+            ]
+
+        }
+
+    };
+
+    return (
+
+        restrictedPlatforms[hostname] || {
+
+            platform: hostname,
+
+            supported: true
+
+        }
+
+    );
+
+}
 async function ProfileIntelligenceAPI({
 
     profileLink,
