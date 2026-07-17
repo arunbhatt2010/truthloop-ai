@@ -2420,8 +2420,18 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-saveJourney();    
-typeEffect(data.reply);
+saveJourney();
+
+if (loopLevel >= 7) {
+
+    outputBox.innerHTML += renderLoop7Report(data.reply);
+
+} else {
+
+    typeEffect(data.reply);
+
+}
+
 try{
   showShareCard(data.reply);
 }catch(e){
