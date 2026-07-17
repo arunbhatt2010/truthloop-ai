@@ -1388,12 +1388,14 @@ if (loopLevel === 7) {
           model:"llama-3.3-70b-versatile",
 
           messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
-            ...messages.slice(-2)
-          ],
+  {
+    role: "system",
+    content: systemPrompt
+  },
+  ...(loopLevel === 7
+      ? messages.slice(-8)
+      : messages.slice(-2))
+]
 
           temperature: 0.7,
 max_tokens: maxTokens
