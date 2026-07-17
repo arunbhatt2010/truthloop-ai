@@ -1,3 +1,11 @@
+import {
+    loadPublicContentFetcher,
+    acquirePublicContent,
+    validatePublicContent,
+    cleanPublicContent,
+    extractPublicContent,
+    buildPublicContentPackage
+} from "./PublicContentFetcher.js";
 /* ============================================================
    DIGITAL FOOTPRINT BRAIN
 
@@ -84,6 +92,46 @@ if (
 
 const normalizedProfileLink =
     profileLink.trim();
+   // STEP 2.5
+// Public Content Fetcher
+
+const urlPackage =
+    await loadPublicContentFetcher({
+        url: normalizedProfileLink
+    });
+
+const rawPackage =
+    await acquirePublicContent(urlPackage);
+
+const validatedPackage =
+    validatePublicContent(rawPackage);
+
+const cleanPackage =
+    cleanPublicContent(validatedPackage);
+
+const extractedPackage =
+    extractPublicContent(cleanPackage);
+
+const publicContentPackage =
+    buildPublicContentPackage(
+        rawPackage,
+        extractedPackage
+    );
+
+if (!publicContentPackage.success) {
+
+    return {
+
+        success: false,
+
+        stage: "Public Content Fetcher",
+
+        reason:
+            publicContentPackage.reason
+
+    };
+
+}
    /* ==========================================
    STEP 3
    Platform Detector
@@ -123,17 +171,15 @@ const profileEvidence =
 
     await ProfileIntelligenceAPI({
 
-        profileLink:
-            normalizedProfileLink,
+    publicContentPackage,
 
-        truthLoopPackage,
+    truthLoopPackage,
 
-        currentLoop,
+    currentLoop,
 
-        provider: "Cerebras"
+    provider: "Cerebras"
 
-    });
-
+});
 if (!profileEvidence.success) {
 
     return profileEvidence;
