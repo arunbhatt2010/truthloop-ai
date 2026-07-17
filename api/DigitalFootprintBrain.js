@@ -287,7 +287,8 @@ async function ProfileIntelligenceAPI({
 
         model: null,
 
-        profileLink,
+        profileLink:
+    publicContentPackage.url,
 
         timestamp:
 
