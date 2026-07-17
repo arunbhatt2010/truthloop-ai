@@ -2190,7 +2190,47 @@ getBtn.disabled = false;
 nextBtn.onclick=async()=>{
 
 if (isLoading) return;
+if (loopLevel === 6) {
 
+    const profileLink =
+        document.getElementById("loop7ProfileLink")?.value.trim() || "";
+
+    messages.push({
+        role: "user",
+        content: profileLink || "Continue to Loop 7"
+    });
+
+    loopLevel = 7;
+
+    document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
+
+    const data = await fetch(API_URL,{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            messages,
+            loopLevel,
+            profileLink,
+            paid49:payment49,
+            paid199:payment199,
+            currentCategory
+        })
+    }).then(r=>r.json());
+
+    messages.push({
+        role:"assistant",
+        content:data.reply
+    });
+
+    typeEffect(data.reply);
+
+    isLoading = false;
+    nextBtn.disabled = false;
+
+    return;
+  }
 isLoading = true;
 
 nextBtn.disabled = true;
