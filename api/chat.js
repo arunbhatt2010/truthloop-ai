@@ -560,6 +560,8 @@ Verified Public Evidence Package
 ${publicEvidencePackage
 ? JSON.stringify(publicEvidencePackage, null, 2)
 : "Not available"}
+Current profile link:
+${profileLink}
 • Complete TruthLoop Package
 
 • Complete Conversation
