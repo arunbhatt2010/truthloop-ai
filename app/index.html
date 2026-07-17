@@ -1377,7 +1377,13 @@ paid199:payment199,
 currentCategory  
 });  
 const data = await res.json();  
-  
+ if (data.platformCard) {
+
+    renderPlatformCard(data);
+
+    return;
+
+  } 
 console.log("API RESPONSE:", data);  
 if(data.primaryLoop){
 
