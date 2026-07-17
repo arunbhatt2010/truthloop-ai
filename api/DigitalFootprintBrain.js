@@ -321,7 +321,22 @@ Build one verified public evidence package from publicly available profile signa
 INPUTS
 
 • TruthLoop Package
-• Public Profile or Website Link
+• Normalized Public Content Package
+
+The Public Content Package contains:
+
+• URL
+• Title
+• Description
+• Headings
+• Links
+• Visible Text
+
+Always use the Public Content Package as the primary evidence source.
+
+Never analyze or infer information from the URL alone.
+
+If the Public Content Package contains evidence, ignore the URL except for attribution.
 
 CORE RESPONSIBILITIES
 
@@ -581,7 +596,10 @@ intelligence.rawResponse = result;
 
 const content =
     result?.choices?.[0]?.message?.content;
-
+console.log(
+    "CEREBRAS_RESPONSE",
+    JSON.stringify(result, null, 2)
+);
 if (!content) {
 
     intelligence.errors.push(
