@@ -61,3 +61,60 @@ Fetcher never performs AI analysis.
 
 ═══════════════════════════════════════════════════════════════
 */
+export async function loadPublicContentFetcher({
+    url = ""
+}) {
+
+    const result = {
+        success: false,
+
+        originalUrl: url,
+
+        normalizedUrl: null,
+
+        protocol: null,
+
+        hostname: null,
+
+        platform: "unknown",
+
+        valid: false,
+
+        reason: null
+    };
+
+    try {
+
+        url = String(url).trim();
+
+        if (!url) {
+            result.reason = "Public URL is required.";
+            return result;
+        }
+
+        const parsed = new URL(url);
+const protocol = parsed.protocol.toLowerCase();
+
+if (protocol !== "http:" && protocol !== "https:") {
+    result.reason = "Only HTTP and HTTPS URLs are supported.";
+    return result;
+       }
+       result.protocol = protocol.replace(":", "");
+        result.normalizedUrl = parsed.href;
+        result.protocol = parsed.protocol.replace(":", "");
+        result.hostname = parsed.hostname.toLowerCase();
+
+        result.valid = true;
+        result.success = true;
+
+        return result;
+
+    } catch {
+
+        result.reason = "Invalid public URL.";
+
+        return result;
+
+    }
+
+}
