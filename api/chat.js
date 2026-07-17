@@ -1395,9 +1395,9 @@ if (loopLevel === 7) {
   ...(loopLevel === 7
       ? messages.slice(-8)
       : messages.slice(-2))
-]
+],
 
-          temperature: 0.7,
+temperature: 0.7,
 max_tokens: maxTokens
         })
       }
