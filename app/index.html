@@ -1255,7 +1255,7 @@ let payment49=false;
 let payment199=false;
 let userCountry = "IN";  
 let currentCategory="";
-
+let waitingForLoop7Bridge = false;
 let isLoading=false;
 const UI_TEXT = {
   en: {
@@ -2195,18 +2195,31 @@ if(!text){
    isLoading = false;
    nextBtn.disabled = false;
    return;
-  }   
+  }
+  messages.push({
+  role: "user",
+  content: text
+});
 track(`loop_${loopLevel}_completed`);     
 loopLevel++;
+if (loopLevel === 7 && !waitingForLoop7Bridge) {
 
+    waitingForLoop7Bridge = true;
+
+    outputBox.innerHTML += renderLoop7EntryBridge();
+
+    nextBtn.innerText = "Continue to Loop 7";
+
+    isLoading = false;
+    nextBtn.disabled = false;
+
+    return;
+  }
 
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
    
-messages.push({    
-role:"user",    
-content:text    
-});    
+
     
 const userReply=document.createElement("div");
 
