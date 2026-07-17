@@ -118,3 +118,87 @@ if (protocol !== "http:" && protocol !== "https:") {
     }
 
 }
+export async function acquirePublicContent(urlPackage) {
+
+    const result = {
+
+        success: false,
+
+        source: "unknown",
+
+        url: urlPackage.normalizedUrl,
+
+        status: null,
+
+        contentType: null,
+
+        contentLength: 0,
+
+        rawContent: null,
+
+        fetchedAt: null,
+
+        reason: null
+
+    };
+
+    try {
+
+        if (!urlPackage.success) {
+
+            result.reason = "Invalid URL package.";
+
+            return result;
+
+        }
+
+        const response = await fetch(urlPackage.normalizedUrl, {
+
+            method: "GET",
+
+            redirect: "follow",
+
+            headers: {
+
+                "User-Agent": "TruthLoop Public Content Fetcher"
+
+            }
+
+        });
+
+        result.status = response.status;
+
+        result.contentType =
+            response.headers.get("content-type");
+
+        result.contentLength =
+            Number(response.headers.get("content-length")) || 0;
+
+        if (!response.ok) {
+
+            result.reason =
+                `HTTP ${response.status}`;
+
+            return result;
+
+        }
+
+        result.rawContent =
+            await response.text();
+
+        result.fetchedAt =
+            new Date().toISOString();
+
+        result.success = true;
+
+        return result;
+
+    } catch (error) {
+
+        result.reason = error.message;
+
+        return result;
+
+    }
+
+                     }
