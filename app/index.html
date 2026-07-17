@@ -1691,33 +1691,81 @@ nextBtn.style.display = "block";
 
 function renderLoop7Report(report){
 
+    function getSection(title){
+
+        const regex = new RegExp(
+            `${title}[\\s\\S]*?\\n([\\s\\S]*?)(?=\\n(?:📋|🧩|⚙|🌐|🔍|📊|💡|🎯|════════|$))`,
+            "i"
+        );
+
+        const match = report.match(regex);
+
+        return match ? match[1].trim().replace(/\n/g,"<br>") : "";
+
+    }
+
+    const summary = getSection("📋");
+    const findings = getSection("🧩");
+    const mechanism = getSection("⚙");
+    const publicEvidence = getSection("🌐");
+    const crossEvidence = getSection("🔍");
+    const confidence = getSection("📊");
+    const reflection = getSection("💡");
+    const action = getSection("🎯");
+
     return `
 
-    <div class="truthLoopReport">
+<div class="truthLoopReport">
 
-        <h1>🧠 TruthLoop Investigation Report</h1>
+<h1>🧠 TruthLoop Investigation Report</h1>
 
-        <div id="investigationSummary"></div>
+<div id="investigationSummary">
+<h2>📋 Investigation Summary</h2>
+${summary}
+</div>
 
-        <div id="behavioralFindings"></div>
+<div id="behavioralFindings">
+<h2>🧩 Behavioral Findings</h2>
+${findings}
+</div>
 
-        <div id="hiddenMechanism"></div>
+<div id="hiddenMechanism">
+<h2>⚙ Hidden Mechanism</h2>
+${mechanism}
+</div>
 
-        <div id="publicEvidence"></div>
+${publicEvidence ? `
+<div id="publicEvidence">
+<h2>🌐 Public Evidence</h2>
+${publicEvidence}
+</div>
+` : ""}
 
-        <div id="crossEvidence"></div>
+<div id="crossEvidence">
+<h2>🔍 Cross Evidence</h2>
+${crossEvidence}
+</div>
 
-        <div id="evidenceConfidence"></div>
+<div id="evidenceConfidence">
+<h2>📊 Evidence Confidence</h2>
+${confidence}
+</div>
 
-        <div id="finalReflection"></div>
+<div id="finalReflection">
+<h2>💡 Final Reflection</h2>
+${reflection}
+</div>
 
-        <div id="oneNextAction"></div>
+<div id="oneNextAction">
+<h2>🎯 One Next Action</h2>
+${action}
+</div>
 
-    </div>
+</div>
 
-    `;
+`;
 
-  }
+}
 /* SHARE */    
     
 function showShareCard(text){
