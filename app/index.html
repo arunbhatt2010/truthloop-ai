@@ -1608,14 +1608,24 @@ ${lastQuestion}
 
 div.innerHTML = finalHtml;
 
-reflectionInput.style.display = "block";
+if (loopLevel === 6) {
+
+    div.innerHTML += renderLoop7EntryBridge();
+
+    reflectionInput.style.display = "none";
+
+    nextBtn.innerText = "Continue to Loop 7";
+
+} else {
+
+    reflectionInput.style.display = "block";
+}
 
 setTimeout(()=>{
-// reflectionInput.focus();
+    // reflectionInput.focus();
 },300);
 
 nextBtn.style.display = "block";
-
 }
 
 },speed);
@@ -2198,19 +2208,7 @@ if(!text){
 });
 track(`loop_${loopLevel}_completed`);     
 loopLevel++;
-if (loopLevel === 7 && !waitingForLoop7Bridge) {
 
-    waitingForLoop7Bridge = true;
-
-    outputBox.innerHTML += renderLoop7EntryBridge();
-
-    nextBtn.innerText = "Continue to Loop 7";
-nextBtn.style.display = "block";
-    isLoading = false;
-    nextBtn.disabled = false;
-
-    return;
-  }
 
 document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
 track("loop_progress",{loop:loopLevel});    
