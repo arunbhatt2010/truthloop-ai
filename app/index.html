@@ -1421,7 +1421,58 @@ return { reply:"Network error 😃" };
 }    
     
 }    
-    
+ function renderPlatformCard(data) {
+
+    outputBox.innerHTML = `
+
+<div style="
+margin-top:20px;
+padding:18px;
+border-radius:16px;
+background:#111827;
+border:1px solid rgba(255,140,0,.25);
+line-height:1.8;
+">
+
+<div style="
+font-size:20px;
+font-weight:bold;
+color:#ffb347;
+margin-bottom:12px;
+">
+
+${data.platform}
+
+</div>
+
+<div style="
+color:#ddd;
+margin-bottom:16px;
+">
+
+${data.reason}
+
+</div>
+
+${
+data.oauth
+?
+
+`<button id="linkedinConnectBtn">
+Connect with LinkedIn
+</button>`
+
+:
+
+""
+
+}
+
+</div>
+
+`;
+
+  }   
 /* TYPE EFFECT */
 function renderLoop7EntryBridge() {
 return `
