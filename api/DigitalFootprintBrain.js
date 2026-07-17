@@ -84,7 +84,40 @@ if (
 
 const normalizedProfileLink =
     profileLink.trim();
-    // STEP 3
+   /* ==========================================
+   STEP 3
+   Platform Detector
+========================================== */
+
+const platformDecision =
+    detectPlatform(normalizedProfileLink);
+
+if (!platformDecision.supported) {
+
+    return {
+
+        success: false,
+
+        stage: "Platform Detection",
+
+        type: "platformCard",
+
+        platform:
+            platformDecision.platform,
+
+        reason:
+            platformDecision.reason,
+
+        oauth:
+            platformDecision.oauth,
+
+        options:
+            platformDecision.options
+
+    };
+
+       }
+    // STEP 4
     // Profile Intelligence API
 const profileEvidence =
 
@@ -106,7 +139,7 @@ if (!profileEvidence.success) {
     return profileEvidence;
 
        }
-    // STEP 4
+    // STEP 5
     // Profile Main Brain
 const evidencePackage =
 
@@ -125,7 +158,7 @@ if (!evidencePackage.success) {
     return evidencePackage;
 
    }
-    // STEP 5
+    // STEP 6
     // Return Evidence Package
 return evidencePackage;
 }
