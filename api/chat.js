@@ -499,7 +499,13 @@ if (loopLevel === 7 && profileLink.trim()) {
 
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
-    profileLink
+
+    truthLoopPackage,
+
+    profileLink,
+
+    currentLoop: 7
+
 });
     /* =========================
    PLATFORM CARD
