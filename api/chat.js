@@ -501,6 +501,33 @@ if (loopLevel === 7 && profileLink.trim()) {
 await loadDigitalFootprintBrain({
     profileLink
 });
+    /* =========================
+   PLATFORM CARD
+========================= */
+
+if (
+    publicEvidencePackage?.type === "platformCard"
+) {
+
+    return res.status(200).json({
+
+        platformCard: true,
+
+        platform:
+            publicEvidencePackage.platform,
+
+        reason:
+            publicEvidencePackage.reason,
+
+        oauth:
+            publicEvidencePackage.oauth,
+
+        options:
+            publicEvidencePackage.options
+
+    });
+
+}
 console.log(
     "PUBLIC_EVIDENCE_PACKAGE",
     JSON.stringify(publicEvidencePackage, null, 2)
