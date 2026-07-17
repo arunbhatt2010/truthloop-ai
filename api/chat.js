@@ -1238,17 +1238,22 @@ Loop 5:
 Loop 6:
 - Complete the investigation.
 - Present the strongest evidence-based reflection.
-- Do not ask another question.
-- Do not append "Now act."
-- End the response naturally.
-- The frontend will handle the next interaction.
+- This is the final interview loop.
+- Do not ask any follow-up question.
+- Do not end with a question mark (?).
+- Do not request more information.
+- Do not mention Loop 7.
+- Do not ask for a profile link.
+- End naturally after the final reflection.
+- The frontend will display the Loop 7 Entry Bridge.
 
 Loop 7:
-- Start only after Loop 6 is completed.
-- Use the complete TruthLoop Package.
+- Never continue the interview.
+- Never ask follow-up questions.
+- Treat the interview as already complete.
+- Use the completed TruthLoop Package.
 - If a verified Public Evidence Package exists, include it.
-- Never invent public evidence.
-- Ignore missing profile evidence if none exists.
+- Generate only the final investigation report.
 Provide:
 Pattern Summary
 Core Contradiction
@@ -1260,9 +1265,13 @@ Loops 1-5:
 End with one useful investigative question only.
 Never ask questions already answered.
 Loop 6:
-Do not ask a follow-up question.
-Finish the investigation naturally.
+Do not ask any question.
+Do not generate a sentence ending with "?".
+Finish the investigation completely.
 
+Loop 7:
+Do not ask questions.
+Generate only the investigation report.
 
 CONTENT GUARD:
 TruthLoop does not create:
@@ -1348,8 +1357,21 @@ Users stay engaged when they feel understood, not analyzed.
     /* =========================
        🤖 AI CALL
     ========================= */
+    /******************************
+ LOOP 7 RESPONSE SANITIZER
+******************************/
+
+if (loopLevel === 7) {
+
+  messages = messages.filter(m => {
+    if (m.role !== "assistant") return true;
+
+    return !m.content.includes("?");
+  });
+
+}
     const maxTokens =
-  loopLevel === 7 ? 400 : 220;
+  loopLevel === 7 ? 900 : 220;
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -1522,7 +1544,16 @@ hiddenAssumption = "";
         ""
       )
       .trim();
+/* =========================
+   LOOP RESPONSE GUARD
+========================= */
 
+if (loopLevel >= 6) {
+
+  // Loop 6 & 7 par koi follow-up question allowed nahi
+  reply = reply.replace(/\s*[^.!?\n]*\?\s*$/s, "");
+
+}
     /* =========================
        🔧 REMOVE WEAK PHRASES
     ========================= */
