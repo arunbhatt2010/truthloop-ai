@@ -1,5 +1,5 @@
 /* ============================================================
-   PROFILE SYSTEM BRAIN
+   DIGITAL FOOTPRINT BRAIN
 
    Mission
 
@@ -38,8 +38,7 @@
 
 ============================================================ */
 
-export async function loadProfileSystemBrain({
-
+export async function loadDigitalFootprintBrain({
     truthLoopPackage = {},
 
     profileLink = "",
@@ -59,7 +58,7 @@ if (currentLoop !== 7) {
         stage: "Security",
 
         reason:
-            "Profile System Brain is available only after Loop 6."
+            "Digital Footprint Brain is available only after Loop 6."
 
     };
 
@@ -174,7 +173,7 @@ const endpoint =
 intelligence.model = model;
 
 const systemPrompt = `
-You are TruthLoop Profile System Brain.
+You are TruthLoop Digital Footprint Brain.
 
 MISSION
 
