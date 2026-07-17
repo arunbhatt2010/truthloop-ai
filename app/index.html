@@ -2370,12 +2370,20 @@ if (loopLevel === 6) {
         content:data.reply
     });
 
+    if (data.reply.includes("📋")) {
+
+    outputBox.innerHTML += renderLoop7Report(data.reply);
+
+} else {
+
     typeEffect(data.reply);
 
-    isLoading = false;
-    nextBtn.disabled = false;
+}
 
-    return;
+isLoading = false;
+nextBtn.disabled = false;
+
+return;
   }
 isLoading = true;
 
