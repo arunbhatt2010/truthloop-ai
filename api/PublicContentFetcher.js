@@ -101,7 +101,7 @@ if (protocol !== "http:" && protocol !== "https:") {
        }
        result.protocol = protocol.replace(":", "");
         result.normalizedUrl = parsed.href;
-        result.protocol = parsed.protocol.replace(":", "");
+        
         result.hostname = parsed.hostname.toLowerCase();
 
         result.valid = true;
