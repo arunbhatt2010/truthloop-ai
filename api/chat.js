@@ -500,8 +500,6 @@ if (loopLevel === 7 && profileLink.trim()) {
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
 
-    truthLoopPackage,
-
     profileLink,
 
     currentLoop: 7
