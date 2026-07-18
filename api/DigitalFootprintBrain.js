@@ -432,6 +432,17 @@ PUBLIC SIGNALS TO COLLECT
 • Career
 • Activity
 • Content
+Knowledge & Content
+
+Return
+
+{
+  "contentPillars": [],
+  "knowledgeDepth": "",
+  "expertiseAreas": [],
+  "writingStyle": "",
+  "contentConsistency": ""
+}
 • Audience
 • Authority
 • Trust
