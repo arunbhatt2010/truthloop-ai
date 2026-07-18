@@ -432,17 +432,6 @@ PUBLIC SIGNALS TO COLLECT
 • Career
 • Activity
 • Content
-Knowledge & Content
-
-Return
-
-{
-  "contentPillars": [],
-  "knowledgeDepth": "",
-  "expertiseAreas": [],
-  "writingStyle": "",
-  "contentConsistency": ""
-}
 • Audience
 • Authority
 • Trust
@@ -452,18 +441,6 @@ Return
 • Professional Signals
 • Communication Signals
 • Business Signals
-Business Presence
-
-Return
-
-{
-  "products": [],
-  "services": [],
-  "targetAudience": "",
-  "businessModel": "",
-  "valueProposition": "",
-  "brandPositioning": ""
-}
 • Behavioral Signals
 • Business & Career Relationship Signals
 • Reputation Signals
@@ -620,7 +597,29 @@ Never return code blocks.
 Never return text outside JSON.
 
 The JSON schema is mandatory.
+Knowledge & Content
+The JSON must include the following sections when evidence exists:
+Return
 
+{
+  "contentPillars": [],
+  "knowledgeDepth": "",
+  "expertiseAreas": [],
+  "writingStyle": "",
+  "contentConsistency": ""
+}
+Business Presence
+
+Return
+
+{
+  "products": [],
+  "services": [],
+  "targetAudience": "",
+  "businessModel": "",
+  "valueProposition": "",
+  "brandPositioning": ""
+}
 This brain exists only to build one reusable public Evidence Package for TruthLoop Main Brain.
 `;
        const userPrompt = `
