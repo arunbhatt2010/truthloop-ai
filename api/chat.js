@@ -1966,8 +1966,11 @@ const response = await fetch(
           ? messages.slice(-8)
           : messages.slice(-2))
       ],
+      
+      const maxTokens =
+  loopLevel === 7 ? 900 : 220;,
       temperature: 0.7,
-      loopLevel === 7 ? 900 : 220;
+max_completion_tokens: maxTokens
     })
   }
 );
