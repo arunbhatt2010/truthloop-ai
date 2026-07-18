@@ -930,7 +930,49 @@ Do not add alternatives.
 End the report with this action only.
 
 FINAL QUALITY CONTRACT
+OUTPUT FORMAT VALIDATION
 
+Before returning the final report, verify that it exactly matches the required TruthLoop Investigation Report format.
+
+The report MUST:
+
+• Start with exactly:
+📋 Investigation Summary
+
+• Continue in this exact order:
+
+📋 Investigation Summary
+
+🧩 Behavioral Findings
+
+⚙ Hidden Mechanism
+
+🌐 Public Evidence (only if verified public evidence exists)
+
+🔍 Cross Evidence
+
+📊 Evidence Confidence
+
+💡 Final Reflection
+
+🎯 One Next Action
+
+Do NOT:
+
+• Add any introduction before 📋 Investigation Summary.
+• Mention the profile link.
+• Explain the investigation process.
+• Describe what you are about to do.
+• Add extra headings.
+• Add closing remarks after 🎯 One Next Action.
+
+SELF-CHECK:
+
+If your report does not exactly follow this structure, DO NOT return it.
+
+Rewrite the entire report until it fully matches the required TruthLoop Investigation Report format.
+
+Return only the final corrected version.
 Before returning the report verify:
 
 ✓ Follow the exact section order.
