@@ -717,25 +717,26 @@ if (
    Normalize Evidence
 ========================================== */
 
+let parsedEvidence;
+
+try {
+    parsedEvidence = JSON.parse(rawEvidence);
+} catch {
+    parsedEvidence = {
+        success: false,
+        error: "Invalid public evidence JSON"
+    };
+}
+
 const normalizedEvidence = {
+    profileLink: profileEvidence.profileLink,
+    collectedAt: profileEvidence.timestamp,
+    provider: profileEvidence.provider,
+    model: profileEvidence.model,
 
-    profileLink:
-        profileEvidence.profileLink,
-
-    collectedAt:
-        profileEvidence.timestamp,
-
-    provider:
-        profileEvidence.provider,
-
-    model:
-        profileEvidence.model,
-
-    publicEvidence:
-        rawEvidence.trim(),
+    publicEvidence: parsedEvidence,
 
     truthLoopPackage
-
 };
 
         /* ==========================================
