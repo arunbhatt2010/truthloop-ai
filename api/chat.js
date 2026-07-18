@@ -1967,7 +1967,7 @@ const response = await fetch(
           : messages.slice(-2))
       ],
       temperature: 0.7,
-      max_completion_tokens: maxTokens
+      loopLevel === 7 ? 900 : 220;
     })
   }
 );
@@ -1989,10 +1989,10 @@ let reply =
     /* =========================
        📤 RESPONSE
     ========================= */
-
+/* =========================
     const data =
       await response.json();
-    /* =========================
+    
 const profileResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
