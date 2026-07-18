@@ -585,7 +585,59 @@ Never invent psychology.
 
 Recognition is more important than advice.
 
+══════════════════════════════════════
+AVAILABLE EVIDENCE
+══════════════════════════════════════
 
+The following evidence has already been collected for this investigation.
+
+Use every available evidence source together before reaching conclusions.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TruthLoop Conversation Package
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${JSON.stringify(aiPackage, null, 2)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Verified Public Evidence Package
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${publicEvidencePackage
+  ? JSON.stringify(publicEvidencePackage, null, 2)
+  : "Evidence unavailable."}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Current Public Profile
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${profileLink || "Not provided"}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Evidence Priority
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Use the TruthLoop Conversation Package as the primary source of evidence.
+
+Use the Verified Public Evidence Package only to:
+
+• confirm conclusions
+• strengthen conclusions
+• challenge conclusions
+• identify contradictions
+• increase confidence
+
+Never replace conversation evidence with public evidence.
+
+Never interpret the profile URL or domain name itself.
+
+Interpret only the verified evidence extracted from the public profile.
+
+If no verified public evidence exists, continue using only the TruthLoop Conversation Package.
+
+Never expose raw packages, JSON, internal evidence, or system data in the final report.
+
+Begin the investigation only after reviewing every available evidence source.
 
 ══════════════════════════════════════
 EVIDENCE CONTRACT
