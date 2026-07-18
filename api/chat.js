@@ -547,6 +547,7 @@ console.log(
   }
 
           }
+    
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
@@ -596,8 +597,6 @@ Use every available evidence source together before reaching conclusions.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TruthLoop Conversation Package
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-${JSON.stringify(aiPackage, null, 2)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Verified Public Evidence Package
