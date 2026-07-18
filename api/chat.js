@@ -1933,11 +1933,14 @@ max_tokens: maxTokens
 
     if (!response.ok) {
 
- return res.status(500).json({
-  reply:"AI service busy. Please try again."
- });
+    const errorText = await response.text();
+    console.log(errorText);
 
-    }
+    return res.status(500).json({
+        reply: errorText
+    });
+
+}
 
     /* =========================
        📤 RESPONSE
