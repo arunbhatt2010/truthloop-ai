@@ -1691,7 +1691,8 @@ nextBtn.style.display = "block";
 
 
 function renderLoop7Report(report){
-
+console.log("=== RAW REPORT ===");
+console.log(report);
     // Clean existing TruthLoop markers
     report = report
         .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
@@ -1722,7 +1723,14 @@ function renderLoop7Report(report){
     const confidence = getSection("📊");
     const reflection = getSection("💡");
     const action = getSection("🎯");
-
+console.log("Summary:", summary);
+console.log("Findings:", findings);
+console.log("Mechanism:", mechanism);
+console.log("Public:", publicEvidence);
+console.log("Cross:", crossEvidence);
+console.log("Confidence:", confidence);
+console.log("Reflection:", reflection);
+console.log("Action:", action);
     return `
 
 <div class="truthLoopReport">
@@ -2363,7 +2371,12 @@ if (loopLevel === 6) {
             paid199:payment199,
             currentCategory
         })
-    }).then(r=>r.json());
+    }).then(r => r.json());
+
+console.log("=== LOOP 7 RESPONSE ===");
+console.log(data);
+console.log("=== LOOP 7 REPLY ===");
+console.log(data.reply);
 
     messages.push({
         role:"assistant",
