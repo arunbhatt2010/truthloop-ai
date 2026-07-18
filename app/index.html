@@ -2385,7 +2385,12 @@ console.log(data.reply);
 
     if (data.reply.includes("📋")) {
 
-    outputBox.innerHTML += renderLoop7Report(data.reply);
+    outputBox.innerHTML =
+    "<pre style='white-space:pre-wrap;font-size:13px'>" +
+    data.reply +
+    "</pre>";
+
+    return;
 
 } else {
 
