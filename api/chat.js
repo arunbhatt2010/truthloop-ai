@@ -1888,7 +1888,9 @@ Users stay engaged when they feel understood, not analyzed.
     /******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
-
+/* =========================
+   🤖 GROQ AI CALL (TEMP DISABLED)
+=========================
 if (loopLevel === 7) {
 
   messages = messages.filter(m => {
@@ -1944,14 +1946,53 @@ max_tokens: maxTokens
         reply: "Something went wrong."
     });
 }
+========================= */
+const response = await fetch(
+  "https://api.cerebras.ai/v1/chat/completions",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + process.env.CEREBRAS_API_KEY
+    },
+    body: JSON.stringify({
+      model: "gpt-oss-120b", // ya jo model tum use karna chaho
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt
+        },
+        ...(loopLevel === 7
+          ? messages.slice(-8)
+          : messages.slice(-2))
+      ],
+      temperature: 0.7,
+      max_completion_tokens: maxTokens
+    })
+  }
+);
 
+if (!response.ok) {
+  const err = await response.text();
+
+  return res.status(500).json({
+    reply: "Cerebras Error",
+    error: err
+  });
+}
+
+const data = await response.json();
+
+let reply =
+  data?.choices?.[0]?.message?.content || "";
+    
     /* =========================
        📤 RESPONSE
     ========================= */
 
     const data =
       await response.json();
-    
+    /* =========================
 const profileResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
@@ -2071,6 +2112,30 @@ avoidanceStyle = "";
 hiddenAssumption = "";
 
   }
+  ========================= */
+
+    const profileResponse = await fetch(
+  "https://api.cerebras.ai/v1/chat/completions",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + process.env.CEREBRAS_API_KEY
+    },
+    body: JSON.stringify({
+      model: "gpt-oss-120b",
+      messages: [
+        {
+          role: "system",
+          content: profilePrompt
+        },
+        ...messages.slice(-3)
+      ],
+      temperature: 0.3,
+      max_completion_tokens: 120
+    })
+  }
+);
     /* =========================
        ✂️ CLEANER
     ========================= */
