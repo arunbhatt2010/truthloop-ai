@@ -1564,9 +1564,7 @@ try {
     e
   );
 
-}
-    let reply =
-      data?.choices?.[0]?.message?.content || "";
+      }
     let reply =
     data?.choices?.[0]?.message?.content || "";
 
