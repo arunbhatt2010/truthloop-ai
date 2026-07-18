@@ -1932,14 +1932,17 @@ max_tokens: maxTokens
     );
 
     if (!response.ok) {
+    const error = await response.json();
 
-    const errorText = await response.text();
-    console.log(errorText);
+    if (error.error?.code === "rate_limit_exceeded") {
+        return res.json({
+            reply: "🚦 TruthLoop AI is temporarily busy. Please try again in a few minutes."
+        });
+    }
 
     return res.status(500).json({
-        reply: errorText
+        reply: "Something went wrong."
     });
-
 }
 
     /* =========================
