@@ -452,6 +452,18 @@ Return
 • Professional Signals
 • Communication Signals
 • Business Signals
+Business Presence
+
+Return
+
+{
+  "products": [],
+  "services": [],
+  "targetAudience": "",
+  "businessModel": "",
+  "valueProposition": "",
+  "brandPositioning": ""
+}
 • Behavioral Signals
 • Business & Career Relationship Signals
 • Reputation Signals
