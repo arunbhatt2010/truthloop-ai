@@ -608,18 +608,7 @@ Return
   "writingStyle": "",
   "contentConsistency": ""
 }
-Business Presence
 
-Return
-
-{
-  "products": [],
-  "services": [],
-  "targetAudience": "",
-  "businessModel": "",
-  "valueProposition": "",
-  "brandPositioning": ""
-}
 This brain exists only to build one reusable public Evidence Package for TruthLoop Main Brain.
 `;
        const userPrompt = `
