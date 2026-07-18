@@ -45,6 +45,84 @@ import {
    during Loop 7.
 
 ============================================================ */
+/* ============================================================
+   KNOWLEDGE & CONTENT
+
+   Mission
+
+   Understand what the person publicly knows,
+   teaches, creates and consistently shares.
+
+   Collect
+
+   • Content Pillars
+   • Knowledge Depth
+   • Expertise Areas
+   • Writing / Teaching Style
+   • Content Consistency
+
+   Never
+
+   • Guess expertise
+   • Infer private knowledge
+   • Create authority without evidence
+   • Invent content themes
+
+============================================================ */
+
+
+/* ============================================================
+   BUSINESS PRESENCE
+
+   Mission
+
+   Understand the person's public business
+   footprint and market positioning.
+
+   Collect
+
+   • Products
+   • Services
+   • Target Audience
+   • Business Model
+   • Value Proposition
+   • Company / Brand Positioning
+
+   Never
+
+   • Guess products
+   • Invent business models
+   • Create offers
+   • Assume target audience
+
+============================================================ */
+
+
+/* ============================================================
+   EVIDENCE QUALITY
+
+   Mission
+
+   Measure the strength, completeness and
+   reliability of the collected public evidence.
+
+   Collect
+
+   • Evidence Coverage (%)
+   • Confidence
+   • Missing Evidence
+   • Verification Status
+   • Data Freshness
+   • Source Count
+
+   Never
+
+   • Inflate confidence
+   • Hide missing evidence
+   • Ignore conflicting evidence
+   • Fabricate verification
+
+============================================================ */
 
 export async function loadDigitalFootprintBrain({
     truthLoopPackage = {},
