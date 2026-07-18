@@ -1567,6 +1567,12 @@ try {
 }
     let reply =
       data?.choices?.[0]?.message?.content || "";
+    let reply =
+    data?.choices?.[0]?.message?.content || "";
+
+console.log("===== RAW AI REPLY =====");
+console.log(data?.choices?.[0]?.message?.content);
+console.log("===== END RAW AI REPLY =====");
 const contentLeakWords = [
 
 "template",
