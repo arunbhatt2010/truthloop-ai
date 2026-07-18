@@ -695,7 +695,283 @@ Do not repeat the Investigation Summary.
 
 This card should diagnose the pattern, not solve it.
 
+⚙ HIDDEN MECHANISM
 
+Purpose
+
+Reveal the invisible mechanism keeping the user's pattern alive.
+
+Answer only:
+
+"Why does this pattern continue even after the user notices it?"
+
+Do not describe the behavior.
+
+Do not repeat the Pattern Summary.
+
+Do not repeat the Core Contradiction.
+
+Explain the hidden mechanism connecting:
+
+• Thoughts
+
+• Emotions
+
+• Decisions
+
+• Repeated behavior
+
+Reveal the strongest invisible loop supported by the available evidence.
+
+Create one genuine recognition moment.
+
+The user should feel:
+
+"I understood my pattern before.
+
+Now I understand why it keeps happening."
+
+Use simple language.
+
+Never motivate.
+
+Never judge.
+
+Never exaggerate.
+
+Never invent psychological causes.
+
+If evidence is insufficient, clearly say the mechanism cannot yet be confirmed.
+
+This is the signature TruthLoop insight.
+
+Its purpose is recognition, not advice.
+
+🌐 PUBLIC EVIDENCE
+
+Purpose
+
+Interpret verified public evidence.
+
+Generate this section only when a Verified Public Evidence Package exists.
+
+Answer only:
+
+"What does the user's public behavior consistently reveal?"
+
+Do not describe the profile.
+
+Do not list platforms.
+
+Do not summarize posts.
+
+Interpret only the strongest verified signals.
+
+Explain only what public evidence reinforces about:
+
+• Professional Identity
+
+• Expertise & Authority
+
+• Public Reputation
+
+• Content & Communication
+
+• Audience & Community
+
+• Business Presence
+
+• Public Behavioral Signals
+
+Use only verified evidence.
+
+Never invent observations.
+
+Never assume intent.
+
+Never repeat Behavioral Findings.
+
+Never explain the Hidden Mechanism.
+
+Never calculate confidence.
+
+Keep every observation concise.
+
+If verified public evidence is unavailable,
+
+omit this section completely.
+
+🔍 CROSS EVIDENCE
+
+Purpose
+
+Compare conversation evidence with verified public evidence.
+
+Answer only:
+
+"How well do both evidence sources align?"
+
+Generate exactly three parts.
+
+• Agreements
+
+Explain where conversation evidence and verified public evidence support the same conclusion.
+
+• Contradictions
+
+Explain where both evidence sources disagree or reveal different signals.
+
+Do not choose a side.
+
+Explain the difference objectively.
+
+• Missing Evidence
+
+Identify important conclusions that cannot yet be verified.
+
+Never invent missing evidence.
+
+Never repeat Behavioral Findings.
+
+Never repeat Public Evidence.
+
+Never explain the Hidden Mechanism again.
+
+Never calculate confidence.
+
+Use comparison only.
+
+Keep every comparison concise.
+
+If no Verified Public Evidence Package exists,
+
+state that comparison is unavailable because only one evidence source was available.
+
+📊 EVIDENCE CONFIDENCE
+
+Purpose
+
+Measure the reliability of this investigation.
+
+Answer only:
+
+"How reliable are the conclusions?"
+
+Return only:
+
+• Overall Confidence (0–100)
+
+• Strongest Supporting Evidence
+
+• Weakest Supporting Evidence
+
+• Reason for Confidence Score
+
+Confidence must depend only on evidence quality.
+
+Increase confidence when multiple evidence sources support the same conclusion.
+
+Lower confidence when evidence is weak, incomplete, or conflicting.
+
+Never guess confidence.
+
+Never exaggerate certainty.
+
+Never repeat previous sections.
+
+Keep this section concise.
+
+💡 FINAL REFLECTION
+
+Purpose
+
+Leave the user with one lasting realization.
+
+Answer only:
+
+"What is the most important truth revealed by this investigation?"
+
+Do not summarize the report.
+
+Do not repeat previous insights.
+
+Do not motivate.
+
+Do not give advice.
+
+Generate one memorable realization that naturally follows from the investigation.
+
+Keep it short.
+
+The user should feel clarity, not pressure.
+
+🎯 ONE NEXT ACTION
+
+Purpose
+
+Recommend the single highest-impact next step.
+
+Answer only:
+
+"What one action would most effectively interrupt this pattern?"
+
+Provide exactly one practical action.
+
+One sentence only.
+
+Make the action specific, realistic, and immediately actionable.
+
+Do not explain.
+
+Do not justify.
+
+Do not add alternatives.
+
+End the report with this action only.
+
+FINAL QUALITY CONTRACT
+
+Before returning the report verify:
+
+✓ Follow the exact section order.
+
+✓ Every section has one unique purpose.
+
+✓ Every section answers a different question.
+
+✓ No repeated facts.
+
+✓ No repeated insights.
+
+✓ No repeated profile information.
+
+✓ Every conclusion is evidence-based.
+
+✓ Never invent evidence.
+
+✓ Never hide uncertainty.
+
+✓ Hidden Mechanism creates the strongest recognition.
+
+✓ Final Reflection creates emotional clarity.
+
+✓ One Next Action follows naturally from the investigation.
+
+The final report must feel:
+
+Professional.
+
+Objective.
+
+Personalized.
+
+Evidence-driven.
+
+Easy to understand.
+
+Recognition before advice.
+
+Diagnosis before motivation.
 `;
 }
     /* =========================
