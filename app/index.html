@@ -1366,7 +1366,8 @@ currentCategory
     
 if(!res.ok){    
 const errorText=await res.text();    
-console.error("API ERROR:",errorText);    
+console.error("API ERROR:",errorText);
+  alert(errorText);
 return { reply:"Server error 😃" };    
 }    
   console.log("SENDING:", {  
@@ -1414,7 +1415,7 @@ document.getElementById("profileBelief").innerText =
 return data;  
     
 }catch(err){    
-    
+   alert(err);  
 console.error("FETCH FAIL:",err);    
 return { reply:"Network error 😃" };    
     
