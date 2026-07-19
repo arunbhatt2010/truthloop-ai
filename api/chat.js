@@ -52,6 +52,18 @@ if (DEV_GATE) {
   paid49 = true;
   paid199 = true;
 }
+    // =========================
+// DEV LOOP 7 TEST MODE
+// =========================
+const DEV_LOOP7 = true;
+
+if (DEV_GATE && DEV_LOOP7) {
+  loopLevel = 7;
+
+  if (!profileLink) {
+    profileLink = "https://www.earnwithtrusts.online/";
+  }
+}
     if (!messages || !messages.length) {
 
       return res.status(400).json({
