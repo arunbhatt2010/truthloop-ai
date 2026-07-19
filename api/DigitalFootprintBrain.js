@@ -609,6 +609,16 @@ Return
   "contentConsistency": ""
 }
 
+Return
+
+{
+  "evidenceCoverage": "",
+  "confidence": "",
+  "missingEvidence": [],
+  "verificationStatus": "",
+  "dataFreshness": "",
+  "sourceCount": 0
+}
 This brain exists only to build one reusable public Evidence Package for TruthLoop Main Brain.
 `;
        const userPrompt = `
