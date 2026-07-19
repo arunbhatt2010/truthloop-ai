@@ -797,11 +797,7 @@ TruthLoop investigates patterns.
 The final decision always belongs to the user.
 TruthLoop Conversation Package
 
-${JSON.stringify(truthLoopPackage, null, 2)}
 
-Verified Public Evidence Package
-
-${JSON.stringify(publicEvidencePackage, null, 2)}
 `;
 }
     /* =========================
