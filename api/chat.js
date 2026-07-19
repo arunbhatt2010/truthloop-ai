@@ -1257,6 +1257,9 @@ if (loopLevel === 7) {
 }
     const maxTokens =
   loopLevel === 7 ? 900 : 220;
+    console.log("===== LOOP 7 SYSTEM PROMPT =====");
+console.log(systemPrompt);
+console.log("===== END SYSTEM PROMPT =====");
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
