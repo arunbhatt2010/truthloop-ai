@@ -1,6 +1,7 @@
 import { runMasterBrain }
 from "./masterBrain.js";
 import { loadDigitalFootprintBrain } from "./DigitalFootprintBrain.js";
+import { buildTruthLoopPackage } from "./TruthLoopPackage.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -494,11 +495,18 @@ User feels close to an important realization but not there yet.
     let publicEvidencePackage = null;
 
 if (loopLevel === 7 && profileLink.trim()) {
+const truthLoopPackage = buildTruthLoopPackage(messages);
 
+console.log(
+    "TRUTH_LOOP_PACKAGE",
+    JSON.stringify(truthLoopPackage, null, 2)
+);
   try {
 
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
+
+    truthLoopPackage,
 
     profileLink,
 
