@@ -55,7 +55,7 @@ if (DEV_GATE) {
     // =========================
 // DEV LOOP 7 TEST MODE
 // =========================
-const DEV_LOOP7 = true;
+const DEV_LOOP7 = false;
 
 if (DEV_GATE && DEV_LOOP7) {
   loopLevel = 7;
