@@ -1266,18 +1266,17 @@ console.log("===== END SYSTEM PROMPT =====");
     let finalSystemPrompt = systemPrompt;
 
 if (loopLevel === 7) {
-  finalSystemPrompt += `
-
-TruthLoop Conversation Package
-
-${JSON.stringify(truthLoopPackage, null, 2)}
-
-Verified Public Evidence Package
-
-${JSON.stringify(publicEvidencePackage, null, 2)}
-`;
+  finalSystemPrompt +=
+    "\n\nTruthLoop Conversation Package\n\n" +
+    JSON.stringify(truthLoopPackage, null, 2) +
+    "\n\nVerified Public Evidence Package\n\n" +
+    JSON.stringify(publicEvidencePackage, null, 2);
 }
-    const response = await fetch(
+
+console.log("===== FINAL SYSTEM PROMPT =====");
+console.log(finalSystemPrompt);
+
+const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
         method: "POST",
