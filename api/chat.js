@@ -1264,7 +1264,8 @@ if (loopLevel === 7) {
 console.log(systemPrompt);
 console.log("===== END SYSTEM PROMPT =====");
     let finalSystemPrompt = systemPrompt;
-
+console.log("truthLoopPackage:", truthLoopPackage);
+console.log("publicEvidencePackage:", publicEvidencePackage);
 if (loopLevel === 7) {
   finalSystemPrompt +=
     "\n\nTruthLoop Conversation Package\n\n" +
