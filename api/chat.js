@@ -1523,11 +1523,14 @@ max_tokens: maxTokens
 
     if (!response.ok) {
 
- return res.status(500).json({
-  reply:"AI service busy. Please try again."
- });
+    console.log("GROQ_STATUS", response.status);
+    console.log("GROQ_STATUS_TEXT", response.statusText);
+    console.log("GROQ_ERROR_BODY", await response.text());
 
-    }
+    return res.status(500).json({
+        reply: "AI service busy. Please try again."
+    });
+          }
 
     /* =========================
        📤 RESPONSE
