@@ -493,10 +493,10 @@ User feels close to an important realization but not there yet.
 `;
           }
     let publicEvidencePackage = null;
+let truthLoopPackage = null;
 
 if (loopLevel === 7 && profileLink.trim()) {
-const truthLoopPackage = buildTruthLoopPackage(messages);
-
+truthLoopPackage = buildTruthLoopPackage(messages);
 console.log(
     "TRUTH_LOOP_PACKAGE",
     JSON.stringify(truthLoopPackage, null, 2)
