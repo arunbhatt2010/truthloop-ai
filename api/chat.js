@@ -1535,7 +1535,13 @@ max_tokens: maxTokens
 
     const data =
       await response.json();
-    
+    console.log("===== RAW AI RESPONSE =====");
+console.log(JSON.stringify(data, null, 2));
+console.log("===== END RAW AI RESPONSE =====");
+
+console.log("===== RAW AI REPLY =====");
+console.log(data?.choices?.[0]?.message?.content);
+console.log("===== END RAW AI REPLY =====");
 const profileResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
