@@ -598,6 +598,8 @@ Never return text outside JSON.
 
 The JSON schema is mandatory.
 Knowledge & Content
+Business Presence
+Evidence Quality
 The JSON must include the following sections when evidence exists:
 Return
 
@@ -607,6 +609,17 @@ Return
   "expertiseAreas": [],
   "writingStyle": "",
   "contentConsistency": ""
+}
+
+Return
+
+{
+  "products": [],
+  "services": [],
+  "targetAudience": "",
+  "businessModel": "",
+  "valueProposition": "",
+  "brandPositioning": ""
 }
 
 Return
