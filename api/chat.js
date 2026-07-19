@@ -492,7 +492,20 @@ User feels close to an important realization but not there yet.
 `;
           }
     let publicEvidencePackage = null;
+/* ==========================================
+   TRUTHLOOP PACKAGE
+   Complete Loop 1–6 Investigation Context
+========================================== */
 
+const truthLoopPackage = {
+    messages,
+    loopLevel,
+    currentCategory,
+    profileLink,
+    paid49,
+    paid199
+};
+if (loopLevel === 7 && profileLink.trim()) {
 
   try {
 
