@@ -1723,28 +1723,6 @@ reply += "\n\n" + q;
     }
 
     /* =========================
-       🔥 FINAL PUSH
-    ========================= */
-
-    
-
-if (loopLevel === 7) {
-
-reply += `
-
-Now act.
-
-TruthLoop notices patterns.
-Not permanent truths.
-
-Recognition can create clarity.
-
-What you do next
-is still your choice.`;
-}
-
-
-    /* =========================
        ✅ FINAL
     ========================= */
 
