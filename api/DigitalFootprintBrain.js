@@ -232,7 +232,7 @@ function detectPlatform(profileLink) {
 
     }
 
-    function detectPlatform(profileLink) {
+    
 
     let hostname = "";
 
