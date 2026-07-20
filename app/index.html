@@ -2368,15 +2368,11 @@ alert("Fetch Starting");
     messages.push({
         role:"assistant",
         content:data.reply
-    });
-
     if (data.reply.includes("📋")) {
-
-    // Remove Loop 7 preparation screen
-    const bridge = document.getElementById("loop7EntryBridge");
-    if (bridge) {
-        bridge.closest(".aiResponse")?.remove();
-    }
+    outputBox.innerHTML = renderLoop7Report(data.reply);
+} else {
+    typeEffect(data.reply);
+  }
 
     // Show Final Investigation Report
     outputBox.innerHTML = renderLoop7Report(data.reply);
