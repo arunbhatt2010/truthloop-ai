@@ -1528,7 +1528,7 @@ max_tokens: maxTokens
         })
       }
     );
-console.log("STEP 6: END RAW =", reply);
+
     if (!response.ok) {
 
     console.log("GROQ_STATUS", response.status);
