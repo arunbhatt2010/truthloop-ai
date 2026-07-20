@@ -234,30 +234,7 @@ function detectPlatform(profileLink) {
 
     
 
-    let hostname = "";
-
-    try {
-
-        hostname = new URL(profileLink)
-            .hostname
-            .replace(/^www\./, "")
-            .toLowerCase();
-
-    } catch {
-
-        return {
-            platform: "Unknown",
-            supported: true
-        };
-
-    }
-
-    return {
-        platform: hostname,
-        supported: true
-    };
-
-}
+    
 async function ProfileIntelligenceAPI({
 
     publicContentPackage,
