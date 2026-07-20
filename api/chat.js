@@ -565,7 +565,7 @@ console.log(
 
 if (loopLevel === 7) {
 
-loop7Instruction = `
+
 const loop7Role = `
 LOOP 7 MODE
 
@@ -1086,7 +1086,7 @@ ${loop7QualityContract}
 
 ${loop7FinalReview}
 `;
-
+  }
     /* =========================
        🧠 MODE ROUTER
     ========================= */
