@@ -734,7 +734,7 @@ ${loop7InputPackage}
 
 ${loop7EvidenceContract}
 
-${loop7ReportStructure}
+${loop7ReportContract}
 
 ${investigationSummaryPrompt}
 
