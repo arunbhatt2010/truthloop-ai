@@ -1822,7 +1822,7 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 }
-
+console.log("FINAL RETURN REACHED");
 return res.status(200).json({
 analysis,
 question,
