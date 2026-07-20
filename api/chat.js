@@ -623,7 +623,7 @@ Every conclusion must be supported by:
 • Or both.
 `;
 
-const loop7ReportStructure = `
+const loop7ReportContract = `
 Generate the report using the exact section order defined below.
 
 Every section has one unique responsibility.
