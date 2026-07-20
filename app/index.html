@@ -1699,20 +1699,33 @@ function renderLoop7Report(report){
         .replace(/\r/g, "")
         .trim();
 
-    function getSection(title){
+    function getSection(icon){
 
-        const regex = new RegExp(
-            `${title}[\\s\\S]*?\\n([\\s\\S]*?)(?=\\n(?:📋|🧩|⚙|🌐|🔍|📊|💡|🎯|════════|$))`,
-            "i"
-        );
+    const icons = ["📋","🧩","⚙","🌐","🔍","📊","💡","🎯"];
 
-        const match = report.match(regex);
+    const start = report.indexOf(icon);
 
-        return match
-            ? match[1].trim().replace(/\n/g,"<br>")
-            : "";
+    if(start === -1) return "";
 
+    let end = report.length;
+
+    for(const nextIcon of icons){
+
+        if(nextIcon === icon) continue;
+
+        const pos = report.indexOf(nextIcon, start + 1);
+
+        if(pos !== -1 && pos < end){
+            end = pos;
+        }
     }
+
+    let text = report.substring(start, end);
+
+    text = text.replace(/^.*?\n/, "").trim();
+
+    return text.replace(/\n/g,"<br>");
+}
 
     const summary = getSection("📋");
     const findings = getSection("🧩");
