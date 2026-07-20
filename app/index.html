@@ -2459,11 +2459,13 @@ if (loopLevel >= 7) {
 }
 
 try{
-  showShareCard(data.reply);
+    // showShareCard(data.reply);
 }catch(e){
-  console.log("share error", e);
-  }
-showShareCard(data.reply);
+    console.log("share error", e);
+}
+
+// Duplicate call bhi comment
+// showShareCard(data.reply);
 
 if(loopLevel >= 7){
 
