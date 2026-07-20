@@ -232,39 +232,30 @@ function detectPlatform(profileLink) {
 
     }
 
-    const restrictedPlatforms = {
+    function detectPlatform(profileLink) {
 
-        "linkedin.com": {
+    let hostname = "";
 
-            platform: "LinkedIn",
+    try {
 
-            supported: false,
+        hostname = new URL(profileLink)
+            .hostname
+            .replace(/^www\./, "")
+            .toLowerCase();
 
-            oauth: true,
+    } catch {
 
-            reason:
-                "Direct LinkedIn profile analysis is currently unavailable.",
-
-            options: [
-                "Use another public website",
-                "Connect with LinkedIn (coming soon)"
-            ]
-
-        }
-
-    };
-
-    return (
-
-        restrictedPlatforms[hostname] || {
-
-            platform: hostname,
-
+        return {
+            platform: "Unknown",
             supported: true
+        };
 
-        }
+    }
 
-    );
+    return {
+        platform: hostname,
+        supported: true
+    };
 
 }
 async function ProfileIntelligenceAPI({
