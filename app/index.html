@@ -2371,9 +2371,11 @@ alert(data.reply.substring(0,200));
 });
 
 if (data.reply.includes("📋")) {
+  alert("Loop 7 Report Detected");
     outputBox.innerHTML = renderLoop7Report(data.reply);
   alert(outputBox.innerHTML.substring(0,300));
 } else {
+  alert("Not a Loop 7 Report");
     typeEffect(data.reply);
 }
 
