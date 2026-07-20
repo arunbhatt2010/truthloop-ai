@@ -2372,14 +2372,20 @@ if (loopLevel === 6) {
 
     if (data.reply.includes("📋")) {
 
-    outputBox.innerHTML += renderLoop7Report(data.reply);
+    // Remove Loop 7 preparation screen
+    const bridge = document.getElementById("loop7EntryBridge");
+    if (bridge) {
+        bridge.closest(".aiResponse")?.remove();
+    }
+
+    // Show Final Investigation Report
+    outputBox.innerHTML = renderLoop7Report(data.reply);
 
 } else {
 
     typeEffect(data.reply);
 
-}
-
+  }
 isLoading = false;
 nextBtn.disabled = false;
 
