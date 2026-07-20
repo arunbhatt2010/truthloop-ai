@@ -1480,15 +1480,7 @@ Users stay engaged when they feel understood, not analyzed.
 ******************************/
 
 if (loopLevel === 7) {
-console.log("STEP 1: Loop Level =", loopLevel);
 
-console.log("STEP 2: Digital Footprint =", digitalFootprintReport ? "YES" : "NO");
-
-console.log("STEP 3: Public Evidence =", publicEvidencePackage?.success);
-
-console.log("STEP 4: Final Prompt Length =", finalSystemPrompt.length);
-
-console.log("STEP 5: Final AI Reply =", reply?.substring(0,300));
   messages = messages.filter(m => {
     if (m.role !== "assistant") return true;
 
