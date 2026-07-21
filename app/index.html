@@ -1908,6 +1908,49 @@ This investigation report is based on your complete Loop 1 to Loop 7 conversatio
 
 </div>
 `;
+   const report = document.querySelector(".truthLoopReport");
+
+const downloadReport = `
+<div style="max-width:900px;margin:0 auto;">
+
+<h1>TruthLoop Investigation Report</h1>
+
+<p>Find what you're avoiding.</p>
+
+<hr>
+
+<h2>Investigation Summary</h2>
+${report.querySelector("#investigationSummary")?.innerHTML || ""}
+
+<h2>Behavioral Findings</h2>
+${report.querySelector("#behavioralFindings")?.innerHTML || ""}
+
+<h2>Hidden Mechanism</h2>
+${report.querySelector("#hiddenMechanism")?.innerHTML || ""}
+
+${
+report.querySelector("#publicEvidence")
+? `
+<h2>Public Evidence</h2>
+${report.querySelector("#publicEvidence").innerHTML}
+`
+: ""
+}
+
+<h2>Cross Evidence</h2>
+${report.querySelector("#crossEvidence")?.innerHTML || ""}
+
+<h2>Evidence Confidence</h2>
+${report.querySelector("#evidenceConfidence")?.innerHTML || ""}
+
+<h2>Final Reflection</h2>
+${report.querySelector("#finalReflection")?.innerHTML || ""}
+
+<h2>One Next Action</h2>
+${report.querySelector("#oneNextAction")?.innerHTML || ""}
+
+</div>
+`;
     const blob = new Blob([`
 <!DOCTYPE html>
 <html>
@@ -1960,7 +2003,7 @@ max-width:900px;
 margin:0 auto;
 ">
 
-${html}
+${downloadReport}
 
 </div>
 
