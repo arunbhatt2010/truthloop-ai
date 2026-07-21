@@ -1841,7 +1841,36 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
  function downloadTruthLoopReport(){
 
     const html = document.querySelector(".truthLoopReport").outerHTML;
+const generatedDate = new Date().toLocaleDateString(undefined,{
+    year:"numeric",
+    month:"long",
+    day:"numeric"
+});
 
+const reportHeader = `
+<div style="
+max-width:900px;
+margin:0 auto 40px;
+padding-bottom:25px;
+border-bottom:2px solid #333;
+text-align:center;
+font-family:Arial,sans-serif;
+">
+
+<h1 style="margin-bottom:8px;">
+🧠 TruthLoop Investigation Report
+</h1>
+
+<p style="color:#666;margin:0;">
+Find what you're avoiding.
+</p>
+
+<p style="margin-top:20px;font-size:14px;color:#888;">
+Generated: ${generatedDate}
+</p>
+
+</div>
+`;
     const blob = new Blob([`
 <!DOCTYPE html>
 <html>
@@ -1849,12 +1878,19 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 <meta charset="UTF-8">
 <title>TruthLoop Investigation Report</title>
 </head>
-<body>
+<body style="
+background:#0f1115;
+padding:40px;
+font-family:Arial,sans-serif;
+color:#f5f5f5;
+line-height:1.8;
+">
+
+${reportHeader}
 
 ${html}
 
 </body>
-</html>
 `],{type:"text/html"});
 
     const a=document.createElement("a");
