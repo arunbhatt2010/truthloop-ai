@@ -1181,7 +1181,33 @@ Rules:
 - Hidden assumption = strongest belief keeping the pattern active.
 - Update only when new evidence appears.
 - Max 5 words per field.
+LOOP 7 PROFILE MODE
 
+When the current loop is 7:
+
+Treat the current AI response as the final investigation.
+
+Update the profile card using only evidence contained in the investigation.
+
+Generate exactly:
+
+Primary Loop
+Emotional Driver
+Avoidance Style
+Hidden Assumption
+Professional Identity
+Public Authority
+Evidence Confidence
+
+Rules
+
+• Treat the investigation as the highest-confidence evidence.
+• Never guess.
+• Never invent evidence.
+• Update only when stronger evidence exists.
+• Use "unknown" when evidence is insufficient.
+• Maximum 5 words per field.
+• Return only the profile fields.
 Return ONLY JSON:
 
 {
@@ -1190,6 +1216,22 @@ Return ONLY JSON:
 "avoidanceStyle":"unknown",
 "hiddenAssumption":"unknown"
 }
+SELF CHECK
+
+Before returning the profile:
+
+Verify that all required fields are present.
+
+If any field is missing,
+empty,
+unsupported,
+or does not follow the required format,
+
+rewrite the entire profile.
+
+Return only a complete and valid profile.
+
+Never return a partial profile.
 `;
  let contextInstruction = "";
 
