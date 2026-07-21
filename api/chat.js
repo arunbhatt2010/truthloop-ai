@@ -632,39 +632,30 @@ Every conclusion must be supported by:
 
 Purpose
 
-Deliver the final investigation verdict.
+Deliver the investigation's final verdict.
 
-Answer only:
+Answer one question only:
 
-"What did the investigation conclude?"
+"What is the single most important truth this investigation proved?"
 
-Generate one short paragraph (40–80 words).
+This is not a summary.
+This is the case verdict.
 
-Summarize the strongest evidence-based conclusion only.
+Compress every verified signal into one evidence-backed conclusion.
 
-This section introduces the investigation.
+The reader should immediately understand what the investigation uncovered before reading the remaining sections.
 
-Do not explain:
+Write one paragraph (40–80 words).
 
-• Behavioral patterns
-
-• Hidden mechanism
-
-• Public evidence
-
-• Cross evidence
-
-• Confidence
-
-• Reflection
-
-• Action
+Do not explain why.
+Do not describe behavioral patterns.
+Do not mention hidden mechanisms.
+Do not discuss public evidence, cross evidence, confidence, reflection, or actions.
 
 Do not repeat profile information.
 
-Do not give advice.
-
 Do not motivate.
+Do not give advice.
 
 End with one clear investigation verdict.
 🧩 BEHAVIORAL FINDINGS
