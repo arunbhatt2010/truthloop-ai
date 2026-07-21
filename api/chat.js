@@ -1183,32 +1183,33 @@ Rules:
 - Max 5 words per field.
 LOOP 7 PROFILE MODE
 
-LOOP 7 REPORT CONTRACT
+LOOP 7 INVESTIGATION MODE
 
-When the current loop is 7,
+When the current loop is 7:
 
-the current AI response is the final TruthLoop Investigation Report.
+The current AI response is the final TruthLoop Investigation Report.
 
-The report contains:
+Treat it as the highest-confidence investigation evidence.
 
-• Investigation Summary
-• Behavioral Findings
-• Hidden Mechanism
-• Public Evidence (optional)
-• Cross Evidence (optional)
-• Evidence Confidence
-• Final Reflection
-• One Next Action
+Do not expect additional conversation evidence.
 
-Treat this report as the highest-confidence investigation evidence.
+Do not require user input.
 
-Update the profile using only information supported by the report.
+Update the profile card using only the investigation report.
 
-Do not infer beyond the investigation.
+The investigation report contains verified behavioral findings, hidden mechanisms, public evidence, cross evidence, and evidence confidence.
 
-Ignore conversational wording.
+Assume all required evidence already exists inside the investigation.
 
-Extract only stable behavioral and identity signals.
+Never return "unknown" because conversation evidence is missing.
+
+Return "unknown" only if the investigation explicitly states that evidence is unavailable.
+
+If any required profile field is missing, empty, unsupported, or returned as "unknown" without evidence stating "Evidence unavailable",
+
+rewrite the entire profile.
+
+Return only a complete profile.
 Return ONLY JSON:
 
 {
