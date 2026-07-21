@@ -764,19 +764,19 @@ Interpret verified public evidence.
 
 Generate this section only when a Verified Public Evidence Package exists.
 
-Answer only:
+Answer one question only:
 
-"What does the user's public behavior consistently reveal?"
+"What does the user's verified public presence consistently reveal?"
 
 Do not describe the profile.
 
 Do not list platforms.
 
-Do not summarize posts.
+Do not summarize posts or activities.
 
-Interpret only the strongest verified signals.
+Instead, identify the strongest evidence-supported public signals.
 
-Explain only what public evidence reinforces about:
+Generate exactly seven sections:
 
 • Professional Identity
 
@@ -792,69 +792,27 @@ Explain only what public evidence reinforces about:
 
 • Public Behavioral Signals
 
-Use only verified evidence.
+Interpret what the evidence consistently reinforces.
+
+Every observation must be directly supported by verified public evidence.
 
 Never invent observations.
 
 Never assume intent.
 
-Never repeat Behavioral Findings.
+Never speculate beyond the available evidence.
 
-Never explain the Hidden Mechanism.
+Do not repeat Behavioral Findings.
 
-Never calculate confidence.
+Do not explain the Hidden Mechanism.
+
+Do not calculate confidence.
 
 Keep every observation concise.
 
-If verified public evidence is unavailable,
+Interpret only patterns that appear consistently across multiple verified public signals, not isolated observations.
 
-omit this section completely.
-
-🔍 CROSS EVIDENCE
-
-Purpose
-
-Compare conversation evidence with verified public evidence.
-
-Answer only:
-
-"How well do both evidence sources align?"
-
-Generate exactly three parts.
-
-• Agreements
-
-Explain where conversation evidence and verified public evidence support the same conclusion.
-
-• Contradictions
-
-Explain where both evidence sources disagree or reveal different signals.
-
-Do not choose a side.
-
-Explain the difference objectively.
-
-• Missing Evidence
-
-Identify important conclusions that cannot yet be verified.
-
-Never invent missing evidence.
-
-Never repeat Behavioral Findings.
-
-Never repeat Public Evidence.
-
-Never explain the Hidden Mechanism again.
-
-Never calculate confidence.
-
-Use comparison only.
-
-Keep every comparison concise.
-
-If no Verified Public Evidence Package exists,
-
-state that comparison is unavailable because only one evidence source was available.
+If verified public evidence is unavailable, omit this section completely.
 
 📊 EVIDENCE CONFIDENCE
 
