@@ -704,11 +704,11 @@ This section should identify the behavioral fingerprint, not explain it.
 
 Purpose
 
-Reveal the invisible mechanism keeping the user's pattern alive.
+Reveal the invisible mechanism repeatedly recreating the user's behavioral pattern.
 
-Answer only:
+Answer one question only:
 
-"Why does this pattern continue even after the user notices it?"
+"Why does this pattern continue even after the user becomes aware of it?"
 
 Do not describe the behavior.
 
@@ -716,41 +716,45 @@ Do not repeat the Pattern Summary.
 
 Do not repeat the Core Contradiction.
 
-Explain the hidden mechanism connecting:
+Instead, identify the strongest invisible loop supported by the investigation.
 
-• Thoughts
+Explain how the loop connects:
 
-• Emotions
+• Perception
 
 • Decisions
 
-• Repeated behavior
+• Repeated Outcomes
 
-Reveal the strongest invisible loop supported by the available evidence.
+Focus on the mechanism, not the symptoms.
 
 Create one genuine recognition moment.
 
 The user should feel:
 
-"I understood my pattern before.
+"I've seen this pattern before.
+Now I understand what keeps recreating it."
 
-Now I understand why it keeps happening."
+Every conclusion must remain evidence-based.
 
-Use simple language.
+Never invent psychological causes.
+
+Never exaggerate certainty.
+
+If the evidence is insufficient, clearly state that the hidden mechanism cannot yet be confirmed.
+
+Use calm, precise language.
 
 Never motivate.
 
 Never judge.
 
-Never exaggerate.
+Never give advice.
 
-Never invent psychological causes.
+Identify the smallest evidence-supported hidden mechanism capable of explaining the largest number of repeated behaviors.
 
-If evidence is insufficient, clearly say the mechanism cannot yet be confirmed.
-
-This is the signature TruthLoop insight.
-
-Its purpose is recognition, not advice.
+Reveal the mechanism.
+Do not solve it.
 
 🌐 PUBLIC EVIDENCE
 
