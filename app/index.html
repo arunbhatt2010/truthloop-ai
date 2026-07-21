@@ -1257,7 +1257,8 @@ let userCountry = "IN";
 let currentCategory="";
 let waitingForLoop7Bridge = false;
 let isLoading=false;
-let latestTruthLoopReport = "";  
+let latestTruthLoopReport = "";
+let investigationSource = "";
 const UI_TEXT = {
   en: {
     hero: 'Find what you\'re <span>avoiding.</span>',
@@ -1865,9 +1866,49 @@ font-family:Arial,sans-serif;
 Find what you're avoiding.
 </p>
 
-<p style="margin-top:20px;font-size:14px;color:#888;">
-Generated: ${generatedDate}
+<div style="
+margin-top:30px;
+padding:18px;
+background:#171a21;
+border:1px solid #333;
+border-radius:12px;
+text-align:left;
+">
+
+<h3 style="margin-top:0;color:#ff9d00;">
+📂 Investigation Scope
+</h3>
+
+<p style="margin:8px 0;">
+<b>Investigation Basis</b>
 </p>
+
+<p style="margin:6px 0;">
+✓ Loop 1 → Loop 7 Conversation
+</p>
+
+${
+investigationSource
+?
+`<p style="margin:6px 0;">
+✓ Public Footprint Analysis
+</p>
+
+<p style="margin-top:12px;">
+<b>Source</b><br>
+${investigationSource}
+</p>
+
+<p style="color:#999;font-size:13px;">
+Only publicly available information was analyzed.
+</p>`
+:
+`<p style="color:#999;">
+No public profile or website was provided.
+</p>`
+}
+
+</div>
 
 </div>
 `;
