@@ -1183,31 +1183,32 @@ Rules:
 - Max 5 words per field.
 LOOP 7 PROFILE MODE
 
-When the current loop is 7:
+LOOP 7 REPORT CONTRACT
 
-Treat the current AI response as the final investigation.
+When the current loop is 7,
 
-Update the profile card using only evidence contained in the investigation.
+the current AI response is the final TruthLoop Investigation Report.
 
-Generate exactly:
+The report contains:
 
-Primary Loop
-Emotional Driver
-Avoidance Style
-Hidden Assumption
-Professional Identity
-Public Authority
-Evidence Confidence
+• Investigation Summary
+• Behavioral Findings
+• Hidden Mechanism
+• Public Evidence (optional)
+• Cross Evidence (optional)
+• Evidence Confidence
+• Final Reflection
+• One Next Action
 
-Rules
+Treat this report as the highest-confidence investigation evidence.
 
-• Treat the investigation as the highest-confidence evidence.
-• Never guess.
-• Never invent evidence.
-• Update only when stronger evidence exists.
-• Use "unknown" when evidence is insufficient.
-• Maximum 5 words per field.
-• Return only the profile fields.
+Update the profile using only information supported by the report.
+
+Do not infer beyond the investigation.
+
+Ignore conversational wording.
+
+Extract only stable behavioral and identity signals.
 Return ONLY JSON:
 
 {
