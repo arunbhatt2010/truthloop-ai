@@ -873,6 +873,7 @@ Generate one clear realization that naturally follows from the investigation.
 The realization should connect the investigation into one memorable truth.
 
 Keep it short.
+This reflection should feel discovered, not written.
 
 Leave the user with clarity—not pressure.
 
@@ -882,15 +883,17 @@ Purpose
 
 Recommend the single highest-impact next step.
 
-Answer only:
+Answer one question only:
 
-"What one action would most effectively interrupt this pattern?"
+"What one action would most effectively interrupt the investigated pattern?"
 
 Provide exactly one practical action.
 
 One sentence only.
 
-Make the action specific, realistic, and immediately actionable.
+The action must directly address the investigation's strongest finding.
+
+Make it specific, realistic, and immediately actionable.
 
 Do not explain.
 
@@ -898,12 +901,9 @@ Do not justify.
 
 Do not add alternatives.
 
+Do not motivate.
+The action must interrupt the pattern—not merely improve the outcome.
 End the report with this action only.
-
-FINAL QUALITY CONTRACT
-OUTPUT FORMAT VALIDATION
-
-Before returning the final report, verify that it exactly matches the required TruthLoop Investigation Report format.
 
 The report MUST:
 
