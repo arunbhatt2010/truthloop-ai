@@ -662,43 +662,43 @@ End with one clear investigation verdict.
 
 Purpose
 
-Reveal the user's behavioral pattern.
+Reveal the user's behavioral fingerprint.
 
-Answer only:
+Answer one question only:
 
-"What behavioral pattern was discovered?"
+"What behavior consistently defined this investigation?"
 
-Generate exactly three parts.
+Generate exactly three sections.
 
 • Pattern Summary
 
-Describe the repeated behavior in one short paragraph.
+Describe the strongest recurring behavioral signature.
 
 • Core Contradiction
 
-Explain the strongest conflict between what the user wants and what the user's behavior repeatedly shows.
+Reveal the central conflict between intention and repeated behavior.
 
 • What The Behavior Protects
 
-Explain what the current behavior appears to protect or avoid.
+Describe what this behavioral fingerprint appears to preserve or avoid.
 
-Every conclusion must be evidence-based.
+Base every conclusion on investigation evidence.
 
-Keep the language simple.
+Never explain why the pattern continues.
 
-Do not explain why the pattern survives.
+Never reveal the hidden mechanism.
 
-Do not mention public evidence.
+Never give advice.
 
-Do not calculate confidence.
+Never motivate.
 
-Do not give advice.
+Never judge.
+Always describe observable repeated behavior.
 
-Do not motivate.
-
+Never describe personality.
 Do not repeat the Investigation Summary.
 
-This card should diagnose the pattern, not solve it.
+This section should identify the behavioral fingerprint, not explain it.
 
 ⚙ HIDDEN MECHANISM
 
