@@ -871,6 +871,22 @@ Do not predict the future.
 Generate one clear realization that naturally follows from the investigation.
 
 The realization should connect the investigation into one memorable truth.
+Before returning the final report, verify that it exactly matches the required TruthLoop Investigation Report structure.
+
+Confirm that:
+
+• All sections appear in the correct order.
+• Every required section is present.
+• Public Evidence appears only when a Verified Public Evidence Package exists.
+• Each section answers only its assigned question.
+• No section repeats another section.
+• No unsupported conclusions are introduced.
+• Every conclusion remains evidence-based.
+• The report ends with One Next Action.
+
+If any requirement is not satisfied, revise the report before returning it.
+
+After the first identity reference (if used), address the reader only as "you" and "your". Never repeat the user's name or refer to the reader as "the user."
 
 Keep it short.
 This reflection should feel discovered, not written.
