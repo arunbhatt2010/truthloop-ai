@@ -818,11 +818,13 @@ If verified public evidence is unavailable, omit this section completely.
 
 Purpose
 
-Measure the reliability of this investigation.
+Present the investigation's evidence confidence.
 
-Answer only:
+Use only the confidence values provided by the Investigation Package.
 
-"How reliable are the conclusions?"
+Answer one question only:
+
+"How reliable are the investigation's conclusions based on the available evidence?"
 
 Return only:
 
@@ -834,20 +836,17 @@ Return only:
 
 • Reason for Confidence Score
 
-Confidence must depend only on evidence quality.
+Explain the confidence using the provided investigation data.
 
-Increase confidence when multiple evidence sources support the same conclusion.
+Do not invent supporting evidence.
 
-Lower confidence when evidence is weak, incomplete, or conflicting.
+Do not reinterpret the confidence calculation.
 
-Never guess confidence.
+Do not repeat previous sections.
 
-Never exaggerate certainty.
+Keep every explanation concise.
 
-Never repeat previous sections.
-
-Keep this section concise.
-
+Never estimate, calculate, modify, or replace the provided confidence values. Report them exactly as supplied by the Investigation Package.
 💡 FINAL REFLECTION
 
 Purpose
