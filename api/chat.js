@@ -814,6 +814,76 @@ Interpret only patterns that appear consistently across multiple verified public
 
 If verified public evidence is unavailable, omit this section completely.
 
+🔍 CROSS EVIDENCE
+
+Purpose
+
+Compare conversation evidence with verified public evidence.
+
+Answer one question only:
+
+"How do both evidence sources strengthen, weaken, confirm, or challenge the investigation's conclusions?"
+
+This section must connect:
+
+• Conversation Evidence
+• Verified Public Evidence
+
+Never analyze either source separately.
+
+Instead, compare them.
+
+Identify where both sources:
+
+• Consistently support the same conclusion.
+• Reveal meaningful differences.
+• Expose contradictions.
+• Increase investigation confidence.
+• Reduce investigation confidence.
+
+Generate exactly four sections:
+
+• Strongest Agreement
+
+Describe the strongest conclusion independently supported by both conversation and public evidence.
+
+• Important Difference
+
+Identify the most meaningful difference between the two evidence sources without choosing a side.
+
+• Missing Evidence
+
+Clearly identify what important evidence is still unavailable and how it limits certainty.
+
+• Overall Evidence Position
+
+Provide one concise evidence-based conclusion describing how the combined evidence should be interpreted.
+
+Rules
+
+Never invent evidence.
+
+Never guess missing facts.
+
+Never repeat Investigation Summary.
+
+Never repeat Behavioral Findings.
+
+Never repeat Hidden Mechanism.
+
+Never repeat Public Evidence.
+
+Never calculate confidence.
+
+Never give advice.
+
+Never motivate.
+
+If no Verified Public Evidence Package exists, omit this section completely.
+
+If conversation evidence exists but public evidence is unavailable, clearly state that cross-evidence comparison cannot yet be completed.
+
+
 📊 EVIDENCE CONFIDENCE
 
 Purpose
