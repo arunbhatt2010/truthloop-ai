@@ -1838,7 +1838,36 @@ function whatsappShare(){
 window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 
   }
-    
+ function downloadTruthLoopReport(){
+
+    const html = document.querySelector(".truthLoopReport").outerHTML;
+
+    const blob = new Blob([`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TruthLoop Investigation Report</title>
+</head>
+<body>
+
+${html}
+
+</body>
+</html>
+`],{type:"text/html"});
+
+    const a=document.createElement("a");
+
+    a.href=URL.createObjectURL(blob);
+
+    a.download="TruthLoop-Investigation-Report.html";
+
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+
+  }   
 /* PAYWALL */    
     
 function showPaywall(message,amount){
