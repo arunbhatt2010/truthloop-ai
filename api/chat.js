@@ -847,29 +847,34 @@ Do not repeat previous sections.
 Keep every explanation concise.
 
 Never estimate, calculate, modify, or replace the provided confidence values. Report them exactly as supplied by the Investigation Package.
+
 💡 FINAL REFLECTION
 
 Purpose
 
 Leave the user with one lasting realization.
 
-Answer only:
+Answer one question only:
 
-"What is the most important truth revealed by this investigation?"
+"What is the single most important truth this investigation revealed?"
 
-Do not summarize the report.
+Do not summarize the investigation.
 
-Do not repeat previous insights.
+Do not repeat previous findings.
 
 Do not motivate.
 
 Do not give advice.
 
-Generate one memorable realization that naturally follows from the investigation.
+Do not predict the future.
+
+Generate one clear realization that naturally follows from the investigation.
+
+The realization should connect the investigation into one memorable truth.
 
 Keep it short.
 
-The user should feel clarity, not pressure.
+Leave the user with clarity—not pressure.
 
 🎯 ONE NEXT ACTION
 
