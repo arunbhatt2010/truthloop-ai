@@ -1257,6 +1257,7 @@ let userCountry = "IN";
 let currentCategory="";
 let waitingForLoop7Bridge = false;
 let isLoading=false;
+let latestTruthLoopReport = "";  
 const UI_TEXT = {
   en: {
     hero: 'Find what you\'re <span>avoiding.</span>',
@@ -1783,14 +1784,24 @@ ${reflection}
 <h2>🎯 One Next Action</h2>
 ${action}
 </div>
-
+<div style="margin-top:30px;text-align:center;">
+    <button id="downloadReportBtn">
+        📄 Download Report
+    </button>
+</div>
 </div>
 
 `;
 
   }
 
+document.addEventListener("click",(e)=>{
 
+    if(e.target.id==="downloadReportBtn"){
+        downloadTruthLoopReport();
+    }
+
+});
 
 /* SHARE */    
     
@@ -2385,6 +2396,7 @@ alert(data.reply.substring(0,200));
 
 if (data.reply.includes("📋")) {
   alert("Loop 7 Report Detected");
+  latestTruthLoopReport = data.reply;
     outputBox.innerHTML = renderLoop7Report(data.reply);
   alert(outputBox.innerHTML.substring(0,300));
 } else {
