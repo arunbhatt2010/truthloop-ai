@@ -238,9 +238,9 @@ function detectPlatform(profileLink) {
 
             platform: "LinkedIn",
 
-            supported: false,
+            supported: true,
 
-            oauth: true,
+            oauth: false,
 
             reason:
                 "Direct LinkedIn profile analysis is currently unavailable.",
