@@ -1917,6 +1917,36 @@ No public profile or website was provided.
 <html>
 <head>
 <meta charset="UTF-8">
+<style>
+
+body{
+    background:#0f1115;
+    color:#f5f5f5;
+    font-family:Arial,sans-serif;
+    line-height:1.8;
+}
+
+.truthLoopReport{
+    max-width:900px;
+    margin:auto;
+}
+
+.truthLoopReport h1,
+.truthLoopReport h2{
+    color:#ff9d00;
+}
+
+.truthLoopReport p,
+.truthLoopReport li{
+    color:#ddd;
+}
+
+.truthLoopReport hr{
+    border:0;
+    border-top:1px solid #333;
+}
+
+</style>
 <title>TruthLoop Investigation Report</title>
 </head>
 <body style="
@@ -1929,7 +1959,14 @@ line-height:1.8;
 
 ${reportHeader}
 
+<div style="
+max-width:900px;
+margin:0 auto;
+">
+
 ${html}
+
+</div>
 
 </body>
 `],{type:"text/html"});
