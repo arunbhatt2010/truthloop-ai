@@ -1756,24 +1756,162 @@ function showEvidence(type){
 
         case "upload":
 
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📄 Upload Files (Coming Soon)</div>`;
+    container.innerHTML = `
 
-            nextBtn.style.display = "block";
-            break;
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        📄 Upload Files
+    </div>
+
+    <div style="
+        margin-top:12px;
+        color:#cccccc;
+        line-height:1.8;
+    ">
+        Upload documents that help TruthLoop understand your situation more accurately.
+    </div>
+
+    <div style="
+        margin-top:18px;
+        padding:14px;
+        border-radius:12px;
+        border:1px solid rgba(255,140,0,.25);
+        background:rgba(255,140,0,.06);
+        color:#bbbbbb;
+        line-height:1.8;
+    ">
+
+        • PDF Documents<br>
+        • Images<br>
+        • Screenshots<br>
+        • Text Files
+
+    </div>
+
+    <input
+        id="loop7FileInput"
+        type="file"
+        style="margin-top:18px;width:100%;"
+        onchange="alert('File Upload trigger verified');">
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Your files remain private and are only used for this investigation.
+
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
 
         case "business":
 
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📊 Business Data (Coming Soon)</div>`;
+    container.innerHTML = `
 
-            nextBtn.style.display = "block";
-            break;
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        📊 Business Data
+    </div>
+
+    <div style="
+        margin-top:12px;
+        color:#cccccc;
+        line-height:1.8;
+    ">
+        Share your business website or public business information for a deeper investigation.
+    </div>
+
+    <textarea
+        id="businessDataInput"
+        placeholder="Website, business profile, public company information..."
+        style="
+            width:100%;
+            min-height:120px;
+            margin-top:18px;
+            padding:12px;
+            border-radius:10px;
+        "
+        oninput="alert('Business Data trigger verified');">
+    </textarea>
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Only publicly available business information will be analyzed.
+
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
 
         case "other":
 
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">✨ Other Evidence (Coming Soon)</div>`;
+    container.innerHTML = `
 
-            nextBtn.style.display = "block";
-            break;
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        ✨ Other
+    </div>
+
+    <div style="
+        margin-top:12px;
+        color:#cccccc;
+        line-height:1.8;
+    ">
+        Share any additional public information that may help TruthLoop understand your situation better.
+    </div>
+
+    <textarea
+        id="otherEvidenceInput"
+        placeholder="Paste links, notes, references, public information..."
+        style="
+            width:100%;
+            min-height:120px;
+            margin-top:18px;
+            padding:12px;
+            border-radius:10px;
+        "
+        oninput="alert('Other Evidence trigger verified');">
+    </textarea>
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Add only information you want TruthLoop to consider during the investigation.
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
     }
 
 }
