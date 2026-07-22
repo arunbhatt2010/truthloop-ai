@@ -6,6 +6,9 @@ import {
     extractPublicContent,
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
+import {
+    loadFootprintSupport
+} from "./FootprintSupport.js";
 /* ============================================================
    DIGITAL FOOTPRINT BRAIN
 
