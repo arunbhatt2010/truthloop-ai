@@ -1586,7 +1586,7 @@ function showEvidence(type){
     const container = document.getElementById("evidenceContainer");
 
     container.style.display = "block";
-nextBtn.style.display = "none";
+
     switch(type){
 
         case "public":
@@ -1610,38 +1610,41 @@ nextBtn.style.display = "none";
                         color:#fff;
                         box-sizing:border-box;
                     ">
-
-                
             `;
+
+            nextBtn.style.display = "block";
             break;
 
-        case "public":
-    container.innerHTML = `...`;
-    nextBtn.style.display = "block";
-    break;
+        case "oauth":
 
-case "oauth":
-    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">🔐 Connected Apps (Coming Soon)</div>`;
-    nextBtn.style.display = "block";
-    break;
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">🔐 Connected Apps (Coming Soon)</div>`;
 
-case "upload":
-    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📄 Upload Files (Coming Soon)</div>`;
-    nextBtn.style.display = "block";
-    break;
+            nextBtn.style.display = "block";
+            break;
 
-case "business":
-    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📊 Business Data (Coming Soon)</div>`;
-    nextBtn.style.display = "block";
-    break;
+        case "upload":
 
-case "other":
-    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">✨ Other Evidence (Coming Soon)</div>`;
-    nextBtn.style.display = "block";
-    break;
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📄 Upload Files (Coming Soon)</div>`;
+
+            nextBtn.style.display = "block";
+            break;
+
+        case "business":
+
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📊 Business Data (Coming Soon)</div>`;
+
+            nextBtn.style.display = "block";
+            break;
+
+        case "other":
+
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">✨ Other Evidence (Coming Soon)</div>`;
+
+            nextBtn.style.display = "block";
+            break;
     }
 
-  }  
+}
 function typeEffect(text){
 
 text = text.replace(
@@ -1728,7 +1731,7 @@ ${lastQuestion}
 div.innerHTML = finalHtml;
 
 if (loopLevel === 6) {
-
+nextBtn.style.display = "block";
     div.innerHTML += renderLoop7EntryBridge();
 
     reflectionInput.style.display = "none";
@@ -1745,7 +1748,7 @@ setTimeout(()=>{
     // reflectionInput.focus();
 },300);
 
-nextBtn.style.display = "block";
+
 }
 
 },speed);
