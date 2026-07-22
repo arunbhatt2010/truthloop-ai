@@ -1692,10 +1692,67 @@ function showEvidence(type){
 
         case "oauth":
 
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">🔐 Connected Apps (Coming Soon)</div>`;
+    container.innerHTML = `
 
-            nextBtn.style.display = "block";
-            break;
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        🔐 Connected Apps
+    </div>
+
+    <div style="
+        margin-top:12px;
+        line-height:1.8;
+        color:#cccccc;
+    ">
+        Connect your professional account to improve the quality of your
+        TruthLoop investigation.
+    </div>
+
+    <div style="
+        margin-top:18px;
+        padding:14px;
+        border-radius:12px;
+        border:1px solid rgba(255,140,0,.25);
+        background:rgba(255,140,0,.06);
+        color:#bbbbbb;
+        line-height:1.8;
+    ">
+
+        • LinkedIn Profile<br>
+        • Public Professional Activity<br>
+        • Career Signals<br>
+        • Public Reputation
+
+    </div>
+
+    <button
+        id="linkedinOAuthBtn"
+        style="margin-top:18px;"
+        onclick="alert('LinkedIn OAuth trigger verified');">
+
+        🔐 Connect LinkedIn
+
+    </button>
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Your account is used only with your permission.
+
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
 
         case "upload":
 
