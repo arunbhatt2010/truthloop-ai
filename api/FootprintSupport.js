@@ -134,25 +134,84 @@ const platformType =
 
     platformMap[hostname] || "Website";
 
-    // STEP 5
-    // Access Method
+// STEP 5
+// Access Method
 
-    ...
+const accessMethodMap = {
 
-    // STEP 6
-    // OAuth Decision
+    LinkedIn: "OAuth",
 
-    ...
+    GitHub: "Public",
 
-    // STEP 7
-    // Investigation Context
+    X: "OAuth",
 
-    ...
+    Facebook: "OAuth",
 
-    // STEP 8
-    // Footprint Context Package
+    Reddit: "Public",
 
-    ...
+    YouTube: "Public",
+
+    Medium: "Public",
+
+    Substack: "Public",
+
+    Website: "Public"
+
+};
+
+const accessMethod =
+
+    accessMethodMap[platformType] || "Public";
+
+// STEP 6
+// OAuth Decision
+
+const oauthRequired =
+    accessMethod === "OAuth";
+
+const oauthProvider =
+
+    oauthRequired
+        ? platformType
+        : null;
+
+ // STEP 7
+// Investigation Context
+
+const investigationContext = {
+
+    truthLoopPackage,
+
+    profileLink:
+        normalizedProfileLink,
+
+    hostname,
+
+    platformType,
+
+    accessMethod,
+
+    oauthRequired,
+
+    oauthProvider,
+
+    currentLoop
+
+};
+
+// STEP 8
+// Footprint Context Package
+
+const footprintContextPackage = {
+
+    success: true,
+
+    stage: "Footprint Support",
+
+    context:
+        investigationContext
+
+};
 
     return footprintContextPackage;
 
