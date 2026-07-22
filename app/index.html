@@ -2721,7 +2721,7 @@ alert(data.reply.substring(0,200));
     role: "assistant",
     content: data.reply
 });
-
+alert(data.reply.includes("📋"));
 if (data.reply.includes("📋")) {
   alert("Loop 7 Report Detected");
   latestTruthLoopReport = data.reply;
