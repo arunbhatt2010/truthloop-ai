@@ -1865,7 +1865,9 @@ function renderLoop7Report(report){
 
     text = text.replace(/^.*?\n/, "").trim();
 
-    return text.replace(/\n/g,"<br>");
+return text
+    .replace(/^###\s*/gm,"⏩ ")
+    .replace(/\n/g,"<br>");
 }
 
     const summary = getSection("📋");
