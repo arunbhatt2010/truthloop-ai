@@ -95,6 +95,23 @@ if (
 
 const normalizedProfileLink =
     profileLink.trim();
+    const footprintContextPackage =
+    await loadFootprintSupport({
+
+        truthLoopPackage,
+
+        profileLink:
+            normalizedProfileLink,
+
+        currentLoop
+
+    });
+
+if (!footprintContextPackage.success) {
+
+    return footprintContextPackage;
+
+}
    // STEP 2.5
 // Public Content Fetcher
 
