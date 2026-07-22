@@ -1496,86 +1496,96 @@ margin-bottom:14px;
 🔗 Loop 7 Entry Bridge
 </div>
 
+function renderLoop7EntryBridge() {
+return `
+<div id="loop7EntryBridge"
+style="
+margin-top:20px;
+padding:20px;
+border-radius:16px;
+border:1px solid rgba(255,140,0,.25);
+background:rgba(255,140,0,.08);
+">
+
+<div style="
+font-size:22px;
+font-weight:700;
+color:#ffb347;
+margin-bottom:14px;
+">
+🔗 Loop 7 Evidence Bridge
+</div>
+
 <div style="
 font-size:14px;
-line-height:1.7;
+line-height:1.8;
 color:#ddd;
 ">
 
-<b>Public Profile (Recommended)</b>
+<b>Build a more trustworthy investigation.</b>
 
 <br><br>
 
-Add a public profile or website to help TruthLoop understand your real public footprint.
+TruthLoop works best when it analyzes the place where you spend most of your professional time.
 
 <br><br>
 
-This helps TruthLoop analyze:
+<b>Choose the place where you are most involved.</b>
 
-<br><br>
+<br>
 
-• Professional Identity<br>
-• Career Journey<br>
-• Public Reputation<br>
-• Expertise<br>
-• Authority<br>
-• Trust<br>
-• Audience<br>
-• Content<br>
-• Communication Style<br>
-• Business Presence<br>
-• Community Presence
-
-<br><br>
-
-<b>Supported public links</b>
-
-<br><br>
-
-• LinkedIn<br>
-• GitHub<br>
-• Portfolio<br>
-• Personal Website<br>
-• X<br>
-• Facebook<br>
-• Reddit<br>
-• YouTube<br>
-• Medium<br>
-• Substack
-
-<br><br>
-
-Paste your public profile or website:
+The better your evidence represents your real work, the more trustworthy your personalized Loop 7 investigation becomes.
 
 </div>
 
-<input
-id="loop7ProfileLink"
-type="text"
-placeholder="https://..."
+<div
 style="
-width:100%;
-margin-top:14px;
-padding:12px;
-border-radius:10px;
-border:1px solid rgba(255,140,0,.3);
-background:#111;
-color:#fff;
-box-sizing:border-box;
+margin-top:20px;
+display:flex;
+flex-direction:column;
+gap:12px;
 ">
 
-<div style="
-margin-top:14px;
+<button id="publicEvidenceBtn">
+🌐 Public Links
+</button>
+
+<button id="oauthEvidenceBtn">
+🔐 Connected Apps
+</button>
+
+<button id="uploadEvidenceBtn">
+📄 Upload Files
+</button>
+
+<button id="businessEvidenceBtn">
+📊 Business Data
+</button>
+
+<button id="otherEvidenceBtn">
+✨ Other
+</button>
+
+</div>
+
+<div
+id="evidenceContainer"
+style="margin-top:18px;display:none;">
+</div>
+
+<div
+style="
+margin-top:18px;
 font-size:12px;
-line-height:1.6;
+line-height:1.7;
 color:#999;
 ">
 
-TruthLoop analyzes only publicly available information from the link you provide.
+TruthLoop analyzes only the evidence you choose to provide.
 
-Providing a profile is recommended because it improves the accuracy of your personalized Loop 7 report.
+<br><br>
 
-If you prefer, you can continue without adding one.
+More representative evidence leads to a more trustworthy investigation.
 
 </div>
 
