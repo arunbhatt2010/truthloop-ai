@@ -1612,8 +1612,10 @@ function showEvidence(type){
                     ">
 
                 <button
+<button
+id="evidenceContinueBtn"
 style="margin-top:14px;width:100%;"
-onclick="nextBtn.click()">
+onclick="startEvidenceFlow(this)">
 Continue →
 </button>
             `;
@@ -1637,6 +1639,25 @@ Continue →
     }
 
   }  
+  async function startEvidenceFlow(btn){
+
+    if(!btn.dataset.ready){
+
+        btn.dataset.ready = "true";
+
+        // DigitalFootprintBrain ko trigger karega
+        nextBtn.click();
+
+        // Button ka text change
+        btn.innerHTML = "🧠 Generate Your Final Report →";
+
+        return;
+    }
+
+    // Ab Loop 7 report generate hogi
+    nextBtn.click();
+
+}
 function typeEffect(text){
 
 text = text.replace(
