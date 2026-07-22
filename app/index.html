@@ -1476,25 +1476,6 @@ Connect with LinkedIn
 
   }   
 /* TYPE EFFECT */
-function renderLoop7EntryBridge() {
-return `
-<div id="loop7EntryBridge"
-style="
-margin-top:20px;
-padding:18px;
-border-radius:16px;
-border:1px solid rgba(255,140,0,.25);
-background:rgba(255,140,0,.08);
-">
-
-<div style="
-font-size:20px;
-font-weight:700;
-color:#ffb347;
-margin-bottom:14px;
-">
-🔗 Loop 7 Entry Bridge
-</div>
 
 function renderLoop7EntryBridge() {
 return `
@@ -1532,7 +1513,7 @@ TruthLoop works best when it analyzes the place where you spend most of your pro
 
 <b>Choose the place where you are most involved.</b>
 
-<br>
+<br><br>
 
 The better your evidence represents your real work, the more trustworthy your personalized Loop 7 investigation becomes.
 
@@ -1546,23 +1527,28 @@ flex-direction:column;
 gap:12px;
 ">
 
-<button id="publicEvidenceBtn">
+<button id="publicEvidenceBtn"
+onclick="showEvidence('public')">
 🌐 Public Links
 </button>
 
-<button id="oauthEvidenceBtn">
+<button id="oauthEvidenceBtn"
+onclick="showEvidence('oauth')">
 🔐 Connected Apps
 </button>
 
-<button id="uploadEvidenceBtn">
+<button id="uploadEvidenceBtn"
+onclick="showEvidence('upload')">
 📄 Upload Files
 </button>
 
-<button id="businessEvidenceBtn">
+<button id="businessEvidenceBtn"
+onclick="showEvidence('business')">
 📊 Business Data
 </button>
 
-<button id="otherEvidenceBtn">
+<button id="otherEvidenceBtn"
+onclick="showEvidence('other')">
 ✨ Other
 </button>
 
@@ -1570,7 +1556,10 @@ gap:12px;
 
 <div
 id="evidenceContainer"
-style="margin-top:18px;display:none;">
+style="
+margin-top:18px;
+display:none;
+">
 </div>
 
 <div
@@ -1591,7 +1580,7 @@ More representative evidence leads to a more trustworthy investigation.
 
 </div>
 `;
-  }
+}
 function typeEffect(text){
 
 text = text.replace(
