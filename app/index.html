@@ -1586,7 +1586,7 @@ function showEvidence(type){
     const container = document.getElementById("evidenceContainer");
 
     container.style.display = "block";
-
+nextBtn.style.display = "none";
     switch(type){
 
         case "public":
@@ -1615,21 +1615,30 @@ function showEvidence(type){
             `;
             break;
 
-        case "oauth":
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">🔐 Connected Apps (Coming Soon)</div>`;
-            break;
+        case "public":
+    container.innerHTML = `...`;
+    nextBtn.style.display = "block";
+    break;
 
-        case "upload":
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📄 Upload Files (Coming Soon)</div>`;
-            break;
+case "oauth":
+    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">🔐 Connected Apps (Coming Soon)</div>`;
+    nextBtn.style.display = "block";
+    break;
 
-        case "business":
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📊 Business Data (Coming Soon)</div>`;
-            break;
+case "upload":
+    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📄 Upload Files (Coming Soon)</div>`;
+    nextBtn.style.display = "block";
+    break;
 
-        case "other":
-            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">✨ Other Evidence (Coming Soon)</div>`;
-            break;
+case "business":
+    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📊 Business Data (Coming Soon)</div>`;
+    nextBtn.style.display = "block";
+    break;
+
+case "other":
+    container.innerHTML = `<div style="margin-top:10px;color:#ddd;">✨ Other Evidence (Coming Soon)</div>`;
+    nextBtn.style.display = "block";
+    break;
     }
 
   }  
