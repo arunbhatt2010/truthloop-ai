@@ -1724,13 +1724,17 @@ if (loopLevel === 6) {
 
     reflectionInput.style.display = "none";
 
-    nextBtn.innerText = "Get Your Final Report →";
+    if (!window.loop7Started) {
+        window.loop7Started = true;
+        nextBtn.innerText = "Start Loop 7";
+    } else {
+        nextBtn.innerText = "Get Your Final Report →";
+    }
 
 } else {
 
     reflectionInput.style.display = "block";
-}
-
+  }
 setTimeout(()=>{
     // reflectionInput.focus();
 },300);
@@ -2631,6 +2635,7 @@ if (data.reply.includes("📋")) {
   alert("Loop 7 Report Detected");
   latestTruthLoopReport = data.reply;
     outputBox.innerHTML = renderLoop7Report(data.reply);
+  nextBtn.style.display = "none";
   alert(outputBox.innerHTML.substring(0,300));
 } else {
   alert("Not a Loop 7 Report");
