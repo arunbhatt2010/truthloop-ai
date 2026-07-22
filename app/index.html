@@ -1729,14 +1729,9 @@ function showEvidence(type){
 
     </div>
 
-    <button
-        id="linkedinOAuthBtn"
-        style="margin-top:18px;"
-        onclick="alert('LinkedIn OAuth trigger verified');">
-
-        🔐 Connect LinkedIn
-
-    </button>
+    <button onclick="startLinkedInOAuth()">
+    Connect LinkedIn
+</button>
 
     <div style="
         margin-top:14px;
@@ -3370,6 +3365,31 @@ setInterval(() => {
     }, 350);
 
 }, 5000);
+  async function startLinkedInOAuth() {
+    try {
+        const response = await fetch("/api/digitalFootprint", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: "linkedin_oauth"
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        } else {
+            alert(data.reply || "Unable to start LinkedIn connection.");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Connection failed.");
+    }
+  }
 </script>    
 </div>
   <footer style="
