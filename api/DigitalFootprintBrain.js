@@ -153,9 +153,9 @@ if (!publicContentPackage.success) {
 
 }
    /* ==========================================
-   STEP 3
-   Platform Detector
-========================================== */
+STEP 3
+Platform Detector
+==========================================
 
 const platformDecision =
     detectPlatform(normalizedProfileLink);
@@ -184,7 +184,9 @@ if (!platformDecision.supported) {
 
     };
 
-       }
+}
+
+*/
     // STEP 4
     // Profile Intelligence API
 const profileEvidence =
