@@ -1731,7 +1731,7 @@ ${lastQuestion}
 div.innerHTML = finalHtml;
 
 if (loopLevel === 6) {
-nextBtn.style.display = "block";
+
     div.innerHTML += renderLoop7EntryBridge();
 
     reflectionInput.style.display = "none";
@@ -2608,7 +2608,8 @@ alert("Button Clicked");
 if (isLoading) return;
 if (loopLevel === 6) {
   if (!window.loop7Started) {
-        window.loop7Started = true;
+    window.loop7Started = true;
+    nextBtn.innerText = "Get Your Final Report →";
   }
 alert("Loop 6 Block");
     const profileLink =
