@@ -1645,19 +1645,16 @@ Continue →
 
         btn.dataset.ready = "true";
 
-        // DigitalFootprintBrain ko trigger karega
+        // Sirf DigitalFootprintBrain
         nextBtn.click();
 
-        // Button ka text change
         btn.innerHTML = "🧠 Generate Your Final Report →";
 
         return;
     }
 
-// Ab Loop 7 report generate hogi
-btn.disabled = true;
-btn.style.opacity = "0.7";
-nextBtn.click();
+    // Stage 2
+    nextBtn.click();
 
 }
 function typeEffect(text){
@@ -2630,7 +2627,14 @@ investigationSource = profileLink;
         content: profileLink || "Continue to Loop 7"
     });
 
-    loopLevel = 7;
+    if(!window.loop7EvidenceReady){
+    window.loop7EvidenceReady = true;
+    isLoading = false;
+    nextBtn.disabled = false;
+    return;
+}
+
+loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
 alert("Fetch Starting");
