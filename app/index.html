@@ -1581,6 +1581,61 @@ More representative evidence leads to a more trustworthy investigation.
 </div>
 `;
 }
+function showEvidence(type){
+
+    const container = document.getElementById("evidenceContainer");
+
+    container.style.display = "block";
+
+    switch(type){
+
+        case "public":
+
+            container.innerHTML = `
+                <div style="margin-top:10px;color:#ddd;">
+                    <b>Paste your public profile or website:</b>
+                </div>
+
+                <input
+                    id="loop7ProfileLink"
+                    type="text"
+                    placeholder="https://..."
+                    style="
+                        width:100%;
+                        margin-top:12px;
+                        padding:12px;
+                        border-radius:10px;
+                        border:1px solid rgba(255,140,0,.3);
+                        background:#111;
+                        color:#fff;
+                        box-sizing:border-box;
+                    ">
+
+                <button
+                    style="margin-top:14px;width:100%;">
+                    Continue →
+                </button>
+            `;
+            break;
+
+        case "oauth":
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">🔐 Connected Apps (Coming Soon)</div>`;
+            break;
+
+        case "upload":
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📄 Upload Files (Coming Soon)</div>`;
+            break;
+
+        case "business":
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">📊 Business Data (Coming Soon)</div>`;
+            break;
+
+        case "other":
+            container.innerHTML = `<div style="margin-top:10px;color:#ddd;">✨ Other Evidence (Coming Soon)</div>`;
+            break;
+    }
+
+  }  
 function typeEffect(text){
 
 text = text.replace(
