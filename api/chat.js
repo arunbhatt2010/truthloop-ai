@@ -39,7 +39,8 @@ export default async function handler(req, res) {
   paid199 = false,
   shownLoop5 = [],
   currentCategory = "",
-  profileLink = ""    
+  profileLink = "",
+  identityPackage = null
 } = body;
 /* =========================
    🧪 TEMP DEV GATE
@@ -502,11 +503,17 @@ const truthLoopPackage = {
     loopLevel,
     currentCategory,
     profileLink,
+    identityPackage,
     paid49,
     paid199
 };
-if (loopLevel === 7 && profileLink.trim()) {
-
+if (
+    loopLevel === 7 &&
+    (
+        profileLink.trim() ||
+        identityPackage
+    )
+) {
   try {
 
     publicEvidencePackage =
@@ -515,6 +522,8 @@ await loadDigitalFootprintBrain({
     truthLoopPackage,
 
     profileLink,
+
+    identityPackage,
 
     currentLoop: 7
 
