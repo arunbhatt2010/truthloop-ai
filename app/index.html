@@ -3152,13 +3152,35 @@ div.innerHTML = text;
 outputBox.appendChild(div);
 
 });
-if(loopLevel < 7){
-nextBtn.innerText = "Continue Journey";
+/* =====================================
+   TruthLoop Restore Routing v2
+   Replace old loopLevel>=7 routing
+===================================== */
+
+if (loopLevel < 7) {
+
+    nextBtn.innerText = "Continue Journey";
+
 }
 
-if(loopLevel >= 7){
-nextBtn.innerText = "Select New Pattern";
-  }
+else {
+
+    // Loop 7 Journey
+    // Never jump to START NEW PATTERN
+
+    if (window.latestTruthLoopReport) {
+
+        // Investigation already completed
+        restoreTruthLoopReport(window.latestTruthLoopReport);
+
+    } else {
+
+        // OAuth / Evidence / Report pending
+        nextBtn.innerText = "Get Your Final Report →";
+
+    }
+
+}
  document.getElementById("restoreScreen").style.display = "block";
 document.getElementById("mainApp").style.display = "none";
 const selectedBtn =
