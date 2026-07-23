@@ -12,7 +12,22 @@ export default async function handler(req, res) {
         action,
         provider
     } = req.body;
+const clientId = process.env.LINKEDIN_CLIENT_ID;
 
+const state =
+Math.random().toString(36).substring(2) +
+Date.now();
+
+const redirectUri = encodeURIComponent(
+"https://truthloop.in/api/connectedApps"
+);
+
+const scope = encodeURIComponent(
+"openid profile email"
+);
+
+const redirectUrl =
+`https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
     // ==========================
     // LinkedIn OAuth
     // ==========================
@@ -23,12 +38,11 @@ export default async function handler(req, res) {
 
         // Temporary verification
         return res.status(200).json({
-            success: true,
-            provider: "linkedin",
-            oauth: true,
-            message: "LinkedIn OAuth request received.",
-            redirectUrl: null // Next step: real LinkedIn OAuth URL
-        });
+    success: true,
+    provider: "linkedin",
+    oauth: true,
+    redirectUrl
+});
 
     }
 
