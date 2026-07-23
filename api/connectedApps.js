@@ -13,7 +13,17 @@ export default async function handler(req, res) {
         provider
     } = req.body;
 const clientId = process.env.LINKEDIN_CLIENT_ID;
+if (!clientId) {
 
+    return res.status(200).json({
+
+        success: false,
+
+        reason: "CLIENT ID NOT FOUND"
+
+    });
+
+}
 const state =
 Math.random().toString(36).substring(2) +
 Date.now();
