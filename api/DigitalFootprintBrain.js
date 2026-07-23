@@ -50,14 +50,16 @@ import {
 ============================================================ */
 
 export async function loadDigitalFootprintBrain({
+
     truthLoopPackage = {},
 
     profileLink = "",
 
+    identityPackage = null,
+
     currentLoop = 7
 
 } = {}) {
-
     // STEP 1
     // Security
 if (currentLoop !== 7) {
@@ -76,9 +78,17 @@ if (currentLoop !== 7) {
 }
     // STEP 2
     // Input Validation
+const hasProfileLink =
+    typeof profileLink === "string" &&
+    profileLink.trim();
+
+const hasIdentityPackage =
+    identityPackage &&
+    typeof identityPackage === "object";
+
 if (
-    typeof profileLink !== "string" ||
-    !profileLink.trim()
+    !hasProfileLink &&
+    !hasIdentityPackage
 ) {
 
     return {
@@ -87,14 +97,17 @@ if (
 
         stage: "Input Validation",
 
-        reason: "Public profile or website link is required."
+        reason:
+            "A public profile link or authenticated profile is required."
 
     };
 
 }
 
 const normalizedProfileLink =
-    profileLink.trim();
+    hasProfileLink
+        ? profileLink.trim()
+        : "";
     const footprintContextPackage =
     await loadFootprintSupport({
 
