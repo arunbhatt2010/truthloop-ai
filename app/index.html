@@ -3378,28 +3378,31 @@ setInterval(() => {
             },
 
             body: JSON.stringify({
-
                 action: "oauth",
-
                 provider: "linkedin"
-
             })
 
         });
 
         const data = await response.json();
 
-        alert(data.message);
+        if (data.redirectUrl) {
+
+            window.location.href = data.redirectUrl;
+            return;
+
+        }
+
+        alert(data.reason || "OAuth failed.");
 
     } catch (err) {
 
         console.error(err);
-
         alert("Connection failed.");
 
     }
 
-  }
+}
 </script>    
 </div>
   <footer style="
