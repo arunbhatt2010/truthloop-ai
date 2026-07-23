@@ -1257,7 +1257,7 @@ font-weight:bold;
 </div>    
     
 <script>    
-    
+alert("JS START");    
 const API_URL="/api/chat";    
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
@@ -1274,7 +1274,7 @@ const paywallBox=document.getElementById("paywallBox");
 const paySub=document.getElementById("paySub");    
 const razorpayBtn=document.getElementById("razorpayBtn");
   const welcomeOverlay = document.getElementById("welcomeOverlay");
-
+alert("VARIABLES OK");
 let welcomeShown = false;
 let welcomeDisabled = false;
 
@@ -1288,6 +1288,7 @@ function disableWelcome() {
         welcomeOverlay.classList.add("hidden");
     }
   }
+  alert("EVENTS START");
  mainInput.addEventListener("focus", () => {
     window.hasStartedJourney = true;
 
