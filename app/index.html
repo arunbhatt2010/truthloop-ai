@@ -1447,9 +1447,9 @@ gtag('event',event,data);
 /* API */    
     
 async function callAPI(){    
-    
+   alert("1. callAPI started");   
 try{    
-    
+  alert("2. Before fetch");
 const res=await fetch(API_URL,{    
 method:"POST",    
 headers:{    
@@ -1463,7 +1463,7 @@ paid199:payment199,
 currentCategory    
 })    
 });    
-    
+  alert("3. Fetch completed");  
 if(!res.ok){    
 const errorText=await res.text();    
 console.error("API ERROR:",errorText);    
@@ -1476,7 +1476,8 @@ paid49:payment49,
 paid199:payment199,  
 currentCategory  
 });  
-const data = await res.json();  
+const data = await res.json();
+  alert("4. JSON received");
  if (data.platformCard) {
 
     renderPlatformCard(data);
@@ -1514,7 +1515,7 @@ document.getElementById("profileBelief").innerText =
 return data;  
     
 }catch(err){    
-    
+   alert("ERROR: " + err.message); 
 console.error("FETCH FAIL:",err);    
 return { reply:"Network error 😃" };    
     
