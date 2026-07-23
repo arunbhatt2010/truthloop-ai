@@ -3066,16 +3066,28 @@ userCountry = "IN";
 detectCountry();  
 const MEMORY_KEY = "truthloopMemory";
 
-function saveJourney() {
+function saveJourney(){
 
-localStorage.setItem(
-MEMORY_KEY,
-JSON.stringify({
-loopLevel,
-messages,
-currentCategory
-})
-);
+    localStorage.setItem(
+
+        MEMORY_KEY,
+
+        JSON.stringify({
+
+            loopLevel,
+            messages,
+            currentCategory,
+
+            waitingForLoop7Bridge,
+            latestTruthLoopReport,
+            investigationSource,
+
+            loop7Started:
+                window.loop7Started || false
+
+        })
+
+    );
 
 }
 
@@ -3119,7 +3131,17 @@ window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
+waitingForLoop7Bridge =
+    restored.waitingForLoop7Bridge || false;
 
+latestTruthLoopReport =
+    restored.latestTruthLoopReport || "";
+
+investigationSource =
+    restored.investigationSource || "";
+
+window.loop7Started =
+    restored.loop7Started || false;
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
 
