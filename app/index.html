@@ -3102,7 +3102,8 @@ const linkedInCallback =
 
 if (linkedInCallback) {
 
-    localStorage.removeItem(MEMORY_KEY);
+    window.loop7Started = true;
+waitingForLoop7Bridge = true;
 
     window.history.replaceState(
         {},
@@ -3113,7 +3114,7 @@ if (linkedInCallback) {
     alert("✅ LinkedIn Connected Successfully");
 
   }
-if (restored && !linkedInCallback) {
+if (restored) {
 window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
