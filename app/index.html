@@ -3118,18 +3118,21 @@ const restored = loadJourney();
 const params = new URLSearchParams(window.location.search);
 
 const linkedInCallback =
-    params.has("code") &&
-    params.has("state");
+    params.get("linkedin") === "connected" &&
+    params.has("code");
 
 if (linkedInCallback) {
-    localStorage.removeItem(MEMORY_KEY);
-  window.history.replaceState(
-    {},
-    document.title,
-    window.location.pathname
-);
 
-alert("✅ LinkedIn Connected Successfully");
+    localStorage.removeItem(MEMORY_KEY);
+
+    window.history.replaceState(
+        {},
+        document.title,
+        "/app"
+    );
+
+    alert("✅ LinkedIn Connected Successfully");
+
   }
 if (restored && !linkedInCallback) {
 window.isRestoredJourney = true;
