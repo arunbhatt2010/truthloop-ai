@@ -19,12 +19,9 @@ export default async function handler(req, res) {
                 .send("Authorization code not received.");
         }
 
-        return res.status(200).send(`
-            <h2>✅ LinkedIn Connected</h2>
-            <p>Authorization Code:</p>
-            <pre>${code}</pre>
-        `);
-
+        return res.redirect(
+`https://truthloop.in/app?linkedin=connected&code=${encodeURIComponent(code)}`
+);
     }
 
     // ==========================
