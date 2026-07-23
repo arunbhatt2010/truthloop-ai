@@ -1334,6 +1334,29 @@ let waitingForLoop7Bridge = false;
 let isLoading=false;
 let latestTruthLoopReport = "";
 let investigationSource = "";
+  // ==========================
+// LinkedIn OAuth Callback
+// ==========================
+
+const params = new URLSearchParams(window.location.search);
+
+const linkedinCode = params.get("code");
+
+if (linkedinCode) {
+
+    localStorage.setItem(
+        "linkedinAuthorizationCode",
+        linkedinCode
+    );
+
+    window.history.replaceState(
+        {},
+        document.title,
+        "/app"
+    );
+
+    alert("✅ LinkedIn Connected Successfully");
+  }
 const UI_TEXT = {
   en: {
     hero: 'Find what you\'re <span>avoiding.</span>',
