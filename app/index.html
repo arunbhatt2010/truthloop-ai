@@ -3115,8 +3115,23 @@ localStorage.removeItem(MEMORY_KEY);
 
   }
 const restored = loadJourney();
+const params = new URLSearchParams(window.location.search);
 
-if(restored){
+const linkedInCallback =
+    params.has("code") &&
+    params.has("state");
+
+if (linkedInCallback) {
+    localStorage.removeItem(MEMORY_KEY);
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+);
+
+alert("✅ LinkedIn Connected Successfully");
+  }
+if (restored && !linkedInCallback) {
 window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
