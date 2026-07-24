@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         }
 
         return res.redirect(
-`https://truthloop.in/app?linkedin=connected&resume=loop7&code=${encodeURIComponent(code)}`
+`https://truthloop.in/app?linkedin=connected&code=${encodeURIComponent(code)}`
 );
 
     // ==========================
