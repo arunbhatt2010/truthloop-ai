@@ -1667,7 +1667,11 @@ function showEvidence(type){
     const container = document.getElementById("evidenceContainer");
 
     container.style.display = "block";
+selectedEvidenceSource = type;
+bridgeCompleted = true;
 
+nextBtn.style.display = "block";
+nextBtn.innerText = "Enter Your Footprint";
     switch(type){
 
         case "public":
