@@ -2896,8 +2896,8 @@ if (loopLevel === 6) {
     return;
   }
 
-    const profileLink =
-        document.getElementById("loop7ProfileLink")?.value.trim() || "";
+    const input = document.getElementById("loop7ProfileLink");
+const profileLink = input ? input.value.trim() : "";
 investigationSource = profileLink;
     messages.push({
         role: "user",
