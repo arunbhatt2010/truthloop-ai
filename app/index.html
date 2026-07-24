@@ -1270,7 +1270,7 @@ const mainInput=document.getElementById("mainInput");
 const reflectionInput=document.getElementById("reflectionInput");    
 const getBtn=document.getElementById("getBtn");    
 const nextBtn=document.getElementById("nextBtn");    
-    
+const startLoop7Btn = document.getElementById("startLoop7Btn");    
 const shareBox=document.getElementById("shareBox");    
 const shareText=document.getElementById("shareText");    
     
@@ -2010,7 +2010,7 @@ if (loopLevel === 7) {
 } else if (loopLevel === 6) {
 
     reflectionInput.style.display = "none";
-
+startLoop7Btn.style.display = "block";
     nextBtn.innerText = window.loop7Started
         ? "Get Your Final Report →"
         : "Enter Your Footprint";
