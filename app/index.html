@@ -3090,17 +3090,23 @@ const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney() {
 alert("Saving Loop = " + loopLevel);
+
 localStorage.setItem(
 MEMORY_KEY,
 JSON.stringify({
 loopLevel,
 messages,
-currentCategory
+currentCategory,
+
+loop7Started,
+selectedEvidenceSource,
+bridgeCompleted,
+oauthProvider
+
 })
 );
 
-}
-
+  }
 function loadJourney() {
 
 const saved = localStorage.getItem(MEMORY_KEY);
@@ -3156,6 +3162,10 @@ window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
+loop7Started = restored.loop7Started || false;
+selectedEvidenceSource = restored.selectedEvidenceSource || "";
+bridgeCompleted = restored.bridgeCompleted || false;
+oauthProvider = restored.oauthProvider || "";  
 
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
@@ -3449,7 +3459,8 @@ setInterval(() => {
         const data = await response.json();
 
         if (data.redirectUrl) {
-
+oauthProvider = "linkedin";
+saveJourney();
             window.location.href = data.redirectUrl;
             return;
 
