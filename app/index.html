@@ -1654,7 +1654,20 @@ TruthLoop analyzes only the evidence you choose to provide.
 More representative evidence leads to a more trustworthy investigation.
 
 </div>
+<hr style="
+margin:20px 0;
+border:none;
+border-top:1px solid rgba(255,140,0,.15);
+">
 
+<div
+id="loop7ActionContainer"
+style="
+margin-top:20px;
+display:flex;
+justify-content:center;
+">
+</div>
 </div>
 `;
 }
@@ -2003,13 +2016,17 @@ if (loopLevel === 6) {
 
     reflectionInput.style.display = "none";
 
-    nextBtn.innerText = window.loop7Started
-        ? "Get Your Final Report →"
-        : "Start Loop 7";
+    nextBtn.style.display = "block";
 
-} else {
+nextBtn.innerText = window.loop7Started
+    ? "Get Your Final Report →"
+    : "Start Loop 7";
 
-    reflectionInput.style.display = "block";
+const actionContainer =
+    document.getElementById("loop7ActionContainer");
+
+if (actionContainer) {
+    actionContainer.appendChild(nextBtn);
   }
 setTimeout(()=>{
     // reflectionInput.focus();
@@ -3110,7 +3127,20 @@ function showLoop7Bridge() {
 
     div.innerHTML += renderLoop7EntryBridge();
 
-  }  
+nextBtn.style.display = "block";
+
+nextBtn.innerText = window.loop7Started
+    ? "Get Your Final Report →"
+    : "Start Loop 7";
+
+const actionContainer =
+    document.getElementById("loop7ActionContainer");
+
+if (actionContainer) {
+    actionContainer.appendChild(nextBtn);
+}
+
+  }
 const restored = loadJourney();
 const params = new URLSearchParams(window.location.search);
 
