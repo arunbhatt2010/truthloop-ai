@@ -3104,22 +3104,17 @@ const linkedInCallback =
     params.has("code");
 if (linkedInCallback) {
 
-    // localStorage.removeItem(MEMORY_KEY);
-
-    window.history.replaceState(
-        {},
-        document.title,
-        "/app"
-    );
+    window.history.replaceState({}, document.title, "/app");
 
     alert("✅ LinkedIn Connected Successfully");
 
+    waitingForLoop7Bridge = true;
+
+    
   }
 
 
-if (linkedInCallback && restored) {
-    window.location.reload();
-  }
+
 if (restored && !linkedInCallback) {
 window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
