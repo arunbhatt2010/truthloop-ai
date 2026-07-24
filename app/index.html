@@ -3480,11 +3480,8 @@ saveJourney();
         alert(data.reason || "OAuth failed.");
 
     } catch (err) {
-
-        console.error(err);
-        alert("Connection failed.");
-
-    }
+    alert(JSON.stringify(err));
+}
 
 }
 </script>    
