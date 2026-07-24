@@ -3100,6 +3100,7 @@ const params = new URLSearchParams(window.location.search);
 
 const linkedInCallback =
     params.get("linkedin") === "connected" &&
+    params.get("resume") === "loop7" &&
     params.has("code");
 if (linkedInCallback) {
 
