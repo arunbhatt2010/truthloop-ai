@@ -3139,7 +3139,11 @@ function showLoop7Bridge() {
 
     div.innerHTML += renderLoop7EntryBridge();
 
-  }  
+if (bridgeCompleted && selectedEvidenceSource) {
+    showEvidence(selectedEvidenceSource);
+}
+
+}
 const restored = loadJourney();
 const params = new URLSearchParams(window.location.search);
 
