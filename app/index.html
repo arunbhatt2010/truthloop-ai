@@ -1999,7 +1999,7 @@ div.innerHTML = finalHtml;
 
 if (loopLevel === 6) {
 
-    div.innerHTML += renderLoop7EntryBridge();
+    
 
     reflectionInput.style.display = "none";
 
@@ -2894,7 +2894,7 @@ investigationSource = profileLink;
     loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
-
+div.innerHTML += renderLoop7EntryBridge();
     const data = await fetch(API_URL,{
         method:"POST",
         headers:{
