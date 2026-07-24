@@ -2979,8 +2979,11 @@ ${text}<br><br>
 
 outputBox.appendChild(userReply);
 
-const data=await callAPI();    
-alert(data.reply);
+const data = await callAPI();
+
+console.log("DATA =", data);
+
+alert(JSON.stringify(data));
 if(data.paywall){
 
 nextBtn.style.display="none";
