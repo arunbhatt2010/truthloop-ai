@@ -2890,6 +2890,18 @@ if (loopLevel === 6) {
     nextBtn.innerText = "Get Your Final Report →";
     return;
   }
+  
+  startLoop7Btn.onclick = () => {
+
+    loopLevel = 7;
+
+    document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
+
+    startLoop7Btn.style.display = "none";
+
+    renderLoop7EntryBridge();
+
+};
 
     const profileLink =
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
