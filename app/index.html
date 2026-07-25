@@ -2781,7 +2781,11 @@ mainInput.focus();
 /* START */
     
 getBtn.onclick = async () => {
-
+alert(
+    "GET BTN CLICK\n" +
+    "loopLevel=" + loopLevel +
+    "\ntext=" + mainInput.value
+);
 disableWelcome();
 
 const text = mainInput.value.trim();
