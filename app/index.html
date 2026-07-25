@@ -3098,7 +3098,12 @@ const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney() {
     alert("A");
-alert("Saving Loop = " + loopLevel);
+alert(JSON.stringify({
+    loopLevel,
+    messages: messages.length,
+    bridgeCompleted,
+    oauthProvider
+}));
 
 localStorage.setItem(
 MEMORY_KEY,
