@@ -3090,22 +3090,28 @@ detectCountry();
 const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney() {
-alert("Saving Loop = " + loopLevel);
 
-localStorage.setItem(
-MEMORY_KEY,
-JSON.stringify({
-loopLevel,
-messages,
-currentCategory,
+    alert("Saving Loop = " + loopLevel);
+    alert("Messages = " + messages.length);
 
-loop7Started,
-selectedEvidenceSource,
-bridgeCompleted,
-oauthProvider
+    localStorage.setItem(
+        MEMORY_KEY,
+        JSON.stringify({
 
-})
-);
+            loopLevel,
+
+            // TEMP TEST
+            messages: [],
+
+            currentCategory,
+
+            loop7Started,
+            selectedEvidenceSource,
+            bridgeCompleted,
+            oauthProvider
+
+        })
+    );
 
   }
 function loadJourney() {
