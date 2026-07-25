@@ -3002,12 +3002,17 @@ content:data.reply
 });    
 saveJourney();
 
-if (loopLevel >= 7) {
+try {
+
+    alert("Before typeEffect");
 
     typeEffect(data.reply);
-} else {
 
-    typeEffect(data.reply);
+    alert("After typeEffect");
+
+} catch (e) {
+
+    alert("typeEffect Error: " + e.message);
 
 }
 
