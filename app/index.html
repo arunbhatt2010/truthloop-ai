@@ -3160,9 +3160,12 @@ alert("INSIDE LOOP7 RESTORE");
 
         // Restore Loop 7 Bridge UI
         showLoop7Bridge();
-alert("AFTER BRIDGE");
 
-alert("loopLevel = " + loopLevel);
+alert("AFTER SHOWLOOP7");
+
+alert(
+    "loopLevel = " + loopLevel +
+    "\nmessages = " + messages.length
 );
         // Clean URL
         window.history.replaceState({}, document.title, "/app");
