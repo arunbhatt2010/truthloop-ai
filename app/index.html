@@ -3400,9 +3400,24 @@ setInterval(() => {
     }, 350);
 
 }, 5000);
-  async function startLinkedInOAuth() {
+async function startLinkedInOAuth() {
 
     try {
+
+        // ===============================
+        // Save current Loop 7 state
+        // ===============================
+        localStorage.setItem(
+            "truthloopPendingOAuth",
+            JSON.stringify({
+                loopLevel,
+                messages,
+                investigationSource,
+                currentCategory,
+                waitingForLoop7Bridge: true,
+                savedAt: Date.now()
+            })
+        );
 
         const response = await fetch("/api/connectedApps", {
 
@@ -3428,11 +3443,18 @@ setInterval(() => {
 
         }
 
+        // OAuth start failed → remove pending state
+        localStorage.removeItem("truthloopPendingOAuth");
+
         alert(data.reason || "OAuth failed.");
 
     } catch (err) {
 
         console.error(err);
+
+        // Network error → remove pending state
+        localStorage.removeItem("truthloopPendingOAuth");
+
         alert("Connection failed.");
 
     }
