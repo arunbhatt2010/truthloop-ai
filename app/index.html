@@ -3128,7 +3128,7 @@ if (linkedInCallback) {
     );
 alert(JSON.stringify(pending, null, 2));
     if (pending.waitingForLoop7Bridge) {
-
+alert("INSIDE LOOP7 RESTORE");
         // Restore previous Loop 7 session
         loopLevel = pending.loopLevel || 6;
         messages = pending.messages || [];
