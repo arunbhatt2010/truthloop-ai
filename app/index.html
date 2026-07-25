@@ -3115,7 +3115,11 @@ localStorage.removeItem(MEMORY_KEY);
 
   }
 function showLoop7Bridge() {
-
+alert(
+    "LOOP 1 RENDER TRIGGERED\n" +
+    "loopLevel = " + loopLevel +
+    "\nlinkedInCallback = " + linkedInCallback
+);
     const div = outputBox;
     div.innerHTML = "";
 
