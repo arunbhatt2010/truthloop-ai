@@ -3110,23 +3110,48 @@ function showLoop7Bridge() {
 
     div.innerHTML += renderLoop7EntryBridge();
 
-  }  
+}
+
 const restored = loadJourney();
+
 const params = new URLSearchParams(window.location.search);
 
 const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop7" &&
     params.has("code");
+
 if (linkedInCallback) {
 
-    window.history.replaceState({}, document.title, "/app");
+    const pending = JSON.parse(
+        localStorage.getItem("truthloopPendingOAuth") || "{}"
+    );
 
-    showLoop7Bridge();
+    if (pending.waitingForLoop7Bridge) {
 
-  }
+        // Restore previous Loop 7 session
+        loopLevel = pending.loopLevel || 6;
+        messages = pending.messages || [];
+        currentCategory = pending.currentCategory || "";
+        investigationSource = pending.investigationSource || "";
 
+        waitingForLoop7Bridge = true;
 
+        // User has NOT started Digital Footprint yet
+        window.loop7Started = false;
+
+        // Restore Loop 7 Bridge UI
+        showLoop7Bridge();
+
+        // Clean URL
+        window.history.replaceState({}, document.title, "/app");
+
+        // Remove temporary OAuth state
+        localStorage.removeItem("truthloopPendingOAuth");
+
+    }
+
+}
 
 if (restored && !linkedInCallback) {
 window.isRestoredJourney = true;
