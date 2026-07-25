@@ -3160,7 +3160,11 @@ alert("INSIDE LOOP7 RESTORE");
 
         // Restore Loop 7 Bridge UI
         showLoop7Bridge();
-
+alert(
+    "RESTORED MESSAGES = " + messages.length +
+    "\n" +
+    JSON.stringify(messages, null, 2)
+);
         // Clean URL
         window.history.replaceState({}, document.title, "/app");
 
