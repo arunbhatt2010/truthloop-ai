@@ -3485,10 +3485,10 @@ saveJourney();
 
         alert(data.reason || "OAuth failed.");
 
-    } catch (err) {
-    alert(JSON.stringify(err));
-}
-
+} catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
 }
 </script>    
 </div>
