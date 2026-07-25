@@ -3176,7 +3176,15 @@ alert("INSIDE LOOP7 RESTORE");
         window.loop7Started = false;
 
         // Restore Loop 7 Bridge UI
-        showLoop7Bridge();
+showLoop7Bridge();
+
+document.getElementById("loopIndicator").innerText =
+    "Loop " + loopLevel + " of 7";
+
+alert(
+    "Indicator Updated\n" +
+    document.getElementById("loopIndicator").innerText
+);
 
 alert("AFTER SHOWLOOP7");
 
