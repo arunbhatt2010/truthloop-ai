@@ -3003,7 +3003,7 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-saveJourney();
+// saveJourney();
 
 alert("Before TypeEffect");
 
@@ -3097,6 +3097,7 @@ detectCountry();
 const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney() {
+    alert("A");
 alert("Saving Loop = " + loopLevel);
 
 localStorage.setItem(
@@ -3113,12 +3114,12 @@ oauthProvider
 
 })
 );
-
+alert("B");
   }
 function loadJourney() {
 
 const saved = localStorage.getItem(MEMORY_KEY);
-
+alert("C");
 alert(saved ? "MEMORY FOUND" : "MEMORY NULL");
 
 if(!saved) return null;
