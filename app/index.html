@@ -2750,19 +2750,20 @@ document.getElementById("hintContent").style.display = "none";
 document.getElementById("hintBox").innerHTML =
 "💡 HOW DOES THIS WORK?";
 clearJourney();
+
 alert(
-    "LOOP 1 INIT\n\n" +
+    "🚨 LOOP 1 TRIGGERED 🚨\n\n" +
+    "BEFORE RESET\n" +
     "loopLevel = " + loopLevel +
-    "\nwaitingForLoop7Bridge = " + waitingForLoop7Bridge
+    "\nwaitingForLoop7Bridge = " + waitingForLoop7Bridge +
+    "\nmessages = " + messages.length
 );
+
 loopLevel = 1;
-
-
-
 messages = [];
 
 document.getElementById("loopIndicator").innerText =
-"Loop 1 of 7";
+    "Loop 1 of 7";
 
 outputBox.innerHTML = "";
 document.querySelectorAll(".categoryBtn").forEach(b=>{
