@@ -3118,8 +3118,8 @@ const params = new URLSearchParams(window.location.search);
 
 const linkedInCallback =
     params.get("linkedin") === "connected" &&
-params.get("resume") === "loop6" &&
-params.has("code")
+    params.get("resume") === "loop6" &&
+    params.has("code");
 
 if (linkedInCallback) {
 
@@ -3138,22 +3138,23 @@ if (linkedInCallback) {
         waitingForLoop7Bridge = true;
 
         // User has NOT started Digital Footprint yet
-window.loop7Started = false;
+        window.loop7Started = false;
 
-// Restore Loop 7 Bridge UI
-showLoop7Bridge();
+        // Restore Loop 7 Bridge UI
+        showLoop7Bridge();
 
-// Clean URL
-window.history.replaceState({}, document.title, "/app");
+        // Clean URL
+        window.history.replaceState({}, document.title, "/app");
 
-// TEMP DEBUG
-return;
+        // TEMP DEBUG
+        console.log("OAuth Restore Success", {
+            loopLevel,
+            pending
+        });
 
-// Remove temporary OAuth state
-localStorage.removeItem("truthloopPendingOAuth");
-
-  }
+        return;
     }
+}
 
 if (restored && !linkedInCallback) {
 window.isRestoredJourney = true;
