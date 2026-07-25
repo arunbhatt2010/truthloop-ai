@@ -3138,20 +3138,22 @@ if (linkedInCallback) {
         waitingForLoop7Bridge = true;
 
         // User has NOT started Digital Footprint yet
-        window.loop7Started = false;
+window.loop7Started = false;
 
-        // Restore Loop 7 Bridge UI
-        showLoop7Bridge();
+// Restore Loop 7 Bridge UI
+showLoop7Bridge();
 
-        // Clean URL
-        window.history.replaceState({}, document.title, "/app");
+// Clean URL
+window.history.replaceState({}, document.title, "/app");
 
-        // Remove temporary OAuth state
-        localStorage.removeItem("truthloopPendingOAuth");
+// TEMP DEBUG
+return;
 
+// Remove temporary OAuth state
+localStorage.removeItem("truthloopPendingOAuth");
+
+  }
     }
-
-}
 
 if (restored && !linkedInCallback) {
 window.isRestoredJourney = true;
