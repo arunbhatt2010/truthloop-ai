@@ -3126,7 +3126,7 @@ if (linkedInCallback) {
     const pending = JSON.parse(
         localStorage.getItem("truthloopPendingOAuth") || "{}"
     );
-
+alert(JSON.stringify(pending, null, 2));
     if (pending.waitingForLoop7Bridge) {
 
         // Restore previous Loop 7 session
