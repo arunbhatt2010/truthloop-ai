@@ -2842,9 +2842,15 @@ setTimeout(()=>{
 outputBox.scrollTop=outputBox.scrollHeight;    
 },100);    
     
-const data=await callAPI();    
-    
-typeEffect(data.reply);    
+alert("BEFORE CALL API");
+
+const data = await callAPI();
+
+alert("AFTER CALL API");
+
+typeEffect(data.reply);
+
+alert("AFTER TYPE EFFECT");
 showShareCard(data.reply);    
 messages.push({    
 role:"assistant",    
