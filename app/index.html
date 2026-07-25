@@ -3120,11 +3120,7 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     params.has("code");
-console.log("linkedInCallback =", linkedInCallback);
-console.log("URL =", window.location.href);
-console.log("resume =", params.get("resume"));
-console.log("linkedin =", params.get("linkedin"));
-console.log("code =", params.get("code"));
+
 if (linkedInCallback) {
 
     const pending = JSON.parse(
