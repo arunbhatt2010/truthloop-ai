@@ -3178,14 +3178,10 @@ waitingForLoop7Bridge = true;
 window.loop7Started = false;
 
 saveJourney();
-alert("Calling showLoop7Bridge()");
-showLoop7Bridge();
-// showLoop7Bridge();
-
-// Clean URL
+alert("Calling renderRestoredJourney()");
+renderRestoredJourney();
 window.history.replaceState({}, document.title, "/app");
-
-// return;
+return;
 
 alert("OAuth block finished");
       alert(
@@ -3224,23 +3220,7 @@ URL = ${window.location.href}
     }
   
 }
-
-if (restored && !linkedInCallback) {
-window.isRestoredJourney = true;
-loopLevel = restored.loopLevel || 1;
-messages = restored.messages || [];
-currentCategory = restored.currentCategory || "";
-alert(
-"RESTORE BLOCK ENTERED\n\n" +
-"linkedInCallback = " + linkedInCallback +
-"\nloopLevel = " + loopLevel
-);
-document.getElementById("loopIndicator").innerText =
-`Loop ${loopLevel} of 7`;
-alert(
-"LOOP INDICATOR UPDATED\n\n" +
-document.getElementById("loopIndicator").innerText
-);
+  function renderRestoredJourney() {
 outputBox.innerHTML = "";
 
 messages.forEach(msg=>{
@@ -3289,8 +3269,28 @@ document.getElementById("restorePattern").innerText =
 document.getElementById("restoreLoop").innerText =
 "You left at Loop " + loopLevel + " of 7"; 
 getBtn.disabled = false;
-
+    showLoop7Bridge();
   }
+
+if (restored && !linkedInCallback) {
+window.isRestoredJourney = true;
+loopLevel = restored.loopLevel || 1;
+messages = restored.messages || [];
+currentCategory = restored.currentCategory || "";
+alert(
+"RESTORE BLOCK ENTERED\n\n" +
+"linkedInCallback = " + linkedInCallback +
+"\nloopLevel = " + loopLevel
+);
+document.getElementById("loopIndicator").innerText =
+`Loop ${loopLevel} of 7`;
+alert(
+"LOOP INDICATOR UPDATED\n\n" +
+document.getElementById("loopIndicator").innerText
+);
+
+
+  
   document.getElementById("hintBox").addEventListener("click", () => {
 
   const hint =
