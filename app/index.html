@@ -2760,6 +2760,10 @@ alert(
 );
 
 loopLevel = 1;
+  alert(
+"LOOP 1 RESET TRIGGERED\n\n" +
+new Error().stack
+);
 messages = [];
 
 document.getElementById("loopIndicator").innerText =
@@ -3197,6 +3201,23 @@ alert("OAuth block finished");
       document.getElementById("loopIndicator").innerText
   ].join("\n")
 );
+      alert(`
+=== AFTER OAUTH ===
+
+loopLevel = ${loopLevel}
+loopIndicator = ${document.getElementById("loopIndicator").innerText}
+
+mainApp.display = ${document.getElementById("mainApp").style.display}
+restoreScreen.display = ${document.getElementById("restoreScreen").style.display}
+
+nextBtn = ${nextBtn.innerText}
+
+outputBox children = ${outputBox.children.length}
+
+reflectionInput = ${reflectionInput.value}
+
+URL = ${window.location.href}
+`);
     }
   
 }
@@ -3206,10 +3227,17 @@ window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
-
+alert(
+"RESTORE BLOCK ENTERED\n\n" +
+"linkedInCallback = " + linkedInCallback +
+"\nloopLevel = " + loopLevel
+);
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
-
+alert(
+"LOOP INDICATOR UPDATED\n\n" +
+document.getElementById("loopIndicator").innerText
+);
 outputBox.innerHTML = "";
 
 messages.forEach(msg=>{
