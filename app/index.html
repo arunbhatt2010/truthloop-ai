@@ -3144,16 +3144,20 @@ function showLoop7Bridge() {
 
     const div = outputBox;
 
-    // Agar bridge already conversation ke end me hai to dobara mat banao
-    if (div.innerHTML.includes("Loop 7 Evidence Bridge")) {
-        return;
+    // Bridge already restored?
+    if (!div.innerHTML.includes("Loop 7 Evidence Bridge")) {
+        div.innerHTML += renderLoop7EntryBridge();
     }
 
-    // Sirf bridge append karo, conversation ko touch mat karo
-    div.innerHTML += renderLoop7EntryBridge();
+    // Restore OAuth evidence panel
+    showEvidence("oauth");
+
+    // Restore normal Loop 6 progression
+    nextBtn.style.display = "block";
+    nextBtn.innerText = "Start Loop 7";
 
     div.scrollTop = div.scrollHeight;
-}
+   }
 const restored = loadJourney();
 
 const params = new URLSearchParams(window.location.search);
