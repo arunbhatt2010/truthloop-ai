@@ -3153,7 +3153,7 @@ alert(
     "\nURL = " + window.location.href
 );
 if (linkedInCallback) {
-
+if (linkedInCallback) {
     alert("OAuth Redirect");
   }
     const pending = JSON.parse(
@@ -3180,11 +3180,11 @@ saveJourney();
 // Clean URL
 window.history.replaceState({}, document.title, "/app");
 
-return;
+// return;
 
-
+alert("OAuth block finished");
     }
-  alert("OAuth block finished");
+  
 }
 
 if (restored && !linkedInCallback) {
