@@ -3188,6 +3188,8 @@ waitingForLoop7Bridge = true;
 window.loop7Started = false;
 
 saveJourney();
+  document.getElementById("restoreScreen").style.display = "none";
+document.getElementById("mainApp").style.display = "block";     
 alert("Calling renderRestoredJourney()");
 renderRestoredJourney(false);
 window.history.replaceState({}, document.title, "/app");
