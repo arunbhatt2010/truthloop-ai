@@ -3153,7 +3153,9 @@ alert(
     "\nURL = " + window.location.href
 );
 if (linkedInCallback) {
-
+if (linkedInCallback) {
+    alert("OAuth Redirect");
+  }
     const pending = JSON.parse(
         localStorage.getItem("truthloopPendingOAuth") || "{}"
     );
