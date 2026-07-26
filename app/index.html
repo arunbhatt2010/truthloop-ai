@@ -3061,7 +3061,7 @@ document.getElementById("continueJourneyBtn").onclick = () => {
     if (typeof renderRestoredJourney === "function") {
         alert("Calling renderRestoredJourney()");
       alert("BEFORE renderRestoredJourney()");
-        renderRestoredJourney(false);
+        renderRestoredJourney();
       alert("AFTER renderRestoredJourney()");
     }
 
@@ -3189,7 +3189,7 @@ window.loop7Started = false;
 
 saveJourney();
 alert("Calling renderRestoredJourney()");
-renderRestoredJourney();
+renderRestoredJourney(false);
 window.history.replaceState({}, document.title, "/app");
 // return;
 
