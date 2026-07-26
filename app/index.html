@@ -3177,10 +3177,11 @@ if (linkedInCallback) {
     if (pending.waitingForLoop7Bridge) {
 
         // Restore previous Loop 7 session
-loopLevel = pending.loopLevel || 6;
-messages = pending.messages || [];
-currentCategory = pending.currentCategory || "";
-investigationSource = pending.investigationSource || "";
+// Restore previous Loop 7 session
+loopLevel = Number(pending.loopLevel ?? 6);
+messages = Array.isArray(pending.messages) ? pending.messages : [];
+currentCategory = pending.currentCategory ?? "";
+investigationSource = pending.investigationSource ?? "";
 
 waitingForLoop7Bridge = true;
 
@@ -3188,10 +3189,19 @@ waitingForLoop7Bridge = true;
 window.loop7Started = false;
 
 saveJourney();
-  document.getElementById("restoreScreen").style.display = "none";
-document.getElementById("mainApp").style.display = "block";     
-//alert("Calling renderRestoredJourney()");
+
+document.getElementById("restoreScreen").style.display = "none";
+document.getElementById("mainApp").style.display = "block";
+
+console.log("OAuth Restore", {
+    loopLevel,
+    messages: messages.length,
+    currentCategory,
+    waitingForLoop7Bridge
+});
+
 renderRestoredJourney();
+
 window.history.replaceState({}, document.title, "/app");
 // return;
 
