@@ -3290,10 +3290,8 @@ nextBtn.innerText = "Continue Journey";
 if(loopLevel >= 7){
 nextBtn.innerText = "Select New Pattern";
   }
- if (showRestoreScreen) {
-    document.getElementById("restoreScreen").style.display = "block";
-    document.getElementById("mainApp").style.display = "none";
-}
+ document.getElementById("restoreScreen").style.display = "none";
+document.getElementById("mainApp").style.display = "block";
 const selectedBtn =
 document.querySelector(
 '.categoryBtn[data-type="' + currentCategory + '"]'
