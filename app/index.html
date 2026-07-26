@@ -3050,12 +3050,18 @@ isLoading = false;
 nextBtn.disabled = false;    
 };
 document.getElementById("continueJourneyBtn").onclick = () => {
-track("journey_restored",{
-  loop:loopLevel
-});
-document.getElementById("restoreScreen").style.display = "none";
 
-document.getElementById("mainApp").style.display = "block";
+    track("journey_restored", {
+        loop: loopLevel
+    });
+
+    document.getElementById("restoreScreen").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+
+    if (typeof renderRestoredJourney === "function") {
+        alert("Calling renderRestoredJourney()");
+        renderRestoredJourney();
+    }
 
 };
 document.getElementById("newPatternBtn").onclick = () => {
