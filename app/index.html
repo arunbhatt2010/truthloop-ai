@@ -2751,18 +2751,18 @@ document.getElementById("hintBox").innerHTML =
 "💡 HOW DOES THIS WORK?";
 clearJourney();
 
+
 alert(
+"LOOP 1 RESET TRIGGERED\n\n" +
+new Error().stack
+);
+loopLevel = 1;
+  alert(
     "🚨 LOOP 1 TRIGGERED 🚨\n\n" +
     "BEFORE RESET\n" +
     "loopLevel = " + loopLevel +
     "\nwaitingForLoop7Bridge = " + waitingForLoop7Bridge +
     "\nmessages = " + messages.length
-);
-
-loopLevel = 1;
-  alert(
-"LOOP 1 RESET TRIGGERED\n\n" +
-new Error().stack
 );
 messages = [];
 
