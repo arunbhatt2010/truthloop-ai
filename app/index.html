@@ -3213,7 +3213,9 @@ restoreScreen.display = ${document.getElementById("restoreScreen").style.display
 nextBtn = ${nextBtn.innerText}
 
 outputBox children = ${outputBox.children.length}
-
+outputBox HTML = ${
+document.getElementById("outputBox").innerHTML.substring(0,300)
+  }
 reflectionInput = ${reflectionInput.value}
 
 URL = ${window.location.href}
