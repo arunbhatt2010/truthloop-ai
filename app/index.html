@@ -3191,7 +3191,7 @@ saveJourney();
   document.getElementById("restoreScreen").style.display = "none";
 document.getElementById("mainApp").style.display = "block";     
 alert("Calling renderRestoredJourney()");
-renderRestoredJourney(false);
+renderRestoredJourney();
 window.history.replaceState({}, document.title, "/app");
 // return;
 
@@ -3232,7 +3232,7 @@ URL = ${window.location.href}
     }
   
 }
-  function renderRestoredJourney(showRestoreScreen = true) {
+  function renderRestoredJourney() {
      alert(
         "search = " + window.location.search +
         "\n\nhref = " + window.location.href
