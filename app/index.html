@@ -2752,18 +2752,18 @@ document.getElementById("hintBox").innerHTML =
 clearJourney();
 
 
-alert(
+/* alert(
 "LOOP 1 RESET TRIGGERED\n\n" +
 new Error().stack
-);
+); */
 loopLevel = 1;
-  alert(
+ /* alert(
     "🚨 LOOP 1 TRIGGERED 🚨\n\n" +
     "BEFORE RESET\n" +
     "loopLevel = " + loopLevel +
     "\nwaitingForLoop7Bridge = " + waitingForLoop7Bridge +
     "\nmessages = " + messages.length
-);
+); */
 messages = [];
 
 document.getElementById("loopIndicator").innerText =
@@ -2855,15 +2855,15 @@ setTimeout(()=>{
 outputBox.scrollTop=outputBox.scrollHeight;    
 },100);    
     
-alert("BEFORE CALL API");
+//alert("BEFORE CALL API");
 
 const data = await callAPI();
 
-alert("AFTER CALL API");
+//alert("AFTER CALL API");
 
 typeEffect(data.reply);
 
-alert("AFTER TYPE EFFECT");
+//alert("AFTER TYPE EFFECT");
 showShareCard(data.reply);    
 messages.push({    
 role:"assistant",    
@@ -2894,11 +2894,11 @@ getBtn.disabled = false;
 /* NEXT */    
     
 nextBtn.onclick=async()=>{
-alert(
+/*alert(
     "NEXT BTN\n" +
     "loopLevel = " + loopLevel +
     "\nloop7Started = " + window.loop7Started
-);
+); */
 if (isLoading) return;
 if (loopLevel === 6) {
   if (!window.loop7Started) {
@@ -3059,10 +3059,10 @@ document.getElementById("continueJourneyBtn").onclick = () => {
     document.getElementById("mainApp").style.display = "block";
 
     if (typeof renderRestoredJourney === "function") {
-        alert("Calling renderRestoredJourney()");
-      alert("BEFORE renderRestoredJourney()");
+       // alert("Calling renderRestoredJourney()");
+      // alert("BEFORE renderRestoredJourney()");
         renderRestoredJourney();
-      alert("AFTER renderRestoredJourney()");
+     // alert("AFTER renderRestoredJourney()");
     }
 
 };
@@ -3102,7 +3102,7 @@ detectCountry();
 const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney() {
-alert("Saving Loop = " + loopLevel);
+//alert("Saving Loop = " + loopLevel);
 localStorage.setItem(
 MEMORY_KEY,
 JSON.stringify({
@@ -3160,19 +3160,19 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     params.has("code");
-alert(
+/* alert(
     "linkedInCallback = " + linkedInCallback +
     "\nURL = " + window.location.href
-);
+); */
 if (linkedInCallback) {
 
-    alert("OAuth Redirect");
+ //   alert("OAuth Redirect");
 
     const pending = JSON.parse(
         localStorage.getItem("truthloopPendingOAuth") || "{}"
     );
 
-    alert(JSON.stringify(pending, null, 2));
+  //  alert(JSON.stringify(pending, null, 2));
 
     if (pending.waitingForLoop7Bridge) {
 
@@ -3190,13 +3190,13 @@ window.loop7Started = false;
 saveJourney();
   document.getElementById("restoreScreen").style.display = "none";
 document.getElementById("mainApp").style.display = "block";     
-alert("Calling renderRestoredJourney()");
+//alert("Calling renderRestoredJourney()");
 renderRestoredJourney();
 window.history.replaceState({}, document.title, "/app");
 // return;
 
-alert("OAuth block finished");
-      alert(
+//alert("OAuth block finished");
+    /*  alert(
   [
     "After OAuth",
     "loopLevel = " + loopLevel,
@@ -3209,8 +3209,8 @@ alert("OAuth block finished");
     "loopIndicator = " +
       document.getElementById("loopIndicator").innerText
   ].join("\n")
-);
-      alert(`
+); */
+   /*  alert(`
 === AFTER OAUTH ===
 
 loopLevel = ${loopLevel}
@@ -3228,16 +3228,16 @@ document.getElementById("outputBox").innerHTML.substring(0,300)
 reflectionInput = ${reflectionInput.value}
 
 URL = ${window.location.href}
-`);
+`); */
     }
   
 }
   function renderRestoredJourney() {
-     alert("showRestoreScreen = " + showRestoreScreen);
-     alert(
+    /* alert("showRestoreScreen = " + showRestoreScreen); */
+    /* alert(
         "search = " + window.location.search +
         "\n\nhref = " + window.location.href
-    );
+    ); */
 outputBox.innerHTML = "";
 
 messages.forEach(msg=>{
