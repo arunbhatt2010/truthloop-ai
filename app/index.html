@@ -3060,7 +3060,9 @@ document.getElementById("continueJourneyBtn").onclick = () => {
 
     if (typeof renderRestoredJourney === "function") {
         alert("Calling renderRestoredJourney()");
+      alert("BEFORE renderRestoredJourney()");
         renderRestoredJourney();
+      alert("AFTER renderRestoredJourney()");
     }
 
 };
