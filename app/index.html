@@ -3183,6 +3183,20 @@ window.history.replaceState({}, document.title, "/app");
 // return;
 
 alert("OAuth block finished");
+      alert(
+  [
+    "After OAuth",
+    "loopLevel = " + loopLevel,
+    "waitingForLoop7Bridge = " + waitingForLoop7Bridge,
+    "window.loop7Started = " + window.loop7Started,
+    "restoreScreen = " +
+      document.getElementById("restoreScreen").style.display,
+    "mainApp = " +
+      document.getElementById("mainApp").style.display,
+    "loopIndicator = " +
+      document.getElementById("loopIndicator").innerText
+  ].join("\n")
+);
     }
   
 }
