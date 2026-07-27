@@ -2914,6 +2914,22 @@ if (isLoading) return;
 if (loopLevel === 6) {
   if (!window.loop7Started) {
     window.loop7Started = true;
+     if (window.oauthBridgeReady) {
+    window.oauthBridgeReady = false;
+
+    // OAuth path complete
+    profileLink = "";
+}
+     await fetch(API_URL, {
+    body: JSON.stringify({
+        messages,
+        loopLevel,
+        profileLink,
+        paid49,
+        paid199,
+        currentCategory
+    })
+});
     nextBtn.innerText = "Get Your Final Report →";
     return;
   }
@@ -3143,8 +3159,9 @@ localStorage.removeItem(MEMORY_KEY);
 
   }
 function showLoop7Bridge() {
-getBtn.style.display = "none";
+    getBtn.style.display = "none";
     mainInput.style.display = "none";
+
     document.getElementById("loopIndicator").innerText =
         "Loop " + loopLevel + " of 7";
 
@@ -3158,12 +3175,15 @@ getBtn.style.display = "none";
     // Restore OAuth evidence panel
     showEvidence("oauth");
 
+    // ✅ Mark that OAuth successfully restored the bridge
+    window.oauthBridgeReady = true;
+
     // Restore normal Loop 6 progression
     nextBtn.style.display = "block";
     nextBtn.innerText = "Start Loop 7";
 
     div.scrollTop = div.scrollHeight;
-   }
+}
 const restored = loadJourney();
 
 const params = new URLSearchParams(window.location.search);
