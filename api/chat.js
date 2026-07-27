@@ -566,10 +566,10 @@ console.log(
 );
 
 if (publicEvidencePackage) {
-    console.log(
+   /* console.log(
         "PUBLIC_EVIDENCE_KEYS",
         Object.keys(publicEvidencePackage)
-    );
+    );*/
 }
   } catch (e) {
 
