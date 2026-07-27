@@ -2796,11 +2796,11 @@ mainInput.focus();
 /* START */
     
 getBtn.onclick = async () => {
-alert(
+/*alert(
     "GET BTN CLICK\n" +
     "loopLevel=" + loopLevel +
     "\ntext=" + mainInput.value
-);
+); */
 disableWelcome();
 
 const text = mainInput.value.trim();
@@ -2916,10 +2916,10 @@ if (loopLevel === 6) {
     const profileLink =
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
 investigationSource = profileLink;
-  alert(
+  /*alert(
     "BEFORE PUSH\n\n" +
     JSON.stringify(messages, null, 2)
-);
+);*/
     messages.push({
         role: "user",
         content: profileLink || "Continue to Loop 7"
@@ -3124,7 +3124,7 @@ function loadJourney() {
 
 const saved = localStorage.getItem(MEMORY_KEY);
 
-alert(saved ? "MEMORY FOUND" : "MEMORY NULL");
+// alert(saved ? "MEMORY FOUND" : "MEMORY NULL");
 
 if(!saved) return null;
 
@@ -3166,11 +3166,13 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     params.has("code");
+   alert("OAuth Callback = " + linkedInCallback);
 /* alert(
     "linkedInCallback = " + linkedInCallback +
     "\nURL = " + window.location.href
 ); */
 if (linkedInCallback) {
+   alert("Entered OAuth Resume Flow");
 
  //   alert("OAuth Redirect");
 
@@ -3302,7 +3304,7 @@ document.getElementById("restorePattern").innerText =
 document.getElementById("restoreLoop").innerText =
 "You left at Loop " + loopLevel + " of 7"; 
 getBtn.disabled = false;
-     alert("Reached end of renderRestoredJourney()");
+     // alert("Reached end of renderRestoredJourney()");
 showLoop7Bridge();
    showLoop7Bridge();
   }
@@ -3312,11 +3314,11 @@ window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
-alert(
+/* alert(
 "RESTORE BLOCK ENTERED\n\n" +
 "linkedInCallback = " + linkedInCallback +
 "\nloopLevel = " + loopLevel
-);
+); */
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
 alert(
