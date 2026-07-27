@@ -110,11 +110,38 @@ const hasProfileLink =
 const hasIdentityPackage =
     identityPackage &&
     typeof identityPackage === "object";
+/*
+Universal Evidence Contract
 
-if (
-    !hasProfileLink &&
-    !hasIdentityPackage
-) {
+Current Evidence Sources
+
+- Public Website
+- Public Profile
+- Authenticated Identity
+
+Future Evidence Adapters
+
+- OAuth
+- PDF
+- DOCX
+- Spreadsheet
+- CSV
+- Images
+- OCR
+- Business Records
+- Financial Reports
+- Chat History
+
+Only this block should expand as new adapters are added.
+
+The Universal Evidence Pipeline remains unchanged.
+*/
+
+const hasEvidenceSource =
+    hasProfileLink ||
+    hasIdentityPackage;
+
+if (!hasEvidenceSource) {
 
     return {
 
@@ -123,16 +150,17 @@ if (
         stage: "Input Validation",
 
         reason:
-            "A evidence source link or authenticated profile is required."
+            "A valid Evidence Source is required."
 
     };
 
 }
-
+    // Normalize current Evidence Source
 const normalizedProfileLink =
     hasProfileLink
         ? profileLink.trim()
         : "";
+    // Build Universal Evidence Context
     const footprintContextPackage =
     await loadFootprintSupport({
 
@@ -150,9 +178,8 @@ if (!footprintContextPackage.success) {
     return footprintContextPackage;
 
 }
-   // STEP 2.5
-// Public Content Fetcher
-
+// STEP 2.5
+// Public Evidence Adapter
 const urlPackage =
     await loadPublicContentFetcher({
         url: normalizedProfileLink
@@ -182,7 +209,7 @@ if (!publicContentPackage.success) {
 
         success: false,
 
-        stage: "Public Content Fetcher",
+        stage: "Public Evidence Adapter",
 
         reason:
             publicContentPackage.reason
@@ -191,8 +218,8 @@ if (!publicContentPackage.success) {
 
 }
    /* ==========================================
-STEP 3
-Platform Detector
+// STEP 3
+// Evidence Source Detection
 ==========================================
 
 const platformDecision =
@@ -204,7 +231,7 @@ if (!platformDecision.supported) {
 
         success: false,
 
-        stage: "Platform Detection",
+        stage: "Evidence Source Detection",
 
         type: "platformCard",
 
@@ -226,7 +253,7 @@ if (!platformDecision.supported) {
 
 */
     // STEP 4
-    // Profile Intelligence API
+// Universal Evidence Intelligence
 const profileEvidence =
 
     await ProfileIntelligenceAPI({
@@ -246,7 +273,7 @@ if (!profileEvidence.success) {
 
        }
     // STEP 5
-    // Profile Main Brain
+// Universal Evidence Processor
 const evidencePackage =
 
     await ProfileMainBrain({
@@ -269,9 +296,27 @@ if (!evidencePackage.success) {
 return evidencePackage;
 }
 /* ==========================================
-   Platform Detector
+   Evidence Source Detector
 ========================================== */
+/*
+Current Adapter
 
+Website / Public Profile
+
+Future Adapters
+
+- OAuth
+- PDF
+- DOCX
+- Spreadsheet
+- CSV
+- OCR
+- Images
+
+Only the adapter list expands.
+
+The Universal Evidence Engine remains unchanged.
+*/
 function detectPlatform(profileLink) {
 
     let hostname = "";
@@ -292,7 +337,8 @@ function detectPlatform(profileLink) {
 
     }
 
-    const restrictedPlatforms = {
+    // Current adapter-specific restrictions.
+// Future adapters manage their own validation independently.
 
         "linkedin.com": {
 
@@ -327,6 +373,20 @@ function detectPlatform(profileLink) {
     );
 
 }
+
+/* ==========================================
+   UNIVERSAL EVIDENCE INTELLIGENCE
+
+   Mission
+
+   Convert every available Evidence Source into
+   one verified Universal Evidence Package.
+
+   The source may change.
+
+   The investigation rules never change.
+
+========================================== */
 async function ProfileIntelligenceAPI({
 
     publicContentPackage,
@@ -355,7 +415,9 @@ async function ProfileIntelligenceAPI({
             new Date().toISOString(),
 
         rawResponse: null,
+sourceType: "PublicWebsite",
 
+packageType: "UniversalEvidencePackage",
         evidence: null,
 
         errors: []
@@ -390,10 +452,10 @@ TruthLoop Package
 
 Normalized Evidence Package
 
-The Evidence Package may originate from one or more Evidence Adapters including:
+The Universal Evidence Package may originate from one or more Evidence Adapters including:
 
 • Public Website
-• evidence source
+• Public Profile
 • OAuth Connection
 • PDF
 • DOCX
@@ -412,9 +474,13 @@ Never allow source type to change investigation quality.
 
 UNIVERSAL EVIDENCE TYPES
 
-Collect every measurable evidence signal that can be verified.
+Evidence categories are dynamic.
 
-Examples include:
+Collect only categories supported by verified evidence.
+
+Do not create empty categories.
+
+Do not force unavailable evidence into the package.
 
 • Identity Evidence
 • Activity Evidence
@@ -435,6 +501,9 @@ Examples include:
 • Cross Evidence
 • Missing Evidence
 • Conflicting Evidence
+Evidence Coverage
+
+The investigation is incomplete while usable evidence remains unprocessed.
 
 Never force every category to exist.
 
@@ -442,42 +511,21 @@ Return null when verified evidence is unavailable.
 
 CORE RESPONSIBILITIES
 
-1. Discover every available evidence source.
-2. Collect every measurable evidence signal.
+1. Discover every available Evidence Source.
+2. Collect every measurable Evidence Signal.
 3. Verify every claim before using it.
 4. Normalize evidence into one reusable structure.
 5. Remove duplicate evidence.
 6. Preserve entities, relationships, timelines and numerical data.
 7. Cross-link related evidence.
-8. Compress evidence without losing meaning.
-9. Build one reusable Universal Evidence Package.
-
+8. Calculate Evidence Coverage before completion.
+9. Compress evidence without losing meaning.
+10. Build one reusable Universal Evidence Package.
 Evidence first.
 
 Conclusions later.
 
-PUBLIC SIGNALS TO COLLECT
 
-• Identity
-• Career
-• Activity
-• Content
-• Audience
-• Authority
-• Trust
-• Position
-• Timeline
-• Consistency
-• Professional Signals
-• Communication Signals
-• Business Signals
-• Behavioral Signals
-• Business & Career Relationship Signals
-• Reputation Signals
-• Credibility Signals
-• Expertise Signals
-• Community Signals
-• Media & Website Signals
 
 COLLECTION WINDOW
 
@@ -494,7 +542,7 @@ Always prefer the most recent evidence.
 
 Recent evidence has higher priority than historical evidence.
 
-Never use old evidence when newer verified evidence is available.
+Stop expanding the collection window only when sufficient verified evidence has been collected or no additional usable evidence exists.
 
 EVIDENCE PRIORITY
 
@@ -520,7 +568,11 @@ Weak or incomplete evidence.
 
 Never increase confidence without supporting evidence.
 
-Confidence is determined by evidence quality, consistency and verification, never by source popularity.
+Evidence Coverage directly influences confidence.
+
+Incomplete evidence collection must reduce overall confidence.
+
+Confidence must never exceed evidence completeness.
 
 VALIDATION RULES
 
@@ -531,6 +583,8 @@ VALIDATION RULES
 • Prefer recent evidence over outdated evidence.
 • Keep confidence high.
 • Keep evidence reusable.
+• Never remove evidence that may become useful during cross-evidence validation.
+• Preserve traceability back to the original Evidence Source.
 
 CONFIDENCE RULES
 
@@ -560,8 +614,14 @@ Confidence must decrease when evidence is weak, inconsistent, outdated, or incom
 
 Always explain why confidence changed.
 
-Confidence is calculated from evidence quality,
-not from assumptions.
+Confidence is calculated from:
+
+• Evidence Quality
+• Evidence Coverage
+• Evidence Consistency
+• Cross Evidence Verification
+
+Never calculate confidence from assumptions or popularity.
 
 MISSING EVIDENCE RULES
 
@@ -583,7 +643,9 @@ Always distinguish between:
 • Unverified
 • Missing
 • Conflicting
+Missing evidence must never be fabricated.
 
+Missing evidence should become future collection targets when additional Evidence Sources become available.
 Never hide uncertainty.
 
 Always preserve evidence integrity.
@@ -595,7 +657,7 @@ Never begin evidence collection without at least one valid Evidence Source.
 A valid Evidence Source may include:
 
 • Public Website
-• evidence source
+• Public Profile
 • OAuth Connection
 • PDF
 • DOCX
@@ -607,7 +669,6 @@ A valid Evidence Source may include:
 • Financial Reports
 • Chat History
 • Future Evidence Adapters
-
 Without a valid Evidence Source:
 
 • Do not collect evidence.
@@ -643,13 +704,18 @@ Return one reusable, verified Universal Evidence Package.
 The package must preserve:
 
 • Evidence
-• Sources
-• Business Relationships
+• Evidence Sources
+• Entities
+• Domin Filters
 • Timelines
 • Numerical Data
+• Evidence Coverage
 • Confidence
 • Missing Evidence
 • Conflicting Evidence
+
+Never remove verified evidence unless it is duplicated or invalid.
+
 
 This brain exists only to build one reusable Universal Evidence Package for TruthLoop Main Brain.
 
@@ -659,7 +725,7 @@ Conclusions later.
 `;
        const userPrompt = `
 
-PUBLIC CONTENT PACKAGE
+CURRENT EVIDENCE SOURCE
 
 ${JSON.stringify(publicContentPackage, null, 2)}
 
@@ -672,6 +738,20 @@ TRUTHLOOP PACKAGE
 ${JSON.stringify(truthLoopPackage, null, 2)}
 `;
 
+        /* ==========================================
+   AI REQUEST CONTRACT
+
+   Input
+
+   • TruthLoop Package
+   • Current Evidence Source
+
+   Output
+
+   • Universal Evidence Package
+
+   JSON only.
+========================================== */
 const requestBody = {
 
     model,
@@ -697,6 +777,7 @@ const requestBody = {
     }
 
 };
+        // Execute Universal Evidence Intelligence Request
        const response = await fetch(endpoint, {
 
     method: "POST",
@@ -718,14 +799,13 @@ if (!response.ok) {
 
     intelligence.errors.push(
 
-        `HTTP ${response.status}`
+        `Universal Evidence API Error: HTTP ${response.status}`
 
     );
 
     return intelligence;
 
 }
-
 const result = await response.json();
 intelligence.rawResponse = result;
 
@@ -776,13 +856,23 @@ async function ProfileMainBrain({
     currentLoop
 
 }) {
+    
+/* ==========================================
+   UNIVERSAL EVIDENCE PACKAGE
 
+   This Brain transforms raw AI evidence into
+   one verified TruthLoop Universal Evidence Package.
+
+========================================== */
     const evidencePackage = {
 
         success: false,
 
         timestamp:
             new Date().toISOString(),
+        packageType: "UniversalEvidencePackage",
+
+contractVersion: "UEP-1.0",
 
         profileLink:
             profileEvidence.profileLink,
@@ -797,7 +887,8 @@ async function ProfileMainBrain({
 
         /* ==========================================
    STEP 1
-   Receive Profile Evidence
+
+Receive Verified Evidence
 ========================================== */
 
 const rawEvidence =
@@ -818,7 +909,9 @@ if (!rawEvidence) {
    STEP 2
    Validate Evidence
 ========================================== */
+// Reject fabricated evidence.
 
+// Reject evidence without verifiable structure.
 if (
 
     typeof rawEvidence !== "string"
@@ -863,9 +956,15 @@ try {
     };
 }
 
+        /* Normalize every Evidence Source into one
+   Universal Evidence Contract.
+
+   Every adapter must produce this structure.
+*/
 const normalizedEvidence = {
 
     packageType: "UniversalEvidencePackage",
+    contractVersion: "UEP-1.0",
 
     profileLink: profileEvidence.profileLink,
 
@@ -892,25 +991,25 @@ const refinedEvidence = {
 "Build one verified Universal Evidence Package."
 
     rules: [
+"Discover every available Evidence Source.",
 
-"Discover every available evidence source.",
-
-"Collect every measurable evidence signal.",
+"Collect every measurable Evidence Signal.",
 
 "Validate every claim.",
 
 "Normalize duplicate evidence.",
 
-"Cross-link related evidence.",
+"Cross-check every Domin Filter.",
 
-"Preserve entities, relationships, timelines and numerical data.",
+"Preserve entities, Domin Filters, timelines and numerical data.",
 
 "Keep only reusable evidence.",
 
 "Evidence first.",
 
-"Conclusions later."
+"Verification second.",
 
+"Conclusions last."
 ],
 
     evidence:
@@ -926,6 +1025,7 @@ const refinedEvidence = {
 evidencePackage.evidence = {
 
     packageType: "UniversalEvidencePackage",
+    contractVersion: "UEP-1.0",
 
     source: "DigitalFootprintBrain",
 
@@ -942,7 +1042,7 @@ evidencePackage.evidence = {
 };
 
 evidencePackage.success = true;
-
+// Universal Evidence Package ready for TruthLoop Main Brain.
 return evidencePackage;
 
         
