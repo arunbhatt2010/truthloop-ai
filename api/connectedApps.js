@@ -31,7 +31,7 @@ const tokenData = await tokenResponse.json();
 console.log("LinkedIn Token Response:", tokenData);
 
 return res.status(200).json(tokenData);
-    }
+    
     // ==========================
     // Only POST requests
     // ==========================
