@@ -2915,24 +2915,31 @@ if (loopLevel === 6) {
   if (!window.loop7Started) {
     window.loop7Started = true;
      if (window.oauthBridgeReady) {
+
     window.oauthBridgeReady = false;
 
-    // OAuth path complete
-    profileLink = "";
-}
-     await fetch(API_URL, {
-    body: JSON.stringify({
-        messages,
-        loopLevel,
-        profileLink,
-        paid49,
-        paid199,
-        currentCategory
-    })
-});
+    await fetch("/api/digitalFootprint", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+
+            identityPackage: window.identityPackage,
+
+            currentLoop: 7,
+
+            currentCategory,
+
+            messages
+
+        })
+    });
+
     nextBtn.innerText = "Get Your Final Report →";
+
     return;
-  }
+}
 
     const profileLink =
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
