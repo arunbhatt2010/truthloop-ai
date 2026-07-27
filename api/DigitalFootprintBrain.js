@@ -808,7 +808,7 @@ if (!rawEvidence) {
 
     throw new Error(
 
-        "No public profile evidence received."
+        "No verified evidence received."
 
     );
 
@@ -859,19 +859,26 @@ try {
 } catch {
     parsedEvidence = {
         success: false,
-        error: "Invalid public evidence JSON"
+        error: "Invalid Universal Evidence JSON"
     };
 }
 
 const normalizedEvidence = {
+
+    packageType: "UniversalEvidencePackage",
+
     profileLink: profileEvidence.profileLink,
+
     collectedAt: profileEvidence.timestamp,
+
     provider: profileEvidence.provider,
+
     model: profileEvidence.model,
 
     universalEvidence: parsedEvidence,
 
     truthLoopPackage
+
 };
 
         /* ==========================================
@@ -885,25 +892,26 @@ const refinedEvidence = {
 "Build one verified Universal Evidence Package."
 
     rules: [
-Collect every measurable evidence signal.
 
-Discover every available evidence source.
+"Discover every available evidence source.",
 
-Validate every claim.
+"Collect every measurable evidence signal.",
 
-Normalize duplicate evidence.
+"Validate every claim.",
 
-Cross-link related evidence.
+"Normalize duplicate evidence.",
 
-Preserve entities, relationships, timelines and numerical data.
+"Cross-link related evidence.",
 
-Keep only reusable evidence.
+"Preserve entities, relationships, timelines and numerical data.",
 
-Evidence first.
+"Keep only reusable evidence.",
 
-Conclusions later.
+"Evidence first.",
 
-    ],
+"Conclusions later."
+
+],
 
     evidence:
         normalizedEvidence
@@ -919,20 +927,17 @@ evidencePackage.evidence = {
 
     packageType: "UniversalEvidencePackage",
 
-    provider:
-        normalizedEvidence.provider,
+    source: "DigitalFootprintBrain",
 
-    profileLink:
-        normalizedEvidence.profileLink,
+    provider: normalizedEvidence.provider,
 
-    collectedAt:
-        normalizedEvidence.collectedAt,
+    profileLink: normalizedEvidence.profileLink,
 
-    evidence:
-        refinedEvidence.evidence,
+    collectedAt: normalizedEvidence.collectedAt,
 
-    rules:
-        refinedEvidence.rules
+    evidence: refinedEvidence.evidence,
+
+    rules: refinedEvidence.rules
 
 };
 
