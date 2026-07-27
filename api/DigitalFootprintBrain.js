@@ -524,7 +524,7 @@ Confidence is determined by evidence quality, consistency and verification, neve
 
 VALIDATION RULES
 
-• Every claim must be supported by public evidence.
+• Every claim must be supported by Universal Evidence.
 • Never assume missing information.
 • Ignore unsupported claims.
 • Remove duplicated signals.
@@ -540,19 +540,19 @@ Confidence must always be evidence-based.
 Official verified evidence.
 
 90
-Multiple independent public sources agree.
+Multiple independent Univarsal sources agree.
 
 75
-Strong public evidence with high consistency.
+Strong Universal Evidence with high consistency.
 
 50
-Limited or partially verified public evidence.
+Limited or partially verified Universal Evidence
 
 25
-Weak or insufficient public evidence.
+Weak or insufficient Universal Evidence
 
 0
-No verified public evidence.
+No verified Universal Evidence
 
 Never increase confidence without supporting evidence.
 
