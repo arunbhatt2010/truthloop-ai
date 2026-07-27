@@ -220,7 +220,7 @@ if (!publicContentPackage.success) {
    /* ==========================================
 // STEP 3
 // Evidence Source Detection
-==========================================
+========================================== 
 
 const platformDecision =
     detectPlatform(normalizedProfileLink);
@@ -319,7 +319,7 @@ The Universal Evidence Engine remains unchanged.
 */
 function detectPlatform(profileLink) {
 
-    let hostname = "";
+    let hostname = "Unknown";
 
     try {
 
@@ -331,46 +331,30 @@ function detectPlatform(profileLink) {
     } catch {
 
         return {
+
             platform: "Unknown",
-            supported: true
+
+            supported: true,
+
+            sourceType: "Unknown",
+
+            adapter: "Unknown"
+
         };
 
     }
 
-    // Current adapter-specific restrictions.
-// Future adapters manage their own validation independently.
+    return {
 
-        "linkedin.com": {
+        platform: hostname,
 
-            platform: "LinkedIn",
+        supported: true,
 
-            supported: true,
+        sourceType: "PublicWebsite",
 
-            oauth: false,
-
-            reason:
-                "Direct LinkedIn profile analysis is currently unavailable.",
-
-            options: [
-                "Use another public website",
-                "Connect with LinkedIn (coming soon)"
-            ]
-
-        }
+        adapter: "PublicWebsite"
 
     };
-
-    return (
-
-        restrictedPlatforms[hostname] || {
-
-            platform: hostname,
-
-            supported: true
-
-        }
-
-    );
 
 }
 
@@ -987,7 +971,7 @@ const normalizedEvidence = {
 
 const refinedEvidence = {
 
-    mission:
+    mission:,
 "Build one verified Universal Evidence Package."
 
     rules: [
