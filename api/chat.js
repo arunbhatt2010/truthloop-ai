@@ -514,12 +514,6 @@ if (
         identityPackage
     )
 ) {
-  alert(
-        "ENTERED DFB BLOCK\n" +
-        "loopLevel = " + loopLevel +
-        "\nprofileLink = " + profileLink +
-        "\nidentity = " + !!identityPackage
-    );
   try {
 
     publicEvidencePackage =
@@ -534,18 +528,7 @@ await loadDigitalFootprintBrain({
     currentLoop: 7
 
 });
-    alert(
-    "Reached DFB\n" +
-    "loopLevel = " + loopLevel +
-    "\nprofileLink = " + profileLink +
-    "\nidentity = " + !!identityPackage
-);
-    alert(
-    "DFB returned\n" +
-    "success = " + publicEvidencePackage?.success +
-    "\nstage = " + publicEvidencePackage?.stage +
-    "\nreason = " + publicEvidencePackage?.reason
-);
+    
     /* =========================
    PLATFORM CARD
 ========================= */
