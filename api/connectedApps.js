@@ -3,25 +3,34 @@ export default async function handler(req, res) {
     // ==========================
     // LinkedIn OAuth Callback
     // ==========================
-    if (req.method === "GET") {
+if (!code) {
+    return res
+        .status(400)
+        .send("Authorization code not received.");
+}
 
-        const { code, error } = req.query;
-
-        if (error) {
-            return res
-                .status(400)
-                .send("LinkedIn authorization cancelled.");
-        }
-
-        if (!code) {
-            return res
-                .status(400)
-                .send("Authorization code not received.");
-        }
-
-        return res.redirect(
-  `https://truthloop.in/app?linkedin=connected&resume=loop6&code=${encodeURIComponent(code)}`
+const tokenResponse = await fetch(
+    "https://www.linkedin.com/oauth/v2/accessToken",
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            grant_type: "authorization_code",
+            code,
+            redirect_uri: "https://truthloop.in/api/connectedApps",
+            client_id: process.env.LINKEDIN_CLIENT_ID,
+            client_secret: process.env.LINKEDIN_CLIENT_SECRET
+        })
+    }
 );
+
+const tokenData = await tokenResponse.json();
+
+console.log("LinkedIn Token Response:", tokenData);
+
+return res.status(200).json(tokenData);
     }
     // ==========================
     // Only POST requests
