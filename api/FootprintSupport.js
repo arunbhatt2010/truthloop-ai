@@ -48,6 +48,8 @@ export async function loadFootprintSupport({
 
     profileLink = "",
 
+    identityPackage = null,
+
     currentLoop = 7
 
 } = {}) {
@@ -60,10 +62,14 @@ const normalizedProfileLink =
         ? profileLink.trim()
         : "";
 
-// STEP 2
-// Investigation Request Validation
+const hasProfileLink =
+    !!normalizedProfileLink;
 
-if (!normalizedProfileLink) {
+const hasIdentityPackage =
+    identityPackage &&
+    typeof identityPackage === "object";
+
+if (!hasProfileLink && !hasIdentityPackage) {
 
     return {
 
@@ -72,7 +78,7 @@ if (!normalizedProfileLink) {
         stage: "Investigation Request",
 
         reason:
-            "A public profile or website link is required."
+            "A valid Evidence Source is required."
 
     };
 
@@ -83,25 +89,33 @@ if (!normalizedProfileLink) {
 
 let hostname = "";
 
-try {
+if (hasProfileLink) {
 
-    hostname = new URL(normalizedProfileLink)
-        .hostname
-        .replace(/^www\./, "")
-        .toLowerCase();
+    try {
 
-} catch {
+        hostname = new URL(normalizedProfileLink)
+            .hostname
+            .replace(/^www\./, "")
+            .toLowerCase();
 
-    return {
+    } catch {
 
-        success: false,
+        return {
 
-        stage: "Platform Detection",
+            success: false,
 
-        reason:
-            "Invalid public profile or website link."
+            stage: "Platform Detection",
+
+            reason:
+                "Invalid public profile or website link."
+
+        };
 
     };
+
+} else {
+
+    hostname = "oauth";
 
 }
 
@@ -182,8 +196,9 @@ const investigationContext = {
 
     truthLoopPackage,
 
-    profileLink:
-        normalizedProfileLink,
+    profileLink: normalizedProfileLink,
+
+    identityPackage,
 
     hostname,
 
@@ -198,7 +213,6 @@ const investigationContext = {
     currentLoop
 
 };
-
 // STEP 8
 // Footprint Context Package
 
