@@ -1,5 +1,5 @@
 import { loadDigitalFootprintBrain }
-from "./brains/DigitalFootprintBrain.js";
+from "./DigitalFootprintBrain.js";
 
 export default async function handler(req,res){
 
