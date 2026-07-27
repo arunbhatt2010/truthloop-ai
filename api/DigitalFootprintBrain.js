@@ -123,7 +123,7 @@ if (
         stage: "Input Validation",
 
         reason:
-            "A public profile link or authenticated profile is required."
+            "A evidence source link or authenticated profile is required."
 
     };
 
@@ -393,7 +393,7 @@ Normalized Evidence Package
 The Evidence Package may originate from one or more Evidence Adapters including:
 
 • Public Website
-• Public Profile
+• evidence source
 • OAuth Connection
 • PDF
 • DOCX
@@ -595,7 +595,7 @@ Never begin evidence collection without at least one valid Evidence Source.
 A valid Evidence Source may include:
 
 • Public Website
-• Public Profile
+• evidence source
 • OAuth Connection
 • PDF
 • DOCX
