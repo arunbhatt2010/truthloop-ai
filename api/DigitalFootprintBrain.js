@@ -974,8 +974,7 @@ const normalizedEvidence = {
 
 const refinedEvidence = {
 
-    mission:,
-"Build one verified Universal Evidence Package."
+    mission: "Build one verified Universal Evidence Package.",
 
     rules: [
 "Discover every available Evidence Source.",
