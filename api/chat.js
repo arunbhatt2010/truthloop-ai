@@ -559,6 +559,17 @@ console.log(
     "PUBLIC_EVIDENCE_PACKAGE",
     JSON.stringify(publicEvidencePackage, null, 2)
 );
+    console.log(
+    "PUBLIC_EVIDENCE_EXISTS",
+    publicEvidencePackage ? "YES" : "NO"
+);
+
+if (publicEvidencePackage) {
+    console.log(
+        "PUBLIC_EVIDENCE_KEYS",
+        Object.keys(publicEvidencePackage)
+    );
+}
   } catch (e) {
 
     console.error(
