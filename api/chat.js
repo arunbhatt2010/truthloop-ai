@@ -514,6 +514,12 @@ if (
         identityPackage
     )
 ) {
+  alert(
+        "ENTERED DFB BLOCK\n" +
+        "loopLevel = " + loopLevel +
+        "\nprofileLink = " + profileLink +
+        "\nidentity = " + !!identityPackage
+    );
   try {
 
     publicEvidencePackage =
