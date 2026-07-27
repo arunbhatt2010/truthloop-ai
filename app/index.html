@@ -2009,14 +2009,20 @@ if (loopLevel === 6) {
 
     reflectionInput.style.display = "none";
 
+    // 👇 Go Deeper button permanently hide after Bridge
+    getBtn.style.display = "none";
+
+    nextBtn.style.display = "block";
     nextBtn.innerText = window.loop7Started
         ? "Get Your Final Report →"
         : "Start Loop 7";
 
 } else {
 
+    getBtn.style.display = "block";
+
     reflectionInput.style.display = "block";
-  }
+}
 setTimeout(()=>{
     // reflectionInput.focus();
 },300);
