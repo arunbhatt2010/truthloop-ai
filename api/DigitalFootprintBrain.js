@@ -500,14 +500,17 @@ CORE RESPONSIBILITIES
 3. Verify every claim before using it.
 4. Normalize evidence into one reusable structure.
 5. Remove duplicate evidence.
-6. Preserve entities, relationships, timelines and numerical data.
-7. Cross-link related evidence.
+6. Preserve entities, timelines and numerical data.
+7. Identify Domin Filters from verified evidence.
 8. Calculate Evidence Coverage before completion.
 9. Compress evidence without losing meaning.
 10. Build one reusable Universal Evidence Package.
+
 Evidence first.
 
-Conclusions later.
+Domin Filters emerge from verified evidence.
+
+Conclusions last.
 
 
 
