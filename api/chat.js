@@ -526,13 +526,14 @@ await loadDigitalFootprintBrain({
     identityPackage,
 
     currentLoop: 7
-alert(
+
+});
+    alert(
     "Reached DFB\n" +
     "loopLevel = " + loopLevel +
     "\nprofileLink = " + profileLink +
     "\nidentity = " + !!identityPackage
 );
-});
     alert(
     "DFB returned\n" +
     "success = " + publicEvidencePackage?.success +
