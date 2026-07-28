@@ -378,7 +378,7 @@ async function handleLinkedInOAuth(req, res) {
             state
 
         });
-
+console.log(redirectUrl);
     return res.status(200).json({
     clientId: LINKEDIN_CLIENT_ID,
     redirectUrl
