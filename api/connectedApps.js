@@ -475,17 +475,7 @@ async function handleLinkedInCallback(req, res) {
         });
 
     }
-return res.status(200).json({
-    code,
-    clientId: LINKEDIN_CLIENT_ID,
-    redirectUri: REDIRECT_URI,
-    body: {
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: REDIRECT_URI,
-        client_id: LINKEDIN_CLIENT_ID
-    }
-});
+
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
