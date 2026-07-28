@@ -481,74 +481,51 @@ console.log({
   clientSecretStart: LINKEDIN_CLIENT_SECRET.slice(0, 4),
   clientSecretEnd: LINKEDIN_CLIENT_SECRET.slice(-8)
 });
+
+const body = new URLSearchParams({
+  grant_type: "authorization_code",
+  code,
+  redirect_uri: REDIRECT_URI,
+  client_id: LINKEDIN_CLIENT_ID,
+  client_secret: LINKEDIN_CLIENT_SECRET
+});
+
+console.log(body.toString());
+
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
-    {
-        method: "POST",
-
-        headers: {
-            "Content-Type":
-                "application/x-www-form-urlencoded"
-        },
-
-        body: new URLSearchParams({
-
-            grant_type:
-                "authorization_code",
-
-            code,
-
-            redirect_uri:
-                REDIRECT_URI,
-
-            client_id:
-                LINKEDIN_CLIENT_ID,
-
-            client_secret:
-                LINKEDIN_CLIENT_SECRET
-
-        })
-
-    }
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body
+  }
 );
 
-const tokenData =
-    await tokenResponse.json();
-  return res.status(200).json({
+const tokenData = await tokenResponse.json();
+
+return res.status(200).json({
   status: tokenResponse.status,
   ok: tokenResponse.ok,
   tokenData
 });
-  
-  if (!tokenResponse.ok) {
 
-    return res.status(400).json({
-
-        success: false,
-
-        stage: "TOKEN",
-
-        tokenData
-
-    });
-
+if (!tokenResponse.ok) {
+  return res.status(400).json({
+    success: false,
+    stage: "TOKEN",
+    tokenData
+  });
 }
 
 if (!tokenData.access_token) {
-
-    return res.status(400).json({
-
-        success: false,
-
-        stage: "TOKEN",
-
-        reason:
-            "Access token not received.",
-
-        tokenData
-
-    });
-
+  return res.status(400).json({
+    success: false,
+    stage: "TOKEN",
+    reason: "Access token not received.",
+    tokenData
+  });
 }
   /* =========================================
    FETCH USER INFO
