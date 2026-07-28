@@ -1,3 +1,4 @@
+import crypto from "crypto";
 /*
 connectedApps.js
 
@@ -148,7 +149,31 @@ const LINKEDIN_CLIENT_SECRET =
 
 const REDIRECT_URI =
     "https://truthloop.in/api/connectedApps";
+function base64url(buffer) {
+    return buffer
+        .toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+}
 
+function generatePKCE() {
+    const codeVerifier = base64url(
+        crypto.randomBytes(32)
+    );
+
+    const codeChallenge = base64url(
+        crypto
+            .createHash("sha256")
+            .update(codeVerifier)
+            .digest()
+    );
+
+    return {
+        codeVerifier,
+        codeChallenge
+    };
+}
 /* =========================================
    TEMP SESSION STORE
 ========================================= */
