@@ -493,7 +493,11 @@ document.body.innerText = window.location.href;
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
-
+console.log({
+  clientId: LINKEDIN_CLIENT_ID,
+  clientSecretStart: LINKEDIN_CLIENT_SECRET.slice(0, 4),
+  clientSecretEnd: LINKEDIN_CLIENT_SECRET.slice(-8)
+});
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
     {
