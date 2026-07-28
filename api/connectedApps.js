@@ -479,12 +479,7 @@ async function handleLinkedInCallback(req, res) {
         });
 
     }
-return res.status(200).json({
-    code,
-    redirect_uri: REDIRECT_URI,
-    client_id: LINKEDIN_CLIENT_ID,
-    state
-});
+
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
