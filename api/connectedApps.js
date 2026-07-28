@@ -491,3 +491,50 @@ async function handleLinkedInCallback(req, res) {
     });
 
 }
+
+/*
+handleLinkedInCallback()
+
+1. Read query
+   ├─ code
+   ├─ error
+   └─ state
+
+2. Validate callback
+   ├─ error?
+   └─ code missing?
+
+3. Exchange Authorization Code
+   └─ LinkedIn Access Token
+
+4. Validate token
+   └─ access_token exists?
+
+5. Fetch OpenID UserInfo
+   └─ https://api.linkedin.com/v2/userinfo
+
+6. Build identityPackage
+   ├─ provider
+   ├─ id
+   ├─ name
+   ├─ email
+   ├─ picture
+   ├─ locale
+   ├─ verified
+   └─ connectedAt
+
+7. Create sessionId
+
+8. Save session
+   sessionStore.set(sessionId,{
+       identityPackage,
+       createdAt,
+       expiresAt
+   })
+
+9. Redirect
+
+/app?linkedin=connected
+&resume=loop6
+&session=<sessionId>
+*/
