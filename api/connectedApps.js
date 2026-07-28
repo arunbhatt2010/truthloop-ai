@@ -480,16 +480,157 @@ async function handleLinkedInCallback(req, res) {
 
     }
 
-    return res.status(200).json({
+  /* =========================================
+   EXCHANGE AUTHORIZATION CODE
+========================================= */
 
-        success: true,
+const tokenResponse = await fetch(
+    "https://www.linkedin.com/oauth/v2/accessToken",
+    {
+        method: "POST",
 
-        stage: "CALLBACK",
+        headers: {
+            "Content-Type":
+                "application/x-www-form-urlencoded"
+        },
 
-        code
+        body: new URLSearchParams({
+
+            grant_type:
+                "authorization_code",
+
+            code,
+
+            redirect_uri:
+                REDIRECT_URI,
+
+            client_id:
+                LINKEDIN_CLIENT_ID,
+
+            client_secret:
+                LINKEDIN_CLIENT_SECRET
+
+        })
+
+    }
+);
+
+const tokenData =
+    await tokenResponse.json();
+
+  if (!tokenResponse.ok) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        stage: "TOKEN",
+
+        tokenData
 
     });
 
+}
+
+if (!tokenData.access_token) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        stage: "TOKEN",
+
+        reason:
+            "Access token not received.",
+
+        tokenData
+
+    });
+
+}
+  /* =========================================
+   FETCH USER INFO
+========================================= */
+
+const userResponse = await fetch(
+    "https://api.linkedin.com/v2/userinfo",
+    {
+        headers: {
+            Authorization:
+                `Bearer ${tokenData.access_token}`
+        }
+    }
+);
+
+const userInfo =
+    await userResponse.json();
+
+if (!userResponse.ok) {
+
+    return res.status(400).json({
+
+        success: false,
+
+        stage: "USER_INFO",
+
+        userInfo
+
+    });
+
+}
+
+  /* =========================================
+   BUILD IDENTITY PACKAGE
+========================================= */
+
+const identityPackage = {
+
+    provider: "linkedin",
+
+    id: userInfo.sub,
+
+    name: userInfo.name,
+
+    email: userInfo.email,
+
+    picture: userInfo.picture,
+
+    locale: userInfo.locale,
+
+    verified: true,
+
+    connectedAt: Date.now(),
+
+    raw: userInfo
+
+};
+
+  /* =========================================
+   CREATE SESSION
+========================================= */
+
+const sessionId = createSessionId();
+
+sessionStore.set(sessionId, {
+
+    identityPackage,
+
+    createdAt: Date.now(),
+
+    expiresAt: Date.now() + SESSION_TTL
+
+});
+
+/* =========================================
+   REDIRECT TO APP
+========================================= */
+
+return res.redirect(
+
+    `/app?linkedin=connected&resume=loop6&session=${sessionId}`
+
+);
+    
 }
 
 /*
