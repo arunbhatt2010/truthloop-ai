@@ -347,8 +347,7 @@ async function handleDELETE(req, res) {
 ========================================= */
 
 async function handleLinkedInOAuth(req, res) {
-console.log("===== HANDLE POST =====");
-console.log("BODY:", req.body);
+
     if (!LINKEDIN_CLIENT_ID) {
 
         return res.status(500).json({
@@ -380,9 +379,7 @@ console.log("BODY:", req.body);
             state
 
         });
-  console.log({
-  authUrl: redirectUrl
-});
+  
   return res.status(200).json({
     clientId: LINKEDIN_CLIENT_ID,
     redirectUri: REDIRECT_URI,
@@ -487,12 +484,7 @@ console.log("===== CALLBACK START =====");
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
 
-  console.log({
-  clientId: LINKEDIN_CLIENT_ID,
-  clientSecretStart: LINKEDIN_CLIENT_SECRET.slice(0, 4),
-  clientSecretEnd: LINKEDIN_CLIENT_SECRET.slice(-8)
-});
-
+  
 const body = new URLSearchParams({
   grant_type: "authorization_code",
   code,
@@ -501,8 +493,7 @@ const body = new URLSearchParams({
   client_secret: LINKEDIN_CLIENT_SECRET
 });
 
-console.log(body.toString());
-console.log("===== TOKEN EXCHANGE START =====");
+
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
   {
