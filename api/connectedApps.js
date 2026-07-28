@@ -388,7 +388,13 @@ async function handleLinkedInOAuth(req, res) {
     const state =
         Math.random().toString(36).substring(2) +
         Date.now();
+const { codeVerifier, codeChallenge } = generatePKCE();
 
+sessionStore.set(state, {
+    codeVerifier,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + SESSION_TTL
+});
     const redirectUrl =
         "https://www.linkedin.com/oauth/v2/authorization?" +
         new URLSearchParams({
@@ -400,6 +406,9 @@ async function handleLinkedInOAuth(req, res) {
             redirect_uri: REDIRECT_URI,
 
             scope: "openid profile email",
+state,
+code_challenge: codeChallenge,
+code_challenge_method: "S256"
 
             state
 
@@ -480,7 +489,14 @@ console.log("===== CALLBACK START =====");
         state
 
     } = req.query;
+const pkce = sessionStore.get(state);
 
+if (!pkce) {
+    return res.status(400).json({
+        success: false,
+        reason: "PKCE session not found."
+    });
+}
     if (error) {
 
         return res.status(400).json({
@@ -516,6 +532,7 @@ const body = new URLSearchParams({
   redirect_uri: REDIRECT_URI,
   client_id: LINKEDIN_CLIENT_ID,
   client_secret: LINKEDIN_CLIENT_SECRET
+  code_verifier: pkce.codeVerifier
 });
 
 
