@@ -481,7 +481,11 @@ return res.status(200).json({
         });
 
     }
-
+return res.status(200).json({
+    clientId: LINKEDIN_CLIENT_ID,
+    hasSecret: !!LINKEDIN_CLIENT_SECRET,
+    redirectUri: REDIRECT_URI
+});
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
