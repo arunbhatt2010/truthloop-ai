@@ -477,12 +477,7 @@ async function handleLinkedInCallback(req, res) {
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
-alert(
-"STEP 1\n\n" +
-"Callback reached\n\n" +
-"Code: " + (code ? "YES" : "NO") +
-"\nState: " + state
-);
+
   console.log({
   clientId: LINKEDIN_CLIENT_ID,
   clientSecretStart: LINKEDIN_CLIENT_SECRET.slice(0, 4),
@@ -498,10 +493,7 @@ const body = new URLSearchParams({
 });
 
 console.log(body.toString());
-alert(
-"STEP 2\n\n" +
-body.toString()
-);
+
 const tokenResponse = await fetch(
   "https://api.linkedin.com/oauth/v2/accessToken",
   {
@@ -512,30 +504,15 @@ const tokenResponse = await fetch(
     body
   }
 );
-alert(
-"STEP 3\n\n" +
-"Status = " + tokenResponse.status +
-"\nOK = " + tokenResponse.ok
-);
+
 const raw = await tokenResponse.text();
 
-alert(
-"STEP 4\n\n" +
-raw
-);
-
-const tokenData = JSON.parse(raw);
-
-alert(
-"STEP 5\n\n" +
-JSON.stringify(tokenData, null, 2)
-);
-
 return res.status(200).json({
-    status: tokenResponse.status,
-    ok: tokenResponse.ok,
-    tokenData
+  status: tokenResponse.status,
+  ok: tokenResponse.ok,
+  raw
 });
+
 
 if (!tokenResponse.ok) {
   return res.status(400).json({
