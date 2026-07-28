@@ -1,102 +1,493 @@
+/*
+connectedApps.js
+
+┌──────────────────────────────────────┐
+│ 0. Config & Memory                   │
+│ • Environment variables              │
+│ • Session Store                      │
+│ • Utility Functions                  │
+└──────────────────────────────────────┘
+
+                │
+                ▼
+
+┌──────────────────────────────────────┐
+│ 1. Main Router                       │
+│                                      │
+│ GET  → OAuth Callback                │
+│ POST → OAuth Start                   │
+│ DELETE (Future) → Disconnect         │
+└──────────────────────────────────────┘
+
+                │
+                ▼
+
+===========================
+POST FLOW
+===========================
+
+2. Validate Request
+
+↓
+
+3. Provider Router
+
+↓
+
+4. LinkedIn OAuth URL Builder
+
+↓
+
+5. Return redirectUrl
+
+
+===========================
+GET FLOW
+===========================
+
+6. Read Query
+
+↓
+
+7. Validate code/state/error
+
+↓
+
+8. Exchange Authorization Code
+
+↓
+
+9. Validate Access Token
+
+↓
+
+10. Fetch OIDC UserInfo
+
+↓
+
+11. Build identityPackage
+
+↓
+
+12. Build TruthLoop ConnectedApp Package
+
+↓
+
+13. Create Temporary Session
+
+↓
+
+14. Store Session
+
+↓
+
+15. Redirect
+
+/app?linkedin=connected
+&resume=loop6
+&session=xxxx
+
+
+===========================
+SESSION FLOW
+===========================
+
+16. GET?action=session
+
+↓
+
+17. Validate Session
+
+↓
+
+18. Return identityPackage
+
+↓
+
+19. Destroy Session
+
+
+===========================
+FUTURE
+===========================
+
+20. Google
+
+21. GitHub
+
+22. Facebook
+
+23. X
+
+24. Custom OAuth
+
+
+===========================
+COMMON
+===========================
+
+25. Error Handler
+
+26. Logger
+
+27. Security
+
+28. Response Builder
+*/
+
+
+/* =========================================
+   CONFIG
+========================================= */
+
+const LINKEDIN_CLIENT_ID =
+    process.env.LINKEDIN_CLIENT_ID;
+
+const LINKEDIN_CLIENT_SECRET =
+    process.env.LINKEDIN_CLIENT_SECRET;
+
+const REDIRECT_URI =
+    "https://truthloop.in/api/connectedApps";
+
+/* =========================================
+   TEMP SESSION STORE
+========================================= */
+
+const sessionStore = new Map();
+
+/* =========================================
+   SESSION EXPIRY
+========================================= */
+
+const SESSION_TTL =
+    5 * 60 * 1000;
+
+/* =========================================
+   CREATE SESSION ID
+========================================= */
+
+function createSessionId() {
+
+    return (
+        Math.random().toString(36).substring(2) +
+        Date.now().toString(36)
+    );
+
+}
+
+/* =========================================
+   CLEAN EXPIRED SESSIONS
+========================================= */
+
+function cleanSessions() {
+
+    const now = Date.now();
+
+    for (const [id, session] of sessionStore) {
+
+        if (now > session.expiresAt) {
+
+            sessionStore.delete(id);
+
+        }
+
+    }
+
+}
+
+/* =========================================
+   MAIN ROUTER
+========================================= */
+
 export default async function handler(req, res) {
 
-// ==========================  
-// LinkedIn OAuth Callback  
-// ==========================  
-if (req.method === "GET") {  
+    cleanSessions();
 
-    const { code, error } = req.query;  
+    try {
+
+        if (req.method === "GET") {
+            return await handleGET(req, res);
+        }
+
+        if (req.method === "POST") {
+            return await handlePOST(req, res);
+        }
+
+        if (req.method === "DELETE") {
+            return await handleDELETE(req, res);
+        }
+
+        return res.status(405).json({
+            success: false,
+            reason: "Method not allowed."
+        });
+
+    } catch (error) {
+
+        console.error("CONNECTED APPS:", error);
+
+        return res.status(500).json({
+            success: false,
+            reason: "Internal server error."
+        });
+
+    }
+
+}
+
+/* =========================================
+   GET HANDLER
+========================================= */
+
+async function handleGET(req, res) {
+
+    const {
+
+        action,
+        code,
+        error,
+        state,
+        session
+
+    } = req.query;
+
+    if (action === "session") {
+
+        return await handleSessionRequest(
+            req,
+            res
+        );
+
+    }
+
+    if (code || error) {
+
+        return await handleLinkedInCallback(
+            req,
+            res
+        );
+
+    }
+
+    return res.status(400).json({
+
+        success: false,
+
+        reason: "Unknown GET request."
+
+    });
+
+}
+/* =========================================
+   POST HANDLER
+========================================= */
+
+async function handlePOST(req, res) {
+
+    const {
+
+        action,
+
+        provider
+
+    } = req.body || {};
+
+    if (action !== "oauth") {
+
+        return res.status(400).json({
+
+            success: false,
+
+            reason: "Unsupported action."
+
+        });
+
+    }
+
+    switch (provider) {
+
+        case "linkedin":
+
+            return await handleLinkedInOAuth(
+                req,
+                res
+            );
+
+        default:
+
+            return res.status(400).json({
+
+                success: false,
+
+                reason: "Unsupported provider."
+
+            });
+
+    }
+
+}
+
+/* =========================================
+   DELETE HANDLER
+========================================= */
+
+async function handleDELETE(req, res) {
+
+    return res.status(200).json({
+
+        success: true,
+        stage: "DELETE"
+
+    });
+
+    }
+/* =========================================
+   LINKEDIN OAUTH
+========================================= */
+
+async function handleLinkedInOAuth(req, res) {
+
+    if (!LINKEDIN_CLIENT_ID) {
+
+        return res.status(500).json({
+
+            success: false,
+
+            reason: "LinkedIn Client ID not configured."
+
+        });
+
+    }
+
+    const state =
+        Math.random().toString(36).substring(2) +
+        Date.now();
+
+    const redirectUrl =
+        "https://www.linkedin.com/oauth/v2/authorization?" +
+        new URLSearchParams({
+
+            response_type: "code",
+
+            client_id: LINKEDIN_CLIENT_ID,
+
+            redirect_uri: REDIRECT_URI,
+
+            scope: "openid profile email",
+
+            state
+
+        });
+
+    return res.status(200).json({
+
+        success: true,
+
+        provider: "linkedin",
+
+        oauth: true,
+
+        redirectUrl
+
+    });
+
+}
+
+/* =========================================
+   SESSION REQUEST
+========================================= */
+
+async function handleSessionRequest(req, res) {
+
+    const { session } = req.query;
+
+    if (!session) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            reason: "Session ID missing."
+
+        });
+
+    }
+
+    cleanSessions();
+
+    const data = sessionStore.get(session);
+
+    if (!data) {
+
+        return res.status(404).json({
+
+            success: false,
+
+            reason: "Session not found."
+
+        });
+
+    }
+
+    sessionStore.delete(session);
+
+    return res.status(200).json({
+
+        success: true,
+
+        identityPackage: data.identityPackage
+
+    });
+
+}
+/* =========================================
+   LINKEDIN CALLBACK
+========================================= */
+
+async function handleLinkedInCallback(req, res) {
+
+    const {
+
+        code,
+
+        error,
+
+        state
+
+    } = req.query;
+
+    if (error) {
+
+        return res.status(400).json({
+
+            success: false,
+
+            reason: error
+
+        });
+
+    }
 
     if (!code) {
-    return res
-        .status(400)
-        .send("Authorization code not received.");
-}
 
-const tokenResponse = await fetch(
-    "https://www.linkedin.com/oauth/v2/accessToken",
-    {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            grant_type: "authorization_code",
-            code,
-            redirect_uri: "https://truthloop.in/api/connectedApps",
-            client_id: process.env.LINKEDIN_CLIENT_ID,
-            client_secret: process.env.LINKEDIN_CLIENT_SECRET
-        })
+        return res.status(400).json({
+
+            success: false,
+
+            reason: "Authorization code not received."
+
+        });
+
     }
-);
 
-const tokenData = await tokenResponse.json();
+    return res.status(200).json({
 
-console.log("LinkedIn Token Response:", tokenData);
+        success: true,
 
-return res.status(tokenResponse.status).json(tokenData);
-// ==========================
-// Only POST requests
-// ==========================
-if (req.method !== "POST") {
-return res.status(405).json({
-success: false,
-reason: "Method not allowed."
-});
-}
+        stage: "CALLBACK",
 
-const {  
-    action,  
-    provider  
-} = req.body;  
+        code
 
-const clientId = process.env.LINKEDIN_CLIENT_ID;  
-
-if (!clientId) {  
-    return res.status(200).json({  
-        success: false,  
-        reason: "CLIENT ID NOT FOUND"  
-    });  
-}  
-
-const state =  
-    Math.random().toString(36).substring(2) +  
-    Date.now();  
-
-const redirectUri = encodeURIComponent(  
-    "https://truthloop.in/api/connectedApps"  
-);  
-
-const scope = encodeURIComponent(  
-    "openid profile email"  
-);  
-
-const redirectUrl =  
-    `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;  
-
-// ==========================  
-// LinkedIn OAuth  
-// ==========================  
-if (  
-    action === "oauth" &&  
-    provider === "linkedin"  
-) {  
-
-    return res.status(200).json({  
-        success: true,  
-        provider: "linkedin",  
-        oauth: true,  
-        redirectUrl  
-    });  
-
-}  
-
-// ==========================  
-// Future Providers  
-// ==========================  
-return res.status(400).json({  
-    success: false,  
-    reason: "Unsupported provider."  
-});
+    });
 
 }
