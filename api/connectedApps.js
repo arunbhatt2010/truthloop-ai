@@ -380,16 +380,9 @@ async function handleLinkedInOAuth(req, res) {
         });
 
     return res.status(200).json({
-
-        success: true,
-
-        provider: "linkedin",
-
-        oauth: true,
-
-        redirectUrl
-
-    });
+    clientId: LINKEDIN_CLIENT_ID,
+    redirectUrl
+});
 
 }
 
