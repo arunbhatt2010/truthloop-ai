@@ -445,9 +445,7 @@ async function handleSessionRequest(req, res) {
 ========================================= */
 
 async function handleLinkedInCallback(req, res) {
-return res.status(200).json({
-    query: req.query
-});
+
     const {
 
         code,
