@@ -410,7 +410,7 @@ state,
 code_challenge: codeChallenge,
 code_challenge_method: "S256"
 
-            state
+            
 
         });
   console.log("===== AUTH URL =====");
@@ -527,12 +527,12 @@ if (!pkce) {
 
   
 const body = new URLSearchParams({
-  grant_type: "authorization_code",
-  code,
-  redirect_uri: REDIRECT_URI,
-  client_id: LINKEDIN_CLIENT_ID,
-  client_secret: LINKEDIN_CLIENT_SECRET
-  code_verifier: pkce.codeVerifier
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: REDIRECT_URI,
+    client_id: LINKEDIN_CLIENT_ID,
+    client_secret: LINKEDIN_CLIENT_SECRET,
+    code_verifier: pkce.codeVerifier
 });
 
 
