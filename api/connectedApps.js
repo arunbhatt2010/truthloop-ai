@@ -379,13 +379,13 @@ async function handleLinkedInOAuth(req, res) {
             state
 
         });
+  console.log("===== AUTH URL =====");
+console.log(redirectUrl.toString());
+console.log("===== END AUTH URL =====");
   
   return res.status(200).json({
-    clientId: LINKEDIN_CLIENT_ID,
-    redirectUri: REDIRECT_URI,
     redirectUrl
 });
-
     
 
 }
@@ -505,14 +505,7 @@ const tokenResponse = await fetch(
   }
 );
 
-const raw = await tokenResponse.text();
-
-return res.status(200).json({
-  status: tokenResponse.status,
-  ok: tokenResponse.ok,
-  raw
-});
-
+const tokenData = await tokenResponse.json();
 
 if (!tokenResponse.ok) {
   return res.status(400).json({
