@@ -441,7 +441,10 @@ async function handleSessionRequest(req, res) {
 ========================================= */
 
 async function handleLinkedInCallback(req, res) {
-
+console.log("===== CALLBACK START =====");
+    console.log("URL:", req.url);
+    console.log("CODE:", req.query.code);
+    console.log("STATE:", req.query.state);
     const {
 
         code,
@@ -495,7 +498,7 @@ const body = new URLSearchParams({
 });
 
 console.log(body.toString());
-
+console.log("===== TOKEN EXCHANGE START =====");
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
   {
