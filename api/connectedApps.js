@@ -493,7 +493,7 @@ const body = new URLSearchParams({
 console.log(body.toString());
 
 const tokenResponse = await fetch(
-  "https://www.linkedin.com/oauth/v2/accessToken",
+  "https://api.linkedin.com/oauth/v2/accessToken",
   {
     method: "POST",
     headers: {
