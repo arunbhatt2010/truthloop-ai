@@ -1427,7 +1427,7 @@ gtag('event',event,data);
 async function callAPI(){    
     
 try{    
-    alert(JSON.stringify(messages, null, 2));
+    //alert(JSON.stringify(messages, null, 2));
 const res=await fetch(API_URL,{    
 method:"POST",    
 headers:{    
@@ -1555,12 +1555,12 @@ Connect with LinkedIn
 /* TYPE EFFECT */
 
 function renderLoop7EntryBridge() {
-   alert(
+ /*  alert(
         "Bridge Render\n" +
         "loopLevel = " + loopLevel +
         "\nwaiting = " + waitingForLoop7Bridge +
         "\nmessages = " + messages.length
-    );
+    ); */
 return `
 <div id="loop7EntryBridge"
 style="
@@ -2796,11 +2796,11 @@ mainInput.focus();
 /* START */
     
 getBtn.onclick = async () => {
-alert(
+/*alert(
     "GET BTN CLICK\n" +
     "loopLevel=" + loopLevel +
     "\ntext=" + mainInput.value
-);
+); */
 disableWelcome();
 
 const text = mainInput.value.trim();
@@ -3124,7 +3124,7 @@ function loadJourney() {
 
 const saved = localStorage.getItem(MEMORY_KEY);
 
-alert(saved ? "MEMORY FOUND" : "MEMORY NULL");
+// alert(saved ? "MEMORY FOUND" : "MEMORY NULL");
 
 if(!saved) return null;
 
@@ -3302,7 +3302,7 @@ document.getElementById("restorePattern").innerText =
 document.getElementById("restoreLoop").innerText =
 "You left at Loop " + loopLevel + " of 7"; 
 getBtn.disabled = false;
-     alert("Reached end of renderRestoredJourney()");
+    // alert("Reached end of renderRestoredJourney()");
 showLoop7Bridge();
    showLoop7Bridge();
   }
@@ -3312,11 +3312,11 @@ window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
-alert(
+/*alert(
 "RESTORE BLOCK ENTERED\n\n" +
 "linkedInCallback = " + linkedInCallback +
 "\nloopLevel = " + loopLevel
-);
+); */
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
 alert(
