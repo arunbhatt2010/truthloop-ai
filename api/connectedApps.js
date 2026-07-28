@@ -524,7 +524,15 @@ if (!pkce) {
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
-
+console.log("CLIENT ID:", LINKEDIN_CLIENT_ID);
+console.log(
+  "SECRET LENGTH:",
+  LINKEDIN_CLIENT_SECRET?.length
+);
+console.log(
+  "HAS SECRET:",
+  !!LINKEDIN_CLIENT_SECRET
+);
   
 const body = new URLSearchParams({
     grant_type: "authorization_code",
