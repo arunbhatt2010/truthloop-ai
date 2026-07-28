@@ -455,17 +455,7 @@ async function handleLinkedInCallback(req, res) {
         state
 
     } = req.query;
-return res.status(200).send(`
-<!DOCTYPE html>
-<html>
-<body>
-<script>
-alert(window.location.href);
-document.body.innerText = window.location.href;
-</script>
-</body>
-</html>
-`);
+
     if (error) {
 
         return res.status(400).json({
