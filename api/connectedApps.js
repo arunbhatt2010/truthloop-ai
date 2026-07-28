@@ -384,7 +384,9 @@ async function handleLinkedInOAuth(req, res) {
     redirectUri: REDIRECT_URI,
     redirectUrl
 });
-console.log(redirectUrl);
+console.log({
+  authUrl: redirectUrl
+});
     
 
 }
