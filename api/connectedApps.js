@@ -347,7 +347,8 @@ async function handleDELETE(req, res) {
 ========================================= */
 
 async function handleLinkedInOAuth(req, res) {
-
+console.log("===== HANDLE POST =====");
+console.log("BODY:", req.body);
     if (!LINKEDIN_CLIENT_ID) {
 
         return res.status(500).json({
@@ -379,14 +380,15 @@ async function handleLinkedInOAuth(req, res) {
             state
 
         });
+  console.log({
+  authUrl: redirectUrl
+});
   return res.status(200).json({
     clientId: LINKEDIN_CLIENT_ID,
     redirectUri: REDIRECT_URI,
     redirectUrl
 });
-console.log({
-  authUrl: redirectUrl
-});
+
     
 
 }
