@@ -363,12 +363,7 @@ async function handleLinkedInOAuth(req, res) {
     const state =
         Math.random().toString(36).substring(2) +
         Date.now();
-return res.status(200).json({
-    redirectUrl,
-    state,
-    clientId: LINKEDIN_CLIENT_ID,
-    redirectUri: REDIRECT_URI
-});
+
     const redirectUrl =
         "https://www.linkedin.com/oauth/v2/authorization?" +
         new URLSearchParams({
@@ -384,11 +379,13 @@ return res.status(200).json({
             state
 
         });
-console.log(redirectUrl);
-    return res.status(200).json({
+  return res.status(200).json({
     clientId: LINKEDIN_CLIENT_ID,
+    redirectUri: REDIRECT_URI,
     redirectUrl
 });
+console.log(redirectUrl);
+    
 
 }
 
@@ -478,7 +475,17 @@ async function handleLinkedInCallback(req, res) {
         });
 
     }
-
+return res.status(200).json({
+    code,
+    clientId: LINKEDIN_CLIENT_ID,
+    redirectUri: REDIRECT_URI,
+    body: {
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: REDIRECT_URI,
+        client_id: LINKEDIN_CLIENT_ID
+    }
+});
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
