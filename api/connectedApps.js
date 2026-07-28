@@ -227,10 +227,11 @@ export default async function handler(req, res) {
         console.error("CONNECTED APPS:", error);
 
         return res.status(500).json({
-            success: false,
-            reason: "Internal server error."
-        });
-
+    success: false,
+    reason: "Internal server error.",
+    message: error.message,
+    stack: error.stack
+});
     }
 
 }
