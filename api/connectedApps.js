@@ -490,7 +490,7 @@ return res.status(200).json({
 ========================================= */
 
 const tokenResponse = await fetch(
-    "https://www.linkedin.com/oauth/v2/accessToken",
+  "https://www.linkedin.com/oauth/v2/accessToken",
     {
         method: "POST",
 
@@ -522,7 +522,12 @@ const tokenResponse = await fetch(
 
 const tokenData =
     await tokenResponse.json();
-
+  return res.status(200).json({
+  status: tokenResponse.status,
+  ok: tokenResponse.ok,
+  tokenData
+});
+  
   if (!tokenResponse.ok) {
 
     return res.status(400).json({
