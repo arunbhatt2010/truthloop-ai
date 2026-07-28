@@ -363,7 +363,12 @@ async function handleLinkedInOAuth(req, res) {
     const state =
         Math.random().toString(36).substring(2) +
         Date.now();
-
+return res.status(200).json({
+    redirectUrl,
+    state,
+    clientId: LINKEDIN_CLIENT_ID,
+    redirectUri: REDIRECT_URI
+});
     const redirectUrl =
         "https://www.linkedin.com/oauth/v2/authorization?" +
         new URLSearchParams({
