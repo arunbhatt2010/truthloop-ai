@@ -578,7 +578,10 @@ const tokenResponse = await fetch(
     body
   }
 );
-
+console.log("HTTP Status:", tokenResponse.status);
+console.log("HTTP Status Text:", tokenResponse.statusText);
+console.log("Response Headers:");
+console.log(Object.fromEntries(tokenResponse.headers.entries()));
 const tokenData = await tokenResponse.json();
 
 if (!tokenResponse.ok) {
