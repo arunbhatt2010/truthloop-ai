@@ -511,6 +511,14 @@ if (!pkce) {
         reason: "PKCE session not found."
     });
 }
+  console.log({
+  clientIdLength: LINKEDIN_CLIENT_ID.length,
+  clientSecretLength: LINKEDIN_CLIENT_SECRET.length,
+  clientIdStart: LINKEDIN_CLIENT_ID.slice(0, 4),
+  clientIdEnd: LINKEDIN_CLIENT_ID.slice(-4),
+  clientSecretStart: LINKEDIN_CLIENT_SECRET.slice(0, 4),
+  clientSecretEnd: LINKEDIN_CLIENT_SECRET.slice(-4)
+});
     if (error) {
 
         return res.status(400).json({
@@ -547,7 +555,11 @@ const body = new URLSearchParams({
    client_secret: LINKEDIN_CLIENT_SECRET,
     code_verifier: pkce.codeVerifier
 });
-
+console.log("Encoded Body:");
+console.log(body.toString().replace(
+  LINKEDIN_CLIENT_SECRET,
+  "***SECRET***"
+));
 
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
