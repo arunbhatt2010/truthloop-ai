@@ -388,14 +388,15 @@ async function handleLinkedInOAuth(req, res) {
     const state =
         Math.random().toString(36).substring(2) +
         Date.now();
-//const { codeVerifier, codeChallenge } = generatePKCE();
+const { codeVerifier, codeChallenge } = generatePKCE();
 
 sessionStore.set(state,{
+    codeVerifier,
     createdAt: Date.now(),
     expiresAt: Date.now()+SESSION_TTL
 })
-//  console.log("Original Verifier:", codeVerifier);
-//console.log("Original Challenge:", codeChallenge);
+ console.log("Original Verifier:", codeVerifier);
+console.log("Original Challenge:", codeChallenge);
     const redirectUrl =
         "https://www.linkedin.com/oauth/v2/authorization?" +
         new URLSearchParams({
@@ -407,7 +408,9 @@ sessionStore.set(state,{
             redirect_uri: REDIRECT_URI,
 
             scope: "openid profile email",
-state
+state,
+code_challenge: codeChallenge,
+code_challenge_method: "S256"
 
             
 
@@ -540,7 +543,8 @@ const body = new URLSearchParams({
     code,
     redirect_uri: REDIRECT_URI,
     client_id: LINKEDIN_CLIENT_ID,
-   client_secret: LINKEDIN_CLIENT_SECRET
+    client_secret: LINKEDIN_CLIENT_SECRET,
+    code_verifier: session.codeVerifier
 });
 console.log("Encoded Body:");
 console.log(body.toString().replace(
