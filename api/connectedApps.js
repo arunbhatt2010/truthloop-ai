@@ -394,8 +394,8 @@ sessionStore.set(state,{
     createdAt: Date.now(),
     expiresAt: Date.now()+SESSION_TTL
 })
-  console.log("Original Verifier:", codeVerifier);
-console.log("Original Challenge:", codeChallenge);
+//  console.log("Original Verifier:", codeVerifier);
+//console.log("Original Challenge:", codeChallenge);
     const redirectUrl =
         "https://www.linkedin.com/oauth/v2/authorization?" +
         new URLSearchParams({
