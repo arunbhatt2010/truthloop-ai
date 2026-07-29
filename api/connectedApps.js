@@ -548,22 +548,7 @@ const body = new URLSearchParams({
     code_verifier: pkce.codeVerifier
 });
 
-console.log({
-  grant_type: "authorization_code",
-  code_length: code.length,
-  redirect_uri: REDIRECT_URI,
-  client_id: LINKEDIN_CLIENT_ID,
-  client_secret_last4: LINKEDIN_CLIENT_SECRET.slice(-4),
-  //code_verifier_length: pkce.codeVerifier.length
-});
 
-console.log(
-  body.toString().replace(
-    LINKEDIN_CLIENT_SECRET,
-    "********"
-  )
-);
-  console.log("Body has verifier:", body.get("code_verifier"));
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
   {
