@@ -492,25 +492,29 @@ console.log("===== CALLBACK START =====");
 
     } = req.query;
 const pkce = sessionStore.get(state);
+
+if (!pkce) {
+    return res.status(400).json({
+        success: false,
+        stage: "PKCE",
+        reason: "PKCE session not found.",
+        state
+    });
+}
+
 console.log("===== PKCE =====");
 console.log("State:", state);
 console.log("Verifier:", pkce.codeVerifier);
 console.log(
-  "Challenge:",
-  base64url(
-    crypto
-      .createHash("sha256")
-      .update(pkce.codeVerifier)
-      .digest()
-  )
+    "Challenge:",
+    base64url(
+        crypto
+            .createHash("sha256")
+            .update(pkce.codeVerifier)
+            .digest()
+    )
 );
 console.log("===== END PKCE =====");
-if (!pkce) {
-    return res.status(400).json({
-        success: false,
-        reason: "PKCE session not found."
-    });
-}
   console.log({
   clientIdLength: LINKEDIN_CLIENT_ID.length,
   clientSecretLength: LINKEDIN_CLIENT_SECRET.length,
