@@ -390,11 +390,10 @@ async function handleLinkedInOAuth(req, res) {
         Date.now();
 const { codeVerifier, codeChallenge } = generatePKCE();
 
-sessionStore.set(state, {
-    codeVerifier,
+sessionStore.set(state,{
     createdAt: Date.now(),
-    expiresAt: Date.now() + SESSION_TTL
-});
+    expiresAt: Date.now()+SESSION_TTL
+})
   console.log("Original Verifier:", codeVerifier);
 console.log("Original Challenge:", codeChallenge);
     const redirectUrl =
@@ -408,9 +407,7 @@ console.log("Original Challenge:", codeChallenge);
             redirect_uri: REDIRECT_URI,
 
             scope: "openid profile email",
-state,
-code_challenge: codeChallenge,
-code_challenge_method: "S256"
+state
 
             
 
@@ -491,38 +488,18 @@ console.log("===== CALLBACK START =====");
         state
 
     } = req.query;
-const pkce = sessionStore.get(state);
+const session = sessionStore.get(state);
 
-if (!pkce) {
+if (!session) {
     return res.status(400).json({
         success: false,
-        stage: "PKCE",
-        reason: "PKCE session not found.",
+        stage: "SESSION",
+        reason: "OAuth session not found.",
         state
     });
 }
 
-console.log("===== PKCE =====");
-console.log("State:", state);
-console.log("Verifier:", pkce.codeVerifier);
-console.log(
-    "Challenge:",
-    base64url(
-        crypto
-            .createHash("sha256")
-            .update(pkce.codeVerifier)
-            .digest()
-    )
-);
-console.log("===== END PKCE =====");
-  console.log({
-  clientIdLength: LINKEDIN_CLIENT_ID.length,
-  clientSecretLength: LINKEDIN_CLIENT_SECRET.length,
-  clientIdStart: LINKEDIN_CLIENT_ID.slice(0, 4),
-  clientIdEnd: LINKEDIN_CLIENT_ID.slice(-4),
-  clientSecretStart: LINKEDIN_CLIENT_SECRET.slice(0, 4),
-  clientSecretEnd: LINKEDIN_CLIENT_SECRET.slice(-4)
-});
+
     if (error) {
 
         return res.status(400).json({
@@ -563,8 +540,7 @@ const body = new URLSearchParams({
     code,
     redirect_uri: REDIRECT_URI,
     client_id: LINKEDIN_CLIENT_ID,
-   client_secret: LINKEDIN_CLIENT_SECRET,
-    code_verifier: pkce.codeVerifier
+   client_secret: LINKEDIN_CLIENT_SECRET
 });
 console.log("Encoded Body:");
 console.log(body.toString().replace(
@@ -577,15 +553,8 @@ const tokenResponse = await fetch(
   {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-
-      // 👇 Ye line add karo
-      "Authorization":
-        "Basic " +
-        Buffer.from(
-          `${LINKEDIN_CLIENT_ID}:${LINKEDIN_CLIENT_SECRET}`
-        ).toString("base64")
-    },
+    "Content-Type": "application/x-www-form-urlencoded"
+    }
     body
   }
 );
