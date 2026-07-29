@@ -374,55 +374,47 @@ async function handleDELETE(req, res) {
 async function handleLinkedInOAuth(req, res) {
 
     if (!LINKEDIN_CLIENT_ID) {
-
         return res.status(500).json({
-
             success: false,
-
             reason: "LinkedIn Client ID not configured."
-
         });
-
     }
 
+    // Generate OAuth State
     const state =
         Math.random().toString(36).substring(2) +
-        Date.now();
-const { codeVerifier, codeChallenge } = generatePKCE();
+        Date.now().toString(36);
 
-sessionStore.set(state,{
-    codeVerifier,
-    createdAt: Date.now(),
-    expiresAt: Date.now()+SESSION_TTL
-})
- console.log("Original Verifier:", codeVerifier);
-console.log("Original Challenge:", codeChallenge);
+    // Generate PKCE
+    const {
+        codeVerifier,
+        codeChallenge
+    } = generatePKCE();
+
+    // Store temporary OAuth session
+    sessionStore.set(state, {
+        codeVerifier,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + SESSION_TTL
+    });
+
+    // Build LinkedIn Authorization URL
     const redirectUrl =
         "https://www.linkedin.com/oauth/v2/authorization?" +
         new URLSearchParams({
-
             response_type: "code",
-
             client_id: LINKEDIN_CLIENT_ID,
-
             redirect_uri: REDIRECT_URI,
-
             scope: "openid profile email",
-state,
-code_challenge: codeChallenge,
-code_challenge_method: "S256"
+            state,
+            code_challenge: codeChallenge,
+            code_challenge_method: "S256"
+        }).toString();
 
-            
-
-        });
-  console.log("===== AUTH URL =====");
-console.log(redirectUrl.toString());
-console.log("===== END AUTH URL =====");
-  
-  return res.status(200).json({
-    redirectUrl
-});
-    
+    return res.status(200).json({
+        success: true,
+        redirectUrl
+    });
 
 }
 
@@ -478,66 +470,56 @@ async function handleSessionRequest(req, res) {
 ========================================= */
 
 async function handleLinkedInCallback(req, res) {
-console.log("===== CALLBACK START =====");
-    console.log("URL:", req.url);
-    console.log("CODE:", req.query.code);
-    console.log("STATE:", req.query.state);
+
     const {
-
         code,
-
         error,
-
         state
-
     } = req.query;
-const session = sessionStore.get(state);
 
-if (!session) {
-    return res.status(400).json({
-        success: false,
-        stage: "SESSION",
-        reason: "OAuth session not found.",
-        state
-    });
-}
-
-
+    // OAuth Provider returned an error
     if (error) {
-
         return res.status(400).json({
-
             success: false,
-
+            stage: "CALLBACK",
             reason: error
-
         });
-
     }
 
+    // Missing authorization code
     if (!code) {
-
         return res.status(400).json({
-
             success: false,
-
+            stage: "CALLBACK",
             reason: "Authorization code not received."
-
         });
-
     }
 
-  /* =========================================
+    // Missing OAuth state
+    if (!state) {
+        return res.status(400).json({
+            success: false,
+            stage: "CALLBACK",
+            reason: "State not received."
+        });
+    }
+
+    // Restore OAuth session
+    const session = sessionStore.get(state);
+
+    if (!session) {
+        return res.status(400).json({
+            success: false,
+            stage: "SESSION",
+            reason: "OAuth session expired or not found."
+        });
+    }
+
+    // Continue to Token Exchange...
+/* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
-console.log("newline:", LINKEDIN_CLIENT_SECRET.includes("\n"));
-console.log("carriage:", LINKEDIN_CLIENT_SECRET.includes("\r"));
-console.log("space:", LINKEDIN_CLIENT_SECRET.includes(" "));
-console.log("trim length:", LINKEDIN_CLIENT_SECRET.trim().length);
-  console.log(
-  "Secret equals trimmed:",
-  LINKEDIN_CLIENT_SECRET === LINKEDIN_CLIENT_SECRET.trim()
-);
+
 const body = new URLSearchParams({
     grant_type: "authorization_code",
     code,
@@ -546,43 +528,37 @@ const body = new URLSearchParams({
     client_secret: LINKEDIN_CLIENT_SECRET,
     code_verifier: session.codeVerifier
 });
-console.log("Encoded Body:");
-console.log(body.toString().replace(
-  LINKEDIN_CLIENT_SECRET,
-  "***SECRET***"
-));
 
 const tokenResponse = await fetch(
-  "https://www.linkedin.com/oauth/v2/accessToken",
-  {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body
-            }
+    "https://www.linkedin.com/oauth/v2/accessToken",
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: body.toString()
+    }
 );
-console.log("HTTP Status:", tokenResponse.status);
-console.log("HTTP Status Text:", tokenResponse.statusText);
-console.log("Response Headers:");
-console.log(Object.fromEntries(tokenResponse.headers.entries()));
+
 const tokenData = await tokenResponse.json();
 
 if (!tokenResponse.ok) {
-  return res.status(400).json({
-    success: false,
-    stage: "TOKEN",
-    tokenData
-  });
+    return res.status(tokenResponse.status).json({
+        success: false,
+        stage: "TOKEN",
+        status: tokenResponse.status,
+        reason: tokenData.error_description || tokenData.error || "Token exchange failed.",
+        tokenData
+    });
 }
 
 if (!tokenData.access_token) {
-  return res.status(400).json({
-    success: false,
-    stage: "TOKEN",
-    reason: "Access token not received.",
-    tokenData
-  });
+    return res.status(400).json({
+        success: false,
+        stage: "TOKEN",
+        reason: "Access token not received.",
+        tokenData
+    });
 }
   /* =========================================
    FETCH USER INFO
