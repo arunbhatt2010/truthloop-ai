@@ -147,7 +147,8 @@ const LINKEDIN_CLIENT_ID =
 const LINKEDIN_CLIENT_SECRET =
     process.env.LINKEDIN_CLIENT_SECRET;
 
-redirect_uri: "https://truthloop.in/api/connectedApps"
+const REDIRECT_URI =
+  "https://truthloop.in/api/connectedApps";
 function base64url(buffer) {
     return buffer
         .toString("base64")
