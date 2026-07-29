@@ -147,8 +147,7 @@ const LINKEDIN_CLIENT_ID =
 const LINKEDIN_CLIENT_SECRET =
     process.env.LINKEDIN_CLIENT_SECRET;
 
-const REDIRECT_URI =
-    "https://truthloop.in/api/connectedApps";
+redirect_uri: "https://truthloop.in/api/connectedApps"
 function base64url(buffer) {
     return buffer
         .toString("base64")
@@ -525,7 +524,8 @@ const body = new URLSearchParams({
     code,
     redirect_uri: REDIRECT_URI,
     client_id: LINKEDIN_CLIENT_ID,
-    client_secret: LINKEDIN_CLIENT_SECRET
+    client_secret: LINKEDIN_CLIENT_SECRET,
+    code_verifier: session.codeVerifier
 });
 const tokenResponse = await fetch(
     "https://www.linkedin.com/oauth/v2/accessToken",
