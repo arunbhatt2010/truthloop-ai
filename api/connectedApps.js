@@ -388,7 +388,7 @@ async function handleLinkedInOAuth(req, res) {
     const state =
         Math.random().toString(36).substring(2) +
         Date.now();
-const { codeVerifier, codeChallenge } = generatePKCE();
+//const { codeVerifier, codeChallenge } = generatePKCE();
 
 sessionStore.set(state,{
     createdAt: Date.now(),
@@ -553,10 +553,10 @@ const tokenResponse = await fetch(
   {
     method: "POST",
     headers: {
-    "Content-Type": "application/x-www-form-urlencoded"
-    }
+        "Content-Type": "application/x-www-form-urlencoded"
+    },
     body
-  }
+            }
 );
 console.log("HTTP Status:", tokenResponse.status);
 console.log("HTTP Status Text:", tokenResponse.statusText);
