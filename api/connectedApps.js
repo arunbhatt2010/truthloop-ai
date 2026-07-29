@@ -524,16 +524,7 @@ if (!pkce) {
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
-console.log("CLIENT ID:", LINKEDIN_CLIENT_ID);
-console.log(
-  "SECRET LENGTH:",
-  LINKEDIN_CLIENT_SECRET?.length
-);
-console.log(
-  "HAS SECRET:",
-  !!LINKEDIN_CLIENT_SECRET
-);
-  
+
 const body = new URLSearchParams({
     grant_type: "authorization_code",
     code,
@@ -545,11 +536,19 @@ const body = new URLSearchParams({
 
 console.log({
   grant_type: "authorization_code",
+  code_length: code.length,
   redirect_uri: REDIRECT_URI,
   client_id: LINKEDIN_CLIENT_ID,
-  client_secret: `****${LINKEDIN_CLIENT_SECRET?.slice(-4)}`,
-  code_verifier: `...${pkce.codeVerifier?.slice(-4)}`
+  client_secret_last4: LINKEDIN_CLIENT_SECRET.slice(-4),
+  code_verifier_length: pkce.codeVerifier.length
 });
+
+console.log(
+  body.toString().replace(
+    LINKEDIN_CLIENT_SECRET,
+    "********"
+  )
+);
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
   {
