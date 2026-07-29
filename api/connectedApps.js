@@ -225,7 +225,12 @@ function cleanSessions() {
 ========================================= */
 
 export default async function handler(req, res) {
-
+return res.status(200).json({
+  id: !!LINKEDIN_CLIENT_ID,
+  secret: !!LINKEDIN_CLIENT_SECRET,
+  idLength: LINKEDIN_CLIENT_ID?.length,
+  secretLength: LINKEDIN_CLIENT_SECRET?.length
+});
     cleanSessions();
 
     try {
