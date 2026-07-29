@@ -573,7 +573,14 @@ const tokenResponse = await fetch(
   {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
+
+      // 👇 Ye line add karo
+      "Authorization":
+        "Basic " +
+        Buffer.from(
+          `${LINKEDIN_CLIENT_ID}:${LINKEDIN_CLIENT_SECRET}`
+        ).toString("base64")
     },
     body
   }
