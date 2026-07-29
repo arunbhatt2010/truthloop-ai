@@ -539,11 +539,17 @@ const body = new URLSearchParams({
     code,
     redirect_uri: REDIRECT_URI,
     client_id: LINKEDIN_CLIENT_ID,
-   // client_secret: LINKEDIN_CLIENT_SECRET,
+   client_secret: LINKEDIN_CLIENT_SECRET,
     code_verifier: pkce.codeVerifier
 });
 
-
+console.log({
+  grant_type: "authorization_code",
+  redirect_uri: REDIRECT_URI,
+  client_id: LINKEDIN_CLIENT_ID,
+  client_secret: `****${LINKEDIN_CLIENT_SECRET?.slice(-4)}`,
+  code_verifier: `...${pkce.codeVerifier?.slice(-4)}`
+});
 const tokenResponse = await fetch(
   "https://www.linkedin.com/oauth/v2/accessToken",
   {
