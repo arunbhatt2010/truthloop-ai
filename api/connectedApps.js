@@ -407,8 +407,8 @@ sessionStore.set(state, {
 
             scope: "openid profile email",
 state,
-code_challenge: codeChallenge,
-code_challenge_method: "S256"
+//code_challenge: codeChallenge,
+//code_challenge_method: "S256"
 
             
 
@@ -531,7 +531,7 @@ const body = new URLSearchParams({
     redirect_uri: REDIRECT_URI,
     client_id: LINKEDIN_CLIENT_ID,
    client_secret: LINKEDIN_CLIENT_SECRET,
-    code_verifier: pkce.codeVerifier
+    //code_verifier: pkce.codeVerifier
 });
 
 console.log({
@@ -540,7 +540,7 @@ console.log({
   redirect_uri: REDIRECT_URI,
   client_id: LINKEDIN_CLIENT_ID,
   client_secret_last4: LINKEDIN_CLIENT_SECRET.slice(-4),
-  code_verifier_length: pkce.codeVerifier.length
+  //code_verifier_length: pkce.codeVerifier.length
 });
 
 console.log(
