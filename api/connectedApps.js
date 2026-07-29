@@ -546,7 +546,14 @@ if (!pkce) {
   /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
-
+console.log("newline:", LINKEDIN_CLIENT_SECRET.includes("\n"));
+console.log("carriage:", LINKEDIN_CLIENT_SECRET.includes("\r"));
+console.log("space:", LINKEDIN_CLIENT_SECRET.includes(" "));
+console.log("trim length:", LINKEDIN_CLIENT_SECRET.trim().length);
+  console.log(
+  "Secret equals trimmed:",
+  LINKEDIN_CLIENT_SECRET === LINKEDIN_CLIENT_SECRET.trim()
+);
 const body = new URLSearchParams({
     grant_type: "authorization_code",
     code,
