@@ -90,6 +90,15 @@ export async function loadDigitalFootprintBrain({
     currentLoop = 7
 
 } = {}) {
+    console.log("===== DigitalFootprintBrain START =====");
+console.log({
+    profileLink,
+    businessData,
+    otherEvidence,
+    uploadedFiles,
+    connectedApps,
+    currentLoop
+});
     // STEP 1
     // Security
 if (currentLoop !== 7) {
@@ -248,7 +257,9 @@ if (!publicContentPackage.success) {
 }
 }
     else if (hasBusinessData) {
-
+console.log("===== BUSINESS DATA ADAPTER =====");
+console.log("Business Data Length:", businessData.length);
+console.log(businessData);
     publicContentPackage = {
 
         success: true,
@@ -388,6 +399,8 @@ if (!profileEvidence.success) {
        }
     // STEP 5
 // Universal Evidence Processor
+    console.log("===== CALLING PROFILE INTELLIGENCE API =====");
+console.log(publicContentPackage);
 const evidencePackage =
 
     await ProfileMainBrain({
@@ -486,7 +499,8 @@ function detectPlatform(profileLink) {
 
 ========================================== */
 async function ProfileIntelligenceAPI({
-
+console.log("===== ProfileIntelligenceAPI START =====");
+console.log(publicContentPackage);
     publicContentPackage,
 
     truthLoopPackage,
