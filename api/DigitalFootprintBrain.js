@@ -247,6 +247,90 @@ if (!publicContentPackage.success) {
 
 }
 }
+    else if (hasBusinessData) {
+
+    publicContentPackage = {
+
+        success: true,
+
+        sourceType: "BusinessData",
+
+        adapter: "BusinessData",
+
+        url: null,
+
+        rawData: businessData.trim(),
+
+        extractedData: {
+            text: businessData.trim()
+        },
+
+        collectedAt: new Date().toISOString()
+    };
+
+        }
+    else if (hasOtherEvidence) {
+
+    publicContentPackage = {
+
+        success: true,
+
+        sourceType: "OtherEvidence",
+
+        adapter: "OtherEvidence",
+
+        url: null,
+
+        rawData: otherEvidence.trim(),
+
+        extractedData: {
+            text: otherEvidence.trim()
+        },
+
+        collectedAt: new Date().toISOString()
+    };
+
+    }
+    else if (hasUploadedFiles) {
+
+    publicContentPackage = {
+
+        success: true,
+
+        sourceType: "UploadedFiles",
+
+        adapter: "UploadedFiles",
+
+        url: null,
+
+        rawData: uploadedFiles,
+
+        extractedData: uploadedFiles,
+
+        collectedAt: new Date().toISOString()
+    };
+
+            }
+    else if (hasConnectedApps) {
+
+    publicContentPackage = {
+
+        success: true,
+
+        sourceType: "ConnectedApps",
+
+        adapter: "ConnectedApps",
+
+        url: null,
+
+        rawData: connectedApps,
+
+        extractedData: connectedApps,
+
+        collectedAt: new Date().toISOString()
+    };
+
+    }
    /* ==========================================
 // STEP 3
 // Evidence Source Detection
