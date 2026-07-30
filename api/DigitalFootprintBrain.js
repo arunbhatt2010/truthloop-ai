@@ -506,14 +506,14 @@ async function ProfileIntelligenceAPI({
         model: null,
 
         profileLink:
-    publicContentPackage.url,
-
+    publicContentPackage.url || null,
         timestamp:
 
             new Date().toISOString(),
 
         rawResponse: null,
-sourceType: "PublicWebsite",
+sourceType:
+    publicContentPackage.sourceType || "Unknown",
 
 packageType: "UniversalEvidencePackage",
         evidence: null,
