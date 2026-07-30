@@ -543,7 +543,15 @@ if (
     )
 ){
   try {
-
+console.log(">>>>>>>> ENTERING DIGITAL FOOTPRINT <<<<<<<<");
+console.log({
+    profileLink,
+    businessData,
+    otherEvidence,
+    uploadedFiles,
+    connectedApps,
+    identityPackage
+});
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
 
@@ -561,7 +569,8 @@ await loadDigitalFootprintBrain({
     currentLoop: 7
 
 });
-    
+   console.log("<<<<<<<< EXIT DIGITAL FOOTPRINT >>>>>>>>");
+console.log(JSON.stringify(publicEvidencePackage, null, 2)); 
     /* =========================
    PLATFORM CARD
 ========================= */
