@@ -510,9 +510,18 @@ User feels close to an important realization but not there yet.
 const truthLoopPackage = {
     messages,
     loopLevel,
+
     currentCategory,
+
     profileLink,
+    businessData,
+    otherEvidence,
+
+    uploadedFiles,
+    connectedApps,
+
     identityPackage,
+
     paid49,
     paid199
 };
