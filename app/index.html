@@ -2944,7 +2944,14 @@ else if (otherEvidence) {
     evidence.type = "other";
     evidence.otherEvidence = otherEvidence;
    }
-investigationSource = evidence;
+investigationSource = "PublicProfile";   // route
+evidence = {
+    profileLink,
+    businessData,
+    otherEvidence,
+    uploadedFiles,
+    connectedApps
+};                                        // payload
 
 /*  alert(
     "BEFORE PUSH\n\n" +
