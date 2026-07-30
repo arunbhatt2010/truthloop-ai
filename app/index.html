@@ -2973,14 +2973,14 @@ messages.push({
     otherEvidence,
     uploadedFiles,
     connectedApps,
-  //  evidence,
+  evidence,
     paid49,
     paid199,
     currentCategory
 })
     }).then(r=>r.json());
-console.log("LOOP7 DATA:", data);
-alert(JSON.stringify(data));
+console.log("FULL RESPONSE:", data);
+console.log("REPLY:", data.reply);
     messages.push({
     role: "assistant",
     content: data.reply
