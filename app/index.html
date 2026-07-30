@@ -1848,7 +1848,7 @@ function showEvidence(type){
             padding:12px;
             border-radius:10px;
         "
-        oninput="alert('Business Data trigger verified');">
+        
     </textarea>
 
     <div style="
@@ -1898,7 +1898,7 @@ function showEvidence(type){
             padding:12px;
             border-radius:10px;
         "
-        oninput="alert('Other Evidence trigger verified');">
+        
     </textarea>
 
     <div style="
@@ -2916,10 +2916,10 @@ if (loopLevel === 6) {
     const profileLink =
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
 investigationSource = profileLink;
-  alert(
+/*  alert(
     "BEFORE PUSH\n\n" +
     JSON.stringify(messages, null, 2)
-);
+); */
     messages.push({
         role: "user",
         content: profileLink || "Continue to Loop 7"
@@ -3319,10 +3319,10 @@ currentCategory = restored.currentCategory || "";
 ); */
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
-alert(
+/*alert(
 "LOOP INDICATOR UPDATED\n\n" +
 document.getElementById("loopIndicator").innerText
-);
+); */
 
 
   }
