@@ -2919,16 +2919,25 @@ if (loopLevel === 6) {
   }
 
     const profileLink =
-        document.getElementById("loop7ProfileLink")?.value.trim() || "";
+    document.getElementById("loop7ProfileLink")?.value.trim() || "";
+
+const businessData =
+    document.getElementById("businessDataInput")?.value.trim() || "";
+
+const otherEvidence =
+    document.getElementById("otherEvidenceInput")?.value.trim() || "";
+
 investigationSource = profileLink;
+
 /*  alert(
     "BEFORE PUSH\n\n" +
     JSON.stringify(messages, null, 2)
 ); */
-    messages.push({
-        role: "user",
-        content: profileLink || "Continue to Loop 7"
-    });
+
+messages.push({
+    role: "user",
+    content: profileLink || "Continue to Loop 7"
+});
 
     loopLevel = 7;
 
