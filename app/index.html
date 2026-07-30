@@ -2900,56 +2900,106 @@ getBtn.disabled = false;
     
 /* NEXT */    
     
-nextBtn.onclick=async()=>{
-/*alert(
-    "NEXT BTN\n" +
-    "loopLevel = " + loopLevel +
-    "\nloop7Started = " + window.loop7Started
-); */
-if (isLoading) return;
-if (loopLevel === 6) {
-  if (!window.loop7Started) {
-    window.loop7Started = true;
-    nextBtn.innerText = "Get Your Final Report →";
-    return;
-  }
+nextBtn.onclick = async () => {
 
-    const profileLink =
-    document.getElementById("loop7ProfileLink")?.value.trim() || "";
+    if (isLoading) return;
 
-const businessData =
-    document.getElementById("businessDataInput")?.value.trim() || "";
+    if (loopLevel === 6) {
 
-const otherEvidence =
-    document.getElementById("otherEvidenceInput")?.value.trim() || "";
-let evidence = {};
+        if (!window.loop7Started) {
+            window.loop7Started = true;
+            nextBtn.innerText = "Get Your Final Report →";
+            return;
+        }
 
-if (profileLink) {
-    evidence.type = "public";
-    evidence.profileLink = profileLink;
-}
-else if (window.linkedinProfile) {
-    evidence.type = "oauth";
-    evidence.oauth = window.linkedinProfile;
-}
-else if (window.uploadedEvidence) {
-    evidence.type = "upload";
-    evidence.files = window.uploadedEvidence;
-}
-else if (businessData) {
-    evidence.type = "business";
-    evidence.businessData = businessData;
-}
-else if (otherEvidence) {
-    evidence.type = "other";
-    evidence.otherEvidence = otherEvidence;
-   }
-investigationSource = profileLink;
-/*  alert(
-    "BEFORE PUSH\n\n" +
-    JSON.stringify(messages, null, 2)
-); */
+        const profileLink =
+            document.getElementById("loop7ProfileLink")?.value.trim() || "";
 
+        const businessData =
+            document.getElementById("businessDataInput")?.value.trim() || "";
+
+        const otherEvidence =
+            document.getElementById("otherEvidenceInput")?.value.trim() || "";
+
+        let evidence = {};
+
+        if (profileLink) {
+            evidence.type = "public";
+            evidence.profileLink = profileLink;
+            investigationSource = profileLink;
+        }
+        else if (window.linkedinProfile) {
+            evidence.type = "oauth";
+            evidence.oauth = window.linkedinProfile;
+            investigationSource = "oauth";
+        }
+        else if (window.uploadedEvidence) {
+            evidence.type = "upload";
+            evidence.files = window.uploadedEvidence;
+            investigationSource = "upload";
+        }
+        else if (businessData) {
+            evidence.type = "business";
+            evidence.businessData = businessData;
+            investigationSource = "business";
+        }
+        else if (otherEvidence) {
+            evidence.type = "other";
+            evidence.otherEvidence = otherEvidence;
+            investigationSource = "other";
+        }
+        else {
+            investigationSource = "";
+        }
+
+        messages.push({
+            role: "user",
+            content: profileLink || "Continue to Loop 7"
+        });
+
+        loopLevel = 7;
+
+        document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
+
+        const data = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                messages,
+                loopLevel,
+                profileLink,
+                paid49: payment49,
+                paid199: payment199,
+                currentCategory,
+                evidence
+            })
+        }).then(r => r.json());
+
+        console.log("FULL RESPONSE:", data);
+        console.log("REPLY:", data.reply);
+
+        messages.push({
+            role: "assistant",
+            content: data.reply
+        });
+
+        if (data.reply.includes("■")) {
+            latestTruthLoopReport = data.reply;
+            outputBox.innerHTML = renderLoop7Report(data.reply);
+            nextBtn.style.display = "none";
+        } else {
+            typeEffect(data.reply);
+        }
+
+        isLoading = false;
+        nextBtn.disabled = false;
+        return;
+    }
+
+    // baaki existing code yahin se continue rahega...
+};
 messages.push({
     role: "user",
     content: profileLink || "Continue to Loop 7"
