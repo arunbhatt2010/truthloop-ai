@@ -48,7 +48,15 @@ export async function loadFootprintSupport({
 
     profileLink = "",
 
-    identityPackage = null,
+businessData = "",
+
+otherEvidence = "",
+
+uploadedFiles = [],
+
+connectedApps = null,
+
+identityPackage = null,
 
     currentLoop = 7
 
@@ -196,9 +204,17 @@ const investigationContext = {
 
     truthLoopPackage,
 
-    profileLink: normalizedProfileLink,
+profileLink: normalizedProfileLink,
 
-    identityPackage,
+businessData,
+
+otherEvidence,
+
+uploadedFiles,
+
+connectedApps,
+
+identityPackage,
 
     hostname,
 
