@@ -79,6 +79,11 @@ export async function loadDigitalFootprintBrain({
     truthLoopPackage = {},
 
     profileLink = "",
+    businessData = "",
+    otherEvidence = "",
+
+    uploadedFiles = [],
+    connectedApps = null,
 
     identityPackage = null,
 
@@ -106,6 +111,21 @@ if (currentLoop !== 7) {
 const hasProfileLink =
     typeof profileLink === "string" &&
     profileLink.trim();
+
+const hasBusinessData =
+    typeof businessData === "string" &&
+    businessData.trim();
+
+const hasOtherEvidence =
+    typeof otherEvidence === "string" &&
+    otherEvidence.trim();
+
+const hasUploadedFiles =
+    Array.isArray(uploadedFiles) &&
+    uploadedFiles.length > 0;
+
+const hasConnectedApps =
+    !!connectedApps;
 
 const hasIdentityPackage =
     identityPackage &&
@@ -139,6 +159,10 @@ The Universal Evidence Pipeline remains unchanged.
 
 const hasEvidenceSource =
     hasProfileLink ||
+    hasBusinessData ||
+    hasOtherEvidence ||
+    hasUploadedFiles ||
+    hasConnectedApps ||
     hasIdentityPackage;
 
 if (!hasEvidenceSource) {
