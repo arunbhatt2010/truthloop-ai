@@ -1424,7 +1424,7 @@ gtag('event',event,data);
     
 /* API */    
     
-async function callAPI(){    
+async function callAPI(evidence = {}) {
     
 try{    
     //alert(JSON.stringify(messages, null, 2));
@@ -1433,16 +1433,14 @@ method:"POST",
 headers:{    
 "Content-Type":"application/json"    
 },    
-body:JSON.stringify({    
-messages,    
-loopLevel,    
-paid49:payment49,    
-paid199:payment199,    
-currentCategory,
-profileLink: investigationSource,
-businessData,
-    otherEvidence   
-})    
+body: JSON.stringify({
+    messages,
+    loopLevel,
+    paid49: payment49,
+    paid199: payment199,
+    currentCategory,
+    evidence
+})
 });    
     
 if(!res.ok){    
@@ -1450,16 +1448,14 @@ const errorText=await res.text();
 console.error("API ERROR:",errorText);    
 return { reply:"Server error 😃" };    
 }    
-  console.log("SENDING:", {  
-messages,  
-loopLevel,  
-paid49:payment49,  
-paid199:payment199,  
-currentCategory,
-profileLink: investigationSource,
-    businessData,
-    otherEvidence     
-});  
+  console.log("SENDING:", {
+    messages,
+    loopLevel,
+    paid49: payment49,
+    paid199: payment199,
+    currentCategory,
+    evidence
+});
 const data = await res.json();  
  if (data.platformCard) {
 
