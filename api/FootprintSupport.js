@@ -61,23 +61,80 @@ identityPackage = null,
     currentLoop = 7
 
 } = {}) {
-
+// ======================================================
 // STEP 1
-// Security
+// INVESTIGATION SOURCE VALIDATION
+// ======================================================
+
+// Normalize Inputs
 
 const normalizedProfileLink =
     typeof profileLink === "string"
         ? profileLink.trim()
         : "";
 
+const normalizedBusinessData =
+    typeof businessData === "string"
+        ? businessData.trim()
+        : "";
+
+const normalizedOtherEvidence =
+    typeof otherEvidence === "string"
+        ? otherEvidence.trim()
+        : "";
+
 const hasProfileLink =
     !!normalizedProfileLink;
+
+const hasBusinessData =
+    !!normalizedBusinessData;
+
+const hasOtherEvidence =
+    !!normalizedOtherEvidence;
+
+const hasUploadedFiles =
+    Array.isArray(uploadedFiles) &&
+    uploadedFiles.length > 0;
+
+const hasConnectedApps =
+    connectedApps &&
+    typeof connectedApps === "object";
 
 const hasIdentityPackage =
     identityPackage &&
     typeof identityPackage === "object";
 
-if (!hasProfileLink && !hasIdentityPackage) {
+
+// ------------------------------------------------------
+// Evidence Source Detection
+// ------------------------------------------------------
+
+let investigationSource = null;
+
+if (hasProfileLink)
+    investigationSource = "Public Profile";
+
+else if (hasBusinessData)
+    investigationSource = "Business Data";
+
+else if (hasUploadedFiles)
+    investigationSource = "Uploaded Files";
+
+else if (hasConnectedApps)
+    investigationSource = "Connected App";
+
+else if (hasOtherEvidence)
+    investigationSource = "Other Evidence";
+
+else if (hasIdentityPackage)
+    investigationSource = "Identity Package";
+
+
+// ------------------------------------------------------
+// Validation
+// ------------------------------------------------------
+
+if (!investigationSource) {
 
     return {
 
@@ -86,7 +143,7 @@ if (!hasProfileLink && !hasIdentityPackage) {
         stage: "Investigation Request",
 
         reason:
-            "A valid Evidence Source is required."
+            "At least one valid Investigation Source is required."
 
     };
 
@@ -205,7 +262,7 @@ const investigationContext = {
     truthLoopPackage,
 
 profileLink: normalizedProfileLink,
-
+investigationSource,
 businessData,
 
 otherEvidence,
