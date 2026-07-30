@@ -2944,18 +2944,7 @@ else if (otherEvidence) {
     evidence.type = "other";
     evidence.otherEvidence = otherEvidence;
    }
-evidence = {
-    profileLink,
-    businessData,
-    otherEvidence,
-    uploadedFiles,
-    connectedApps
-};
-
-if (profileLink) {
-    investigationSource = profileLink;   // Backward compatibility
-} else {
-    investigationSource = evidence;      // Universal package
+investigationSource = profileLink || evidence;
 }
 
 /*  alert(
