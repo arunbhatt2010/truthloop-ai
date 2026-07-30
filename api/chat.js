@@ -33,14 +33,23 @@ export default async function handler(req, res) {
         : req.body;
 
     let {
-  messages,
-  loopLevel = 1,
-  paid49 = false,
-  paid199 = false,
-  shownLoop5 = [],
-  currentCategory = "",
-  profileLink = "",
-  identityPackage = null
+    messages,
+    loopLevel = 1,
+    paid49 = false,
+    paid199 = false,
+    shownLoop5 = [],
+
+    currentCategory = "",
+
+    profileLink = "",
+    businessData = "",
+    otherEvidence = "",
+
+    uploadedFiles = [],
+    connectedApps = null,
+
+    identityPackage = null
+
 } = body;
 /* =========================
    🧪 TEMP DEV GATE
