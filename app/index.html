@@ -2922,7 +2922,28 @@ const businessData =
 
 const otherEvidence =
     document.getElementById("otherEvidenceInput")?.value.trim() || "";
+let evidence = {};
 
+if (profileLink) {
+    evidence.type = "public";
+    evidence.profileLink = profileLink;
+}
+else if (window.linkedinProfile) {
+    evidence.type = "oauth";
+    evidence.oauth = window.linkedinProfile;
+}
+else if (window.uploadedEvidence) {
+    evidence.type = "upload";
+    evidence.files = window.uploadedEvidence;
+}
+else if (businessData) {
+    evidence.type = "business";
+    evidence.businessData = businessData;
+}
+else if (otherEvidence) {
+    evidence.type = "other";
+    evidence.otherEvidence = otherEvidence;
+   }
 investigationSource = profileLink;
 
 /*  alert(
