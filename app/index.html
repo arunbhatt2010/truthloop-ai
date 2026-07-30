@@ -2908,14 +2908,18 @@ alert("NEXT BUTTON CLICKED");
     "loopLevel = " + loopLevel +
     "\nloop7Started = " + window.loop7Started
 ); */
+   alert("1");
 if (isLoading) return;
+   alert("2");
 if (loopLevel === 6) {
+   alert("3");
   if (!window.loop7Started) {
+     alert("4");
     window.loop7Started = true;
     nextBtn.innerText = "Get Your Final Report →";
     return;
   }
-
+alert("5");
     const profileLink =
     document.getElementById("loop7ProfileLink")?.value.trim() || "";
 
@@ -2940,7 +2944,7 @@ messages.push({
     loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
-
+alert("BEFORE FETCH");
     const data = await fetch(API_URL,{
         method:"POST",
         headers:{
@@ -2962,7 +2966,7 @@ messages.push({
     currentCategory
 })
     }).then(r=>r.json());
-
+alert("AFTER FETCH");
     messages.push({
     role: "assistant",
     content: data.reply
