@@ -2953,7 +2953,8 @@ messages.push({
             currentCategory
         })
     }).then(r=>r.json());
-
+console.log("LOOP7 DATA:", data);
+alert(JSON.stringify(data));
     messages.push({
     role: "assistant",
     content: data.reply
