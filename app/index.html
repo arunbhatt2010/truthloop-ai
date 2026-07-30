@@ -2945,27 +2945,51 @@ messages.push({
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
 alert("BEFORE FETCH");
-    const data = await fetch(API_URL,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-    messages,
-    loopLevel,
+
+const evidence = {
+    type:
+        profileLink ? "public" :
+        connectedApps ? "oauth" :
+        uploadedFiles ? "upload" :
+        businessData ? "business" :
+        otherEvidence ? "other" :
+        "conversation",
 
     profileLink,
     businessData,
     otherEvidence,
+    uploadedFiles,
+    connectedApps
+};
 
-   uploadedFiles,
-   connectedApps,
+const data = await fetch(API_URL,{
+    method:"POST",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
 
-    paid49,
-    paid199,
-    currentCategory
-})
-    }).then(r=>r.json());
+        // Existing flow (Don't touch)
+        messages,
+        loopLevel,
+
+        profileLink,
+        businessData,
+        otherEvidence,
+
+        uploadedFiles,
+        connectedApps,
+
+        paid49,
+        paid199,
+        currentCategory,
+
+        // Universal Trigger
+        evidence
+
+    })
+}).then(r=>r.json());
+
 alert("AFTER FETCH");
     messages.push({
     role: "assistant",
