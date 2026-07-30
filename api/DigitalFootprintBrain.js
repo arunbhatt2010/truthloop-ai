@@ -199,12 +199,24 @@ const normalizedProfileLink =
 
         truthLoopPackage,
 
-        profileLink:
-            normalizedProfileLink,
+        profileLink: normalizedProfileLink,
+
+        businessData,
+
+        otherEvidence,
+
+        uploadedFiles,
+
+        connectedApps,
+
+        identityPackage,
 
         currentLoop
 
     });
+
+const { investigationSource } =
+    footprintContextPackage;
 
 if (!footprintContextPackage.success) {
 
