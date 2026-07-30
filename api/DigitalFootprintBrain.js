@@ -202,12 +202,17 @@ if (!footprintContextPackage.success) {
     return footprintContextPackage;
 
 }
-// STEP 2.5
-// Public Evidence Adapter
-const urlPackage =
-    await loadPublicContentFetcher({
-        url: normalizedProfileLink
-    });
+/// STEP 2.5
+// Universal Evidence Router
+
+let publicContentPackage = null;
+
+if (hasProfileLink) {
+
+    const urlPackage =
+        await loadPublicContentFetcher({
+            url: normalizedProfileLink
+        });
 
 const rawPackage =
     await acquirePublicContent(urlPackage);
@@ -221,7 +226,7 @@ const cleanPackage =
 const extractedPackage =
     extractPublicContent(cleanPackage);
 
-const publicContentPackage =
+publicContentPackage =
     buildPublicContentPackage(
         rawPackage,
         extractedPackage
@@ -240,6 +245,7 @@ if (!publicContentPackage.success) {
 
     };
 
+}
 }
    /* ==========================================
 // STEP 3
