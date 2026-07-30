@@ -2944,14 +2944,21 @@ messages.push({
         headers:{
             "Content-Type":"application/json"
         },
-        body:JSON.stringify({
-            messages,
-            loopLevel,
-            profileLink,
-            paid49:payment49,
-            paid199:payment199,
-            currentCategory
-        })
+        body: JSON.stringify({
+    messages,
+    loopLevel,
+
+    profileLink,
+    businessData,
+    otherEvidence,
+
+    uploadedFiles,
+    connectedApps,
+
+    paid49,
+    paid199,
+    currentCategory
+})
     }).then(r=>r.json());
 
     messages.push({
