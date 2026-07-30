@@ -379,6 +379,8 @@ if (!platformDecision.supported) {
 */
     // STEP 4
 // Universal Evidence Intelligence
+    console.log("===== CALLING PROFILE INTELLIGENCE API =====");
+console.log(publicContentPackage);
 const profileEvidence =
 
     await ProfileIntelligenceAPI({
@@ -399,8 +401,7 @@ if (!profileEvidence.success) {
        }
     // STEP 5
 // Universal Evidence Processor
-    console.log("===== CALLING PROFILE INTELLIGENCE API =====");
-console.log(publicContentPackage);
+    
 const evidencePackage =
 
     await ProfileMainBrain({
@@ -499,8 +500,7 @@ function detectPlatform(profileLink) {
 
 ========================================== */
 async function ProfileIntelligenceAPI({
-console.log("===== ProfileIntelligenceAPI START =====");
-console.log(publicContentPackage);
+
     publicContentPackage,
 
     truthLoopPackage,
@@ -510,7 +510,8 @@ console.log(publicContentPackage);
     provider = "Cerebras"
 
 }) {
-
+console.log("===== ProfileIntelligenceAPI START =====");
+console.log(publicContentPackage);
     const intelligence = {
 
         success: false,
