@@ -529,9 +529,19 @@ if (
     loopLevel === 7 &&
     (
         profileLink.trim() ||
+
+        businessData.trim() ||
+
+        otherEvidence.trim() ||
+
+        (Array.isArray(uploadedFiles) &&
+         uploadedFiles.length > 0) ||
+
+        connectedApps ||
+
         identityPackage
     )
-) {
+){
   try {
 
     publicEvidencePackage =
@@ -540,6 +550,11 @@ await loadDigitalFootprintBrain({
     truthLoopPackage,
 
     profileLink,
+    businessData,
+    otherEvidence,
+
+    uploadedFiles,
+    connectedApps,
 
     identityPackage,
 
