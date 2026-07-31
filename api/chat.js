@@ -508,7 +508,12 @@ const truthLoopPackage = {
 if (loopLevel === 7 && profileLink.trim()) {
 
   try {
-
+console.log(">>> BEFORE DigitalFootprintBrain");
+console.log({
+  loopLevel,
+  profileLink,
+  hasProfile: !!profileLink.trim()
+});
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
 
@@ -519,6 +524,8 @@ await loadDigitalFootprintBrain({
     currentLoop: 7
 
 });
+    console.log(">>> AFTER DigitalFootprintBrain");
+console.log(publicEvidencePackage);
     /* =========================
    PLATFORM CARD
 ========================= */
