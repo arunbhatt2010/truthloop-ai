@@ -528,6 +528,13 @@ const body = new URLSearchParams({
     client_secret: LINKEDIN_CLIENT_SECRET,
     code_verifier: session.codeVerifier
 });
+console.log({
+  clientId: LINKEDIN_CLIENT_ID,
+  redirectUri: REDIRECT_URI,
+  hasSecret: !!LINKEDIN_CLIENT_SECRET,
+  hasCodeVerifier: !!session.codeVerifier
+});
+  
 const tokenResponse = await fetch(
     "https://www.linkedin.com/oauth/v2/accessToken",
     {
