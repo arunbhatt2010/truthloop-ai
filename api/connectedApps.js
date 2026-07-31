@@ -605,7 +605,8 @@ if (!userResponse.ok) {
   /* =========================================
    BUILD IDENTITY PACKAGE
 ========================================= */
-
+console.log("BEFORE IDENTITY PACKAGE");
+console.log(userInfo);
 const identityPackage = {
 
     provider: "linkedin",
@@ -633,7 +634,8 @@ const identityPackage = {
 ========================================= */
 
 const sessionId = createSessionId();
-
+console.log("IDENTITY PACKAGE READY");
+console.log(identityPackage);
 sessionStore.set(sessionId, {
 
     identityPackage,
