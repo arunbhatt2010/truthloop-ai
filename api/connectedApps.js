@@ -547,7 +547,9 @@ const tokenResponse = await fetch(
 );
 console.log("AFTER FETCH", tokenResponse.status);
 const tokenData = await tokenResponse.json();
-
+console.log("LINKEDIN TOKEN RESPONSE");
+console.log(tokenResponse.status);
+console.log(tokenData);
 if (!tokenResponse.ok) {
     return res.status(tokenResponse.status).json({
         success: false,
