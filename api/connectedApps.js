@@ -634,26 +634,25 @@ const identityPackage = {
 ========================================= */
 
 const sessionId = createSessionId();
+
+console.log("SESSION ID", sessionId);
+
 console.log("IDENTITY PACKAGE READY");
 console.log(identityPackage);
+
 sessionStore.set(sessionId, {
-
     identityPackage,
-
     createdAt: Date.now(),
-
     expiresAt: Date.now() + SESSION_TTL
-
 });
 
-/* =========================================
-   REDIRECT TO APP
-========================================= */
+console.log("SESSION STORED");
+
+console.log("REDIRECTING TO APP");
+console.log(`/app?linkedin=connected&resume=loop6&session=${sessionId}`);
 
 return res.redirect(
-
     `/app?linkedin=connected&resume=loop6&session=${sessionId}`
-
 );
     
 }
