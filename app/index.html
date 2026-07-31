@@ -3160,6 +3160,24 @@ function showLoop7Bridge() {
    }
 const restored = loadJourney();
 
+if (restored) {
+    window.isRestoredJourney = true;
+
+    loopLevel = restored.loopLevel || 1;
+    messages = restored.messages || [];
+    currentCategory = restored.currentCategory || "";
+
+    if (loopLevel < 7) {
+        nextBtn.innerText = "Continue Journey";
+    } else {
+        nextBtn.innerText = "Select New Pattern";
+    }
+
+    document.getElementById("restoreScreen").style.display = "block";
+    document.getElementById("mainApp").style.display = "none";
+}
+
+
 const params = new URLSearchParams(window.location.search);
 
 const linkedInCallback =
