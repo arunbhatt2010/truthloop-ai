@@ -2686,11 +2686,12 @@ nextBtn.onclick=async()=>{
 if (isLoading) return;
 if (loopLevel === 6) {
   if (!window.loop7Started) {
+    alert("Start Loop 7 Clicked");
     window.loop7Started = true;
     nextBtn.innerText = "Get Your Final Report →";
     return;
   }
-
+alert("Preparing Digital Footprint");
     const profileLink =
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
 investigationSource = profileLink;
@@ -2702,7 +2703,7 @@ investigationSource = profileLink;
     loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
-
+alert("Sending request to API");
     const data = await fetch(API_URL,{
         method:"POST",
         headers:{
@@ -2717,12 +2718,12 @@ investigationSource = profileLink;
             currentCategory
         })
     }).then(r=>r.json());
-
+alert("Response received");
     messages.push({
     role: "assistant",
     content: data.reply
 });
-
+alert(data.reply.substring(0,150));
 if (data.reply.includes("📋")) {
   
   latestTruthLoopReport = data.reply;
