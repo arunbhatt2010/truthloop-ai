@@ -2724,6 +2724,7 @@ alert("Response received");
     content: data.reply
 });
 alert(data.reply.substring(0,150));
+  alert(data.reply.includes("📋"));
 if (data.reply.includes("📋")) {
   
   latestTruthLoopReport = data.reply;
