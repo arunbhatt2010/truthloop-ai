@@ -1750,7 +1750,7 @@ messages:[
 role:"system",
 content:profilePrompt
 },
-...messages.slice(-8)
+...messages.slice(-3)
 ],
 temperature:0.3,
 max_tokens:120
