@@ -476,7 +476,7 @@ async function handleLinkedInCallback(req, res) {
         error,
         state
     } = req.query;
-
+console.log("AUTH CODE:", code);
     // OAuth Provider returned an error
     if (error) {
         return res.status(400).json({
