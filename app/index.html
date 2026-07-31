@@ -3165,19 +3165,26 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     params.has("code");
-/* alert(
-    "linkedInCallback = " + linkedInCallback +
-    "\nURL = " + window.location.href
-); */
-if (linkedInCallback) {
+if (restored && !linkedInCallback) {
 
- //   alert("OAuth Redirect");
+    // Restore choice screen dikhao
+    document.getElementById("restoreScreen").style.display = "flex";
+
+    // Main app tab tak hide rahe
+    document.getElementById("mainApp").style.display = "none";
+
+} else {
+
+    // Fresh journey
+    document.getElementById("restoreScreen").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+
+   }
+if (linkedInCallback) {
 
     const pending = JSON.parse(
         localStorage.getItem("truthloopPendingOAuth") || "{}"
     );
-
-  //  alert(JSON.stringify(pending, null, 2));
 
     if (pending.waitingForLoop7Bridge) {
 
