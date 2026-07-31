@@ -557,7 +557,10 @@ if (!tokenResponse.ok) {
         tokenData
     });
 }
-
+console.log("LINKEDIN TOKEN RESPONSE");
+console.log(tokenResponse.status);
+console.log(tokenData);
+  
 if (!tokenData.access_token) {
     return res.status(400).json({
         success: false,
