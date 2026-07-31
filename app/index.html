@@ -3165,21 +3165,7 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     params.has("code");
-if (restored && !linkedInCallback) {
 
-    // Restore choice screen dikhao
-    document.getElementById("restoreScreen").style.display = "flex";
-
-    // Main app tab tak hide rahe
-    document.getElementById("mainApp").style.display = "none";
-
-} else {
-
-    // Fresh journey
-    document.getElementById("restoreScreen").style.display = "none";
-    document.getElementById("mainApp").style.display = "block";
-
-   }
 if (linkedInCallback) {
 
     const pending = JSON.parse(
