@@ -3172,10 +3172,12 @@ const restored = loadJourney();
 
 const params = new URLSearchParams(window.location.search);
 
+const sessionId = params.get("session");
+
 const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
-    params.has("code");
+    !!sessionId;
 /* alert(
     "linkedInCallback = " + linkedInCallback +
     "\nURL = " + window.location.href
