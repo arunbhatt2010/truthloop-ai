@@ -3166,6 +3166,16 @@ const linkedInCallback =
     params.get("resume") === "loop6" &&
     params.has("code");
 
+// Sirf normal startup par restore choice dikhao
+if (restored && !linkedInCallback) {
+    document.getElementById("restoreScreen").style.display = "flex";
+} else {
+    document.getElementById("restoreScreen").style.display = "none";
+}
+
+// Main app hamesha available rahe
+document.getElementById("mainApp").style.display = "block";
+
 if (linkedInCallback) {
 
     const pending = JSON.parse(
