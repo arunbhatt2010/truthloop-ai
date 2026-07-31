@@ -559,9 +559,7 @@ if (!tokenResponse.ok) {
         tokenData
     });
 }
-console.log("LINKEDIN TOKEN RESPONSE");
-console.log(tokenResponse.status);
-console.log(tokenData);
+
   
 if (!tokenData.access_token) {
     return res.status(400).json({
@@ -585,10 +583,10 @@ const userResponse = await fetch(
     }
 );
 
-const userInfo =
-  console.log("USER INFO STATUS", userResponse.status);
+const userInfo = await userResponse.json();
+
+console.log("USER INFO STATUS", userResponse.status);
 console.log("USER INFO", userInfo);
-    await userResponse.json();
 
 if (!userResponse.ok) {
 
@@ -649,9 +647,7 @@ sessionStore.set(sessionId, {
 /* =========================================
    REDIRECT TO APP
 ========================================= */
-console.log("REDIRECTING TO APP");
-console.log(sessionId);
-console.log(identityPackage);
+
 return res.redirect(
 
     `/app?linkedin=connected&resume=loop6&session=${sessionId}`
