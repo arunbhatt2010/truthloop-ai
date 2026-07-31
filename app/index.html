@@ -3183,26 +3183,10 @@ const linkedInCallback =
     "\nURL = " + window.location.href
 ); */
 if (linkedInCallback) {
-
+console.log("LINKEDIN CALLBACK");
+console.log(sessionId);
  //   alert("OAuth Redirect");
-const response = await fetch(
-    `/api/connectedApps?action=session&session=${sessionId}`
-);
 
-const data = await response.json();
-
-console.log("SESSION RESPONSE");
-console.log(data);
-
-if (!data.success) {
-    alert(data.reason || "Session restore failed");
-    return;
-}
-
-const identityPackage = data.identityPackage;
-
-console.log("IDENTITY PACKAGE FROM SESSION");
-console.log(identityPackage);
     const pending = JSON.parse(
         localStorage.getItem("truthloopPendingOAuth") || "{}"
     );
