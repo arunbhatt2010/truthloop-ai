@@ -3127,17 +3127,12 @@ if (linkedInCallback) {
     // Session restore yahan hoga
     renderRestoredJourney();
 
-    // Loop 6 → Loop 7 Bridge
-    showLoop7Bridge();
-
     // Sab successful hone ke baad URL clean
     window.history.replaceState({}, document.title, "/app");
 
     return;
   }
-
-
-if (restored && !linkedInCallback) {
+function renderRestoredJourney() {
 window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
@@ -3194,6 +3189,14 @@ document.getElementById("restorePattern").innerText =
 document.getElementById("restoreLoop").innerText =
 "You left at Loop " + loopLevel + " of 7"; 
 getBtn.disabled = false;
+
+}
+
+  if (restored && !linkedInCallback) {
+    renderRestoredJourney();
+  }
+
+
 
   }
   document.getElementById("hintBox").addEventListener("click", () => {
