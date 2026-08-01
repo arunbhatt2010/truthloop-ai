@@ -3182,6 +3182,12 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     !!sessionId;
+   alert(
+  "linkedin=" + params.get("linkedin") +
+  "\nresume=" + params.get("resume") +
+  "\nsession=" + sessionId +
+  "\ncallback=" + linkedInCallback
+);
 alert(
 window.location.search +
 "\nlinkedin=" + params.get("linkedin") +
