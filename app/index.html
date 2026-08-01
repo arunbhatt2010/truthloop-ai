@@ -3214,7 +3214,13 @@ waitingForLoop7Bridge = true;
 
 // User has NOT started Digital Footprint yet
 window.loop7Started = false;
+window.history.replaceState(
+  {},
+  document.title,
+  "/app?linkedin=connected&resume=loop6&session=test123"
+);
 
+alert(window.location.href);
 saveJourney();
 
 //document.getElementById("restoreScreen").style.display = "none";
