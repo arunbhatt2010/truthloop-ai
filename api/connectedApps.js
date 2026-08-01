@@ -521,10 +521,8 @@ console.log("AUTH CODE:", code);
 
     // Restore OAuth session
 console.log("STATE RECEIVED:", state);
-console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
-    const sessionData = await redis.get(state);
-const session = sessionData ? JSON.parse(sessionData) : null;
-
+//console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
+    const session = await redis.get(state);
     if (!session) {
         return res.status(400).json({
             success: false,
