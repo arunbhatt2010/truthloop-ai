@@ -3097,29 +3097,21 @@ localStorage.removeItem(MEMORY_KEY);
   }
 function showLoop7Bridge() {
 
+    document.getElementById("loopIndicator").innerText =
+        "Loop " + loopLevel + " of 7";
+
     const div = outputBox;
 
-    // Purana Loop 6 output hata do
-    div.innerHTML = `
-        <div class="aiResponse">
-            ✅ <b>LinkedIn Connected Successfully</b>
-            <br><br>
-            Let's continue with Loop 7.
-        </div>
-    `;
+    if (!div.innerHTML.includes("Loop 7 Evidence Bridge")) {
+        div.innerHTML += renderLoop7EntryBridge();
+    }
 
-    // Sirf asli Loop 7 Bridge render karo
-    div.innerHTML += renderLoop7EntryBridge();
-
-    // OAuth panel seedha open
     showEvidence("oauth");
 
-    // Purane journey buttons hata do
-    getBtn.style.display = "none";
-    nextBtn.style.display = "none";
-    mainInput.style.display = "none";
-    reflectionInput.style.display = "none";
+    nextBtn.style.display = "block";
+    nextBtn.innerText = "Start Loop 7";
 
+    div.scrollTop = div.scrollHeight;
 }
 const restored = loadJourney();
 
