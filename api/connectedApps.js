@@ -510,9 +510,9 @@ console.log("AUTH CODE:", code);
     }
 
     // Restore OAuth session
-  console.log("STATE RECEIVED:", state);
-console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
-    const session = sessionStore.get(state);
+//  console.log("STATE RECEIVED:", state);
+//console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
+    /*const session = sessionStore.get(state);
 
     if (!session) {
         return res.status(400).json({
@@ -520,7 +520,7 @@ console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
             stage: "SESSION",
             reason: "OAuth session expired or not found."
         });
-    }
+    }*/
 
     // Continue to Token Exchange...
 /* =========================================
@@ -539,7 +539,7 @@ console.log({
   clientId: LINKEDIN_CLIENT_ID,
   redirectUri: REDIRECT_URI,
   hasSecret: !!LINKEDIN_CLIENT_SECRET,
-  hasCodeVerifier: !!session.codeVerifier
+  hasCodeVerifier: false
 });
   console.log("BEFORE FETCH");
 const tokenResponse = await fetch(
