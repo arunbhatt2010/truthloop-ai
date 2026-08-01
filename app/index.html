@@ -3182,18 +3182,14 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     !!sessionId;
+   
    alert(
   "linkedin=" + params.get("linkedin") +
   "\nresume=" + params.get("resume") +
   "\nsession=" + sessionId +
   "\ncallback=" + linkedInCallback
 );
-alert(
-window.location.search +
-"\nlinkedin=" + params.get("linkedin") +
-"\nresume=" + params.get("resume") +
-"\nsession=" + params.get("session")
-);
+
    
 if (linkedInCallback) {
 alert("3 CALLBACK DETECTED");
