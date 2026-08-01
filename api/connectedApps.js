@@ -449,7 +449,8 @@ async function handleSessionRequest(req, res) {
 
     cleanSessions();
 
-    const data = sessionStore.get(session);
+    const sessionData = await redis.get(session);
+const data = sessionData ? JSON.parse(sessionData) : null;
 
     if (!data) {
 
@@ -463,7 +464,7 @@ async function handleSessionRequest(req, res) {
 
     }
 
-    sessionStore.delete(session);
+    await redis.del(session);
 
     return res.status(200).json({
 
@@ -549,7 +550,7 @@ console.log({
   clientId: LINKEDIN_CLIENT_ID,
   redirectUri: REDIRECT_URI,
   hasSecret: !!LINKEDIN_CLIENT_SECRET,
-  hasCodeVerifier: false
+  hasCodeVerifier: !!session.codeVerifier
 });
   console.log("BEFORE FETCH");
 const tokenResponse = await fetch(
