@@ -550,6 +550,8 @@ console.log({
   hasSecret: !!LINKEDIN_CLIENT_SECRET,
   hasCodeVerifier: !!session.codeVerifier
 });
+  console.log("BODY:");
+console.log(body.toString().replace(LINKEDIN_CLIENT_SECRET, "***"));
   console.log("BEFORE FETCH");
 const tokenResponse = await fetch(
     "https://www.linkedin.com/oauth/v2/accessToken",
