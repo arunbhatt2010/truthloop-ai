@@ -3227,10 +3227,14 @@ console.log("OAuth Restore", {
     waitingForLoop7Bridge
 });
 
-renderRestoredJourney();
+setTimeout(() => {
+    alert("CALLING renderRestoredJourney()");
+    renderRestoredJourney();
+    alert("renderRestoredJourney() FINISHED");
+}, 0);
+
 alert("BEFORE REPLACE\n" + window.location.href);
 window.history.replaceState({}, document.title, "/app");
-       alert("AFTER REPLACE\n" + window.location.href);
 // return;
 
 //alert("OAuth block finished");
