@@ -656,7 +656,9 @@ console.log(redirectUrl);
 console.log("RETURNING REDIRECT NOW");
   console.log("CALLBACK END");
 console.log("================================");
-return res.redirect(302, redirectUrl);
+res.statusCode = 302;
+res.setHeader("Location", redirectUrl);
+return res.end();
     
 }
 
