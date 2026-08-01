@@ -3098,19 +3098,29 @@ localStorage.removeItem(MEMORY_KEY);
 function showLoop7Bridge() {
 
     const div = outputBox;
-    div.innerHTML = "";
 
-    div.innerHTML += `
-        <div class="ai-message">
-            ✅ LinkedIn Connected Successfully
+    // Purana Loop 6 output hata do
+    div.innerHTML = `
+        <div class="aiResponse">
+            ✅ <b>LinkedIn Connected Successfully</b>
             <br><br>
             Let's continue with Loop 7.
         </div>
     `;
 
+    // Sirf asli Loop 7 Bridge render karo
     div.innerHTML += renderLoop7EntryBridge();
 
-  }  
+    // OAuth panel seedha open
+    showEvidence("oauth");
+
+    // Purane journey buttons hata do
+    getBtn.style.display = "none";
+    nextBtn.style.display = "none";
+    mainInput.style.display = "none";
+    reflectionInput.style.display = "none";
+
+}
 const restored = loadJourney();
 
 const params = new URLSearchParams(window.location.search);
