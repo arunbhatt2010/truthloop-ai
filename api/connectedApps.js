@@ -470,6 +470,10 @@ async function handleSessionRequest(req, res) {
 ========================================= */
 
 async function handleLinkedInCallback(req, res) {
+  console.log("================================");
+console.log("CALLBACK START");
+console.log("URL:", req.url);
+console.log("TIME:", Date.now());
 console.log("CALLBACK URL:", req.url);
 console.log("CALLBACK QUERY:", req.query);
     const {
@@ -650,6 +654,8 @@ const redirectUrl =
 console.log("REDIRECTING TO APP");
 console.log(redirectUrl);
 console.log("RETURNING REDIRECT NOW");
+  console.log("CALLBACK END");
+console.log("================================");
 return res.redirect(302, redirectUrl);
     
 }
