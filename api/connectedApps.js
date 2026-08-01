@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { Redis } from "@upstash/redis";
 /*
 connectedApps.js
 
@@ -146,6 +147,10 @@ const LINKEDIN_CLIENT_ID =
 
 const LINKEDIN_CLIENT_SECRET =
     process.env.LINKEDIN_CLIENT_SECRET;
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 const REDIRECT_URI =
   "https://truthloop.in/api/connectedApps";
@@ -392,11 +397,15 @@ async function handleLinkedInOAuth(req, res) {
     } = generatePKCE();
 
     // Store temporary OAuth session
-   sessionStore.set(state,{
+   await redis.set(
+  state,
+  JSON.stringify({
     codeVerifier,
     createdAt: Date.now(),
-    expiresAt: Date.now() + SESSION_TTL
-});
+    expiresAt: Date.now() + SESSION_TTL,
+  }),
+  { ex: 300 }
+);
 
     // Build LinkedIn Authorization URL
     const redirectUrl =
@@ -512,7 +521,8 @@ console.log("AUTH CODE:", code);
     // Restore OAuth session
 console.log("STATE RECEIVED:", state);
 console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
-    const session = sessionStore.get(state);
+    const sessionData = await redis.get(state);
+const session = sessionData ? JSON.parse(sessionData) : null;
 
     if (!session) {
         return res.status(400).json({
@@ -642,11 +652,15 @@ const identityPackage = {
 
 const sessionId = createSessionId();
 
-sessionStore.set(sessionId, {
+await redis.set(
+  sessionId,
+  JSON.stringify({
     identityPackage,
     createdAt: Date.now(),
-    expiresAt: Date.now() + SESSION_TTL
-});
+    expiresAt: Date.now() + SESSION_TTL,
+  }),
+  { ex: 300 }
+);
 
 console.log("SESSION STORED", sessionId);
 
