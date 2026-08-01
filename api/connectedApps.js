@@ -633,27 +633,36 @@ const identityPackage = {
    CREATE SESSION
 ========================================= */
 
-const sessionId = createSessionId();
-
-console.log("SESSION ID", sessionId);
-
-console.log("IDENTITY PACKAGE READY");
-console.log(identityPackage);
-
-sessionStore.set(sessionId, {
-    identityPackage,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + SESSION_TTL
-});
-
 console.log("SESSION STORED");
 
-console.log("REDIRECTING TO APP");
-console.log(`/app?linkedin=connected&resume=loop6&session=${sessionId}`);
+const redirectUrl =
+`/app?linkedin=connected&resume=loop6&session=${sessionId}`;
 
-return res.redirect(
-    `/app?linkedin=connected&resume=loop6&session=${sessionId}`
-);
+console.log("REDIRECTING TO APP");
+console.log(redirectUrl);
+
+return res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Redirecting...</title>
+</head>
+<body>
+
+<h3>OAuth Success</h3>
+
+<p id="url">${redirectUrl}</p>
+
+<script>
+alert("REDIRECT\\n" + location.href);
+
+location.href = "${redirectUrl}";
+</script>
+
+</body>
+</html>
+`);
     
 }
 
