@@ -3112,20 +3112,29 @@ function showLoop7Bridge() {
 
   }  
 const restored = loadJourney();
+
 const params = new URLSearchParams(window.location.search);
+
+const sessionId = params.get("session");
 
 const linkedInCallback =
     params.get("linkedin") === "connected" &&
-    params.get("resume") === "loop7" &&
-    params.has("code");
+    params.get("resume") === "loop6" &&
+    !!sessionId;
+
 if (linkedInCallback) {
 
-    window.history.replaceState({}, document.title, "/app");
+    // Session restore yahan hoga
+    renderRestoredJourney();
 
+    // Loop 6 → Loop 7 Bridge
     showLoop7Bridge();
 
-  }
+    // Sab successful hone ke baad URL clean
+    window.history.replaceState({}, document.title, "/app");
 
+    return;
+  }
 
 
 if (restored && !linkedInCallback) {
