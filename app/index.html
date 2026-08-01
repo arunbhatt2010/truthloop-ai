@@ -3198,8 +3198,8 @@ alert("3 CALLBACK DETECTED");
     const pending = JSON.parse(
         localStorage.getItem("truthloopPendingOAuth") || "{}"
     );
+alert(JSON.stringify(pending, null, 2));
 
-  //  alert(JSON.stringify(pending, null, 2));
 
     if (pending.waitingForLoop7Bridge) {
 alert("ENTERED OAUTH CALLBACK");
