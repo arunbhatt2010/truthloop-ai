@@ -386,17 +386,17 @@ async function handleLinkedInOAuth(req, res) {
         Date.now().toString(36);
 
     // Generate PKCE
- /*   const {
+   const {
        codeVerifier,
         codeChallenge
-    } = generatePKCE();*/
+    } = generatePKCE();
 
     // Store temporary OAuth session
-   /* sessionStore.set(state, {
-        //codeVerifier,
-        createdAt: Date.now(),
-        expiresAt: Date.now() + SESSION_TTL
-    });*/
+   sessionStore.set(state,{
+    codeVerifier,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + SESSION_TTL
+});
 
     // Build LinkedIn Authorization URL
     const redirectUrl =
@@ -407,8 +407,8 @@ async function handleLinkedInOAuth(req, res) {
             redirect_uri: REDIRECT_URI,
             scope: "openid profile email",
             state,
-            //code_challenge: codeChallenge,
-            //code_challenge_method: "S256"
+            code_challenge: codeChallenge,
+            code_challenge_method: "S256"
         }).toString();
 
     return res.status(200).json({
@@ -510,9 +510,9 @@ console.log("AUTH CODE:", code);
     }
 
     // Restore OAuth session
-//  console.log("STATE RECEIVED:", state);
-//console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
-    /*const session = sessionStore.get(state);
+console.log("STATE RECEIVED:", state);
+console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
+    const session = sessionStore.get(state);
 
     if (!session) {
         return res.status(400).json({
@@ -520,7 +520,7 @@ console.log("AUTH CODE:", code);
             stage: "SESSION",
             reason: "OAuth session expired or not found."
         });
-    }*/
+    }
 
     // Continue to Token Exchange...
 /* =========================================
@@ -533,7 +533,7 @@ const body = new URLSearchParams({
     redirect_uri: REDIRECT_URI,
     client_id: LINKEDIN_CLIENT_ID,
     client_secret: LINKEDIN_CLIENT_SECRET,
-//  code_verifier: session.codeVerifier
+code_verifier: session.codeVerifier
 });
 console.log({
   clientId: LINKEDIN_CLIENT_ID,
