@@ -3189,9 +3189,13 @@ document.getElementById("restorePattern").innerText =
 document.getElementById("restoreLoop").innerText =
 "You left at Loop " + loopLevel + " of 7"; 
 getBtn.disabled = false;
-
+  if (loopLevel === 6) {
+    showLoop7Bridge();
 }
 
+}
+  
+  
   if (restored && !linkedInCallback) {
     renderRestoredJourney();
   }
