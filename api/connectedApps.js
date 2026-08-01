@@ -510,6 +510,8 @@ console.log("AUTH CODE:", code);
     }
 
     // Restore OAuth session
+  console.log("STATE RECEIVED:", state);
+console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
     const session = sessionStore.get(state);
 
     if (!session) {
