@@ -387,13 +387,13 @@ async function handleLinkedInOAuth(req, res) {
 
     // Generate PKCE
     const {
-        codeVerifier,
+       // codeVerifier,
         codeChallenge
     } = generatePKCE();
 
     // Store temporary OAuth session
     sessionStore.set(state, {
-        codeVerifier,
+        //codeVerifier,
         createdAt: Date.now(),
         expiresAt: Date.now() + SESSION_TTL
     });
@@ -531,7 +531,7 @@ const body = new URLSearchParams({
     redirect_uri: REDIRECT_URI,
     client_id: LINKEDIN_CLIENT_ID,
     client_secret: LINKEDIN_CLIENT_SECRET,
-  code_verifier: session.codeVerifier
+//  code_verifier: session.codeVerifier
 });
 console.log({
   clientId: LINKEDIN_CLIENT_ID,
