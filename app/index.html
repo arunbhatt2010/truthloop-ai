@@ -3168,7 +3168,11 @@ function showLoop7Bridge() {
 
     div.scrollTop = div.scrollHeight;
    }
+alert("1 BEFORE loadJourney");
+
 const restored = loadJourney();
+
+alert("2 AFTER loadJourney");
 
 const params = new URLSearchParams(window.location.search);
 
@@ -3178,18 +3182,15 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     !!sessionId;
-alert(window.location.href);
-
 alert(
-  "linkedin=" + params.get("linkedin") +
-  "\nresume=" + params.get("resume") +
-  "\nsession=" + params.get("session") +
-  "\ncallback=" + linkedInCallback
+window.location.search +
+"\nlinkedin=" + params.get("linkedin") +
+"\nresume=" + params.get("resume") +
+"\nsession=" + params.get("session")
 );
    
 if (linkedInCallback) {
-console.log("LINKEDIN CALLBACK");
-console.log(sessionId);
+alert("3 CALLBACK DETECTED");
  //   alert("OAuth Redirect");
 
     const pending = JSON.parse(
