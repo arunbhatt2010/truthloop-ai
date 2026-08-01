@@ -386,17 +386,17 @@ async function handleLinkedInOAuth(req, res) {
         Date.now().toString(36);
 
     // Generate PKCE
-    const {
-       // codeVerifier,
+ /*   const {
+       codeVerifier,
         codeChallenge
-    } = generatePKCE();
+    } = generatePKCE();*/
 
     // Store temporary OAuth session
-    sessionStore.set(state, {
+   /* sessionStore.set(state, {
         //codeVerifier,
         createdAt: Date.now(),
         expiresAt: Date.now() + SESSION_TTL
-    });
+    });*/
 
     // Build LinkedIn Authorization URL
     const redirectUrl =
@@ -407,8 +407,8 @@ async function handleLinkedInOAuth(req, res) {
             redirect_uri: REDIRECT_URI,
             scope: "openid profile email",
             state,
-            code_challenge: codeChallenge,
-            code_challenge_method: "S256"
+            //code_challenge: codeChallenge,
+            //code_challenge_method: "S256"
         }).toString();
 
     return res.status(200).json({
