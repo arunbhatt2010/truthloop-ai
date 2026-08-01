@@ -3195,88 +3195,22 @@ if (linkedInCallback) {
 alert("3 CALLBACK DETECTED");
  //   alert("OAuth Redirect");
 
-    const pending = JSON.parse(
-        localStorage.getItem("truthloopPendingOAuth") || "{}"
-    );
-alert(JSON.stringify(pending, null, 2));
+    // const pending = JSON.parse(
+//     localStorage.getItem("truthloopPendingOAuth") || "{}"
+// );
 
+// if (pending.waitingForLoop7Bridge) {
 
-    if (pending.waitingForLoop7Bridge) {
-alert("ENTERED OAUTH CALLBACK");
-        // Restore previous Loop 7 session
-// Restore previous Loop 7 session
-loopLevel = Number(pending.loopLevel ?? 6);
-messages = Array.isArray(pending.messages) ? pending.messages : [];
-currentCategory = pending.currentCategory ?? "";
-investigationSource = pending.investigationSource ?? "";
+    window.loop7Started = false;
 
-waitingForLoop7Bridge = true;
+    saveJourney();
 
-// User has NOT started Digital Footprint yet
-window.loop7Started = false;
-window.history.replaceState(
-  {},
-  document.title,
-  "/app?linkedin=connected&resume=loop6&session=test123"
-);
-
-alert(window.location.href);
-saveJourney();
-
-//document.getElementById("restoreScreen").style.display = "none";
-//document.getElementById("mainApp").style.display = "block";
-
-console.log("OAuth Restore", {
-    loopLevel,
-    messages: messages.length,
-    currentCategory,
-    waitingForLoop7Bridge
-});
-
-setTimeout(() => {
-    alert("CALLING renderRestoredJourney()");
     renderRestoredJourney();
-    alert("renderRestoredJourney() FINISHED");
-}, 0);
 
-alert("BEFORE REPLACE\n" + window.location.href);
-window.history.replaceState({}, document.title, "/app");
-// return;
+    return;
 
-//alert("OAuth block finished");
-    /*  alert(
-  [
-    "After OAuth",
-    "loopLevel = " + loopLevel,
-    "waitingForLoop7Bridge = " + waitingForLoop7Bridge,
-    "window.loop7Started = " + window.loop7Started,
-    "restoreScreen = " +
-      document.getElementById("restoreScreen").style.display,
-    "mainApp = " +
-      document.getElementById("mainApp").style.display,
-    "loopIndicator = " +
-      document.getElementById("loopIndicator").innerText
-  ].join("\n")
-); */
-   /*  alert(`
-=== AFTER OAUTH ===
+// }
 
-loopLevel = ${loopLevel}
-loopIndicator = ${document.getElementById("loopIndicator").innerText}
-
-mainApp.display = ${document.getElementById("mainApp").style.display}
-restoreScreen.display = ${document.getElementById("restoreScreen").style.display}
-
-nextBtn = ${nextBtn.innerText}
-
-outputBox children = ${outputBox.children.length}
-outputBox HTML = ${
-document.getElementById("outputBox").innerHTML.substring(0,300)
-  }
-reflectionInput = ${reflectionInput.value}
-
-URL = ${window.location.href}
-`); */
     }
   
 }
