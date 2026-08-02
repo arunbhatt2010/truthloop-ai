@@ -3196,13 +3196,18 @@ getBtn.disabled = false;
 if (linkedInCallback) {
 
     fetch(`/api/connectedApps?action=session&session=${sessionId}`)
-        .then(res => res.json())
-        .then(data => {
-            alert(JSON.stringify(data));
-        })
-        .catch(err => {
-            alert(err.message);
-        });
+.then(res => res.json())
+.then(data => {
+    console.log(data);
+    alert(JSON.stringify(data));
+
+    if (data.success) {
+        alert(JSON.stringify(data.identityPackage));
+    }
+})
+.catch(err => {
+    alert(err.message);
+});
 
 }
   
