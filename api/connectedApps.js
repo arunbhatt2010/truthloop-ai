@@ -540,13 +540,15 @@ const session =
 ========================================= */
 
 const body = new URLSearchParams({
-    grant_type: "authorization_code",
-    code,
-    redirect_uri: REDIRECT_URI,
-    client_id: LINKEDIN_CLIENT_ID,
-    client_secret: LINKEDIN_CLIENT_SECRET,
-code_verifier: session.codeVerifier
+  grant_type: "authorization_code",
+  code,
+  redirect_uri: REDIRECT_URI,
+  code_verifier: session.codeVerifier
 });
+
+const basic = Buffer.from(
+  `${LINKEDIN_CLIENT_ID}:${LINKEDIN_CLIENT_SECRET}`
+).toString("base64");
 console.log({
     clientId: LINKEDIN_CLIENT_ID,
     redirectUri: REDIRECT_URI,
@@ -562,8 +564,9 @@ const tokenResponse = await fetch(
     {
         method: "POST",
         headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
+  "Content-Type": "application/x-www-form-urlencoded",
+  Authorization: `Basic ${basic}`
+},
         body: body.toString()
     }
 );
