@@ -516,6 +516,9 @@ console.log("AUTH CODE:", code);
 }
 
 processedStates.add(state);
+  return res.redirect(
+    `/app?linkedin=connected&resume=loop6&session=${existingSessionId}`
+);
     // OAuth Provider returned an error
     if (error) {
         return res.status(400).json({
