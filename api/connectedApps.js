@@ -504,7 +504,9 @@ console.log("CALLBACK QUERY:", req.query);
     error,
     state
 } = req.query;
-
+console.log("USED BEFORE:", usedCodes.has(code));
+console.log("USED SIZE BEFORE:", usedCodes.size);
+console.log("CODE:", code);
 if (usedCodes.has(code)) {
     console.log("🎯 Duplicate OAuth code blocked:", code);
 
@@ -516,7 +518,8 @@ if (usedCodes.has(code)) {
 }
 
 usedCodes.add(code);
-
+console.log("USED AFTER:", usedCodes.has(code));
+console.log("USED SIZE AFTER:", usedCodes.size);
 console.log("AUTH CODE:", code);
     // OAuth Provider returned an error
     if (error) {
