@@ -3193,7 +3193,10 @@ getBtn.disabled = false;
     renderRestoredJourney();
   }
 
-
+if (linkedInCallback) {
+    alert("LinkedIn callback detected");
+    alert(sessionId);
+  }
 
   
   document.getElementById("hintBox").addEventListener("click", () => {
