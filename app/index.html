@@ -3124,22 +3124,9 @@ const linkedInCallback =
     params.get("resume") === "loop6" &&
     !!sessionId;
 
-/*if (linkedInCallback) {
-
-    // Session restore yahan hoga
-    renderRestoredJourney();
-
-    // Sab successful hone ke baad URL clean
-    window.history.replaceState({}, document.title, "/app");
-
- //   return;
-  }*/
-  if (data.redirectUrl) {
-
-    alert(data.redirectUrl);   // Testing ke liye theek hai
+if (data.redirectUrl) {
 
     window.location.href = data.redirectUrl;
-
     return;
 
   }
