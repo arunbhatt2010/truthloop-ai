@@ -493,7 +493,6 @@ console.log("SEC-FETCH-MODE:", req.headers["sec-fetch-mode"]);
 console.log("SEC-FETCH-SITE:", req.headers["sec-fetch-site"]);
 
 console.log("CALLBACK QUERY:", req.query);
-console.log("AUTH CODE:", code);
     // OAuth Provider returned an error
     if (error) {
         return res.status(400).json({
