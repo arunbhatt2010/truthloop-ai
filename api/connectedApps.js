@@ -543,6 +543,7 @@ const body = new URLSearchParams({
   grant_type: "authorization_code",
   code,
   redirect_uri: REDIRECT_URI,
+  LINKEDIN_CLIENT_ID,
   code_verifier: session.codeVerifier
 });
 
