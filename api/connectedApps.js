@@ -579,7 +579,28 @@ const tokenData = await tokenResponse.json();
 console.log("LINKEDIN TOKEN RESPONSE");
 console.log(tokenResponse.status);
 console.log(tokenData);
-  /* =========================================
+
+// =========================================
+// TOKEN EXCHANGE FAILED
+// =========================================
+
+if (!tokenResponse.ok) {
+
+    return res.status(tokenResponse.status).json({
+
+        success: false,
+
+        stage: "TOKEN",
+
+        reason: tokenData.error_description || tokenData.error,
+
+        tokenData
+
+    });
+
+}
+
+/* =========================================
    FETCH USER INFO
 ========================================= */
 
@@ -587,8 +608,7 @@ const userResponse = await fetch(
     "https://api.linkedin.com/v2/userinfo",
     {
         headers: {
-            Authorization:
-                `Bearer ${tokenData.access_token}`
+            Authorization: `Bearer ${tokenData.access_token}`
         }
     }
 );
@@ -600,7 +620,7 @@ console.log("USER INFO", userInfo);
 
 if (!userResponse.ok) {
 
-    return res.status(400).json({
+    return res.status(userResponse.status).json({
 
         success: false,
 
@@ -611,7 +631,6 @@ if (!userResponse.ok) {
     });
 
 }
-
   /* =========================================
    BUILD IDENTITY PACKAGE
 ========================================= */
