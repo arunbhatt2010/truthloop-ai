@@ -482,15 +482,17 @@ const data = sessionData ? JSON.parse(sessionData) : null;
 async function handleLinkedInCallback(req, res) {
   console.log("================================");
 console.log("CALLBACK START");
+console.log("REQUEST TIME:", new Date().toISOString());
 console.log("URL:", req.url);
-console.log("TIME:", Date.now());
-console.log("CALLBACK URL:", req.url);
+console.log("METHOD:", req.method);
+
+console.log("USER-AGENT:", req.headers["user-agent"]);
+console.log("REFERER:", req.headers["referer"]);
+console.log("SEC-FETCH-DEST:", req.headers["sec-fetch-dest"]);
+console.log("SEC-FETCH-MODE:", req.headers["sec-fetch-mode"]);
+console.log("SEC-FETCH-SITE:", req.headers["sec-fetch-site"]);
+
 console.log("CALLBACK QUERY:", req.query);
-    const {
-        code,
-        error,
-        state
-    } = req.query;
 console.log("AUTH CODE:", code);
     // OAuth Provider returned an error
     if (error) {
@@ -680,6 +682,16 @@ console.log(redirectUrl);
 console.log("RETURNING REDIRECT NOW");
   console.log("CALLBACK END");
 console.log("================================");
+  console.log("REDIRECTING TO APP");
+console.log(redirectUrl);
+console.log("RETURNING REDIRECT NOW");
+console.log("REDIRECT RESPONSE SENT");
+console.log("CALLBACK END");
+console.log("================================");
+
+res.statusCode = 302;
+res.setHeader("Location", redirectUrl);
+return res.end();
 res.statusCode = 302;
 res.setHeader("Location", redirectUrl);
 return res.end();
