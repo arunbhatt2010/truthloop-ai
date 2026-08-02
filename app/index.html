@@ -3195,20 +3195,45 @@ getBtn.disabled = false;
 
 if (linkedInCallback) {
 
-    fetch(`/api/connectedApps?action=session&session=${sessionId}`)
-.then(res => res.json())
+    alert("STEP 1 - linkedinCallback entered");
+alert("Session: " + sessionId);
+
+fetch(`/api/connectedApps?action=session&session=${sessionId}`)
+.then(res => {
+
+    alert("STEP 2 - Fetch completed");
+    alert("HTTP Status: " + res.status);
+
+    return res.json();
+
+})
 .then(data => {
-    console.log(data);
+
+    alert("STEP 3 - JSON parsed");
     alert(JSON.stringify(data));
 
     if (data.success) {
+
+        alert("STEP 4 - success=true");
+
+        alert("Identity Package:");
         alert(JSON.stringify(data.identityPackage));
+
+    } else {
+
+        alert("STEP 4 - success=false");
+        alert(data.reason || "No reason");
+
     }
+
 })
 .catch(err => {
-    alert(err.message);
-});
 
+    alert("STEP ERROR");
+    alert(err.message);
+    console.error(err);
+
+});
 }
   
   document.getElementById("hintBox").addEventListener("click", () => {
