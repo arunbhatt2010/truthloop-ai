@@ -548,54 +548,37 @@ const body = new URLSearchParams({
   code_verifier: session.codeVerifier
 });
 
-const basic = Buffer.from(
-  `${LINKEDIN_CLIENT_ID}:${LINKEDIN_CLIENT_SECRET}`
-).toString("base64");
 console.log({
-    clientId: LINKEDIN_CLIENT_ID,
-    redirectUri: REDIRECT_URI,
-    hasSecret: !!LINKEDIN_CLIENT_SECRET,
-    hasCodeVerifier: !!session.codeVerifier,
-    verifierLength: session.codeVerifier?.length
+  clientId: LINKEDIN_CLIENT_ID,
+  redirectUri: REDIRECT_URI,
+  hasSecret: !!LINKEDIN_CLIENT_SECRET,
+  hasCodeVerifier: !!session.codeVerifier,
+  verifierLength: session.codeVerifier?.length
 });
-  console.log("BODY:");
-console.log(body.toString().replace(LINKEDIN_CLIENT_SECRET, "***"));
-  console.log("BEFORE FETCH");
+
+console.log("BODY:");
+console.log(body.toString().replace(LINKEDIN_CLIENT_SECRET, "****"));
+
+console.log("BEFORE FETCH");
+
 const tokenResponse = await fetch(
-    "https://www.linkedin.com/oauth/v2/accessToken",
-    {
-        method: "POST",
-        headers: {
-  "Content-Type": "application/x-www-form-urlencoded",
-  Authorization: `Basic ${basic}`
-},
-        body: body.toString()
-    }
+  "https://www.linkedin.com/oauth/v2/accessToken",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: body.toString()
+  }
 );
+
 console.log("AFTER FETCH", tokenResponse.status);
+
 const tokenData = await tokenResponse.json();
+
 console.log("LINKEDIN TOKEN RESPONSE");
 console.log(tokenResponse.status);
 console.log(tokenData);
-if (!tokenResponse.ok) {
-    return res.status(tokenResponse.status).json({
-        success: false,
-        stage: "TOKEN",
-        status: tokenResponse.status,
-        reason: tokenData.error_description || tokenData.error || "Token exchange failed.",
-        tokenData
-    });
-}
-
-  
-if (!tokenData.access_token) {
-    return res.status(400).json({
-        success: false,
-        stage: "TOKEN",
-        reason: "Access token not received.",
-        tokenData
-    });
-}
   /* =========================================
    FETCH USER INFO
 ========================================= */
