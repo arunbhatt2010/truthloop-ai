@@ -183,7 +183,7 @@ function generatePKCE() {
    TEMP SESSION STORE
 ========================================= */
 
-const sessionStore = new Map();
+//const sessionStore = new Map();
 
 /* =========================================
    SESSION EXPIRY
@@ -231,7 +231,7 @@ function cleanSessions() {
 
 export default async function handler(req, res) {
 
-    cleanSessions();
+ //   cleanSessions();
 
     try {
 
@@ -520,17 +520,20 @@ console.log("AUTH CODE:", code);
     }
 
     // Restore OAuth session
-console.log("STATE RECEIVED:", state);
-//console.log("SESSION STORE KEYS:", [...sessionStore.keys()]);
-    const session = await redis.get(state);
-    if (!session) {
-        return res.status(400).json({
-            success: false,
-            stage: "SESSION",
-            reason: "OAuth session expired or not found."
-        });
-    }
+const sessionRaw = await redis.get(state);
 
+if (!sessionRaw) {
+    return res.status(400).json({
+        success: false,
+        stage: "SESSION",
+        reason: "OAuth session expired or not found."
+    });
+}
+
+const session =
+    typeof sessionRaw === "string"
+        ? JSON.parse(sessionRaw)
+        : sessionRaw;
     // Continue to Token Exchange...
 /* =========================================
    EXCHANGE AUTHORIZATION CODE
@@ -545,10 +548,11 @@ const body = new URLSearchParams({
 code_verifier: session.codeVerifier
 });
 console.log({
-  clientId: LINKEDIN_CLIENT_ID,
-  redirectUri: REDIRECT_URI,
-  hasSecret: !!LINKEDIN_CLIENT_SECRET,
-  hasCodeVerifier: !!session.codeVerifier
+    clientId: LINKEDIN_CLIENT_ID,
+    redirectUri: REDIRECT_URI,
+    hasSecret: !!LINKEDIN_CLIENT_SECRET,
+    hasCodeVerifier: !!session.codeVerifier,
+    verifierLength: session.codeVerifier?.length
 });
   console.log("BODY:");
 console.log(body.toString().replace(LINKEDIN_CLIENT_SECRET, "***"));
