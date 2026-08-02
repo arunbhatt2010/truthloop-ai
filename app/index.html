@@ -3194,10 +3194,17 @@ getBtn.disabled = false;
   }
 
 if (linkedInCallback) {
-    alert("LinkedIn callback detected");
-    alert(sessionId);
-  }
 
+    fetch(`/api/connectedApps?action=session&session=${sessionId}`)
+        .then(res => res.json())
+        .then(data => {
+            alert(JSON.stringify(data));
+        })
+        .catch(err => {
+            alert(err.message);
+        });
+
+}
   
   document.getElementById("hintBox").addEventListener("click", () => {
 
