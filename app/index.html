@@ -3437,21 +3437,32 @@ setInterval(() => {
 
         });
 
+        alert("POST Status: " + response.status);
+
         const data = await response.json();
 
+        alert("POST Response:\n" + JSON.stringify(data));
+
         if (data.redirectUrl) {
+
+            alert("Redirect URL received.");
 
             window.location.href = data.redirectUrl;
             return;
 
         }
 
-        alert(data.reason || "OAuth failed.");
+        alert("❌ No redirectUrl received.");
+
+        alert(data.reason || data.message || "OAuth failed.");
 
     } catch (err) {
 
         console.error(err);
+
         alert("Connection failed.");
+
+        alert(err.message);
 
     }
 
