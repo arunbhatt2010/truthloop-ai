@@ -504,17 +504,14 @@ console.log("CALLBACK QUERY:", req.query);
     state
 } = req.query;
 
-if (processedStates.has(state)) {
-
-    console.log("🎯 DUPLICATE CALLBACK:", state);
-
+if (usedCodes.has(code)) {
+    console.log("🎯 Catching Vercel auto-retry smoothly.");
     return res.status(200).json({
         success: true,
         message: "Successfully authenticated",
-        duplicate: true
+        isRedirect: true
     });
 }
-
 processedStates.add(state);
 
 console.log("AUTH CODE:", code);
