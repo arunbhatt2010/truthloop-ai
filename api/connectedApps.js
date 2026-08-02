@@ -452,7 +452,11 @@ async function handleSessionRequest(req, res) {
     cleanSessions();
 
     const sessionData = await redis.get(session);
-const data = sessionData ? JSON.parse(sessionData) : null;
+
+const data =
+    typeof sessionData === "string"
+        ? JSON.parse(sessionData)
+        : sessionData;
 
     if (!data) {
 
