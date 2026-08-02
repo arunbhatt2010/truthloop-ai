@@ -480,6 +480,10 @@ const data = sessionData ? JSON.parse(sessionData) : null;
 ========================================= */
 
 async function handleLinkedInCallback(req, res) {
+  const reqId = crypto.randomUUID();
+
+console.log("REQ ID:", reqId);
+console.log("URL:", req.url);
   console.log("================================");
 console.log("CALLBACK START");
 console.log("REQUEST TIME:", new Date().toISOString());
@@ -686,6 +690,7 @@ const redirectUrl =
 console.log("REDIRECTING TO APP");
 console.log(redirectUrl);
 console.log("RETURNING REDIRECT NOW");
+  console.log("END REQ:", reqId);
   console.log("CALLBACK END");
 console.log("================================");
   console.log("REDIRECTING TO APP");
