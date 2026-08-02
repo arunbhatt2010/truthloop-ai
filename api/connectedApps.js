@@ -154,6 +154,7 @@ const redis = new Redis({
 
 const REDIRECT_URI =
   "https://truthloop.in/api/connectedApps";
+const processedStates = new Set();
 function base64url(buffer) {
     return buffer
         .toString("base64")
@@ -504,6 +505,17 @@ console.log("CALLBACK QUERY:", req.query);
 } = req.query;
 
 console.log("AUTH CODE:", code);
+  if (processedStates.has(state)) {
+
+    console.log("🚫 DUPLICATE CALLBACK BLOCKED:", state);
+
+    return res.status(200).json({
+        success: true,
+        duplicate: true
+    });
+}
+
+processedStates.add(state);
     // OAuth Provider returned an error
     if (error) {
         return res.status(400).json({
