@@ -584,7 +584,21 @@ console.log(tokenData);
 // TOKEN EXCHANGE FAILED
 // =========================================
 
+if (!tokenResponse.ok) {
 
+    return res.status(tokenResponse.status).json({
+
+        success: false,
+
+        stage: "TOKEN",
+
+        reason: tokenData.error_description || tokenData.error,
+
+        tokenData
+
+    });
+
+}
 
 /* =========================================
    FETCH USER INFO
