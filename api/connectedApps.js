@@ -504,21 +504,20 @@ console.log("CALLBACK QUERY:", req.query);
     state
 } = req.query;
 
-console.log("AUTH CODE:", code);
-  if (processedStates.has(state)) {
+if (processedStates.has(state)) {
 
-    console.log("🚫 DUPLICATE CALLBACK BLOCKED:", state);
+    console.log("🎯 DUPLICATE CALLBACK:", state);
 
     return res.status(200).json({
         success: true,
+        message: "Successfully authenticated",
         duplicate: true
     });
 }
 
 processedStates.add(state);
-  return res.redirect(
-    `/app?linkedin=connected&resume=loop6&session=${existingSessionId}`
-);
+
+console.log("AUTH CODE:", code);
     // OAuth Provider returned an error
     if (error) {
         return res.status(400).json({
