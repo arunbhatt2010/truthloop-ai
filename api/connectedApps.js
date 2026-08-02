@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { Redis } from "@upstash/redis";
+const usedCodes = new Set();
 /*
 connectedApps.js
 
@@ -505,14 +506,16 @@ console.log("CALLBACK QUERY:", req.query);
 } = req.query;
 
 if (usedCodes.has(code)) {
-    console.log("🎯 Catching Vercel auto-retry smoothly.");
+    console.log("🎯 Duplicate OAuth code blocked:", code);
+
     return res.status(200).json({
         success: true,
         message: "Successfully authenticated",
-        isRedirect: true
+        duplicate: true
     });
 }
-processedStates.add(state);
+
+usedCodes.add(code);
 
 console.log("AUTH CODE:", code);
     // OAuth Provider returned an error
