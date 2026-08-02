@@ -3136,7 +3136,9 @@ const linkedInCallback =
   }*/
   if (data.redirectUrl) {
 
-    alert(data.redirectUrl);
+    alert(data.redirectUrl);   // Testing ke liye theek hai
+
+    window.location.href = data.redirectUrl;
 
     return;
 
