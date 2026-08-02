@@ -542,20 +542,16 @@ const session =
 const body = new URLSearchParams({
   grant_type: "authorization_code",
   code,
-  redirect_uri: REDIRECT_URI,
   client_id: LINKEDIN_CLIENT_ID,
   client_secret: LINKEDIN_CLIENT_SECRET,
-  code_verifier: session.codeVerifier
+  redirect_uri: REDIRECT_URI
 });
 
 console.log({
   clientId: LINKEDIN_CLIENT_ID,
   redirectUri: REDIRECT_URI,
-  hasSecret: !!LINKEDIN_CLIENT_SECRET,
-  hasCodeVerifier: !!session.codeVerifier,
-  verifierLength: session.codeVerifier?.length
+  hasSecret: !!LINKEDIN_CLIENT_SECRET
 });
-
 console.log("BODY:");
 console.log(body.toString().replace(LINKEDIN_CLIENT_SECRET, "****"));
 
