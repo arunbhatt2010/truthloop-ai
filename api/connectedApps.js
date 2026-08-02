@@ -213,7 +213,7 @@ function createSessionId() {
 
 function cleanSessions() {
 
-    const now = Date.now();
+    /*const now = Date.now();
 
     for (const [id, session] of sessionStore) {
 
@@ -223,7 +223,7 @@ function cleanSessions() {
 
         }
 
-    }
+    }*/
 
 }
 
