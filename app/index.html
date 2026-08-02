@@ -3124,12 +3124,7 @@ const linkedInCallback =
     params.get("resume") === "loop6" &&
     !!sessionId;
 
-if (data.redirectUrl) {
 
-    window.location.href = data.redirectUrl;
-    return;
-
-  }
 function renderRestoredJourney() {
 window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
