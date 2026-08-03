@@ -2882,7 +2882,7 @@ content:data.reply
 });    
 saveJourney();    
 
-  }
+  
   mainInput.style.display="none";
 getBtn.style.display="none";
 isLoading = false;
@@ -3244,9 +3244,9 @@ fetch(`/api/connectedApps?action=session&session=${sessionId}`)
         nextBtn.innerText = "Start Loop 7";
         nextBtn.disabled = false;
 
-      //  window.history.replaceState({}, "", "/app");
+       window.history.replaceState({}, "", "/app");
 
-        //return;
+        return;
 
     } else {
 
