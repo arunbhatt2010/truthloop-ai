@@ -3194,7 +3194,15 @@ alert("restored = " + JSON.stringify(restored));
     renderRestoredJourney();
   }
 
+
 if (linkedInCallback) {
+  if (restored) {
+    loopLevel = restored.loopLevel || 6;
+    messages = restored.messages || [];
+    currentCategory = restored.currentCategory || "";
+
+    showLoop7Bridge();
+  }
 
     alert("STEP 1 - linkedinCallback entered");
 alert("Session: " + sessionId);
