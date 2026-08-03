@@ -512,13 +512,11 @@ console.log("USED BEFORE:", usedCodes.has(code));
 console.log("USED SIZE BEFORE:", usedCodes.size);
 console.log("CODE:", code);
 if (usedCodes.has(code)) {
-    console.log("🎯 Duplicate OAuth code blocked:", code);
+    console.log("Duplicate OAuth callback ignored");
 
-    return res.status(200).json({
-        success: true,
-        message: "Successfully authenticated",
-        duplicate: true
-    });
+    return res.redirect(
+        `/app?linkedin=connected&resume=loop6&session=${existingSessionId}`
+    );
 }
 
 usedCodes.add(code);
