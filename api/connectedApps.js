@@ -155,7 +155,7 @@ const redis = new Redis({
 
 const REDIRECT_URI =
   "https://truthloop.in/api/connectedApps";
-const processedStates = new Set();
+const processedStates = new Map();
 function base64url(buffer) {
     return buffer
         .toString("base64")
@@ -516,15 +516,17 @@ if (usedCodes.has(code)) {
 
     console.log("🎯 Duplicate OAuth code blocked:", code);
 
-    return res.status(200).json({
-        success: true,
-        duplicate: true
-    });
+    const existingSession = processedStates.get(state);
 
-}
+    if (existingSession) {
+        return res.redirect(
+            `/app?linkedin=connected&resume=loop6&session=${existingSession}`
+        );
+    }
 
-usedCodes.add(code);
-
+    return res.redirect("/app");
+      }
+  usedCodes.add(code);
 console.log("USED AFTER:", usedCodes.has(code));
 console.log("USED SIZE AFTER:", usedCodes.size);
 console.log("AUTH CODE:", code);
@@ -712,7 +714,7 @@ await redis.set(
   }),
   { ex: 300 }
 );
-
+processedStates.set(state, sessionId);
 console.log("SESSION STORED", sessionId);
 
 
