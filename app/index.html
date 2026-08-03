@@ -2899,12 +2899,7 @@ if (investigationSource === "public") {
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
 console.log("ABOUT TO CALL /api/chat");
 return;
-  alert(JSON.stringify({
-  investigationSource,
-  identityPackage,
-  profileLink
-}, null, 2));
-return;
+  
     const data = await fetch(API_URL,{
         method:"POST",
         headers:{
@@ -3077,7 +3072,7 @@ detectCountry();
 const MEMORY_KEY = "truthloopMemory";
 
 function saveJourney() {
-alert("Saving Loop = " + loopLevel);
+
 localStorage.setItem(
 MEMORY_KEY,
 JSON.stringify({
@@ -3093,7 +3088,7 @@ function loadJourney() {
 
 const saved = localStorage.getItem(MEMORY_KEY);
 
-alert(saved ? "MEMORY FOUND" : "MEMORY NULL");
+
 
 if(!saved) return null;
 
@@ -3134,7 +3129,7 @@ const linkedInCallback =
     params.get("linkedin") === "connected" &&
     params.get("resume") === "loop6" &&
     !!sessionId;
-alert(window.location.href);
+
 
 function renderRestoredJourney() {
 window.isRestoredJourney = true;
@@ -3198,8 +3193,6 @@ getBtn.disabled = false;
 }
 
 }
-  alert("linkedInCallback = " + linkedInCallback);
-alert("restored = " + JSON.stringify(restored));
   
   if (restored && !linkedInCallback) {
     renderRestoredJourney();
@@ -3215,42 +3208,30 @@ if (linkedInCallback) {
     showLoop7Bridge();
   }
 
-    alert("STEP 1 - linkedinCallback entered");
-alert("Session: " + sessionId);
-
+    
 fetch(`/api/connectedApps?action=session&session=${sessionId}`)
 .then(res => {
 
-    alert("STEP 2 - Fetch completed");
-    alert("HTTP Status: " + res.status);
-
+    
     return res.json();
 
 })
 .then(data => {
 
-    alert("STEP 3 - JSON parsed");
-    alert(JSON.stringify(data));
+    
 
     if (data.success) {
 
-        alert("STEP 4 - success=true");
-
-        alert("Identity Package:");
-        alert(JSON.stringify(data.identityPackage));
-
+        
     } else {
 
-        alert("STEP 4 - success=false");
-        alert(data.reason || "No reason");
-
+        
     }
 
 })
 .catch(err => {
 
-    alert("STEP ERROR");
-    alert(err.message);
+    
     console.error(err);
 
 });
