@@ -1666,6 +1666,10 @@ function showEvidence(type){
 
     switch(type){
 
+        // =========================
+        // PUBLIC
+        // =========================
+
         case "public":
 
             container.innerHTML = `
@@ -1695,234 +1699,250 @@ function showEvidence(type){
                     "
                 >
             `;
-
             break;
+
+
+        // =========================
+        // CONNECTED APPS
+        // =========================
 
         case "oauth":
 
             container.innerHTML = `
 
-            <div style="
-                margin-top:10px;
-                color:#ffffff;
-                font-size:18px;
-                font-weight:bold;
-            ">
-                🔐 Connected Apps
-            </div>
+                <div style="
+                    margin-top:10px;
+                    color:#fff;
+                    font-size:18px;
+                    font-weight:bold;
+                ">
+                    🔐 Connected Apps
+                </div>
 
-            <div style="
-                margin-top:12px;
-                line-height:1.8;
-                color:#cccccc;
-            ">
-                Connect your professional account to improve the quality of your
-                TruthLoop investigation.
-            </div>
+                <div style="
+                    margin-top:12px;
+                    color:#ccc;
+                    line-height:1.8;
+                ">
+                    Connect your professional account to improve the quality of your TruthLoop investigation.
+                </div>
 
-            <div style="
-                margin-top:18px;
-                padding:14px;
-                border-radius:12px;
-                border:1px solid rgba(255,140,0,.25);
-                background:rgba(255,140,0,.06);
-                color:#bbbbbb;
-                line-height:1.8;
-            ">
-                • LinkedIn Profile<br>
-                • Public Professional Activity<br>
-                • Career Signals<br>
-                • Public Reputation
-            </div>
+                <div style="
+                    margin-top:18px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid rgba(255,140,0,.25);
+                    background:rgba(255,140,0,.06);
+                    color:#bbb;
+                    line-height:1.8;
+                ">
+                    • LinkedIn Profile<br>
+                    • Public Professional Activity<br>
+                    • Career Signals<br>
+                    • Public Reputation
+                </div>
 
-            <button onclick="startLinkedInOAuth()">
-                Connect LinkedIn
-            </button>
+                <button onclick="
+                    window.loop7Started=true;
+                    nextBtn.style.display='block';
+                    nextBtn.innerText='Start Loop 7';
+                    nextBtn.disabled=false;
+                    startLinkedInOAuth();
+                ">
+                    Connect LinkedIn
+                </button>
 
-            <div style="
-                margin-top:14px;
-                color:#888;
-                font-size:13px;
-                text-align:center;
-            ">
-                Your account is used only with your permission.
-            </div>
+                <div style="
+                    margin-top:14px;
+                    color:#888;
+                    font-size:13px;
+                    text-align:center;
+                ">
+                    Your account is used only with your permission.
+                </div>
 
             `;
-
             break;
+
+
+        // =========================
+        // UPLOAD
+        // =========================
 
         case "upload":
 
-    container.innerHTML = `
+            container.innerHTML = `
 
-    <div style="
-        margin-top:10px;
-        color:#ffffff;
-        font-size:18px;
-        font-weight:bold;
-    ">
-        📄 Upload Files
-    </div>
+                <div style="
+                    margin-top:10px;
+                    color:#fff;
+                    font-size:18px;
+                    font-weight:bold;
+                ">
+                    📄 Upload Files
+                </div>
 
-    <div style="
-        margin-top:12px;
-        color:#cccccc;
-        line-height:1.8;
-    ">
-        Upload documents that help TruthLoop understand your situation more accurately.
-    </div>
+                <div style="
+                    margin-top:12px;
+                    color:#ccc;
+                    line-height:1.8;
+                ">
+                    Upload documents that help TruthLoop understand your situation more accurately.
+                </div>
 
-    <div style="
-        margin-top:18px;
-        padding:14px;
-        border-radius:12px;
-        border:1px solid rgba(255,140,0,.25);
-        background:rgba(255,140,0,.06);
-        color:#bbbbbb;
-        line-height:1.8;
-    ">
+                <div style="
+                    margin-top:18px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid rgba(255,140,0,.25);
+                    background:rgba(255,140,0,.06);
+                    color:#bbb;
+                    line-height:1.8;
+                ">
+                    • PDF Documents<br>
+                    • Images<br>
+                    • Screenshots<br>
+                    • Text Files
+                </div>
 
-        • PDF Documents<br>
-        • Images<br>
-        • Screenshots<br>
-        • Text Files
+                <input
+                    id="loop7FileInput"
+                    type="file"
+                    style="margin-top:18px;width:100%;"
+                    onchange="
+                        window.loop7Started=true;
+                        nextBtn.style.display='block';
+                        nextBtn.innerText='Start Loop 7';
+                        nextBtn.disabled=false;
+                    "
+                >
 
-    </div>
+                <div style="
+                    margin-top:14px;
+                    color:#888;
+                    font-size:13px;
+                    text-align:center;
+                ">
+                    Your files remain private and are only used for this investigation.
+                </div>
 
-    <input
-        id="loop7FileInput"
-        type="file"
-        style="margin-top:18px;width:100%;"
-        onchange="
-            window.loop7Started=true;
-            nextBtn.style.display='block';
-            nextBtn.innerText='Start Loop 7';
-            nextBtn.disabled=false;
-        ">
+            `;
+            break;
 
-    <div style="
-        margin-top:14px;
-        color:#888;
-        font-size:13px;
-        text-align:center;
-    ">
-        Your files remain private and are only used for this investigation.
 
-    </div>
+        // =========================
+        // BUSINESS
+        // =========================
 
-    `;
+        case "business":
 
-    break;
+            container.innerHTML = `
 
-case "business":
+                <div style="
+                    margin-top:10px;
+                    color:#fff;
+                    font-size:18px;
+                    font-weight:bold;
+                ">
+                    📊 Business Data
+                </div>
 
-    container.innerHTML = `
+                <div style="
+                    margin-top:12px;
+                    color:#ccc;
+                    line-height:1.8;
+                ">
+                    Share your business website or public business information for a deeper investigation.
+                </div>
 
-    <div style="
-        margin-top:10px;
-        color:#ffffff;
-        font-size:18px;
-        font-weight:bold;
-    ">
-        📊 Business Data
-    </div>
+                <textarea
+                    id="businessDataInput"
+                    placeholder="Website, business profile, public company information..."
+                    style="
+                        width:100%;
+                        min-height:120px;
+                        margin-top:18px;
+                        padding:12px;
+                        border-radius:10px;
+                    "
+                    oninput="
+                        window.loop7Started=true;
+                        nextBtn.style.display='block';
+                        nextBtn.innerText='Start Loop 7';
+                        nextBtn.disabled=false;
+                    "
+                ></textarea>
 
-    <div style="
-        margin-top:12px;
-        color:#cccccc;
-        line-height:1.8;
-    ">
-        Share your business website or public business information for a deeper investigation.
-    </div>
+                <div style="
+                    margin-top:14px;
+                    color:#888;
+                    font-size:13px;
+                    text-align:center;
+                ">
+                    Only publicly available business information will be analyzed.
+                </div>
 
-    <textarea
-        id="businessDataInput"
-        placeholder="Website, business profile, public company information..."
-        style="
-            width:100%;
-            min-height:120px;
-            margin-top:18px;
-            padding:12px;
-            border-radius:10px;
-        "
-        oninput="
-            window.loop7Started=true;
-            nextBtn.style.display='block';
-            nextBtn.innerText='Start Loop 7';
-            nextBtn.disabled=false;
-        ">
-    </textarea>
+            `;
+            break;
 
-    <div style="
-        margin-top:14px;
-        color:#888;
-        font-size:13px;
-        text-align:center;
-    ">
-        Only publicly available business information will be analyzed.
 
-    </div>
-
-    `;
-
-    break;
+        // =========================
+        // OTHER
+        // =========================
 
         case "other":
 
-    container.innerHTML = `
+            container.innerHTML = `
 
-    <div style="
-        margin-top:10px;
-        color:#ffffff;
-        font-size:18px;
-        font-weight:bold;
-    ">
-        ✨ Other
-    </div>
+                <div style="
+                    margin-top:10px;
+                    color:#fff;
+                    font-size:18px;
+                    font-weight:bold;
+                ">
+                    ✨ Other
+                </div>
 
-    <div style="
-        margin-top:12px;
-        color:#cccccc;
-        line-height:1.8;
-    ">
-        Share any additional public information that may help TruthLoop understand your situation better.
-    </div>
+                <div style="
+                    margin-top:12px;
+                    color:#ccc;
+                    line-height:1.8;
+                ">
+                    Share any additional public information that may help TruthLoop understand your situation better.
+                </div>
 
-    <textarea
-        id="otherEvidenceInput"
-        placeholder="Paste links, notes, references, public information..."
-        style="
-            width:100%;
-            min-height:120px;
-            margin-top:18px;
-            padding:12px;
-            border-radius:10px;
-        "
-        oninput="
-            window.loop7Started=true;
-            nextBtn.style.display='block';
-            nextBtn.innerText='Start Loop 7';
-            nextBtn.disabled=false;
-        ">
-    </textarea>
+                <textarea
+                    id="otherEvidenceInput"
+                    placeholder="Paste links, notes, references, public information..."
+                    style="
+                        width:100%;
+                        min-height:120px;
+                        margin-top:18px;
+                        padding:12px;
+                        border-radius:10px;
+                    "
+                    oninput="
+                        window.loop7Started=true;
+                        nextBtn.style.display='block';
+                        nextBtn.innerText='Start Loop 7';
+                        nextBtn.disabled=false;
+                    "
+                ></textarea>
 
-    <div style="
-        margin-top:14px;
-        color:#888;
-        font-size:13px;
-        text-align:center;
-    ">
-        Add only information you want TruthLoop to consider during the investigation.
-    </div>
+                <div style="
+                    margin-top:14px;
+                    color:#888;
+                    font-size:13px;
+                    text-align:center;
+                ">
+                    Add only information you want TruthLoop to consider during the investigation.
+                </div>
 
-    `;
-
-    break;
-
+            `;
+            break;
     }
+  }
 
-}
 function typeEffect(text){
 nextBtn.style.display = "block"
 text = text.replace(
