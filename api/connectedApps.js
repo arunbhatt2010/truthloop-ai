@@ -508,22 +508,7 @@ console.log("CALLBACK QUERY:", req.query);
     error,
     state
 } = req.query;
-console.log("USED BEFORE:", usedCodes.has(code));
-console.log("USED SIZE BEFORE:", usedCodes.size);
-console.log("CODE:", code);
-if (usedCodes.has(code)) {
-    console.log("Duplicate OAuth callback ignored");
 
-    return res.status(200).json({
-        success: true,
-        duplicate: true
-    });
-            }
-
-usedCodes.add(code);
-console.log("USED AFTER:", usedCodes.has(code));
-console.log("USED SIZE AFTER:", usedCodes.size);
-console.log("AUTH CODE:", code);
     // OAuth Provider returned an error
     if (error) {
         return res.status(400).json({
@@ -704,6 +689,18 @@ await redis.set(
 
 console.log("SESSION STORED", sessionId);
 
+// Prevent future duplicate processing
+if (usedCodes.has(code)) {
+
+    console.log("Duplicate callback after session created.");
+
+} else {
+
+    usedCodes.add(code);
+
+    console.log("OAuth code marked as processed.");
+
+}  
 const redirectUrl =
     `/app?linkedin=connected&resume=loop6&session=${sessionId}`;
 
