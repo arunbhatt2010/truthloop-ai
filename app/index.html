@@ -2899,6 +2899,12 @@ if (investigationSource === "public") {
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
 console.log("ABOUT TO CALL /api/chat");
 return;
+  alert(JSON.stringify({
+  investigationSource,
+  identityPackage,
+  profileLink
+}, null, 2));
+return;
     const data = await fetch(API_URL,{
         method:"POST",
         headers:{
@@ -2908,7 +2914,7 @@ return;
             messages,
             loopLevel,
             profileLink,
-          identityPackage,
+          investigationSource,
             paid49:payment49,
             paid199:payment199,
             currentCategory
