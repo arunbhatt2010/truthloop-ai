@@ -2887,7 +2887,7 @@ if (loopLevel === 6) {
     return;
   }
 alert("PASSED LOOP7STARTED CHECK");
-  alert("PROFILE LINK OK");
+  alert("INVESTIGATION SOURCE OK");
     const profileLink =
       
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
@@ -2902,7 +2902,9 @@ if (investigationSource === "public") {
     loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
+alert("PROFILE LINK OK");
 
+alert("ABOUT TO FETCH");
   
     const data = await fetch(API_URL,{
         method:"POST",
