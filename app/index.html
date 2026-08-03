@@ -3242,9 +3242,15 @@ fetch(`/api/connectedApps?action=session&session=${sessionId}`)
 
         renderRestoredJourney();
 
+        // Evidence complete → Enable Loop 7
+        window.loop7Started = true;
+        nextBtn.style.display = "block";
+        nextBtn.innerText = "Start Loop 7";
+        nextBtn.disabled = false;
+
         window.history.replaceState({}, "", "/app");
 
-        return;   // optional but recommended
+        return;
 
     } else {
 
@@ -3252,6 +3258,7 @@ fetch(`/api/connectedApps?action=session&session=${sessionId}`)
         alert(data.reason || "No reason");
 
     }
+
 })
 .catch(err => {
 
@@ -3260,7 +3267,6 @@ fetch(`/api/connectedApps?action=session&session=${sessionId}`)
     console.error(err);
 
 });
-}
   
   document.getElementById("hintBox").addEventListener("click", () => {
 
