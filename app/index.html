@@ -2897,7 +2897,8 @@ if (investigationSource === "public") {
     loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
-
+console.log("ABOUT TO CALL /api/chat");
+return;
     const data = await fetch(API_URL,{
         method:"POST",
         headers:{
