@@ -551,19 +551,26 @@ const session =
     typeof sessionRaw === "string"
         ? JSON.parse(sessionRaw)
         : sessionRaw;
+  if (!session.codeVerifier) {
+    return res.status(400).json({
+        success: false,
+        stage: "SESSION",
+        reason: "PKCE codeVerifier missing."
+    });
+          }
     // Continue to Token Exchange...
 /* =========================================
    EXCHANGE AUTHORIZATION CODE
 ========================================= */
 
 const body = new URLSearchParams({
-  grant_type: "authorization_code",
-  code,
-  client_id: LINKEDIN_CLIENT_ID,
-  client_secret: LINKEDIN_CLIENT_SECRET,
-  redirect_uri: REDIRECT_URI
+    grant_type: "authorization_code",
+    code,
+    client_id: LINKEDIN_CLIENT_ID,
+    client_secret: LINKEDIN_CLIENT_SECRET,
+    redirect_uri: REDIRECT_URI,
+    code_verifier: session.codeVerifier
 });
-
 console.log({
   clientId: LINKEDIN_CLIENT_ID,
   redirectUri: REDIRECT_URI,
