@@ -1686,67 +1686,73 @@ function showEvidence(type){
                         background:#111;
                         color:#fff;
                         box-sizing:border-box;
-                    ">
+                    "
+                    oninput="
+                        window.loop7Started=true;
+                        nextBtn.style.display='block';
+                        nextBtn.innerText='Start Loop 7';
+                        nextBtn.disabled=false;
+                    "
+                >
             `;
 
-            
             break;
 
         case "oauth":
 
-    container.innerHTML = `
+            container.innerHTML = `
 
-    <div style="
-        margin-top:10px;
-        color:#ffffff;
-        font-size:18px;
-        font-weight:bold;
-    ">
-        🔐 Connected Apps
-    </div>
+            <div style="
+                margin-top:10px;
+                color:#ffffff;
+                font-size:18px;
+                font-weight:bold;
+            ">
+                🔐 Connected Apps
+            </div>
 
-    <div style="
-        margin-top:12px;
-        line-height:1.8;
-        color:#cccccc;
-    ">
-        Connect your professional account to improve the quality of your
-        TruthLoop investigation.
-    </div>
+            <div style="
+                margin-top:12px;
+                line-height:1.8;
+                color:#cccccc;
+            ">
+                Connect your professional account to improve the quality of your
+                TruthLoop investigation.
+            </div>
 
-    <div style="
-        margin-top:18px;
-        padding:14px;
-        border-radius:12px;
-        border:1px solid rgba(255,140,0,.25);
-        background:rgba(255,140,0,.06);
-        color:#bbbbbb;
-        line-height:1.8;
-    ">
+            <div style="
+                margin-top:18px;
+                padding:14px;
+                border-radius:12px;
+                border:1px solid rgba(255,140,0,.25);
+                background:rgba(255,140,0,.06);
+                color:#bbbbbb;
+                line-height:1.8;
+            ">
+                • LinkedIn Profile<br>
+                • Public Professional Activity<br>
+                • Career Signals<br>
+                • Public Reputation
+            </div>
 
-        • LinkedIn Profile<br>
-        • Public Professional Activity<br>
-        • Career Signals<br>
-        • Public Reputation
+            <button onclick="startLinkedInOAuth()">
+                Connect LinkedIn
+            </button>
 
-    </div>
+            <div style="
+                margin-top:14px;
+                color:#888;
+                font-size:13px;
+                text-align:center;
+            ">
+                Your account is used only with your permission.
+            </div>
 
-    <button onclick="startLinkedInOAuth()">
-    Connect LinkedIn
-</button>
+            `;
 
-    <div style="
-        margin-top:14px;
-        color:#888;
-        font-size:13px;
-        text-align:center;
-    ">
-        Your account is used only with your permission.
-
-    </div>
-
-    `;
-
+            break;
+    }
+}
     
 
     break;
@@ -1793,7 +1799,12 @@ function showEvidence(type){
         id="loop7FileInput"
         type="file"
         style="margin-top:18px;width:100%;"
-        onchange="alert('File Upload trigger verified');">
+        onchange="
+            window.loop7Started=true;
+            nextBtn.style.display='block';
+            nextBtn.innerText='Start Loop 7';
+            nextBtn.disabled=false;
+        ">
 
     <div style="
         margin-top:14px;
@@ -1807,11 +1818,9 @@ function showEvidence(type){
 
     `;
 
-    
-
     break;
 
-        case "business":
+case "business":
 
     container.innerHTML = `
 
@@ -1842,7 +1851,12 @@ function showEvidence(type){
             padding:12px;
             border-radius:10px;
         "
-        oninput="alert('Business Data trigger verified');">
+        oninput="
+            window.loop7Started=true;
+            nextBtn.style.display='block';
+            nextBtn.innerText='Start Loop 7';
+            nextBtn.disabled=false;
+        ">
     </textarea>
 
     <div style="
@@ -1857,9 +1871,11 @@ function showEvidence(type){
 
     `;
 
+    break;
+
     
 
-    break;
+    
 
         case "other":
 
@@ -1892,7 +1908,12 @@ function showEvidence(type){
             padding:12px;
             border-radius:10px;
         "
-        oninput="alert('Other Evidence trigger verified');">
+        oninput="
+            window.loop7Started=true;
+            nextBtn.style.display='block';
+            nextBtn.innerText='Start Loop 7';
+            nextBtn.disabled=false;
+        ">
     </textarea>
 
     <div style="
@@ -1905,6 +1926,8 @@ function showEvidence(type){
     </div>
 
     `;
+
+    break;
 
     
 
