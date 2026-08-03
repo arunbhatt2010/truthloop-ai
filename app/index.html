@@ -2887,7 +2887,9 @@ if (loopLevel === 6) {
     return;
   }
 alert("PASSED LOOP7STARTED CHECK");
+  alert("PROFILE LINK OK");
     const profileLink =
+      
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
 if (investigationSource === "public") {
     investigationSource = profileLink;
@@ -2900,8 +2902,7 @@ if (investigationSource === "public") {
     loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
-console.log("ABOUT TO CALL /api/chat");
-return;
+
   
     const data = await fetch(API_URL,{
         method:"POST",
@@ -2912,7 +2913,7 @@ return;
             messages,
             loopLevel,
             profileLink,
-         // investigationSource,
+         investigationSource,
             paid49:payment49,
             paid199:payment199,
             currentCategory
