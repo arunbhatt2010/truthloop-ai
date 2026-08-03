@@ -588,7 +588,7 @@ const body = new URLSearchParams({
     client_id: LINKEDIN_CLIENT_ID,
     client_secret: LINKEDIN_CLIENT_SECRET,
     redirect_uri: REDIRECT_URI,
-    code_verifier: session.codeVerifier
+    //code_verifier: session.codeVerifier
 });
 console.log({
   clientId: LINKEDIN_CLIENT_ID,
