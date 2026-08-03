@@ -2881,18 +2881,6 @@ role:"assistant",
 content:data.reply    
 });    
 saveJourney();    
-function saveJourney() {
-
-
-
-localStorage.setItem(
-MEMORY_KEY,
-JSON.stringify({
-loopLevel,
-messages,
-currentCategory
-})
-);
 
   }
   mainInput.style.display="none";
