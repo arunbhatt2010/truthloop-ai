@@ -514,10 +514,11 @@ console.log("CODE:", code);
 if (usedCodes.has(code)) {
     console.log("Duplicate OAuth callback ignored");
 
-    return res.redirect(
-        `/app?linkedin=connected&resume=loop6&session=${existingSessionId}`
-    );
-}
+    return res.status(200).json({
+        success: true,
+        duplicate: true
+    });
+            }
 
 usedCodes.add(code);
 console.log("USED AFTER:", usedCodes.has(code));
