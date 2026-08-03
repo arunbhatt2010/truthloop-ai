@@ -724,9 +724,7 @@ console.log("================================");
 res.statusCode = 302;
 res.setHeader("Location", redirectUrl);
 return res.end();
-res.statusCode = 302;
-res.setHeader("Location", redirectUrl);
-return res.end();
+
     
 }
 
