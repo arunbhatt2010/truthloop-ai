@@ -1439,7 +1439,8 @@ loopLevel,
 paid49:payment49,    
 paid199:payment199,    
 currentCategory,
-profileLink: investigationSource  
+profileLink: investigationSource,
+investigationSource: investigationSource
 })    
 });    
     
@@ -1659,7 +1660,7 @@ More representative evidence leads to a more trustworthy investigation.
 `;
 }
 function showEvidence(type){
-
+investigationSource = type;
     const container = document.getElementById("evidenceContainer");
 
     container.style.display = "block";
@@ -2885,7 +2886,9 @@ if (loopLevel === 6) {
 
     const profileLink =
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
-investigationSource = profileLink;
+if (investigationSource === "public") {
+    investigationSource = profileLink;
+  }
     messages.push({
         role: "user",
         content: profileLink || "Continue to Loop 7"
