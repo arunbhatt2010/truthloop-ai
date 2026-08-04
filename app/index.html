@@ -1491,7 +1491,49 @@ async function generateLoop7Report(){
         alert("Please enter a public profile link.");
         return;
     }
+  const btn = document.getElementById("generateReportBtn");
 
+btn.disabled = true;
+btn.innerText = "Analyzing public evidence...";
+  const payload = {
+    profileLink,
+    loopLevel,
+    messages,
+    currentCategory,
+    paid49: payment49,
+    paid199: payment199
+};
+try {
+
+    const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+} catch (err) {
+
+    console.error(err);
+
+    alert("Unable to generate your report.");
+
+    btn.disabled = false;
+    btn.innerText = "Get Your Final Report →";
+
+    return;
+  }
+  console.log("Loop 7 Response:", data);
+
+btn.disabled = false;
+btn.innerText = "Get Your Final Report →";
+  if (!data.reply) {
+    alert("Invalid server response.");
+    return;
+      }
     // Next update:
     // DigitalFootprintBrain(profileLink)
 
