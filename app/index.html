@@ -1472,11 +1472,10 @@ Learn how TruthLoop AI protects your privacy →
 <button
 id="generateReportBtn"
 onclick="generateLoop7Report()">
-
 Get Your Final Report →
-
 </button>
 
+<div id="loop7StartContainer"></div>
 </div>
     `;
   }
@@ -1517,27 +1516,61 @@ alert("STEP 3");
 alert("STEP 4");
     data = await res.json();
 alert("STEP 5");
-  // ============================
-// LOOP 7 REPORT RENDER
-// ============================
+  document.getElementById("generateReportBtn").style.display="none";
 
-if (data.reply) {
+document.getElementById("loop7StartContainer").innerHTML=`
+<button
+id="startLoop7Btn"
+onclick="startLoop7Investigation()">
+🚀 Start Loop 7
+</button>
+`;
 
-    // Hide Start Loop 7 button
-    btn.style.display = "none";
+return;
+  async function startLoop7Investigation(){
 
-    // Hide bridge card
-    const bridge =
-        document.getElementById("loop7Bridge");
+const btn=document.getElementById("startLoop7Btn");
 
-    if (bridge) {
-        bridge.style.display = "none";
-    }
+btn.disabled=true;
 
-    renderLoop7Report(data);
+btn.innerText="Generating Investigation...";
 
-    return;
-}
+const payload={
+
+messages,
+
+loopLevel:7,
+
+currentCategory,
+
+paid49:payment49,
+
+paid199:payment199,
+
+startFinalReport:true
+
+};
+
+const res=await fetch(API_URL,{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(payload)
+
+});
+
+const data=await res.json();
+
+document.getElementById("loop7StartContainer").innerHTML="";
+document.getElementById("loop7Bridge").style.display="none";
+renderLoop7Report(data);
+return;
+              }
+
 } catch (err) {
 
     console.error(err);
