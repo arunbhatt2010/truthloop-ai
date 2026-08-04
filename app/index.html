@@ -1527,10 +1527,11 @@ onclick="startLoop7Investigation()">
 `;
 
 return;
+  }
   async function startLoop7Investigation(){
 
 const btn=document.getElementById("startLoop7Btn");
-
+try {
 btn.disabled=true;
 
 btn.innerText="Generating Investigation...";
@@ -1578,29 +1579,17 @@ if (bridge) {
 renderLoop7Report(data);
 return;
     
-
-} catch (err) {
+}
+catch (err) {
 
     console.error(err);
 
     alert("Unable to generate your report.");
 
     btn.disabled = false;
-    btn.innerText = "Get Your Final Report →";
+    btn.innerText = "🚀 Start Loop 7";
 
-    return;
-  }
-  console.log("Loop 7 Response:", data);
-alert(JSON.stringify(data));
-btn.disabled = false;
-btn.innerText = "Get Your Final Report →";
-  if (!data.reply) {
-    alert("Invalid server response.");
-    return;
-      }
-    // Next update:
-    // DigitalFootprintBrain(profileLink)
-
+    }
   
   function renderLoop7Report(data){
 
