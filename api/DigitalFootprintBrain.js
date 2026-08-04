@@ -225,7 +225,12 @@ if (hasProfileLink) {
 
 const rawPackage =
     await acquirePublicContent(urlPackage);
-
+console.log({
+    success: rawPackage.success,
+    status: rawPackage.status,
+    reason: rawPackage.reason,
+    contentType: rawPackage.contentType
+});
 const validatedPackage =
     validatePublicContent(rawPackage);
 
