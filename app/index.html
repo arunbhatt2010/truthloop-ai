@@ -1417,112 +1417,65 @@ return { reply:"Network error 😃" };
 }    
     
 /* TYPE EFFECT */
-function renderLoop7EntryBridge() {
-return `
-<div id="loop7EntryBridge"
-style="
-margin-top:20px;
-padding:18px;
-border-radius:16px;
-border:1px solid rgba(255,140,0,.25);
-background:rgba(255,140,0,.08);
-">
+<div id="loop7BridgeCard" class="bridgeCard">
 
-<div style="
-font-size:20px;
-font-weight:700;
-color:#ffb347;
-margin-bottom:14px;
-">
-🔗 Loop 7 Entry Bridge
-</div>
+<h2>🔗 Loop 7 Evidence Bridge</h2>
 
-<div style="
-font-size:14px;
-line-height:1.7;
-color:#ddd;
-">
+<p class="bridgeIntro">
+Strengthen your TruthLoop AI investigation with public evidence.
+</p>
 
-<b>Public Profile (Recommended)</b>
-
-<br><br>
-
-Add a public profile or website to help TruthLoop understand your real public footprint.
-
-<br><br>
-
-This helps TruthLoop analyze:
-
-<br><br>
-
-• Professional Identity<br>
-• Career Journey<br>
-• Public Reputation<br>
-• Expertise<br>
-• Authority<br>
-• Trust<br>
-• Audience<br>
-• Content<br>
-• Communication Style<br>
-• Business Presence<br>
-• Community Presence
-
-<br><br>
-
-<b>Supported public links</b>
-
-<br><br>
-
-• LinkedIn<br>
-• GitHub<br>
-• Portfolio<br>
-• Personal Website<br>
-• X<br>
-• Facebook<br>
-• Reddit<br>
-• YouTube<br>
-• Medium<br>
-• Substack
-
-<br><br>
-
-Paste your public profile or website:
-
-</div>
+<p class="bridgeText">
+Paste one public profile or website that best represents your work,
+ideas, or online presence.
+</p>
 
 <input
 id="loop7ProfileLink"
-type="text"
-placeholder="https://..."
-style="
-width:100%;
-margin-top:14px;
-padding:12px;
-border-radius:10px;
-border:1px solid rgba(255,140,0,.3);
-background:#111;
-color:#fff;
-box-sizing:border-box;
-">
+type="url"
+placeholder="https://linkedin.com/in/... or any public profile"
+/>
 
-<div style="
-margin-top:14px;
-font-size:12px;
-line-height:1.6;
-color:#999;
-">
+<p class="bridgeExamples">
+Examples:
+LinkedIn • Facebook • Instagram • X • GitHub • YouTube • Personal Website • Portfolio • Blog
+</p>
 
-TruthLoop analyzes only publicly available information from the link you provide.
+<div class="privacyNote">
 
-Providing a profile is recommended because it improves the accuracy of your personalized Loop 7 report.
+<p>
+TruthLoop AI analyzes only publicly available information that you choose
+to share.
+</p>
 
-If you prefer, you can continue without adding one.
+<p>
+No passwords. No private messages. No hidden account data.
+</p>
 
 </div>
 
+<div class="connectedPrivacy">
+
+<a
+href="/connected-apps-privacy.html"
+target="_blank"
+rel="noopener">
+
+Learn how TruthLoop AI protects your privacy →
+
+</a>
+
 </div>
-`;
-  }
+
+<button
+id="generateReportBtn"
+onclick="generateLoop7Report()">
+
+Get Your Final Report →
+
+</button>
+
+</div>
 function typeEffect(text){
 
 text = text.replace(
