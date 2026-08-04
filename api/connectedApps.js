@@ -655,7 +655,36 @@ const userResponse = await fetch(
 );
 
 const userInfo = await userResponse.json();
+let profileLink = null;
 
+try {
+
+    const profileResponse = await fetch(
+        "https://api.linkedin.com/v2/me",
+        {
+            headers: {
+                Authorization: `Bearer ${tokenData.access_token}`
+            }
+        }
+    );
+
+    console.log("PROFILE API STATUS:", profileResponse.status);
+
+    const profileData = await profileResponse.json();
+
+    console.log("PROFILE API DATA:", profileData);
+
+    profileLink =
+        profileData.publicProfileUrl ||
+        profileData.vanityName ||
+        profileData.profileUrl ||
+        null;
+
+} catch (err) {
+
+    console.log("PROFILE API ERROR:", err.message);
+
+          }
 console.log("USER INFO STATUS", userResponse.status);
 console.log("USER INFO", userInfo);
 console.log(
@@ -691,6 +720,7 @@ const identityPackage = {
     email: userInfo.email,
 
     picture: userInfo.picture,
+  profileLink,
 
     locale: userInfo.locale,
 
