@@ -1517,6 +1517,27 @@ alert("STEP 3");
 alert("STEP 4");
     data = await res.json();
 alert("STEP 5");
+  // ============================
+// LOOP 7 REPORT RENDER
+// ============================
+
+if (data.reply) {
+
+    // Hide Start Loop 7 button
+    btn.style.display = "none";
+
+    // Hide bridge card
+    const bridge =
+        document.getElementById("loop7Bridge");
+
+    if (bridge) {
+        bridge.style.display = "none";
+    }
+
+    renderLoop7Report(data);
+
+    return;
+}
 } catch (err) {
 
     console.error(err);
@@ -1540,6 +1561,58 @@ btn.innerText = "Get Your Final Report →";
     // DigitalFootprintBrain(profileLink)
 
   }
+  function renderLoop7Report(data){
+
+    const report = `
+    <div class="truthLoopReport">
+
+        <h3>📋 Investigation Summary</h3>
+        <p>${data.analysis || data.reply || "Not available."}</p>
+
+        <h3>🧠 Behavioral Findings</h3>
+        <p>${data.behavioralFindings || "Not available."}</p>
+
+        <h3>🔍 Hidden Mechanism</h3>
+        <p>${data.hiddenMechanism || "Not available."}</p>
+
+        <h3>🌐 Public Evidence</h3>
+        <p>${data.publicEvidence || "No verified public evidence available."}</p>
+
+        <h3>🔗 Cross Evidence</h3>
+        <p>${data.crossEvidence || "Not available."}</p>
+
+        <h3>📊 Evidence Confidence</h3>
+        <p>${data.evidenceConfidence || "Pending verification."}</p>
+
+        <h3>💭 Final Reflection</h3>
+        <p>${data.finalReflection || data.reply || ""}</p>
+
+        <h3>➡️ One Next Action</h3>
+        <p>${data.oneNextAction || "Continue your TruthLoop investigation."}</p>
+
+    </div>
+    `;
+
+    typeEffect(report);
+
+    createDownloadButton();
+
+  }
+  function createDownloadButton(){
+
+    const btn = document.createElement("button");
+
+    btn.innerText = "⬇ Download Report";
+
+    btn.className = "primaryBtn";
+
+    btn.onclick = () => {
+        window.print();
+    };
+
+    outputBox.appendChild(btn);
+
+             }
 function typeEffect(text){
 
 text = text.replace(
