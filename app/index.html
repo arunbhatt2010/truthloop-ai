@@ -1504,6 +1504,7 @@ btn.innerText = "Analyzing public evidence...";
     paid49: payment49,
     paid199: payment199
 };
+  let data;
 try {
 alert("STEP 3");
     const res = await fetch(API_URL, {
@@ -1514,7 +1515,7 @@ alert("STEP 3");
         body: JSON.stringify(payload)
     });
 alert("STEP 4");
-    const data = await res.json();
+    data = await res.json();
 alert("STEP 5");
 } catch (err) {
 
