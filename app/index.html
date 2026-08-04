@@ -1419,7 +1419,7 @@ return { reply:"Network error 😃" };
 /* TYPE EFFECT */
   function renderLoop7EntryBridge() {
     return `
-       <div id="loop7Bridge" class="bridgeCard">
+       <div id="loop7BridgeCard" class="bridgeCard">
 
 <h2>🔗 Loop 7 Evidence Bridge</h2>
 
@@ -1563,13 +1563,21 @@ body:JSON.stringify(payload)
 
 });
 
-const data=await res.json();
+const data = await res.json();
 
-document.getElementById("loop7StartContainer").innerHTML="";
-document.getElementById("loop7Bridge").style.display="none";
+document.getElementById("loop7StartContainer").innerHTML = "";
+
+const bridge =
+    document.getElementById("loop7BridgeCard") ||
+    document.getElementById("loop7Bridge");
+
+if (bridge) {
+    bridge.style.display = "none";
+}
+
 renderLoop7Report(data);
 return;
-              }
+    
 
 } catch (err) {
 
