@@ -1417,7 +1417,9 @@ return { reply:"Network error 😃" };
 }    
     
 /* TYPE EFFECT */
-<div id="loop7BridgeCard" class="bridgeCard">
+  function renderLoop7EntryBridge() {
+    return `
+       <div id="loop7BridgeCard" class="bridgeCard">
 
 <h2>🔗 Loop 7 Evidence Bridge</h2>
 
@@ -1476,6 +1478,24 @@ Get Your Final Report →
 </button>
 
 </div>
+    `;
+  }
+async function generateLoop7Report(){
+
+    const profileLink = document
+        .getElementById("loop7ProfileLink")
+        .value
+        .trim();
+
+    if(!profileLink){
+        alert("Please enter a public profile link.");
+        return;
+    }
+
+    // Next update:
+    // DigitalFootprintBrain(profileLink)
+
+  }
 function typeEffect(text){
 
 text = text.replace(
