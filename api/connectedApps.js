@@ -658,7 +658,10 @@ const userInfo = await userResponse.json();
 
 console.log("USER INFO STATUS", userResponse.status);
 console.log("USER INFO", userInfo);
-
+console.log(
+    "USER INFO RAW",
+    JSON.stringify(userInfo, null, 2)
+);
 if (!userResponse.ok) {
 
     return res.status(userResponse.status).json({
