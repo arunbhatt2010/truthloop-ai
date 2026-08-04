@@ -501,6 +501,12 @@ if (loopLevel === 7 && profileLink.trim()) {
 await loadDigitalFootprintBrain({
     profileLink
 });
+    console.log("PROFILE LINK:", profileLink);
+
+console.log(
+  "PUBLIC EVIDENCE:",
+  JSON.stringify(publicEvidencePackage, null, 2)
+);
 console.log(
     "PUBLIC_EVIDENCE_PACKAGE",
     JSON.stringify(publicEvidencePackage, null, 2)
