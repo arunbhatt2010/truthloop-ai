@@ -3227,7 +3227,13 @@ fetch(`/api/connectedApps?action=session&session=${sessionId}`)
     
 
     if (data.success) {
+window.identityPackage = data.identityPackage;
 
+if (data.identityPackage?.profileLink) {
+    investigationSource = data.identityPackage.profileLink;
+}
+
+console.log("Extracted Profile Link:", investigationSource);
         
     } else {
 
