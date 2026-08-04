@@ -1529,7 +1529,7 @@ alert("STEP 5");
     return;
   }
   console.log("Loop 7 Response:", data);
-alert(data.reply);
+alert(JSON.stringify(data));
 btn.disabled = false;
 btn.innerText = "Get Your Final Report →";
   if (!data.reply) {
