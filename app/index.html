@@ -1479,46 +1479,59 @@ Get Your Final Report →
 </div>
     `;
   }
-async function generateLoop7Report(){
-alert("STEP 1");
+async function generateLoop7Report() {
+
+    alert("STEP 1");
+
     const profileLink = document
         .getElementById("loop7ProfileLink")
         .value
         .trim();
 
-    if(!profileLink){
+    if (!profileLink) {
         alert("Please enter a public profile link.");
         return;
     }
-  alert("STEP 2");
-  const btn = document.getElementById("generateReportBtn");
 
-btn.disabled = true;
-btn.innerText = "Analyzing public evidence...";
-  const payload = {
-    profileLink,
-    loopLevel: 7,
-    messages,
-    currentCategory,
-    paid49: payment49,
-    paid199: payment199
-};
-  let data;
-try {
-alert("STEP 3");
-    const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    });
-alert("STEP 4");
-    data = await res.json();
-alert("STEP 5");
-  document.getElementById("generateReportBtn").style.display="none";
+    alert("STEP 2");
 
-document.getElementById("loop7StartContainer").innerHTML=`
+    const btn = document.getElementById("generateReportBtn");
+
+    btn.disabled = true;
+    btn.innerText = "Analyzing public evidence...";
+
+    const payload = {
+        profileLink,
+        loopLevel: 7,
+        messages,
+        currentCategory,
+        paid49: payment49,
+        paid199: payment199
+    };
+
+    try {
+
+        alert("STEP 3");
+
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        alert("STEP 4");
+
+        const data = await res.json();
+
+        alert("STEP 5");
+
+        console.log("Public Evidence:", data);
+
+        document.getElementById("generateReportBtn").style.display = "none";
+
+        document.getElementById("loop7StartContainer").innerHTML = `
 <button
 id="startLoop7Btn"
 onclick="startLoop7Investigation()">
@@ -1526,70 +1539,71 @@ onclick="startLoop7Investigation()">
 </button>
 `;
 
-return;
-  }
-  async function startLoop7Investigation(){
+        return;
 
-const btn=document.getElementById("startLoop7Btn");
-try {
-btn.disabled=true;
+    } catch (err) {
 
-btn.innerText="Generating Investigation...";
+        console.error(err);
 
-const payload={
+        alert("Unable to generate public evidence.");
 
-messages,
-
-loopLevel:7,
-
-currentCategory,
-
-paid49:payment49,
-
-paid199:payment199,
-
-startFinalReport:true
-
-};
-
-const res=await fetch(API_URL,{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify(payload)
-
-});
-
-const data = await res.json();
-
-document.getElementById("loop7StartContainer").innerHTML = "";
-
-const bridge =
-    document.getElementById("loop7BridgeCard") ||
-    document.getElementById("loop7Bridge");
-
-if (bridge) {
-    bridge.style.display = "none";
-}
-
-renderLoop7Report(data);
-return;
-    
-}
-catch (err) {
-
-    console.error(err);
-
-    alert("Unable to generate your report.");
-
-    btn.disabled = false;
-    btn.innerText = "🚀 Start Loop 7";
+        btn.disabled = false;
+        btn.innerText = "Get Your Final Report →";
 
     }
+
+}
+async function startLoop7Investigation() {
+
+    const btn = document.getElementById("startLoop7Btn");
+
+    try {
+
+        btn.disabled = true;
+        btn.innerText = "Generating Investigation...";
+
+        const payload = {
+            messages,
+            loopLevel: 7,
+            currentCategory,
+            paid49: payment49,
+            paid199: payment199,
+            startFinalReport: true
+        };
+
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+      alert(JSON.stringify(data));
+
+        document.getElementById("loop7StartContainer").innerHTML = "";
+
+        const bridge =
+            document.getElementById("loop7BridgeCard") ||
+            document.getElementById("loop7Bridge");
+
+        if (bridge) {
+            bridge.remove();   // hide ki jagah remove
+        }
+
+        renderLoop7Report(data);
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Unable to generate your report.");
+
+        btn.disabled = false;
+        btn.innerText = "🚀 Start Loop 7";
+    }
+}
   
   function renderLoop7Report(data){
 
@@ -1622,10 +1636,10 @@ catch (err) {
 
     </div>
     `;
+outputBox.innerHTML = report;
+createDownloadButton();
+  //  typeEffect(report);
 
-    typeEffect(report);
-
-    createDownloadButton();
 
   }
   function createDownloadButton(){
