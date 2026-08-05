@@ -2700,8 +2700,8 @@ if (isLoading) return;
   }
 if (loopLevel === 6) {
   if (!window.loop7Started) {
-    window.loop7Started = true;
-    nextBtn.innerText = "Get Your Final Report →";
+    nextBtn.style.display = "block";
+nextBtn.innerText = "Get Your Final Report →";
     //return;
   }
 
@@ -2715,7 +2715,11 @@ investigationSource = profileLink;
 reflectionInput.style.display = "none";
 nextBtn.style.display = "none";
 
-outputBox.innerHTML += renderLoop7EntryBridge();
+if (!document.getElementById("loop7Bridge")) {
+
+    outputBox.innerHTML += renderLoop7EntryBridge();
+
+  }
 
 await saveJourney();
     loopLevel = 7;
