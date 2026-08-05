@@ -1501,13 +1501,21 @@ async function generateLoop7Report() {
     btn.innerText = "Analyzing public evidence...";
 
     const payload = {
-        profileLink,
-        loopLevel: 7,
-        messages,
-        currentCategory,
-        paid49: payment49,
-        paid199: payment199
-    };
+    profileLink,
+    investigationSource: profileLink,
+
+    businessData: "",
+    otherEvidence: "",
+    uploadedFiles: [],
+    connectedApps: null,
+    identityPackage: null,
+
+    loopLevel: 7,
+    messages,
+    currentCategory,
+    paid49: payment49,
+    paid199: payment199
+};
 
     try {
 
@@ -1561,13 +1569,18 @@ alert("START LOOP 7 CLICKED");
 
         btn.disabled = true;
         btn.innerText = "Generating Investigation...";
-
+const profileLink =
+document.getElementById("loop7ProfileLink")
+?.value
+.trim();
         const payload = {
             messages,
             loopLevel: 7,
             currentCategory,
             paid49: payment49,
             paid199: payment199,
+          profileLink,
+investigationSource: profileLink,
             startFinalReport: true
         };
 
@@ -1580,7 +1593,7 @@ alert("START LOOP 7 CLICKED");
         });
 
         const data = await res.json();
-      alert(JSON.stringify(data));
+     // alert(JSON.stringify(data));
 
         document.getElementById("loop7StartContainer").innerHTML = "";
 
