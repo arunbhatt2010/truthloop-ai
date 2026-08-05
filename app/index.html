@@ -2879,18 +2879,6 @@ if (loopLevel === 6) {
 
     typeEffect(data.reply);
 
-    setTimeout(() => {
-
-        if (!document.getElementById("loop7EntryBridge")) {
-            outputBox.innerHTML += renderLoop7EntryBridge();
-        }
-
-        // Type effect ke baad hi global controls hide karo
-        reflectionInput.style.display = "none";
-        nextBtn.style.display = "none";
-
-    }, 400);
-
     isLoading = false;
     nextBtn.disabled = false;
 
