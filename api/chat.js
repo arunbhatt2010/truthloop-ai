@@ -569,7 +569,7 @@ await loadDigitalFootprintBrain({
     currentLoop: 7
 
 });
-    reply = JSON.stringify(result, null, 2);
+    reply = JSON.stringify(publicEvidencePackage, null, 2);
    console.log("<<<<<<<< EXIT DIGITAL FOOTPRINT >>>>>>>>");
 console.log(JSON.stringify(publicEvidencePackage, null, 2)); 
     /* =========================
