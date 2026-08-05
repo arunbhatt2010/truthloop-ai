@@ -1805,19 +1805,22 @@ ${lastQuestion}
 
 div.innerHTML = finalHtml;
 
-if (loopLevel === 6) {
+if (loopLevel < 7) {
+
+    reflectionInput.style.display = "block";
+    nextBtn.style.display = "block";
+
+}
+
+if (loopLevel === 7) {
 
     div.innerHTML += renderLoop7EntryBridge();
 
     reflectionInput.style.display = "none";
 
-    nextBtn.innerText = window.loop7Started
-        ? "Get Your Final Report →"
-        : "Start Loop 7";
+    nextBtn.style.display = "block";
+    nextBtn.innerText = "Get Your Final Report →";
 
-} else {
-
-    reflectionInput.style.display = "block";
   }
 setTimeout(()=>{
     // reflectionInput.focus();
