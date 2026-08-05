@@ -1805,21 +1805,19 @@ ${lastQuestion}
 
 div.innerHTML = finalHtml;
 
-if (loopLevel < 7) {
+if (loopLevel <= 6){
 
-    reflectionInput.style.display = "block";
-    nextBtn.style.display = "block";
+    reflectionInput.style.display="block";
+    nextBtn.style.display="block";
 
 }
 
-if (loopLevel === 7) {
+if(loopLevel===7){
+
+    reflectionInput.style.display="none";
+    nextBtn.style.display="none";
 
     div.innerHTML += renderLoop7EntryBridge();
-
-    reflectionInput.style.display = "none";
-
-    nextBtn.style.display = "block";
-    nextBtn.innerText = "Get Your Final Report →";
 
   }
 setTimeout(()=>{
@@ -2691,7 +2689,7 @@ if (loopLevel === 6) {
   if (!window.loop7Started) {
     window.loop7Started = true;
     nextBtn.innerText = "Get Your Final Report →";
-    return;
+    //return;
   }
 
     const profileLink =
