@@ -586,7 +586,7 @@ if (publicEvidencePackage) {
     let loop7Instruction = "";
 
 if (loopLevel === 7 && startFinalReport) {
-
+console.log("LOOP 7 FINAL REPORT MODE");
 loop7Instruction = `
 
 LOOP 7 MODE
