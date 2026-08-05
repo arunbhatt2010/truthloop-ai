@@ -2865,14 +2865,23 @@ content:data.reply
 });    
 saveJourney();
 
-if (loopLevel >= 7) {
+if (loopLevel === 7) {
 
     typeEffect(data.reply);
-} else {
 
-    typeEffect(data.reply);
+    outputBox.innerHTML += renderLoop7EntryBridge();
+
+    reflectionInput.style.display = "none";
+    nextBtn.style.display = "none";
+
+    isLoading = false;
+    nextBtn.disabled = false;
+
+    return;
 
 }
+
+typeEffect(data.reply);
 
 try{
     // showShareCard(data.reply);
