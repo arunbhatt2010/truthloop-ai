@@ -40,7 +40,8 @@ export default async function handler(req, res) {
   shownLoop5 = [],
   currentCategory = "",
   profileLink = "",
-  identityPackage = null
+  identityPackage = null,
+      startFinalReport = false
 } = body;
 /* =========================
    🧪 TEMP DEV GATE
@@ -584,7 +585,7 @@ if (publicEvidencePackage) {
           }
     let loop7Instruction = "";
 
-if (loopLevel === 7) {
+if (loopLevel === 7 && startFinalReport) {
 
 loop7Instruction = `
 
