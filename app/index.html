@@ -2685,6 +2685,19 @@ getBtn.disabled = false;
 nextBtn.onclick=async()=>{
 
 if (isLoading) return;
+  if (window.loop7Evidence && !window.loop7Started) {
+
+    window.loop7Started = true;
+
+    latestTruthLoopReport = window.loop7Evidence.reply || window.loop7Evidence.data?.reply;
+
+    outputBox.innerHTML = renderLoop7Report(latestTruthLoopReport);
+
+    nextBtn.style.display = "none";
+    reflectionInput.style.display = "none";
+
+    return;
+  }
 if (loopLevel === 6) {
   if (!window.loop7Started) {
     window.loop7Started = true;
@@ -2699,11 +2712,23 @@ investigationSource = profileLink;
         role: "user",
         content: profileLink || "Continue to Loop 7"
     });
+reflectionInput.style.display = "none";
+nextBtn.style.display = "none";
 
+outputBox.innerHTML += renderLoop7EntryBridge();
+
+await saveJourney();
     loopLevel = 7;
 
     document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
+if (!profileLink.trim()) {
 
+    isLoading = false;
+    nextBtn.disabled = false;
+
+    return;
+
+  }
     const data = await fetch(API_URL,{
         method:"POST",
         headers:{
@@ -2723,7 +2748,18 @@ investigationSource = profileLink;
     role: "assistant",
     content: data.reply
 });
+if (data.success && data.evidence) {
 
+    window.loop7Evidence = data;
+
+    nextBtn.style.display = "block";
+    nextBtn.innerText = "🚀 Start Loop 7";
+
+    isLoading = false;
+    nextBtn.disabled = false;
+
+    return;
+  }
 if (data.reply.includes("📋")) {
   
   latestTruthLoopReport = data.reply;
