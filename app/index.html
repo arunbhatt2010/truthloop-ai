@@ -2726,6 +2726,7 @@ nextBtn.onclick = async () => {
         return;
   }
 if (loopLevel === 6) {
+  if (document.getElementById("loop7EntryBridge")) return;
   if (!window.loop7Started) {
     nextBtn.style.display = "block";
 nextBtn.innerText = "Get Your Final Report →";
@@ -2782,7 +2783,8 @@ if (!profileLink.trim()) {
 if (data.success && data.evidence) {
 
     window.loop7Evidence = data;
-window.loop7Started = true;
+    window.loop7Started = false;
+
     nextBtn.style.display = "block";
     nextBtn.innerText = "🚀 Start Loop 7";
 
@@ -2790,7 +2792,7 @@ window.loop7Started = true;
     nextBtn.disabled = false;
 
     return;
-  }
+}
 if (data.reply.includes("📋")) {
   
   latestTruthLoopReport = data.reply;
@@ -2859,20 +2861,27 @@ loopLevel===5 ? 49 : 199
 return;
   }
     
-messages.push({    
-role:"assistant",    
-content:data.reply    
-});    
+messages.push({
+    role:"assistant",
+    content:data.reply
+});
+
 saveJourney();
 
-if (loopLevel === 7) {
+if (loopLevel === 6) {
 
     typeEffect(data.reply);
 
-    outputBox.innerHTML += renderLoop7EntryBridge();
-
     reflectionInput.style.display = "none";
     nextBtn.style.display = "none";
+
+    setTimeout(() => {
+
+        if (!document.getElementById("loop7EntryBridge")) {
+            outputBox.innerHTML += renderLoop7EntryBridge();
+        }
+
+    }, 100);
 
     isLoading = false;
     nextBtn.disabled = false;
