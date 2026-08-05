@@ -1655,7 +1655,7 @@ ${corePrompt}
 ${investigationRules}
 
 ${loopRules}
-
+${loop7Instruction}
 ${outputRules}
 
 ${finalReview}
