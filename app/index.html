@@ -2892,7 +2892,7 @@ investigationSource = profileLink;
             currentCategory
         })
     }).then(r=>r.json());
-console.log("PROFILE UPDATE:", {
+/* console.log("PROFILE UPDATE:", {
   primaryLoop: data.primaryLoop,
   emotionalDriver: data.emotionalDriver,
   avoidanceStyle: data.avoidanceStyle,
@@ -2911,7 +2911,7 @@ document.getElementById("profileAvoidance").innerText =
 "Avoidance Style: " + (data.avoidanceStyle || "—");
 
 document.getElementById("profileBelief").innerText =
-"Underlying Belief: " + (data.hiddenAssumption || "—");
+"Underlying Belief: " + (data.hiddenAssumption || "—");*/
     messages.push({
     role: "assistant",
     content: data.reply
@@ -2969,7 +2969,19 @@ ${text}<br><br>
 outputBox.appendChild(userReply);
 
 const data=await callAPI();    
+console.log("CALL API RESULT:", data);
+document.getElementById("patternProfile").style.display = "block";
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: " + (data.primaryLoop || "--");
 
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: " + (data.emotionalDriver || "--");
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: " + (data.avoidanceStyle || "--");
+
+document.getElementById("profileBelief").innerText =
+"Underlying Belief: " + (data.hiddenAssumption || "--");
 if(data.paywall){
 
 nextBtn.style.display="none";
