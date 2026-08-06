@@ -3134,9 +3134,10 @@ return JSON.parse(saved);
 
 function clearJourney() {
 
-localStorage.removeItem(MEMORY_KEY);
+    localStorage.removeItem(MEMORY_KEY);
 
-  }
+}
+
 function showLoop7Bridge() {
 
     document.getElementById("loopIndicator").innerText =
@@ -3149,41 +3150,39 @@ function showLoop7Bridge() {
         div.innerHTML += renderLoop7EntryBridge();
     }
 
-    
-
     // Restore normal Loop 6 progression
     nextBtn.style.display = "block";
     nextBtn.innerText = "Start Loop 7";
 
     div.scrollTop = div.scrollHeight;
-   }
+}
+
 const restored = loadJourney();
 
+if (restored) {
 
-        // Restore previous Loop 7 session
-// Restore previous Loop 7 session
-loopLevel = Number(restored.loopLevel ?? 1);
-messages = Array.isArray(restored.messages) ? restored.messages : [];
-currentCategory = restored.currentCategory ?? "";
-investigationSource = restored.investigationSource ?? "";
-waitingForLoop7Bridge = true;
+    window.isRestoredJourney = true;
 
-// User has NOT started Digital Footprint yet
-window.loop7Started = false;
+    loopLevel = Number(restored.loopLevel ?? 1);
+    messages = Array.isArray(restored.messages)
+        ? restored.messages
+        : [];
 
-saveJourney();
+    currentCategory = restored.currentCategory ?? "";
+    investigationSource = restored.investigationSource ?? "";
+    waitingForLoop7Bridge = true;
 
-document.getElementById("restoreScreen").style.display = "none";
-document.getElementById("mainApp").style.display = "block";
+    // User has NOT started Digital Footprint yet
+    window.loop7Started = false;
 
+    saveJourney();
 
-renderRestoredJourney();
+    document.getElementById("restoreScreen").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
 
-window.history.replaceState({}, document.title, "/app");
-// return;
+    renderRestoredJourney();
 
-    }
-  
+    window.history.replaceState({}, document.title, "/app");
 }
   function renderRestoredJourney() {
 
