@@ -2968,7 +2968,13 @@ ${text}<br><br>
 
 outputBox.appendChild(userReply);
 
-const data=await callAPI();    
+const data=await callAPI();  
+  alert(JSON.stringify({
+  primaryLoop: data.primaryLoop,
+  emotionalDriver: data.emotionalDriver,
+  avoidanceStyle: data.avoidanceStyle,
+  hiddenAssumption: data.hiddenAssumption
+}, null, 2));
 console.log("CALL API RESULT:", data);
 document.getElementById("patternProfile").style.display = "block";
 document.getElementById("profilePrimary").innerText =
