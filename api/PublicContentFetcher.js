@@ -661,6 +661,163 @@ if (result.hasReadableContent) {
     return result;
 
 }
+
+export function discoverPublicSignals(extractedPackage) {
+
+    const result = {
+
+        success: false,
+
+        sourceType: extractedPackage?.sourceType || "PublicEvidence",
+
+        evidenceStandard: extractedPackage?.evidenceStandard || "TES-1.0",
+
+        collectionWindow: extractedPackage?.collectionWindow || "90 Days",
+
+        publicSignals: [],
+
+        missingSignals: [],
+
+        evidenceCoverage:
+            extractedPackage?.evidenceCoverage || {},
+
+        traceability:
+            extractedPackage?.traceability || [],
+
+        reason: null
+
+    };
+
+    if (!extractedPackage?.success) {
+
+        result.reason =
+            "Public content extraction failed.";
+
+        return result;
+
+    }
+// Profile Identity Signals
+
+if (extractedPackage.title) {
+
+    result.publicSignals.push({
+
+        category: "identity",
+
+        type: "title",
+
+        value: extractedPackage.title,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.description) {
+
+    result.publicSignals.push({
+
+        category: "identity",
+
+        type: "description",
+
+        value: extractedPackage.description,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.language) {
+
+    result.publicSignals.push({
+
+        category: "identity",
+
+        type: "language",
+
+        value: extractedPackage.language,
+
+        verified: true
+
+    });
+
+    }
+    // Content Signals
+
+if (extractedPackage.headings?.length) {
+
+    result.publicSignals.push({
+
+        category: "content",
+
+        type: "headings",
+
+        count: extractedPackage.headings.length,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.hasReadableContent) {
+
+    result.publicSignals.push({
+
+        category: "content",
+
+        type: "visibleText",
+
+        length: extractedPackage.visibleTextLength,
+
+        quality: extractedPackage.extractionQuality,
+
+        verified: true
+
+    });
+
+        }
+    // Structure Signals
+
+if (extractedPackage.links?.length) {
+
+    result.publicSignals.push({
+
+        category: "structure",
+
+        type: "links",
+
+        count: extractedPackage.links.length,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.images?.length) {
+
+    result.publicSignals.push({
+
+        category: "structure",
+
+        type: "images",
+
+        count: extractedPackage.images.length,
+
+        verified: true
+
+    });
+
+        }
+    result.success = true;
+
+    return result;
+
+        }
 /*
 ==============================================================
 BLOCK 3
