@@ -1771,7 +1771,10 @@ try {
 
         ],
         temperature: 0.3,
-        max_tokens: 120
+        max_tokens: 120,
+        response_format: {
+  type: "json_object"
+        }
       })
     }
   );
@@ -1828,10 +1831,12 @@ let hiddenAssumption = "";
 
 try{
 
-const profile =
-JSON.parse(
-profileData?.choices?.[0]?.message?.content || "{}"
-);
+const rawProfile =
+  profileData?.choices?.[0]?.message?.content || "{}";
+
+console.log("PROFILE RAW:", rawProfile);
+
+const profile = JSON.parse(rawProfile);
 
 primaryLoop =
 profile.primaryLoop || "";
