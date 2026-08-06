@@ -641,7 +641,7 @@ export function discoverPublicSignals(extractedPackage) {
 if (extractedPackage.title) {
     result.publicSignals.push({
         type: "title",
-        extractedPackage.title,
+        value: extractedPackage.title,
         verified: true
     });
 } else {
@@ -651,174 +651,132 @@ if (extractedPackage.title) {
 if (extractedPackage.description) {
     result.publicSignals.push({
         type: "description",
-        extractedPackage.description,
+        value: extractedPackage.description,
         verified: true
     });
 } else {
     result.missingSignals.push("description");
 }
 
-if (result.headings.length) {
+if (extractedPackage.headings?.length) {
     result.publicSignals.push({
         type: "headings",
-        count: result.headings.length,
+        count: extractedPackage.headings.length,
         verified: true
     });
 } else {
     result.missingSignals.push("headings");
-    }
-if (result.links.length) {
+}
+
+if (extractedPackage.links?.length) {
     result.publicSignals.push({
         type: "links",
-        count: result.links.length,
+        count: extractedPackage.links.length,
         verified: true
     });
 } else {
     result.missingSignals.push("links");
 }
 
-if (result.images.length) {
+if (extractedPackage.images?.length) {
     result.publicSignals.push({
         type: "images",
-        count: result.images.length,
+        count: extractedPackage.images.length,
         verified: true
     });
 } else {
     result.missingSignals.push("images");
 }
 
-if (result.hasReadableContent) {
+if (extractedPackage.hasReadableContent) {
     result.publicSignals.push({
         type: "visibleText",
-        length: result.visibleTextLength,
-        quality: result.extractionQuality,
+        length: extractedPackage.visibleTextLength,
+        quality: extractedPackage.extractionQuality,
         verified: true
     });
 } else {
     result.missingSignals.push("visibleText");
-}
-// Profile Identity Signals
+    }
+
+// Identity Signals
 
 if (extractedPackage.title) {
-
     result.publicSignals.push({
-
         category: "identity",
-
         type: "title",
-
         value: extractedPackage.title,
-
         verified: true
-
     });
-
 }
 
 if (extractedPackage.description) {
-
     result.publicSignals.push({
-
         category: "identity",
-
         type: "description",
-
         value: extractedPackage.description,
-
         verified: true
-
     });
-
 }
 
 if (extractedPackage.language) {
-
     result.publicSignals.push({
-
         category: "identity",
-
         type: "language",
-
         value: extractedPackage.language,
-
         verified: true
-
     });
+}
 
-    }
-    // Content Signals
+// Content Signals
 
 if (extractedPackage.headings?.length) {
-
     result.publicSignals.push({
-
         category: "content",
-
         type: "headings",
-
         count: extractedPackage.headings.length,
-
         verified: true
-
     });
-
 }
 
 if (extractedPackage.hasReadableContent) {
-
     result.publicSignals.push({
-
         category: "content",
-
         type: "visibleText",
-
         length: extractedPackage.visibleTextLength,
-
         quality: extractedPackage.extractionQuality,
-
         verified: true
-
     });
+    }
 
-        }
+
     // Structure Signals
 
 if (extractedPackage.links?.length) {
-
     result.publicSignals.push({
-
         category: "structure",
-
         type: "links",
-
         count: extractedPackage.links.length,
-
         verified: true
-
     });
-
 }
 
 if (extractedPackage.images?.length) {
-
     result.publicSignals.push({
-
         category: "structure",
-
         type: "images",
-
         count: extractedPackage.images.length,
-
         verified: true
-
     });
+}
 
-        }
-    result.success = true;
+result.success = true;
 
-    return result;
+return result;
 
-        }
+}
+
+
 /*
 ==============================================================
 BLOCK 3
