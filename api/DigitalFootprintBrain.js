@@ -4,6 +4,9 @@ import {
     validatePublicContent,
     cleanPublicContent,
     extractPublicContent,
+    normalizePublicEvidence,
+    mergePublicEvidence,
+    discoverPublicSignals,
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
 import {
@@ -235,12 +238,34 @@ const cleanPackage =
 const extractedPackage =
     extractPublicContent(cleanPackage);
 
+const normalizedPackage =
+    normalizePublicEvidence(extractedPackage);
+
+const mergedPackage =
+    mergePublicEvidence(normalizedPackage);
+
+const signalPackage =
+    discoverPublicSignals(mergedPackage);
+if (!signalPackage.success) {
+
+    return {
+
+        success: false,
+
+        stage: "Public Evidence Pipeline",
+
+        reason:
+            signalPackage.reason ||
+            "Public Evidence Pipeline failed."
+
+    };
+
+}
 publicContentPackage =
     buildPublicContentPackage(
         rawPackage,
-        extractedPackage
+        signalPackage
     );
-
 if (!publicContentPackage.success) {
 
     return {
