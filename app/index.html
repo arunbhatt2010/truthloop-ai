@@ -2967,8 +2967,9 @@ ${text}<br><br>
 `;
 
 outputBox.appendChild(userReply);
-
-const data=await callAPI();  
+alert("BEFORE CALL API");
+const data=await callAPI();
+  alert("AFTER CALL API");
   alert(JSON.stringify({
   primaryLoop: data.primaryLoop,
   emotionalDriver: data.emotionalDriver,
