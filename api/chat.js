@@ -1366,32 +1366,21 @@ if (contextMissing) {
 
 contextInstruction = `
 
-CONTEXT FIRST MODE
+CONVERSATION PROFILE MODE
 
-Evidence is insufficient.
+Analyze only the available conversation evidence.
 
-Do NOT:
-- analyze
-- assume motives/emotions
-- detect patterns
-- identify contradictions
+Build the best current behavioral profile from the evidence that exists.
 
-Goal:
-Collect enough context before investigation.
+Update the profile after every AI response.
 
-Ask ONE natural question that gathers:
+Do not wait for perfect evidence.
 
-- situation
-- goal
-- actions tried
-- results
-- blockers/beliefs
+If confidence is low, return your best evidence-based estimate instead of asking another question.
 
-Avoid generic questions.
+Never return an empty profile.
 
-Adapt the question to the user's situation.
-
-Stay in evidence collection mode until enough context exists.
+Return ONLY valid JSON.
 `;
 }
     const investigationPrompt = `
