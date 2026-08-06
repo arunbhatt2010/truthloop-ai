@@ -403,7 +403,7 @@ export function cleanPublicContent(validatedPackage) {
 
         cleanContent: null,
 
-        reason: null
+        reason: null,
         // TES
 sourceType: validatedPackage?.sourceType || "PublicEvidence",
 evidenceStandard: validatedPackage?.evidenceStandard || "TES-1.0",
@@ -516,9 +516,9 @@ missingSignals: [],
 
 traceability: [],
 
-reason: null
 
-        reason: null
+
+        reason: null,
         // TES
 sourceType: cleanPackage?.sourceType || "PublicEvidence",
 evidenceStandard: cleanPackage?.evidenceStandard || "TES-1.0",
@@ -740,7 +740,7 @@ export function buildPublicContentPackage(
 
         normalizedAt: null,
 
-        reason: null
+        reason: null,
         // TES
 sourceType: extractedPackage?.sourceType || "PublicEvidence",
 evidenceStandard: extractedPackage?.evidenceStandard || "TES-1.0",
@@ -779,6 +779,28 @@ collectionWindow: extractedPackage?.collectionWindow || "90 Days",
     result.images = extractedPackage.images;
 
     result.visibleText = extractedPackage.visibleText;
+    // TES Evidence
+
+result.evidenceCoverage =
+    extractedPackage.evidenceCoverage || {};
+
+result.publicSignals =
+    extractedPackage.publicSignals || [];
+
+result.missingSignals =
+    extractedPackage.missingSignals || [];
+
+result.traceability =
+    extractedPackage.traceability || [];
+
+result.visibleTextLength =
+    extractedPackage.visibleTextLength || 0;
+
+result.hasReadableContent =
+    extractedPackage.hasReadableContent || false;
+
+result.extractionQuality =
+    extractedPackage.extractionQuality || "low";
 
     result.normalizedAt =
         new Date().toISOString();
