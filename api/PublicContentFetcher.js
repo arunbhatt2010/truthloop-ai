@@ -507,6 +507,17 @@ export function extractPublicContent(cleanPackage) {
 
         visibleText: null,
 
+// TES Evidence Signals
+evidenceCoverage: {},
+
+publicSignals: [],
+
+missingSignals: [],
+
+traceability: [],
+
+reason: null
+
         reason: null
         // TES
 sourceType: cleanPackage?.sourceType || "PublicEvidence",
@@ -561,11 +572,92 @@ collectionWindow: cleanPackage?.collectionWindow || "90 Days",
         html.replace(/<[^>]+>/g, " ")
             .replace(/\s+/g, " ")
             .trim();
+// TES Evidence Metrics
 
+result.visibleTextLength = result.visibleText.length;
+
+result.hasReadableContent =
+    result.visibleTextLength > 200;
+
+result.extractionQuality =
+    result.visibleTextLength > 5000
+        ? "high"
+        : result.visibleTextLength > 1000
+        ? "medium"
+        : "low";
     result.success = true;
 result.sourceType = cleanPackage.sourceType;
 result.evidenceStandard = cleanPackage.evidenceStandard;
 result.collectionWindow = cleanPackage.collectionWindow;
+result.evidenceCoverage = {
+    title: !!result.title,
+    description: !!result.description,
+    headings: result.headings.length,
+    links: result.links.length,
+    images: result.images.length,
+    visibleText: result.visibleTextLength
+};
+// TES Initial Public Signals
+
+if (result.title) {
+    result.publicSignals.push({
+        type: "title",
+        value: result.title,
+        verified: true
+    });
+} else {
+    result.missingSignals.push("title");
+}
+
+if (result.description) {
+    result.publicSignals.push({
+        type: "description",
+        value: result.description,
+        verified: true
+    });
+} else {
+    result.missingSignals.push("description");
+}
+
+if (result.headings.length) {
+    result.publicSignals.push({
+        type: "headings",
+        count: result.headings.length,
+        verified: true
+    });
+} else {
+    result.missingSignals.push("headings");
+    }
+if (result.links.length) {
+    result.publicSignals.push({
+        type: "links",
+        count: result.links.length,
+        verified: true
+    });
+} else {
+    result.missingSignals.push("links");
+}
+
+if (result.images.length) {
+    result.publicSignals.push({
+        type: "images",
+        count: result.images.length,
+        verified: true
+    });
+} else {
+    result.missingSignals.push("images");
+}
+
+if (result.hasReadableContent) {
+    result.publicSignals.push({
+        type: "visibleText",
+        length: result.visibleTextLength,
+        quality: result.extractionQuality,
+        verified: true
+    });
+} else {
+    result.missingSignals.push("visibleText");
+        }
     return result;
 
 }
@@ -649,6 +741,10 @@ export function buildPublicContentPackage(
         normalizedAt: null,
 
         reason: null
+        // TES
+sourceType: extractedPackage?.sourceType || "PublicEvidence",
+evidenceStandard: extractedPackage?.evidenceStandard || "TES-1.0",
+collectionWindow: extractedPackage?.collectionWindow || "90 Days",
 
     };
 
@@ -688,7 +784,9 @@ export function buildPublicContentPackage(
         new Date().toISOString();
 
     result.success = true;
-
+result.sourceType = extractedPackage.sourceType;
+result.evidenceStandard = extractedPackage.evidenceStandard;
+result.collectionWindow = extractedPackage.collectionWindow;
     return result;
 
            }
