@@ -589,6 +589,24 @@ INPUTS
 TruthLoop Package
 
 Normalized Evidence Package
+The PublicContentPackage may already contain verified structured evidence.
+
+It may include:
+
+• Profile
+• Posts
+• Comments
+• Articles
+• Communities
+• Timeline
+• Activity
+• Public Signals
+• Evidence Coverage
+• Traceability
+
+Treat every populated section as verified evidence.
+
+Never ignore populated sections.
 
 The Universal Evidence Package may originate from one or more Evidence Adapters including:
 
@@ -726,7 +744,11 @@ VALIDATION RULES
 • Keep evidence reusable.
 • Never remove evidence that may become useful during cross-evidence validation.
 • Preserve traceability back to the original Evidence Source.
+Structured evidence extracted by TruthLoop preprocessing has higher priority than regenerated interpretations.
 
+Preserve extracted evidence first.
+
+Generate new structure only when verified evidence is missing.
 CONFIDENCE RULES
 
 Confidence must always be evidence-based.
@@ -1142,7 +1164,11 @@ const refinedEvidence = {
 "Cross-check every Domin Filter.",
 
 "Preserve entities, Domin Filters, timelines and numerical data.",
+"The PublicContentPackage already contains verified structured evidence.",
 
+"Treat every populated field as verified input.",
+
+"Never discard structured evidence unless it is duplicated or invalid.",
 "Keep only reusable evidence.",
 
 "Evidence first.",
