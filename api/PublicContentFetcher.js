@@ -602,6 +602,167 @@ result.evidenceCoverage = {
 
 }
 
+export function normalizePublicEvidence(extractedPackage) {
+
+    const result = {
+
+        success: false,
+
+        sourceType:
+            extractedPackage?.sourceType || "PublicEvidence",
+
+        evidenceStandard:
+            extractedPackage?.evidenceStandard || "TES-1.0",
+
+        collectionWindow:
+            extractedPackage?.collectionWindow || "90 Days",
+
+        profile: null,
+
+        posts: [],
+
+        comments: [],
+
+        articles: [],
+
+        projects: [],
+
+        documents: [],
+
+        communities: [],
+
+        business: [],
+
+        media: [],
+
+        timeline: [],
+
+        links: [],
+
+        traceability: [],
+
+        reason: null
+
+    };
+
+    if (!extractedPackage?.success) {
+
+        result.reason =
+            "Public content extraction failed.";
+
+        return result;
+
+    }
+// Normalize Profile
+
+result.profile = {
+
+    title: extractedPackage.title,
+
+    description: extractedPackage.description,
+
+    language: extractedPackage.language,
+
+    canonicalUrl: extractedPackage.canonicalUrl
+
+};
+
+// Normalize Links
+
+result.links = extractedPackage.links.map(link => ({
+
+    url: link,
+
+    type: "link",
+
+    verified: true
+
+}));
+    // Normalize Content
+
+result.content = {
+
+    headings: extractedPackage.headings.map(text => ({
+
+        type: "heading",
+
+        text,
+
+        verified: true
+
+    })),
+
+    visibleText: extractedPackage.visibleText,
+
+    visibleTextLength: extractedPackage.visibleTextLength,
+
+    hasReadableContent: extractedPackage.hasReadableContent,
+
+    extractionQuality: extractedPackage.extractionQuality
+
+};
+    // Normalize Timeline
+
+result.timeline.push({
+
+    type: "contentSnapshot",
+
+    timestamp: null,
+
+    source: extractedPackage.canonicalUrl,
+
+    evidence: {
+
+        title: extractedPackage.title,
+
+        description: extractedPackage.description,
+
+        headings: extractedPackage.headings.length,
+
+        links: extractedPackage.links.length,
+
+        visibleTextLength: extractedPackage.visibleTextLength
+
+    },
+
+    verified: true
+
+});
+    // Normalize Posts
+
+result.posts = [];
+
+if (extractedPackage.posts?.length) {
+
+    result.posts = extractedPackage.posts.map(post => ({
+
+        type: "post",
+
+        id: post.id || null,
+
+        title: post.title || null,
+
+        content: post.content || null,
+
+        url: post.url || null,
+
+        publishedAt: post.publishedAt || null,
+
+        author: post.author || null,
+
+        verified: true
+
+    }));
+
+        }
+    
+    result.success = true;
+
+    return result;
+
+}
+
+
 export function discoverPublicSignals(extractedPackage) {
 
     const result = {
