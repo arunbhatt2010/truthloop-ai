@@ -484,6 +484,238 @@ OUTPUT
 Structured Public Content Package
 ==============================================================
 */
+export function extractPosts(html) {
+
+    const posts = [];
+
+    if (!html) return posts;
+
+    // 1. Semantic HTML Articles
+    const articleMatches = [
+        ...html.matchAll(/<article[\s\S]*?<\/article>/gi)
+    ];
+
+    for (const match of articleMatches) {
+
+        const article = match[0];
+
+        const title =
+            article.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i)?.[1]
+                ?.replace(/<[^>]+>/g, "")
+                ?.trim() || null;
+
+        const content =
+            article.replace(/<[^>]+>/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+        posts.push({
+
+            type: "post",
+
+            title,
+
+            content,
+
+            source: "article",
+
+            verified: true
+
+        });
+
+    }
+    // 2. JSON-LD Articles
+
+const jsonLdMatches = [
+    ...html.matchAll(
+        /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
+    )
+];
+
+for (const match of jsonLdMatches) {
+
+    try {
+
+        const data = JSON.parse(match[1]);
+
+        const items = Array.isArray(data) ? data : [data];
+
+        for (const item of items) {
+
+            if (
+                item["@type"] === "Article" ||
+                item["@type"] === "BlogPosting"
+            ) {
+
+                posts.push({
+
+                    type: "post",
+
+                    title: item.headline || null,
+
+                    content: item.description || null,
+
+                    url: item.url || null,
+
+                    publishedAt: item.datePublished || null,
+
+                    author:
+                        item.author?.name ||
+                        item.author ||
+                        null,
+
+                    source: "json-ld",
+
+                    verified: true
+
+                });
+
+            }
+
+        }
+
+    } catch {
+
+        // Ignore invalid JSON-LD
+
+    }
+
+                }
+    // 3. Open Graph / Article Metadata
+
+const ogTitle =
+    html.match(
+        /<meta[^>]*property=["']og:title["'][^>]*content=["'](.*?)["']/i
+    )?.[1]?.trim() || null;
+
+const ogDescription =
+    html.match(
+        /<meta[^>]*property=["']og:description["'][^>]*content=["'](.*?)["']/i
+    )?.[1]?.trim() || null;
+
+const articlePublished =
+    html.match(
+        /<meta[^>]*property=["']article:published_time["'][^>]*content=["'](.*?)["']/i
+    )?.[1]?.trim() || null;
+
+const ogUrl =
+    html.match(
+        /<meta[^>]*property=["']og:url["'][^>]*content=["'](.*?)["']/i
+    )?.[1]?.trim() || null;
+
+if (ogTitle || ogDescription) {
+
+    posts.push({
+
+        type: "post",
+
+        title: ogTitle,
+
+        content: ogDescription,
+
+        url: ogUrl,
+
+        publishedAt: articlePublished,
+
+        source: "open-graph",
+
+        verified: true
+
+    });
+
+                           }
+    // 4. Generic Fallback Extraction
+
+if (!posts.length) {
+
+    const heading =
+        html.match(/<h1[^>]*>(.*?)<\/h1>/i)?.[1]
+            ?.replace(/<[^>]+>/g, "")
+            ?.trim() || null;
+
+    const paragraphs =
+        [...html.matchAll(/<p[^>]*>(.*?)<\/p>/gi)]
+            .map(match =>
+                match[1]
+                    .replace(/<[^>]+>/g, "")
+                    .replace(/\s+/g, " ")
+                    .trim()
+            )
+            .filter(Boolean);
+
+    if (heading || paragraphs.length) {
+
+        posts.push({
+
+            type: "post",
+
+            title: heading,
+
+            content: paragraphs.join("\n\n"),
+
+            source: "generic-html",
+
+            verified: true
+
+        });
+
+    }
+
+}
+
+    return posts;
+
+}
+
+export function extractComments(html) {
+
+    const comments = [];
+
+    if (!html) return comments;
+
+    // Comment Schema
+
+    const commentMatches = [
+
+        ...html.matchAll(
+
+            /itemtype=["'].*?Comment.*?["'][\s\S]*?<\/[^>]+>/gi
+
+        )
+
+    ];
+
+    for (const match of commentMatches) {
+
+        const block = match[0];
+
+        const content =
+
+            block
+
+                .replace(/<[^>]+>/g, " ")
+
+                .replace(/\s+/g, " ")
+
+                .trim();
+
+        comments.push({
+
+            type: "comment",
+
+            content,
+
+            source: "schema-comment",
+
+            verified: true
+
+        });
+
+    }
+
+    return comments;
+
+                }
 
 export function extractPublicContent(cleanPackage) {
 
@@ -504,6 +736,17 @@ export function extractPublicContent(cleanPackage) {
         links: [],
 
         images: [],
+        posts: [],
+
+comments: [],
+
+articles: [],
+
+communities: [],
+
+timeline: [],
+
+activity: [],
 
         visibleText: null,
 
@@ -585,6 +828,19 @@ result.extractionQuality =
         : result.visibleTextLength > 1000
         ? "medium"
         : "low";
+    // Placeholder for future evidence extractors
+
+result.posts = extractPosts(html);
+
+result.comments = extractComments(html);
+
+result.articles = [];
+
+result.communities = [];
+
+result.timeline = [];
+
+result.activity = [];
     result.success = true;
 result.sourceType = cleanPackage.sourceType;
 result.evidenceStandard = cleanPackage.evidenceStandard;
