@@ -1742,7 +1742,7 @@ Normalized Public Content Package
 
 export function buildPublicContentPackage(
     rawPackage,
-    mergedPackage
+    extractedPackage
 ) {
 
     const result = {
