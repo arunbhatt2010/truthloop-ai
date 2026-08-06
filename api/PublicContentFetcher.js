@@ -1373,7 +1373,61 @@ if (extractedPackage.activity?.length) {
     return result;
 
 }
+export function mergePublicEvidence(normalizedPackage) {
 
+    const result = structuredClone(normalizedPackage);
+
+    const deduplicate = (items, keyBuilder) => {
+
+        const seen = new Set();
+
+        return (items || []).filter(item => {
+
+            const key = keyBuilder(item);
+
+            if (!key || seen.has(key)) return false;
+
+            seen.add(key);
+
+            return true;
+
+        });
+
+    };
+
+    result.posts = deduplicate(
+        result.posts,
+        item => `${item.title}|${item.url}`
+    );
+
+    result.comments = deduplicate(
+        result.comments,
+        item => item.content
+    );
+
+    result.articles = deduplicate(
+        result.articles,
+        item => `${item.title}|${item.url}`
+    );
+
+    result.communities = deduplicate(
+        result.communities,
+        item => item.content
+    );
+
+    result.timeline = deduplicate(
+        result.timeline,
+        item => `${item.date}|${item.label}`
+    );
+
+    result.activity = deduplicate(
+        result.activity,
+        item => item.content
+    );
+
+    return result;
+
+                                                    }
 
 export function discoverPublicSignals(extractedPackage) {
 
