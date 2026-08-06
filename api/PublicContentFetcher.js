@@ -1262,6 +1262,111 @@ if (extractedPackage.posts?.length) {
     }));
 
         }
+    // Normalize Comments
+
+result.comments = [];
+
+if (extractedPackage.comments?.length) {
+
+    result.comments = extractedPackage.comments.map(comment => ({
+
+        type: "comment",
+
+        content: comment.content || null,
+
+        source: comment.source || null,
+
+        verified: comment.verified === true
+
+    }));
+
+            }
+    // Normalize Articles
+
+result.articles = [];
+
+if (extractedPackage.articles?.length) {
+
+    result.articles = extractedPackage.articles.map(article => ({
+
+        type: "article",
+
+        title: article.title || null,
+
+        description: article.description || null,
+
+        url: article.url || null,
+
+        publishedAt: article.publishedAt || null,
+
+        author: article.author || null,
+
+        source: article.source || null,
+
+        verified: article.verified === true
+
+    }));
+
+        }
+    // Normalize Communities
+
+result.communities = [];
+
+if (extractedPackage.communities?.length) {
+
+    result.communities = extractedPackage.communities.map(community => ({
+
+        type: "community",
+
+        content: community.content || null,
+
+        source: community.source || null,
+
+        verified: community.verified === true
+
+    }));
+
+}
+    // Normalize Timeline
+
+result.timeline = [];
+
+if (extractedPackage.timeline?.length) {
+
+    result.timeline = extractedPackage.timeline.map(event => ({
+
+        type: "timeline",
+
+        date: event.date || null,
+
+        label: event.label || null,
+
+        source: event.source || null,
+
+        verified: event.verified === true
+
+    }));
+
+        }
+    // Normalize Activity
+
+result.activity = [];
+
+if (extractedPackage.activity?.length) {
+
+    result.activity = extractedPackage.activity.map(activity => ({
+
+        type: "activity",
+
+        content: activity.content || null,
+
+        source: activity.source || null,
+
+        verified: activity.verified === true
+
+    }));
+
+}
     
     result.success = true;
 
@@ -1519,6 +1624,17 @@ export function buildPublicContentPackage(
         links: [],
 
         images: [],
+        posts: [],
+
+comments: [],
+
+articles: [],
+
+communities: [],
+
+timeline: [],
+
+activity: [],
 
         visibleText: null,
 
@@ -1563,6 +1679,19 @@ collectionWindow: extractedPackage?.collectionWindow || "90 Days",
     result.images = extractedPackage.images;
 
     result.visibleText = extractedPackage.visibleText;
+    // Public Evidence
+
+result.posts = extractedPackage.posts || [];
+
+result.comments = extractedPackage.comments || [];
+
+result.articles = extractedPackage.articles || [];
+
+result.communities = extractedPackage.communities || [];
+
+result.timeline = extractedPackage.timeline || [];
+
+result.activity = extractedPackage.activity || [];
     // TES Evidence
 
 result.evidenceCoverage =
