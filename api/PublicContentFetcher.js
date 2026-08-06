@@ -922,6 +922,52 @@ export function extractCommunities(html) {
     return communities;
 
 }
+export function extractActivity(html) {
+
+    const activity = [];
+
+    if (!html) return activity;
+
+    const matches = [
+
+        ...html.matchAll(
+
+            /<(article|section|div)[^>]*(activity|feed|update|timeline|stream|event|history)[^>]*>([\s\S]*?)<\/\1>/gi
+
+        )
+
+    ];
+
+    for (const match of matches) {
+
+        const block = match[0];
+
+        const content =
+
+            block
+                .replace(/<[^>]+>/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+        if (!content) continue;
+
+        activity.push({
+
+            type: "activity",
+
+            content,
+
+            source: "generic-activity",
+
+            verified: true
+
+        });
+
+    }
+
+    return activity;
+
+}
 
 export function extractPublicContent(cleanPackage) {
 
@@ -1045,7 +1091,7 @@ result.communities = extractCommunities(html);
 
 result.timeline = extractTimeline(html);
 
-result.activity = [];
+result.activity = extractActivity(html);
     result.success = true;
 result.sourceType = cleanPackage.sourceType;
 result.evidenceStandard = cleanPackage.evidenceStandard;
