@@ -1598,7 +1598,103 @@ if (extractedPackage.images?.length) {
 }
 
 result.success = true;
+// TES Public Evidence Signals
 
+if (extractedPackage.posts?.length) {
+
+    result.publicSignals.push({
+
+        category: "content",
+
+        type: "posts",
+
+        count: extractedPackage.posts.length,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.comments?.length) {
+
+    result.publicSignals.push({
+
+        category: "content",
+
+        type: "comments",
+
+        count: extractedPackage.comments.length,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.articles?.length) {
+
+    result.publicSignals.push({
+
+        category: "content",
+
+        type: "articles",
+
+        count: extractedPackage.articles.length,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.communities?.length) {
+
+    result.publicSignals.push({
+
+        category: "community",
+
+        type: "communities",
+
+        count: extractedPackage.communities.length,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.timeline?.length) {
+
+    result.publicSignals.push({
+
+        category: "timeline",
+
+        type: "timeline",
+
+        count: extractedPackage.timeline.length,
+
+        verified: true
+
+    });
+
+}
+
+if (extractedPackage.activity?.length) {
+
+    result.publicSignals.push({
+
+        category: "activity",
+
+        type: "activity",
+
+        count: extractedPackage.activity.length,
+
+        verified: true
+
+    });
+
+    }
 return result;
 
 }
@@ -1646,7 +1742,7 @@ Normalized Public Content Package
 
 export function buildPublicContentPackage(
     rawPackage,
-    extractedPackage
+    mergedPackage
 ) {
 
     const result = {
