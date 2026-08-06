@@ -100,22 +100,24 @@ export async function loadPublicContentFetcher({
 }) {
 
     const result = {
-        success: false,
+    success: false,
 
-        originalUrl: url,
+    // Source
+    originalUrl: url,
+    normalizedUrl: null,
+    protocol: null,
+    hostname: null,
+    platform: "unknown",
 
-        normalizedUrl: null,
+    // TES
+    sourceType: "PublicEvidence",
+    collectionWindow: "90 Days",
+    evidenceStandard: "TES-1.0",
 
-        protocol: null,
-
-        hostname: null,
-
-        platform: "unknown",
-
-        valid: false,
-
-        reason: null
-    };
+    // Status
+    valid: false,
+    reason: null
+};
 
     try {
 
@@ -156,25 +158,30 @@ export async function acquirePublicContent(urlPackage) {
 
     const result = {
 
-        success: false,
+    success: false,
 
-        source: "unknown",
+    source: "unknown",
 
-        url: urlPackage.normalizedUrl,
+    url: urlPackage.normalizedUrl,
 
-        status: null,
+    // TES
+    sourceType: urlPackage.sourceType || "PublicEvidence",
+    evidenceStandard: urlPackage.evidenceStandard || "TES-1.0",
+    collectionWindow: urlPackage.collectionWindow || "90 Days",
 
-        contentType: null,
+    status: null,
 
-        contentLength: 0,
+    contentType: null,
 
-        rawContent: null,
+    contentLength: 0,
 
-        fetchedAt: null,
+    rawContent: null,
 
-        reason: null
+    fetchedAt: null,
 
-    };
+    reason: null
+
+};
 
     try {
 
@@ -289,16 +296,20 @@ export function validatePublicContent(rawPackage) {
 
     const result = {
 
-        success: false,
+    success: false,
 
-        valid: false,
+    valid: false,
 
-        rawContent: null,
+    // TES
+    sourceType: rawPackage?.sourceType || "PublicEvidence",
+    evidenceStandard: rawPackage?.evidenceStandard || "TES-1.0",
+    collectionWindow: rawPackage?.collectionWindow || "90 Days",
 
-        reason: null
+    rawContent: null,
 
-    };
+    reason: null
 
+};
     if (!rawPackage?.success) {
 
         result.reason = "Public content acquisition failed.";
@@ -337,7 +348,9 @@ export function validatePublicContent(rawPackage) {
     result.success = true;
 
     result.valid = true;
-
+result.sourceType = rawPackage.sourceType;
+result.evidenceStandard = rawPackage.evidenceStandard;
+result.collectionWindow = rawPackage.collectionWindow;
     result.rawContent = rawPackage.rawContent;
 
     return result;
@@ -391,6 +404,10 @@ export function cleanPublicContent(validatedPackage) {
         cleanContent: null,
 
         reason: null
+        // TES
+sourceType: validatedPackage?.sourceType || "PublicEvidence",
+evidenceStandard: validatedPackage?.evidenceStandard || "TES-1.0",
+collectionWindow: validatedPackage?.collectionWindow || "90 Days",
 
     };
 
@@ -419,7 +436,9 @@ export function cleanPublicContent(validatedPackage) {
     html = html.replace(/\s+/g, " ").trim();
 
     result.success = true;
-
+result.sourceType = validatedPackage.sourceType;
+result.evidenceStandard = validatedPackage.evidenceStandard;
+result.collectionWindow = validatedPackage.collectionWindow;
     result.cleanContent = html;
 
     return result;
@@ -489,6 +508,10 @@ export function extractPublicContent(cleanPackage) {
         visibleText: null,
 
         reason: null
+        // TES
+sourceType: cleanPackage?.sourceType || "PublicEvidence",
+evidenceStandard: cleanPackage?.evidenceStandard || "TES-1.0",
+collectionWindow: cleanPackage?.collectionWindow || "90 Days",
 
     };
 
@@ -540,7 +563,9 @@ export function extractPublicContent(cleanPackage) {
             .trim();
 
     result.success = true;
-
+result.sourceType = cleanPackage.sourceType;
+result.evidenceStandard = cleanPackage.evidenceStandard;
+result.collectionWindow = cleanPackage.collectionWindow;
     return result;
 
 }
