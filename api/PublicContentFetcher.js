@@ -597,22 +597,61 @@ result.evidenceCoverage = {
     images: result.images.length,
     visibleText: result.visibleTextLength
 };
-// TES Initial Public Signals
 
-if (result.title) {
+    return result;
+
+}
+
+export function discoverPublicSignals(extractedPackage) {
+
+    const result = {
+
+        success: false,
+
+        sourceType: extractedPackage?.sourceType || "PublicEvidence",
+
+        evidenceStandard: extractedPackage?.evidenceStandard || "TES-1.0",
+
+        collectionWindow: extractedPackage?.collectionWindow || "90 Days",
+
+        publicSignals: [],
+
+        missingSignals: [],
+
+        evidenceCoverage:
+            extractedPackage?.evidenceCoverage || {},
+
+        traceability:
+            extractedPackage?.traceability || [],
+
+        reason: null
+
+    };
+
+    if (!extractedPackage?.success) {
+
+        result.reason =
+            "Public content extraction failed.";
+
+        return result;
+
+    }
+    // TES Initial Public Signals
+
+if (extractedPackage.title) {
     result.publicSignals.push({
         type: "title",
-        value: result.title,
+        extractedPackage.title,
         verified: true
     });
 } else {
     result.missingSignals.push("title");
 }
 
-if (result.description) {
+if (extractedPackage.description) {
     result.publicSignals.push({
         type: "description",
-        value: result.description,
+        extractedPackage.description,
         verified: true
     });
 } else {
@@ -657,45 +696,7 @@ if (result.hasReadableContent) {
     });
 } else {
     result.missingSignals.push("visibleText");
-        }
-    return result;
-
 }
-
-export function discoverPublicSignals(extractedPackage) {
-
-    const result = {
-
-        success: false,
-
-        sourceType: extractedPackage?.sourceType || "PublicEvidence",
-
-        evidenceStandard: extractedPackage?.evidenceStandard || "TES-1.0",
-
-        collectionWindow: extractedPackage?.collectionWindow || "90 Days",
-
-        publicSignals: [],
-
-        missingSignals: [],
-
-        evidenceCoverage:
-            extractedPackage?.evidenceCoverage || {},
-
-        traceability:
-            extractedPackage?.traceability || [],
-
-        reason: null
-
-    };
-
-    if (!extractedPackage?.success) {
-
-        result.reason =
-            "Public content extraction failed.";
-
-        return result;
-
-    }
 // Profile Identity Signals
 
 if (extractedPackage.title) {
