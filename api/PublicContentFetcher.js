@@ -1,66 +1,100 @@
-/*
-═══════════════════════════════════════════════════════════════
+/*═══════════════════════════════════════════════════════════════
 PUBLIC CONTENT FETCHER
 TruthLoop AI
-Version : 1.0
-Purpose : Universal Public Content Acquisition Layer
-═══════════════════════════════════════════════════════════════
+
+Version : 2.0
+Standard : TruthLoop Public Evidence Standard (TES)
 
 MISSION
---------
-Collect publicly available content from the routed source
-and normalize it for downstream AI analysis.
+
+Discover, collect and normalize every verified public signal
+that is accessible from the supplied Evidence Source.
+
+The investigation target is always the evidence,
+never the platform.
+
+This module never performs investigation.
+
+It only builds one reusable Public Evidence Package.
+
+DEFAULT COLLECTION WINDOW
+
+Most recent 90 days.
+
+If verified evidence is insufficient:
+
+• 6 Months
+• 12 Months
+• Lifetime (only when necessary)
+
+Always prioritize recent evidence.
+
+Stop collecting when sufficient verified evidence
+has been obtained.
+
+PUBLIC SIGNALS MAY INCLUDE
+
+• Public Profile
+• Public Bio
+• Headline
+• About
+• Public Posts
+• Public Comments
+• Public Articles
+• Public Projects
+• Public Websites
+• Public Documents
+• Public Videos
+• Public Podcasts
+• Public Interviews
+• Public Communities
+• Public Business Pages
+• Public Media Mentions
+• Public Links
+• Public Timeline
+• Public Activity History
+• Any other verified public signal
+
+NEVER COLLECT
+
+• Private Messages
+• Login-only Content
+• Restricted Pages
+• Hidden APIs
+• Deleted Content
+• Fabricated Evidence
+• Assumed Psychology
 
 CORE PRINCIPLES
----------------
-1. Universal
-   Support any public platform through routing.
 
-2. Public Evidence Only
-   Never bypass authentication.
-   Never scrape restricted content.
+Evidence First
 
-3. Fetch Only
-   Never perform AI reasoning.
-   Never detect patterns.
-   Never generate conclusions.
+Collect verified public signals.
 
-4. Normalize
-   Convert every source into one common content package.
+Preserve traceability.
 
-5. Evidence First
-   Return only observable public information.
+Ignore duplicate signals.
 
-6. Safe
-   Ignore scripts, tracking, ads and executable code.
+Ignore advertisements.
 
-7. Traceable
-   Preserve source metadata for verification.
+Ignore navigation.
 
-8. Extensible
-   New platforms should plug in without changing
-   existing fetch logic.
+Ignore decorative content.
 
-9. Fail Gracefully
-   Return structured errors instead of guessing.
+Ignore tracking.
 
-10. TruthLoop Standard
-    Evidence first.
-    Conclusions later.
-    Never invent information.
+Ignore content without investigative value.
 
-INPUT
------
-Routing Package
+Never perform AI reasoning.
+
+Never detect patterns.
+
+Never generate conclusions.
 
 OUTPUT
-------
-Normalized Public Content Package
 
-Fetcher never performs AI analysis.
-
-═══════════════════════════════════════════════════════════════
-*/
+One reusable Public Evidence Package.
+═══════════════════════════════════════════════════════════════*/
 export async function loadPublicContentFetcher({
     url = ""
 }) {
