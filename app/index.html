@@ -1895,9 +1895,12 @@ function showEvidence(type){
 function typeEffect(text){
 
 text = text.replace(
- /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
- `<span class="truthHighlight">$1</span>`
+    /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+    '<span class="truthHighlight">$1</span>'
 );
+
+text = text.replace(/\[\[highlight\]\]/gi, "");
+text = text.replace(/\[\[end\]\]/gi, "");
 
 text = text.replace(/\n/g,"<br>");
 
