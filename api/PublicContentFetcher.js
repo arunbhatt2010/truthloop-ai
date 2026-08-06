@@ -712,10 +712,216 @@ export function extractComments(html) {
         });
 
     }
+// 2. Generic Comment Containers
 
+const genericCommentMatches = [
+
+    ...html.matchAll(
+
+        /<(div|section|article)[^>]*(class|id)=["'][^"']*(comment|comments|reply|replies|discussion|responses|thread|message)[^"']*["'][^>]*>([\s\S]*?)<\/\1>/gi
+
+    )
+
+];
+
+for (const match of genericCommentMatches) {
+
+    const block = match[0];
+
+    const content =
+
+        block
+
+            .replace(/<[^>]+>/g, " ")
+
+            .replace(/\s+/g, " ")
+
+            .trim();
+
+    if (!content) continue;
+
+    comments.push({
+
+        type: "comment",
+
+        content,
+
+        source: "generic-comment",
+
+        verified: true
+
+    });
+
+        }
     return comments;
 
                 }
+export function extractArticles(html) {
+
+    const articles = [];
+
+    if (!html) return articles;
+
+    // JSON-LD Articles
+
+    const matches = [
+
+        ...html.matchAll(
+
+            /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
+
+        )
+
+    ];
+
+    for (const match of matches) {
+
+        try {
+
+            const data = JSON.parse(match[1]);
+
+            const items = Array.isArray(data) ? data : [data];
+
+            for (const item of items) {
+
+                if (
+
+                    item["@type"] === "Article" ||
+
+                    item["@type"] === "BlogPosting" ||
+
+                    item["@type"] === "NewsArticle" ||
+
+                    item["@type"] === "TechArticle"
+
+                ) {
+
+                    articles.push({
+
+                        type: "article",
+
+                        title: item.headline || null,
+
+                        description: item.description || null,
+
+                        url: item.url || null,
+
+                        publishedAt: item.datePublished || null,
+
+                        author:
+
+                            item.author?.name ||
+
+                            item.author ||
+
+                            null,
+
+                        verified: true,
+
+                        source: "json-ld"
+
+                    });
+
+                }
+
+            }
+
+        } catch {}
+
+    }
+
+    return articles;
+
+        }
+
+export function extractTimeline(html) {
+
+    const timeline = [];
+
+    if (!html) return timeline;
+
+    const matches = [
+
+        ...html.matchAll(
+
+            /<time[^>]*?(datetime=["'](.*?)["'])?[^>]*>(.*?)<\/time>/gi
+
+        )
+
+    ];
+
+    for (const match of matches) {
+
+        timeline.push({
+
+            type: "timeline",
+
+            date: match[2] || null,
+
+            label: match[3]
+                ?.replace(/<[^>]+>/g, "")
+                ?.trim() || null,
+
+            source: "time-tag",
+
+            verified: true
+
+        });
+
+    }
+
+    return timeline;
+
+}
+
+export function extractCommunities(html) {
+
+    const communities = [];
+
+    if (!html) return communities;
+
+    // Community / Organization / Forum
+
+    const matches = [
+
+        ...html.matchAll(
+
+            /<(section|div|article)[^>]*(community|group|forum|organization|network)[^>]*>([\s\S]*?)<\/\1>/gi
+
+        )
+
+    ];
+
+    for (const match of matches) {
+
+        const block = match[0];
+
+        const content =
+
+            block
+                .replace(/<[^>]+>/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+        if (!content) continue;
+
+        communities.push({
+
+            type: "community",
+
+            content,
+
+            source: "generic-community",
+
+            verified: true
+
+        });
+
+    }
+
+    return communities;
+
+}
 
 export function extractPublicContent(cleanPackage) {
 
@@ -834,11 +1040,10 @@ result.posts = extractPosts(html);
 
 result.comments = extractComments(html);
 
-result.articles = [];
+result.articles = extractArticles(html);
+result.communities = extractCommunities(html);
 
-result.communities = [];
-
-result.timeline = [];
+result.timeline = extractTimeline(html);
 
 result.activity = [];
     result.success = true;
