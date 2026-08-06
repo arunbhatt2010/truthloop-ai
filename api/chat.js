@@ -1727,46 +1727,69 @@ max_tokens: maxTokens
 
     const data =
       await response.json();
-    console.log("===== RAW AI RESPONSE =====");
+
+console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
 console.log("===== END RAW AI RESPONSE =====");
 
-console.log("===== RAW AI REPLY =====");
-console.log(data?.choices?.[0]?.message?.content);
-console.log("===== END RAW AI REPLY =====");
-const profileResponse = await fetch(
-"https://api.groq.com/openai/v1/chat/completions",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:
-"Bearer " + process.env.GROQ_API_KEY
-},
-body:JSON.stringify({
-model:"llama-3.1-8b-instant",
-messages:[
-{
-role:"system",
-content:profilePrompt
-},
-...messages.slice(-3)
-],
-temperature:0.3,
-max_tokens:120
-})
-}
-);
+let reply =
+      data?.choices?.[0]?.message?.content || "";
 
-let profileData = {};
+console.log("===== RAW AI REPLY =====");
+console.log(reply);
+console.log("===== END RAW AI REPLY =====");
+
+let profileData = {
+  choices: [
+    {
+      message: {
+        content: JSON.stringify({
+          primaryLoop: "",
+          emotionalDriver: "",
+          avoidanceStyle: "",
+          hiddenAssumption: ""
+        })
+      }
+    }
+  ]
+};
 
 try {
 
-  if (profileResponse.ok) {
+  const profileResponse = await fetch(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + process.env.GROQ_API_KEY
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "system",
+            content: profilePrompt
+          },
 
+          ...messages.slice(-3),
+
+          {
+            role: "assistant",
+            content: reply
+          }
+
+        ],
+        temperature: 0.3,
+        max_tokens: 120
+      })
+    }
+  );
+
+  if (profileResponse.ok) {
     profileData =
       await profileResponse.json();
-
   }
 
 } catch (e) {
@@ -1776,13 +1799,9 @@ try {
     e
   );
 
-      }
-    let reply =
-    data?.choices?.[0]?.message?.content || "";
+}
 
-console.log("===== RAW AI REPLY =====");
-console.log(data?.choices?.[0]?.message?.content);
-console.log("===== END RAW AI REPLY =====");
+
 const contentLeakWords = [
 
 "template",
