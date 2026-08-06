@@ -3139,7 +3139,9 @@ function clearJourney() {
 }
 
 function showLoop7Bridge() {
-
+if (loopLevel < 6) {
+    return;
+   }
     document.getElementById("loopIndicator").innerText =
         "Loop " + loopLevel + " of 7";
 
