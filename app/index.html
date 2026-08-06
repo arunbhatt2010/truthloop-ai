@@ -3149,8 +3149,7 @@ function showLoop7Bridge() {
         div.innerHTML += renderLoop7EntryBridge();
     }
 
-    // Restore OAuth evidence panel
-    showEvidence("oauth");
+    
 
     // Restore normal Loop 6 progression
     nextBtn.style.display = "block";
@@ -3160,35 +3159,13 @@ function showLoop7Bridge() {
    }
 const restored = loadJourney();
 
-const params = new URLSearchParams(window.location.search);
-
-const linkedInCallback =
-    params.get("linkedin") === "connected" &&
-    params.get("resume") === "loop6" &&
-    params.has("code");
-/* alert(
-    "linkedInCallback = " + linkedInCallback +
-    "\nURL = " + window.location.href
-); */
-if (linkedInCallback) {
-
- //   alert("OAuth Redirect");
-
-    const pending = JSON.parse(
-        localStorage.getItem("truthloopPendingOAuth") || "{}"
-    );
-
-  //  alert(JSON.stringify(pending, null, 2));
-
-    if (pending.waitingForLoop7Bridge) {
 
         // Restore previous Loop 7 session
 // Restore previous Loop 7 session
-loopLevel = Number(pending.loopLevel ?? 6);
-messages = Array.isArray(pending.messages) ? pending.messages : [];
-currentCategory = pending.currentCategory ?? "";
-investigationSource = pending.investigationSource ?? "";
-
+loopLevel = Number(restored.loopLevel ?? 1);
+messages = Array.isArray(restored.messages) ? restored.messages : [];
+currentCategory = restored.currentCategory ?? "";
+investigationSource = restored.investigationSource ?? "";
 waitingForLoop7Bridge = true;
 
 // User has NOT started Digital Footprint yet
@@ -3199,61 +3176,17 @@ saveJourney();
 document.getElementById("restoreScreen").style.display = "none";
 document.getElementById("mainApp").style.display = "block";
 
-console.log("OAuth Restore", {
-    loopLevel,
-    messages: messages.length,
-    currentCategory,
-    waitingForLoop7Bridge
-});
 
 renderRestoredJourney();
 
 window.history.replaceState({}, document.title, "/app");
 // return;
 
-//alert("OAuth block finished");
-    /*  alert(
-  [
-    "After OAuth",
-    "loopLevel = " + loopLevel,
-    "waitingForLoop7Bridge = " + waitingForLoop7Bridge,
-    "window.loop7Started = " + window.loop7Started,
-    "restoreScreen = " +
-      document.getElementById("restoreScreen").style.display,
-    "mainApp = " +
-      document.getElementById("mainApp").style.display,
-    "loopIndicator = " +
-      document.getElementById("loopIndicator").innerText
-  ].join("\n")
-); */
-   /*  alert(`
-=== AFTER OAUTH ===
-
-loopLevel = ${loopLevel}
-loopIndicator = ${document.getElementById("loopIndicator").innerText}
-
-mainApp.display = ${document.getElementById("mainApp").style.display}
-restoreScreen.display = ${document.getElementById("restoreScreen").style.display}
-
-nextBtn = ${nextBtn.innerText}
-
-outputBox children = ${outputBox.children.length}
-outputBox HTML = ${
-document.getElementById("outputBox").innerHTML.substring(0,300)
-  }
-reflectionInput = ${reflectionInput.value}
-
-URL = ${window.location.href}
-`); */
     }
   
 }
   function renderRestoredJourney() {
-    /* alert("showRestoreScreen = " + showRestoreScreen); */
-    /* alert(
-        "search = " + window.location.search +
-        "\n\nhref = " + window.location.href
-    ); */
+
 outputBox.innerHTML = "";
 
 messages.forEach(msg=>{
@@ -3307,22 +3240,15 @@ showLoop7Bridge();
    showLoop7Bridge();
   }
 
-if (restored && !linkedInCallback) {
+if (restored) {
 window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
-/*alert(
-"RESTORE BLOCK ENTERED\n\n" +
-"linkedInCallback = " + linkedInCallback +
-"\nloopLevel = " + loopLevel
-); */
+
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
-/*alert(
-"LOOP INDICATOR UPDATED\n\n" +
-document.getElementById("loopIndicator").innerText
-); */
+
 
 
   }
@@ -3539,9 +3465,6 @@ setInterval(() => {
     }, 350);
 
 }, 5000);
-async function startLinkedInOAuth() {
-
-    try {
 
         // ===============================
         // Save current Loop 7 state
@@ -3558,47 +3481,7 @@ async function startLinkedInOAuth() {
             })
         );
 
-        const response = await fetch("/api/connectedApps", {
 
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-                action: "oauth",
-                provider: "linkedin"
-            })
-
-        });
-
-        const data = await response.json();
-
-        if (data.redirectUrl) {
-
-            window.location.href = data.redirectUrl;
-            return;
-
-        }
-
-        // OAuth start failed → remove pending state
-        localStorage.removeItem("truthloopPendingOAuth");
-
-        alert(data.reason || "OAuth failed.");
-
-    } catch (err) {
-
-        console.error(err);
-
-        // Network error → remove pending state
-        localStorage.removeItem("truthloopPendingOAuth");
-
-        alert("Connection failed.");
-
-    }
-
-}
 </script>    
 </div>
   <footer style="
