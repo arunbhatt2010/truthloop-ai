@@ -228,16 +228,16 @@ if (hasProfileLink) {
 
 const rawPackage =
     await acquirePublicContent(urlPackage);
-
+console.log("RAW PACKAGE", rawPackage);
 const validatedPackage =
     validatePublicContent(rawPackage);
-
+console.log("VALIDATED PACKAGE", validatedPackage);
 const cleanPackage =
     cleanPublicContent(validatedPackage);
-
+console.log("CLEAN PACKAGE", cleanPackage);
 const extractedPackage =
     extractPublicContent(cleanPackage);
-
+console.log("EXTRACTED PACKAGE", extractedPackage);
 const normalizedPackage =
     normalizePublicEvidence(extractedPackage);
 
