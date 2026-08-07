@@ -106,6 +106,14 @@ console.log({
     connectedApps,
     currentLoop
 });
+    console.log(
+    "PROFILE_LINKS_RECEIVED",
+    JSON.stringify(
+        profileLinks,
+        null,
+        2
+    )
+);
     // STEP 1
     // Security
 if (currentLoop !== 7) {
