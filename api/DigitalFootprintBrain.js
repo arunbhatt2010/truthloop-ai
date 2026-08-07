@@ -224,6 +224,22 @@ if (!footprintContextPackage.success) {
 let publicContentPackage = null;
 
 if (hasProfileLinks) {
+    const crossEvidencePackage =
+    await loadCrossEvidenceBrain({
+
+        profileLinks:
+            normalizedProfileLinks
+
+    });
+
+console.log(
+    "CROSS_EVIDENCE_PACKAGE",
+    JSON.stringify(
+        crossEvidencePackage,
+        null,
+        2
+    )
+);
     const urlPackage =
         await loadPublicContentFetcher({
             url: normalizedProfileLink
