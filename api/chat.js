@@ -561,10 +561,24 @@ console.log(
     JSON.stringify(publicEvidencePackage, null, 2)
 );
     console.log(
-    "PUBLIC_EVIDENCE_EXISTS",
-    publicEvidencePackage ? "YES" : "NO"
+  "PUBLIC_EVIDENCE_EXISTS",
+  publicEvidencePackage?.success ? "YES" : "NO"
 );
 
+console.log(
+  "PUBLIC_EVIDENCE_SUCCESS",
+  publicEvidencePackage?.success
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_STAGE",
+  publicEvidencePackage?.stage
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_REASON",
+  publicEvidencePackage?.reason
+);
 if (publicEvidencePackage) {
    /* console.log(
         "PUBLIC_EVIDENCE_KEYS",
