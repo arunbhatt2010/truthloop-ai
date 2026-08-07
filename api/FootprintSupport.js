@@ -83,8 +83,8 @@ const normalizedOtherEvidence =
         ? otherEvidence.trim()
         : "";
 
-const hasProfileLink =
-    !!normalizedProfileLink;
+const hasProfileLinks =
+normalizedProfileLinks.length > 0;
 
 const hasBusinessData =
     !!normalizedBusinessData;
@@ -111,7 +111,7 @@ const hasIdentityPackage =
 
 let investigationSource = null;
 
-if (hasProfileLink)
+if (hasProfileLinks)
     investigationSource = "Public Profile";
 
 else if (hasBusinessData)
@@ -154,7 +154,7 @@ if (!investigationSource) {
 
 let hostname = "";
 
-if (hasProfileLink) {
+if (hasProfileLinks) {
 
     try {
 
@@ -261,7 +261,8 @@ const investigationContext = {
 
     truthLoopPackage,
 
-profileLink: normalizedProfileLink,
+profileLink: normalizedProfileLinks[0] || null,
+profileLinks: normalizedProfileLinks,
 investigationSource,
 businessData,
 
