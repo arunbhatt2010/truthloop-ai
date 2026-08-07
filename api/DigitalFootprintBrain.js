@@ -419,6 +419,8 @@ const profileEvidence =
     provider: "Cerebras"
 
 });
+    console.log("===== PROFILE EVIDENCE =====");
+console.log(JSON.stringify(profileEvidence, null, 2));
 if (!profileEvidence.success) {
 
     return profileEvidence;
@@ -428,22 +430,18 @@ if (!profileEvidence.success) {
 // Universal Evidence Processor
     
 const evidencePackage =
+await ProfileMainBrain({
+    profileEvidence,
+    truthLoopPackage,
+    currentLoop
+});
 
-    await ProfileMainBrain({
-
-        profileEvidence,
-
-        truthLoopPackage,
-
-        currentLoop
-
-    });
+console.log("===== EVIDENCE PACKAGE =====");
+console.log(JSON.stringify(evidencePackage, null, 2));
 
 if (!evidencePackage.success) {
-
     return evidencePackage;
-
-   }
+}
     // STEP 6
     // Return Evidence Package
 return evidencePackage;
