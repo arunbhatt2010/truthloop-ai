@@ -1361,10 +1361,9 @@ Evidence first.
 
 Evidence always wins.
 
-`;
-       const userPrompt = `
+`;const userPrompt = `
 
-CURRENT EVIDENCE SOURCE
+UNIVERSAL EVIDENCE PACKAGE
 
 ${JSON.stringify(publicContentPackage, null, 2)}
 
@@ -1372,11 +1371,50 @@ CURRENT LOOP
 
 ${currentLoop}
 
-TRUTHLOOP PACKAGE
+TRUTHLOOP CONTEXT
 
 ${JSON.stringify(truthLoopPackage, null, 2)}
-`;
 
+IMPORTANT INSTRUCTIONS
+
+1. Use ONLY evidence contained in the Universal Evidence Package.
+
+2. Every conclusion must be traceable to evidence.
+
+3. Never infer:
+- personality
+- motivation
+- emotional state
+- private relationships
+- psychological traits
+
+unless explicitly supported by evidence.
+
+4. Missing evidence must remain missing.
+
+5. Weak evidence must remain weak.
+
+6. If evidence does not support a conclusion:
+return null.
+
+7. Prioritize:
+- visibleText
+- title
+- description
+- headings
+- posts
+- articles
+- comments
+
+over assumptions.
+
+8. Public websites, profiles, documents, and media describe observable signals.
+They do not automatically reveal personal psychology.
+
+9. Confidence must be based only on evidence quality, evidence coverage, source consistency, and cross verification.
+
+10. Never generate narrative filler.
+`;
         /* ==========================================
    AI REQUEST CONTRACT
 
