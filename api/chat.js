@@ -521,7 +521,9 @@ await loadDigitalFootprintBrain({
 
     truthLoopPackage,
 
-    profileLink,
+    profileLinks: profileLink
+    ? [profileLink]
+    : [],
 
     identityPackage,
 
