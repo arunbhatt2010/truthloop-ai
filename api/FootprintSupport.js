@@ -156,14 +156,15 @@ let hostname = "";
 
 if (hasProfileLinks) {
 
-    try {
+  try {
 
-        hostname = new URL(normalizedProfileLink)
-            .hostname
-            .replace(/^www\./, "")
-            .toLowerCase();
+    hostname = new URL(
+      normalizedProfileLinks[0]
+    ).hostname
+     .replace(/^www\./, "")
+     .toLowerCase();
 
-    } catch {
+  } catch {
 
         return {
 
