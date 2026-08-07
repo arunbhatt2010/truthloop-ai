@@ -46,7 +46,7 @@ export async function loadFootprintSupport({
 
     truthLoopPackage = {},
 
-    profileLink = "",
+    profileLinks = "",
 
 businessData = "",
 
@@ -68,10 +68,10 @@ identityPackage = null,
 
 // Normalize Inputs
 
-const normalizedProfileLink =
-    typeof profileLink === "string"
-        ? profileLink.trim()
-        : "";
+const normalizedProfileLinks =
+Array.isArray(profileLinks)
+ ? profileLinks.map(x => x.trim()).filter(Boolean)
+ : [];
 
 const normalizedBusinessData =
     typeof businessData === "string"
