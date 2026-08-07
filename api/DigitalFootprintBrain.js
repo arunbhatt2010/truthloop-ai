@@ -99,7 +99,7 @@ export async function loadDigitalFootprintBrain({
 } = {}) {
     console.log("===== DigitalFootprintBrain START =====");
 console.log({
-    profileLink,
+    profileLinks,
     businessData,
     otherEvidence,
     uploadedFiles,
