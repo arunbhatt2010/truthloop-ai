@@ -139,6 +139,8 @@ if (protocol !== "http:" && protocol !== "https:") {
         result.normalizedUrl = parsed.href;
         
         result.hostname = parsed.hostname.toLowerCase();
+        console.log("HOSTNAME:", result.hostname);
+console.log("URL:", result.normalizedUrl);
 
         result.valid = true;
         result.success = true;
@@ -226,6 +228,17 @@ export async function acquirePublicContent(urlPackage) {
 
         result.rawContent =
             await response.text();
+        // SPA detection
+result.isSPA =
+    /id="root"|id="app"|__NEXT_DATA__|webpack/i.test(
+        result.rawContent || ""
+    );
+        console.log("[PCF DEBUG]", {
+    url: urlPackage.normalizedUrl,
+    sourceType: result.sourceType,
+    isSPA: result.isSPA,
+    rawLength: result.rawContent?.length || 0
+});
 
         result.fetchedAt =
             new Date().toISOString();
