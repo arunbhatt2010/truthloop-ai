@@ -12,6 +12,9 @@ import {
 import {
     loadFootprintSupport
 } from "./FootprintSupport.js";
+import {
+    loadCrossEvidenceBrain
+} from "./CrossEvidenceBrain.js";
 /* ============================================================
    DIGITAL FOOTPRINT BRAIN
 
@@ -81,7 +84,8 @@ export async function loadDigitalFootprintBrain({
 
     truthLoopPackage = {},
 
-    profileLink = "",
+    profileLinks = [],
+
     businessData = "",
     otherEvidence = "",
 
@@ -120,9 +124,9 @@ if (currentLoop !== 7) {
 }
     // STEP 2
     // Input Validation
-const hasProfileLink =
-    typeof profileLink === "string" &&
-    profileLink.trim();
+const hasProfileLinks =
+    Array.isArray(profileLinks) &&
+    profileLinks.length > 0;
 
 const hasBusinessData =
     typeof businessData === "string" &&
@@ -170,13 +174,12 @@ The Universal Evidence Pipeline remains unchanged.
 */
 
 const hasEvidenceSource =
-    hasProfileLink ||
+    hasProfileLinks ||
     hasBusinessData ||
     hasOtherEvidence ||
     hasUploadedFiles ||
     hasConnectedApps ||
     hasIdentityPackage;
-
 if (!hasEvidenceSource) {
 
     return {
@@ -192,23 +195,24 @@ if (!hasEvidenceSource) {
 
 }
     // Normalize current Evidence Source
-const normalizedProfileLink =
-    hasProfileLink
-        ? profileLink.trim()
-        : "";
+const normalizedProfileLinks =
+    hasProfileLinks
+        ? profileLinks
+              .map(link => link?.trim())
+              .filter(Boolean)
+        : [];
     // Build Universal Evidence Context
     const footprintContextPackage =
     await loadFootprintSupport({
 
-        truthLoopPackage,
+    truthLoopPackage,
 
-        profileLink:
-            normalizedProfileLink,
+    profileLinks:
+        normalizedProfileLinks,
 
-        currentLoop
+    currentLoop
 
-    });
-
+});
 if (!footprintContextPackage.success) {
 
     return footprintContextPackage;
@@ -219,8 +223,7 @@ if (!footprintContextPackage.success) {
 
 let publicContentPackage = null;
 
-if (hasProfileLink) {
-
+if (hasProfileLinks) {
     const urlPackage =
         await loadPublicContentFetcher({
             url: normalizedProfileLink
