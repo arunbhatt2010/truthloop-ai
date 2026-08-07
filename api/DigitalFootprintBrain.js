@@ -250,7 +250,7 @@ console.log(
 );
     const urlPackage =
         await loadPublicContentFetcher({
-            url: normalizedProfileLink
+           url: normalizedProfileLinks[0]
         });
 
 const rawPackage =
