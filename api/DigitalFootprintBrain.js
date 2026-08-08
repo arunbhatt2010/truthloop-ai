@@ -249,30 +249,45 @@ console.log(
     )
 );
     const urlPackage =
-        await loadPublicContentFetcher({
-           url: normalizedProfileLinks[0]
-        });
+    await loadPublicContentFetcher({
+        url: normalizedProfileLinks[0]
+    });
 
 const rawPackage =
     await acquirePublicContent(urlPackage);
+
 console.log("RAW PACKAGE", rawPackage);
+
 const validatedPackage =
     validatePublicContent(rawPackage);
+
 console.log("VALIDATED PACKAGE", validatedPackage);
+
 const cleanPackage =
     cleanPublicContent(validatedPackage);
+
 console.log("CLEAN PACKAGE", cleanPackage);
+
 const extractedPackage =
     extractPublicContent(cleanPackage);
+
 console.log("EXTRACTED PACKAGE", extractedPackage);
+
 const normalizedPackage =
     normalizePublicEvidence(extractedPackage);
+
+console.log("NORMALIZED PACKAGE", {
+    visibleTextLength: normalizedPackage.visibleTextLength,
+    hasReadableContent: normalizedPackage.hasReadableContent,
+    extractionQuality: normalizedPackage.extractionQuality
+});
 
 const mergedPackage =
     mergePublicEvidence(normalizedPackage);
 
 const signalPackage =
     discoverPublicSignals(mergedPackage);
+
 if (!signalPackage.success) {
 
     return {
@@ -288,11 +303,18 @@ if (!signalPackage.success) {
     };
 
 }
+
+/*
+ TEMP TEST:
+ bypass signalPackage
+*/
+
 publicContentPackage =
     buildPublicContentPackage(
         rawPackage,
-        signalPackage
+        normalizedPackage
     );
+
 if (!publicContentPackage.success) {
 
     return {
@@ -306,7 +328,6 @@ if (!publicContentPackage.success) {
 
     };
 
-}
 }
     else if (hasBusinessData) {
 console.log("===== BUSINESS DATA ADAPTER =====");
