@@ -582,6 +582,30 @@ console.log(
   publicEvidencePackage?.reason
 );
 if (publicEvidencePackage) {
+  console.log(
+  "PUBLIC_EVIDENCE_PACKAGE",
+  JSON.stringify(publicEvidencePackage, null, 2)
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_KEYS",
+  Object.keys(publicEvidencePackage || {})
+);
+
+console.log(
+  "VISIBLE_TEXT_LENGTH",
+  publicEvidencePackage?.visibleTextLength
+);
+
+console.log(
+  "HAS_READABLE_CONTENT",
+  publicEvidencePackage?.hasReadableContent
+);
+
+console.log(
+  "PUBLIC_SIGNALS",
+  publicEvidencePackage?.publicSignals?.length
+);
    /* console.log(
         "PUBLIC_EVIDENCE_KEYS",
         Object.keys(publicEvidencePackage)
@@ -2231,16 +2255,24 @@ paywall:false
   }
 
   catch (error) {
-console.error("LOOP7 CRASH", error);
- return res.status(500).json({
 
-  reply:"SERVER CRASH",
+  console.error("===== LOOP7 CRASH =====");
+  console.error(error);
 
-  error:error.message,
+  return res.status(500).json({
 
-  stack:error.stack
+    reply:
+      "LOOP7 ERROR\n\n" +
+      (error?.message || "Unknown Error"),
 
- });
+    debug: {
+      message: error?.message,
+      stack: error?.stack
+    }
+
+  });
+
+}
 
   }
         }
