@@ -1103,6 +1103,221 @@ Posts + Comments
 
 Evidence:
 Posts + Articles
+
+5️⃣ Weak Patterns
+
+Purpose:
+
+Identify repeated behaviors,
+habits,
+or signals that consistently weaken growth,
+consistency,
+reach,
+or outcomes.
+
+Output:
+
+⏩ Weak Pattern
+Evidence: Source
+
+⏩ Weak Pattern
+Evidence: Source
+
+⏩ Weak Pattern
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Pattern must repeat
+
+• Pattern must reduce growth or outcomes
+
+• Ignore one-time events
+
+• No advice
+
+• No solutions
+
+• No conclusions
+A Weak Pattern must satisfy:
+
+Repeated
++
+Evidence Supported
++
+Growth Limiting
+
+If any one is missing,
+it is not a Weak Pattern.
+
+Example:
+
+⏩ Topic focus repeatedly shifts before momentum becomes measurable.
+
+Evidence:
+Posts + Timeline
+
+⏩ Audience interaction appears less consistent than content publishing activity.
+
+Evidence:
+Posts + Comments
+
+⏩ Multiple directions compete for attention, reducing message clarity.
+
+Evidence:
+Website + Posts
+
+6️⃣ Hidden Pattern
+
+Purpose:
+
+Identify the strongest hidden mechanism
+connecting:
+
+• Cross Analysis
+
+• Contradictions
+
+• Strong Patterns
+
+• Weak Patterns
+
+Output:
+
+⏩ Hidden Pattern
+
+Evidence: Source
+
+⏩ Hidden Pattern Impact
+
+Evidence: Source
+
+⏩ Hidden Pattern Result
+
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Must explain multiple findings
+
+• Must connect repeated evidence
+
+• Must explain observed outcomes
+
+• No advice
+
+• No solutions
+
+• No conclusions
+A Hidden Pattern must satisfy:
+
+Evidence Supported
++
+Explains Multiple Findings
++
+Explains Outcomes
+
+If any one is missing,
+it is not a Hidden Pattern.
+Example:
+
+⏩ Growth effort repeatedly expands into multiple directions before a single direction becomes measurable.
+
+Evidence:
+Posts + Timeline + Website
+
+⏩ This creates recurring focus fragmentation across content, audience, and positioning.
+
+Evidence:
+Cross Analysis + Contradictions
+
+⏩ As a result, effort remains high while measurable momentum remains inconsistent.
+
+Evidence:
+Timeline + Outcomes
+
+7️⃣ Final Investigation
+
+A. Conclusion
+
+Purpose:
+
+Deliver the final investigation verdict.
+
+Output:
+
+⏩ Conclusion
+
+Evidence: Source
+
+⏩ Conclusion
+
+Evidence: Source
+
+Rules:
+
+• 2 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Must be supported by previous findings
+
+• No new findings
+
+• No assumptions
+
+• No motivation
+
+━━━━━━━━━━━━━━━━━━━━
+
+B. One Next Step
+
+Purpose:
+
+Identify the single highest-impact action
+based on the investigation.
+
+Output:
+
+⏩ One Next Step
+
+Evidence: Source
+
+Rules:
+
+• 1 bullet only
+
+• Evidence mandatory
+
+• Must address the strongest constraint
+
+• Must be supported by findings
+
+• Must be specific
+
+• No generic advice
+
+Example:
+
+⏩ Commit to one primary content direction for the next 30 days before introducing new themes.
+
+Evidence:
+Weak Patterns + Hidden Pattern
+
 `;
 }
     /* =========================
