@@ -870,6 +870,12 @@ Rules:
 • No advice
 • No hidden patterns
 • No contradictions
+Investigation Summary is not allowed
+to reveal the final answer.
+
+Its job is only to frame the case.
+
+The investigation begins afterwards.
 EXAMPLE DO NOT COPY THIS EXAMPLE ONLY UNDERSTAND 
 1️⃣ Investigation Summary
 
@@ -941,6 +947,13 @@ Rules:
 • No contradictions
 
 • No hidden patterns
+Cross Analysis answers:
+
+"What do different evidence sources say when viewed together?"
+
+It does NOT answer:
+
+"Why does it happen?"
 
 Example:
 
@@ -959,6 +972,137 @@ Website + Community
 Evidence:
 Posts + Audience Responses
 
+3️⃣ Contradictions
+
+Purpose:
+
+Identify gaps between:
+
+• Intent
+• Action
+• Outcome
+
+Output:
+
+⏩ Contradiction Finding
+Evidence: Source
+
+⏩ Contradiction Finding
+Evidence: Source
+
+⏩ Contradiction Finding
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Compare intent vs action
+
+• Compare action vs outcome
+
+• Compare stated goals vs observed behavior
+
+• No advice
+
+• No solutions
+
+• No hidden patterns
+Contradictions answers:
+
+"What is not matching?"
+
+It does NOT answer:
+
+"Why is it not matching?"
+
+Example:
+
+⏩ The stated goal is building authority, but published content repeatedly changes direction across unrelated topics.
+
+Evidence:
+Posts + Website Content
+
+⏩ The goal is audience growth, but most effort is invested in content creation rather than audience interaction.
+
+Evidence:
+Posts + Comments
+
+⏩ Consistency is described as important, but activity appears in bursts followed by long gaps.
+
+Evidence:
+Timeline Activity
+
+4️⃣ Strong Patterns
+
+Purpose:
+
+Identify repeated behaviors,
+themes,
+or signals strongly supported by evidence.
+
+Output:
+
+⏩ Strong Pattern
+Evidence: Source
+
+⏩ Strong Pattern
+Evidence: Source
+
+⏩ Strong Pattern
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Pattern must appear repeatedly
+
+• Pattern must be supported by multiple signals
+
+• Ignore one-time events
+
+• No advice
+
+• No conclusions
+
+• No hidden patterns
+
+A Strong Pattern must satisfy:
+
+Repeated
++
+Observable
++
+Evidence Supported
+
+If any one is missing,
+it is not a Strong Pattern.
+
+Example:
+
+⏩ Content repeatedly focuses on hidden mechanisms rather than surface-level advice.
+
+Evidence:
+Posts + Website Content
+
+⏩ Audience engagement increases when pattern-recognition topics are discussed.
+
+Evidence:
+Posts + Comments
+
+⏩ Problem diagnosis appears more frequently than solution-focused content.
+
+Evidence:
+Posts + Articles
 `;
 }
     /* =========================
