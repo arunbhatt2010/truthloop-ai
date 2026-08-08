@@ -559,70 +559,69 @@ if (
 
 }
     if (publicEvidencePackage) {
-console.log(
+
+  console.log(
     "PUBLIC_EVIDENCE_PACKAGE",
     JSON.stringify(publicEvidencePackage, null, 2)
-);
-    console.log(
-  "PUBLIC_EVIDENCE_EXISTS",
-  publicEvidencePackage?.success ? "YES" : "NO"
-);
+  );
 
-console.log(
-  "PUBLIC_EVIDENCE_SUCCESS",
-  publicEvidencePackage?.success
-);
-
-console.log(
-  "PUBLIC_EVIDENCE_STAGE",
-  publicEvidencePackage?.stage
-);
-
-console.log(
-  "PUBLIC_EVIDENCE_REASON",
-  publicEvidencePackage?.reason
-);
-if (publicEvidencePackage) {
   console.log(
-  "PUBLIC_EVIDENCE_PACKAGE",
-  JSON.stringify(publicEvidencePackage, null, 2)
-);
+    "PUBLIC_EVIDENCE_EXISTS",
+    publicEvidencePackage?.success ? "YES" : "NO"
+  );
 
-console.log(
-  "PUBLIC_EVIDENCE_KEYS",
-  Object.keys(publicEvidencePackage || {})
-);
+  console.log(
+    "PUBLIC_EVIDENCE_SUCCESS",
+    publicEvidencePackage?.success
+  );
 
-console.log(
-  "VISIBLE_TEXT_LENGTH",
-  publicEvidencePackage?.visibleTextLength
-);
+  console.log(
+    "PUBLIC_EVIDENCE_STAGE",
+    publicEvidencePackage?.stage
+  );
 
-console.log(
-  "HAS_READABLE_CONTENT",
-  publicEvidencePackage?.hasReadableContent
-);
+  console.log(
+    "PUBLIC_EVIDENCE_REASON",
+    publicEvidencePackage?.reason
+  );
 
-console.log(
-  "PUBLIC_SIGNALS",
-  publicEvidencePackage?.publicSignals?.length
-);
-   /* console.log(
-        "PUBLIC_EVIDENCE_KEYS",
-        Object.keys(publicEvidencePackage)
-    );*/
+  console.log(
+    "PUBLIC_EVIDENCE_KEYS",
+    Object.keys(publicEvidencePackage || {})
+  );
+
+  console.log(
+    "VISIBLE_TEXT_LENGTH",
+    publicEvidencePackage?.visibleTextLength
+  );
+
+  console.log(
+    "HAS_READABLE_CONTENT",
+    publicEvidencePackage?.hasReadableContent
+  );
+
+  console.log(
+    "PUBLIC_SIGNALS",
+    publicEvidencePackage?.publicSignals?.length
+  );
+
 }
-  } catch (e) {
 
-    console.error(
-      "PROFILE_SYSTEM_BRAIN_ERROR",
-      e
-    );
+} catch (e) {
 
-    publicEvidencePackage = null;
-  }
+  console.error(
+    "PROFILE_SYSTEM_BRAIN_ERROR",
+    e
+  );
 
-          }
+  console.error(
+    "PROFILE_SYSTEM_BRAIN_STACK",
+    e?.stack
+  );
+
+  throw e;
+
+}
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
