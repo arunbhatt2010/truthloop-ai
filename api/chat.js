@@ -832,6 +832,133 @@ Rewrite the report.
 
 Return only the final corrected report.
 
+1️⃣ Investigation Summary
+
+Purpose:
+
+Summarize:
+
+A. What the user repeatedly expressed
+across Loop 1–6.
+
+B. What verified public evidence
+repeatedly suggests.
+
+Do not analyze.
+Do not explain patterns.
+Do not explain contradictions.
+Do not give conclusions.
+
+Output:
+
+⏩ User Narrative
+Evidence: TruthLoop Package
+
+⏩ Digital Footprint Narrative
+Evidence: Real Source
+
+⏩ Investigation Starting Point
+Evidence: Real Source
+
+Rules:
+
+• Use repeated signals only
+• Ignore one-time statements
+• Maximum 3 bullets
+• Every bullet requires evidence
+• No assumptions
+• No advice
+• No hidden patterns
+• No contradictions
+EXAMPLE DO NOT COPY THIS EXAMPLE ONLY UNDERSTAND 
+1️⃣ Investigation Summary
+
+⏩ User Narrative:
+The user repeatedly expresses a desire
+to build authority through TruthLoop AI,
+attract the right audience,
+and create meaningful long-term growth.
+
+Evidence:
+TruthLoop Conversation
+
+⏩ Digital Footprint Narrative:
+Public content consistently focuses on
+behavioral patterns,
+hidden mechanisms,
+and decision-making psychology.
+
+Evidence:
+Website Content
+
+⏩ Investigation Starting Point:
+The user's stated goal and public content
+appear aligned around pattern recognition,
+but the relationship between effort,
+consistency,
+and growth remains unresolved.
+
+Evidence:
+TruthLoop Conversation + Website Content
+
+2️⃣ Cross Analysis
+
+Purpose:
+
+Compare evidence sources.
+
+Identify:
+
+• Alignment
+• Mismatch
+• Missing Connection
+
+Output:
+
+⏩ Cross Evidence Finding
+Evidence: Source A + Source B
+
+⏩ Cross Evidence Finding
+Evidence: Source A + Source B
+
+⏩ Cross Evidence Finding
+Evidence: Source A + Source B
+
+Rules:
+
+• 3 bullets only
+
+• Compare multiple sources
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• No advice
+
+• No conclusions
+
+• No contradictions
+
+• No hidden patterns
+
+Example:
+
+⏩ Content targets founders but audience engagement comes mainly from beginners.
+
+Evidence:
+Posts + Comments
+
+⏩ Website messaging emphasizes pattern recognition while community discussions focus on growth problems.
+
+Evidence:
+Website + Community
+
+⏩ Published content is consistent but audience questions repeatedly shift toward execution challenges.
+
+Evidence:
+Posts + Audience Responses
+
 `;
 }
     /* =========================
