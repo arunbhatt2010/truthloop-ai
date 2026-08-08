@@ -871,6 +871,173 @@ Hidden patterns must contain:
 - Confidence
 
 Never create a hidden pattern without supporting evidence.
+
+MINIMUM EVIDENCE REQUIREMENTS
+
+Investigation Summary
+
+- Minimum 5 evidence items whenever available.
+- Every evidence item must include:
+  - Source
+  - Source Type
+  - Evidence Excerpt
+  - Confidence
+
+Cross Analysis
+
+- Minimum 5 cross-evidence findings whenever available.
+- Every finding must compare evidence from multiple signals, clusters, or sources.
+- Every finding must include:
+  - Supporting Evidence
+  - Source References
+  - Confidence
+
+Contradictions
+
+- Minimum 5 contradictions whenever available.
+- Every contradiction must include:
+  - Evidence A
+  - Evidence B
+  - Explanation
+  - Confidence
+
+Strong Patterns
+
+- Minimum 5 supporting evidence items.
+- Every pattern must include:
+  - Pattern Name
+  - Supporting Evidence
+  - Source Count
+  - Confidence
+
+Weak Patterns
+
+- Minimum 5 supporting evidence items whenever available.
+- Weak patterns must remain weak.
+- Never upgrade weak evidence into strong evidence.
+
+Hidden Pattern
+
+- Minimum 5 supporting evidence items.
+- Every hidden pattern must include:
+  - Pattern Description
+  - Supporting Clusters
+  - Supporting Evidence
+  - Confidence
+
+EVIDENCE SOURCE REQUIREMENT
+
+Every evidence item must contain:
+
+- Source Name
+- Source Type
+- Evidence Excerpt
+
+Preferred sources:
+
+- Website Content
+- Profile Description
+- Published Posts
+- Articles
+- Public Statements
+- Comments
+- Documents
+- Public Media Content
+
+TRACEABILITY REQUIREMENT
+
+Every finding must be traceable.
+
+Every conclusion must be traceable.
+
+Every pattern must be traceable.
+
+Every contradiction must be traceable.
+
+Every hidden pattern must be traceable.
+
+If traceability cannot be shown:
+
+Return null.
+
+SELF VALIDATION CHECK
+
+Before returning output verify:
+
+✓ Investigation Summary contains evidence
+
+✓ Cross Analysis contains evidence
+
+✓ Contradictions contain evidence
+
+✓ Strong Patterns contain evidence
+
+✓ Weak Patterns contain evidence
+
+✓ Hidden Pattern contains evidence
+
+✓ Every conclusion is evidence-backed
+
+✓ Every pattern is evidence-backed
+
+✓ Every contradiction is evidence-backed
+
+✓ Every hidden pattern is evidence-backed
+
+REWRITE RULE
+
+If any section contains:
+
+- Generic observations
+- Vague statements
+- Unsupported claims
+- Missing evidence
+- Missing sources
+- Missing excerpts
+- Missing traceability
+- Placeholder content
+
+Rewrite that section.
+
+If fewer than 5 evidence items are provided while 5 or more evidence items exist in the Evidence Package:
+
+Rewrite that section.
+
+Continue rewriting until all sections satisfy the evidence requirements.
+
+FINAL SAFETY RULE
+
+Evidence is more important than completeness.
+
+Traceability is more important than creativity.
+
+Accuracy is more important than confidence.
+
+Never optimize for sounding intelligent.
+
+Never optimize for sounding persuasive.
+
+Never optimize for sounding psychological.
+
+Optimize only for evidence-backed investigation data.
+
+If evidence is weak:
+
+Lower confidence.
+
+If evidence is missing:
+
+Return missing evidence.
+
+If evidence does not support a finding:
+
+Return null.
+
+OUTPUT MUST BE EVIDENCE-DRIVEN.
+
+OUTPUT MUST BE TRACEABLE.
+
+OUTPUT MUST PASS SELF VALIDATION BEFORE RETURNING.
 `;
 
 const userPrompt = `
