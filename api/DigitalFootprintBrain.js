@@ -316,16 +316,17 @@ publicContentPackage =
         normalizedPackage
     );
     console.log(
-    "PUBLIC_CONTENT_PACKAGE",
-    {
-        success: publicContentPackage?.success,
-        visibleTextLength:
-            publicContentPackage?.visibleTextLength,
-        hasReadableContent:
-            publicContentPackage?.hasReadableContent,
-        extractionQuality:
-            publicContentPackage?.extractionQuality
-    }
+  "FINAL_PUBLIC_PACKAGE",
+  {
+    visibleTextLength:
+      result.visibleTextLength,
+
+    hasReadableContent:
+      result.hasReadableContent,
+
+    extractionQuality:
+      result.extractionQuality
+  }
 );
 
 if (!publicContentPackage.success) {
