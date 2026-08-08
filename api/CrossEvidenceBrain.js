@@ -124,6 +124,54 @@ export async function loadCrossEvidenceBrain({
         return result;
     }
 }
+
+function calculateEvidenceScore(
+    mergedEvidence = {}
+){
+
+    let score = 0;
+
+    const profiles =
+        mergedEvidence.profiles?.length || 0;
+
+    const posts =
+        mergedEvidence.posts?.length || 0;
+
+    const articles =
+        mergedEvidence.articles?.length || 0;
+
+    const comments =
+        mergedEvidence.comments?.length || 0;
+
+    const links =
+        mergedEvidence.links?.length || 0;
+
+    const publicSignals =
+        mergedEvidence.publicSignals?.length || 0;
+
+    const traceability =
+        mergedEvidence.traceability?.length || 0;
+
+    score += Math.min(profiles * 10, 20);
+
+    score += Math.min(posts * 5, 20);
+
+    score += Math.min(articles * 5, 20);
+
+    score += Math.min(comments * 2, 10);
+
+    score += Math.min(links * 1, 10);
+
+    score += Math.min(publicSignals * 5, 10);
+
+    score += Math.min(traceability * 5, 10);
+
+    return Math.max(
+        0,
+        Math.min(score, 100)
+    );
+                      }
+
 async function collectSourceEvidence(url) {
 
     try {
