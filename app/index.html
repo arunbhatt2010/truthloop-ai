@@ -2008,70 +2008,66 @@ setTimeout(()=>{
 
 function renderLoop7Report(report){
 
-    // Clean existing TruthLoop markers
     report = report
-        .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
-            '<span class="truthHighlight">$1</span>')
-        .replace(/\r/g, "")
+        .replace(
+            /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+            '<span class="truthHighlight">$1</span>'
+        )
+        .replace(/\r/g,"")
         .trim();
 
     function getSection(icon){
 
-    const icons = [
-        "1️⃣",
-        "2️⃣",
-        "3️⃣",
-        "4️⃣",
-        "5️⃣",
-        "6️⃣",
-        "7️⃣"
-    ];
+        const icons = [
+            "1️⃣",
+            "2️⃣",
+            "3️⃣",
+            "4️⃣",
+            "5️⃣",
+            "6️⃣",
+            "7️⃣"
+        ];
 
-    const start = report.indexOf(icon);
+        const start = report.indexOf(icon);
 
-    if(start === -1) return "";
+        if(start === -1) return "";
 
-    let end = report.length;
+        let end = report.length;
 
-    for(const nextIcon of icons){
+        for(const nextIcon of icons){
 
-        if(nextIcon === icon) continue;
+            if(nextIcon === icon) continue;
 
-        const pos = report.indexOf(
-            nextIcon,
-            start + 1
-        );
+            const pos = report.indexOf(
+                nextIcon,
+                start + 1
+            );
 
-        if(pos !== -1 && pos < end){
-            end = pos;
+            if(pos !== -1 && pos < end){
+                end = pos;
+            }
         }
+
+        let text = report
+            .substring(start,end);
+
+        text = text
+            .replace(/^.*?\n/,"")
+            .trim();
+
+        return text
+            .replace(/#+\s*/g,"⏩ ")
+            .replace(/\n/g,"<br>");
     }
 
-    let text = report
-        .substring(start, end);
-
-    text = text
-        .replace(/^.*?\n/, "")
-        .trim();
-
-    return text
-        .replace(/#+\s*/g,"⏩ ")
-        .replace(/\n/g,"<br>");
-}
-
     const summary = getSection("1️⃣");
+    const crossAnalysis = getSection("2️⃣");
+    const contradictions = getSection("3️⃣");
+    const strongPatterns = getSection("4️⃣");
+    const weakPatterns = getSection("5️⃣");
+    const hiddenPattern = getSection("6️⃣");
+    const finalInvestigation = getSection("7️⃣");
 
-const crossAnalysis = getSection("2️⃣");
-
-const contradictions = getSection("3️⃣");
-
-const strongPatterns = getSection("4️⃣");
-
-const weakPatterns = getSection("5️⃣");
-
-const hiddenPattern = getSection("6️⃣");
-
-const finalInvestigation = getSection("7️⃣");
     return `
 
 <div class="truthLoopReport">
@@ -2112,19 +2108,17 @@ ${hiddenPattern}
 <h2>7️⃣ Final Investigation</h2>
 ${finalInvestigation}
 </div>
-` : ""}
-
 
 <div style="margin-top:30px;text-align:center;">
     <button id="downloadReportBtn">
         📄 Download Report
     </button>
 </div>
+
 </div>
 
 `;
-
-  }
+}
 
 document.addEventListener("click",(e)=>{
 
