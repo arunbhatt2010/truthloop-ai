@@ -1042,41 +1042,88 @@ OUTPUT MUST PASS SELF VALIDATION BEFORE RETURNING.
 
 const userPrompt = `
 
-UNIVERSAL EVIDENCE PACKAGE
-
-${JSON.stringify(publicContentPackage, null, 2)}
+LOOP 7 INVESTIGATION REQUEST
 
 CURRENT LOOP
 
 ${currentLoop}
 
-TRUTHLOOP CONTEXT
+━━━━━━━━━━━━━━━━━━━━
+TRUTHLOOP PACKAGE
+━━━━━━━━━━━━━━━━━━━━
 
 ${JSON.stringify(truthLoopPackage, null, 2)}
 
-IMPORTANT INSTRUCTIONS
+━━━━━━━━━━━━━━━━━━━━
+PUBLIC EVIDENCE PACKAGE
+━━━━━━━━━━━━━━━━━━━━
 
-1. Use ONLY evidence contained in the Universal Evidence Package.
+${JSON.stringify(publicContentPackage, null, 2)}
 
-2. Every conclusion must be traceable to evidence.
+━━━━━━━━━━━━━━━━━━━━
+INVESTIGATION OBJECTIVE
+━━━━━━━━━━━━━━━━━━━━
 
-3. Never infer:
-- personality
-- motivation
-- emotional state
-- private relationships
-- psychological traits
+Generate evidence for the following investigation structure:
 
-unless explicitly supported by evidence.
+1. Investigation Summary
 
-4. Missing evidence must remain missing.
+2. Cross Analysis
 
-5. Weak evidence must remain weak.
+3. Contradictions
 
-6. If evidence does not support a conclusion:
-return null.
+4. Strong Patterns
 
-7. Prioritize:
+5. Weak Patterns
+
+6. Hidden Pattern
+
+7. Final Investigation
+
+   A. Conclusion
+
+   B. One Next Step
+
+━━━━━━━━━━━━━━━━━━━━
+EVIDENCE RULES
+━━━━━━━━━━━━━━━━━━━━
+
+Use only evidence contained inside:
+
+- TruthLoop Package
+- Public Evidence Package
+
+Never use external knowledge.
+
+Never invent facts.
+
+Never invent sources.
+
+Never invent evidence.
+
+Never generate unsupported conclusions.
+
+If evidence is missing:
+
+Return:
+Evidence Unavailable
+
+If evidence is weak:
+
+Keep confidence low.
+
+If evidence conflicts:
+
+Show the conflict.
+
+Do not resolve unsupported conflicts.
+
+━━━━━━━━━━━━━━━━━━━━
+SOURCE PRIORITY
+━━━━━━━━━━━━━━━━━━━━
+
+Prefer evidence from:
+
 - visibleText
 - title
 - description
@@ -1084,15 +1131,125 @@ return null.
 - posts
 - articles
 - comments
+- documents
+- public media
+- public profiles
 
-over assumptions.
+Use actual evidence whenever available.
 
-8. Public websites, profiles, documents, and media describe observable signals.
-They do not automatically reveal personal psychology.
+━━━━━━━━━━━━━━━━━━━━
+TRACEABILITY RULE
+━━━━━━━━━━━━━━━━━━━━
 
-9. Confidence must be based only on evidence quality, evidence coverage, source consistency, and cross verification.
+Every finding must include:
 
-10. Never generate narrative filler.
+- Source
+- Source Type
+- Evidence Excerpt
+- Confidence
+
+Every statement must be traceable.
+
+Every pattern must be traceable.
+
+Every contradiction must be traceable.
+
+Every conclusion must be traceable.
+
+Every hidden pattern must be traceable.
+
+If traceability cannot be shown:
+
+Return null.
+
+━━━━━━━━━━━━━━━━━━━━
+MINIMUM EVIDENCE RULE
+━━━━━━━━━━━━━━━━━━━━
+
+Whenever evidence exists:
+
+Investigation Summary:
+Minimum 5 evidence items.
+
+Cross Analysis:
+Minimum 5 evidence items.
+
+Contradictions:
+Minimum 5 evidence items.
+
+Strong Patterns:
+Minimum 5 evidence items.
+
+Weak Patterns:
+Minimum 5 evidence items.
+
+Hidden Pattern:
+Minimum 5 evidence items.
+
+If fewer than 5 evidence items are returned while evidence exists:
+
+Rewrite the section.
+
+━━━━━━━━━━━━━━━━━━━━
+STRICT PROHIBITIONS
+━━━━━━━━━━━━━━━━━━━━
+
+Do not infer personality.
+
+Do not infer motivation.
+
+Do not infer emotional state.
+
+Do not infer psychological traits.
+
+Do not infer private relationships.
+
+Do not infer hidden facts.
+
+Do not generate narrative filler.
+
+Do not generate motivational language.
+
+Do not generate therapy language.
+
+Do not generate coaching language.
+
+Do not generate assumptions.
+
+Only use evidence-supported observations.
+
+━━━━━━━━━━━━━━━━━━━━
+SELF VALIDATION
+━━━━━━━━━━━━━━━━━━━━
+
+Before returning output verify:
+
+✓ Investigation Summary contains evidence
+
+✓ Cross Analysis contains evidence
+
+✓ Contradictions contain evidence
+
+✓ Strong Patterns contain evidence
+
+✓ Weak Patterns contain evidence
+
+✓ Hidden Pattern contains evidence
+
+✓ Final Investigation is evidence-backed
+
+✓ Every section contains traceability
+
+✓ Every section contains confidence
+
+✓ Every section contains source references
+
+If validation fails:
+
+Rewrite the failing section.
+
+Return only the final validated investigation package.
+
 `;
         /* ==========================================
    AI REQUEST CONTRACT
