@@ -558,6 +558,7 @@ if (
     });
 
 }
+    if (publicEvidencePackage) {
 console.log(
     "PUBLIC_EVIDENCE_PACKAGE",
     JSON.stringify(publicEvidencePackage, null, 2)
