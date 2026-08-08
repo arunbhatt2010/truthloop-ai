@@ -1291,6 +1291,18 @@ const requestBody = {
 
 };
         // Execute Universal Evidence Intelligence Request
+        console.log("===== CEREBRAS REQUEST =====");
+console.log("MODEL:", requestBody.model);
+
+console.log(
+  "===== CEREBRAS MESSAGES =====",
+  JSON.stringify(requestBody.messages, null, 2)
+);
+
+console.log(
+  "===== CEREBRAS REQUEST BODY =====",
+  JSON.stringify(requestBody, null, 2)
+);
        const response = await fetch(endpoint, {
 
     method: "POST",
