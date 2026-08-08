@@ -607,21 +607,7 @@ if (
 
 }
 
-} catch (e) {
 
-  console.error(
-    "PROFILE_SYSTEM_BRAIN_ERROR",
-    e
-  );
-
-  console.error(
-    "PROFILE_SYSTEM_BRAIN_STACK",
-    e?.stack
-  );
-
-  throw e;
-
-}
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
