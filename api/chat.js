@@ -831,6 +831,29 @@ If any rule fails:
 Rewrite the report.
 
 Return only the final corrected report.
+AVAILABLE EVIDENCE
+
+Profile Sources:
+
+${profileLinks?.length
+? profileLinks.join("\n")
+: "Not Available"}
+
+Public Evidence:
+
+${publicEvidencePackage
+? JSON.stringify(publicEvidencePackage, null, 2)
+: "Not Available"}
+
+Rules:
+
+• Evidence may come from multiple sources
+
+• Do not prioritize one source automatically
+
+• Find repeated signals across sources
+
+• Use evidence, not assumptions
 
 1️⃣ Investigation Summary
 
