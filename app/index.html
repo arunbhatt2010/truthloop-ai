@@ -2898,27 +2898,17 @@ investigationSource = profileLink;
             paid199:payment199,
             currentCategory
         })
-    }).then(r=>r.json());
-/* console.log("PROFILE UPDATE:", {
-  primaryLoop: data.primaryLoop,
-  emotionalDriver: data.emotionalDriver,
-  avoidanceStyle: data.avoidanceStyle,
-  hiddenAssumption: data.hiddenAssumption
 });
 
-document.getElementById("patternProfile").style.display = "block";
+const rawText = await data.text();
 
-document.getElementById("profilePrimary").innerText =
-"Primary Loop: " + (data.primaryLoop || "—");
+alert(
+  "STATUS: " + data.status +
+  "\n\nRESPONSE:\n\n" +
+  rawText
+);
 
-document.getElementById("profileTrigger").innerText =
-"Emotional Driver: " + (data.emotionalDriver || "—");
-
-document.getElementById("profileAvoidance").innerText =
-"Avoidance Style: " + (data.avoidanceStyle || "—");
-
-document.getElementById("profileBelief").innerText =
-"Underlying Belief: " + (data.hiddenAssumption || "—");*/
+return;
     messages.push({
     role: "assistant",
     content: data.reply
