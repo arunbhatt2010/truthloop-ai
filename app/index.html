@@ -2898,17 +2898,7 @@ investigationSource = profileLink;
             paid199:payment199,
             currentCategory
         })
-});
-
-const rawText = await data.text();
-
-alert(
-  "STATUS: " + data.status +
-  "\n\nRESPONSE:\n\n" +
-  rawText
-);
-
-return;
+}).then(r=>r.json());
     messages.push({
     role: "assistant",
     content: data.reply
