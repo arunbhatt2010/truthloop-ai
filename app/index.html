@@ -2017,7 +2017,15 @@ function renderLoop7Report(report){
 
     function getSection(icon){
 
-    const icons = ["📋","🧩","⚙","🌐","🔍","📊","💡","🎯"];
+    const icons = [
+        "1️⃣",
+        "2️⃣",
+        "3️⃣",
+        "4️⃣",
+        "5️⃣",
+        "6️⃣",
+        "7️⃣"
+    ];
 
     const start = report.indexOf(icon);
 
@@ -2029,21 +2037,26 @@ function renderLoop7Report(report){
 
         if(nextIcon === icon) continue;
 
-        const pos = report.indexOf(nextIcon, start + 1);
+        const pos = report.indexOf(
+            nextIcon,
+            start + 1
+        );
 
         if(pos !== -1 && pos < end){
             end = pos;
         }
     }
 
-    let text = report.substring(start, end);
+    let text = report
+        .substring(start, end);
 
-    text = text.replace(/^.*?\n/, "").trim();
+    text = text
+        .replace(/^.*?\n/, "")
+        .trim();
 
-return text
-  alert(text), text
-    .replace(/#+\s*/g,"⏩ ")
-    .replace(/\n/g,"<br>");
+    return text
+        .replace(/#+\s*/g,"⏩ ")
+        .replace(/\n/g,"<br>");
 }
 
     const summary = getSection("1️⃣");
