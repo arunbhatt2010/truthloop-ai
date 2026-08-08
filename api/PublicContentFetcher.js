@@ -1077,9 +1077,17 @@ collectionWindow: cleanPackage?.collectionWindow || "90 Days",
         }));
 
     result.visibleText =
-        html.replace(/<[^>]+>/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
+    html.replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+console.log(
+    "VISIBLE_TEXT_DEBUG",
+    {
+        length: result.visibleText.length,
+        sample: result.visibleText.slice(0,300)
+    }
+);
 // TES Evidence Metrics
 
 result.visibleTextLength = result.visibleText.length;
