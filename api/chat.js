@@ -835,9 +835,7 @@ AVAILABLE EVIDENCE
 
 Profile Sources:
 
-${profileLinks?.length
-? profileLinks.join("\n")
-: "Not Available"}
+${profileLink || "Not Available"}
 
 Public Evidence:
 
