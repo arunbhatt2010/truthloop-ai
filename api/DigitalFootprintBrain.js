@@ -315,6 +315,18 @@ publicContentPackage =
         rawPackage,
         normalizedPackage
     );
+    console.log(
+    "PUBLIC_CONTENT_PACKAGE",
+    {
+        success: publicContentPackage?.success,
+        visibleTextLength:
+            publicContentPackage?.visibleTextLength,
+        hasReadableContent:
+            publicContentPackage?.hasReadableContent,
+        extractionQuality:
+            publicContentPackage?.extractionQuality
+    }
+);
 
 if (!publicContentPackage.success) {
 
