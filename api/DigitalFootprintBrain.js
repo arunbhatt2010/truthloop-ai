@@ -303,6 +303,7 @@ if (!signalPackage.success) {
     };
 
 }
+    }
 
 /*
  TEMP TEST:
