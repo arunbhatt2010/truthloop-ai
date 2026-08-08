@@ -1251,6 +1251,20 @@ Rewrite the failing section.
 Return only the final validated investigation package.
 
 `;
+        throw new Error(
+  JSON.stringify({
+    userPromptLength: userPrompt.length,
+
+    hasPublicEvidencePackage:
+      userPrompt.includes("PUBLIC EVIDENCE PACKAGE"),
+
+    hasTruthloop:
+      userPrompt.includes("truthloop.in"),
+
+    preview:
+      userPrompt.substring(0, 500)
+  })
+);
         /* ==========================================
    AI REQUEST CONTRACT
 
@@ -1303,6 +1317,7 @@ console.log(
   "===== CEREBRAS REQUEST BODY =====",
   JSON.stringify(requestBody, null, 2)
 );
+        
        const response = await fetch(endpoint, {
 
     method: "POST",
