@@ -1207,14 +1207,10 @@ result.links = extractedPackage.links.map(link => ({
 
 result.content = {
 
-    headings: extractedPackage.headings.map(text => ({
-
+    headings: (extractedPackage.headings || []).map(text => ({
         type: "heading",
-
         text,
-
         verified: true
-
     })),
 
     visibleText: extractedPackage.visibleText,
@@ -1224,7 +1220,10 @@ result.content = {
     hasReadableContent: extractedPackage.hasReadableContent,
 
     extractionQuality: extractedPackage.extractionQuality
-    result.visibleText = extractedPackage.visibleText;
+
+};   // <-- YEH LINE CRITICAL HAI
+
+result.visibleText = extractedPackage.visibleText;
 
 result.visibleTextLength =
     extractedPackage.visibleTextLength || 0;
