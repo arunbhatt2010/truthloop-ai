@@ -558,52 +558,68 @@ if (
     });
 
 }
-    if (publicEvidencePackage) {
 
-  console.log(
-    "PUBLIC_EVIDENCE_PACKAGE",
-    JSON.stringify(publicEvidencePackage, null, 2)
-  );
+if (publicEvidencePackage) {
 
-  console.log(
-    "PUBLIC_EVIDENCE_EXISTS",
-    publicEvidencePackage?.success ? "YES" : "NO"
-  );
+    console.log(
+        "PUBLIC_EVIDENCE_PACKAGE",
+        JSON.stringify(publicEvidencePackage, null, 2)
+    );
 
-  console.log(
-    "PUBLIC_EVIDENCE_SUCCESS",
-    publicEvidencePackage?.success
-  );
+    console.log(
+        "PUBLIC_EVIDENCE_EXISTS",
+        publicEvidencePackage?.success
+            ? "YES"
+            : "NO"
+    );
 
-  console.log(
-    "PUBLIC_EVIDENCE_STAGE",
-    publicEvidencePackage?.stage
-  );
+    console.log(
+        "PUBLIC_EVIDENCE_SUCCESS",
+        publicEvidencePackage?.success
+    );
 
-  console.log(
-    "PUBLIC_EVIDENCE_REASON",
-    publicEvidencePackage?.reason
-  );
+    console.log(
+        "PUBLIC_EVIDENCE_STAGE",
+        publicEvidencePackage?.stage
+    );
 
-  console.log(
-    "PUBLIC_EVIDENCE_KEYS",
-    Object.keys(publicEvidencePackage || {})
-  );
+    console.log(
+        "PUBLIC_EVIDENCE_REASON",
+        publicEvidencePackage?.reason
+    );
 
-  console.log(
-    "VISIBLE_TEXT_LENGTH",
-    publicEvidencePackage?.visibleTextLength
-  );
+    console.log(
+        "PUBLIC_EVIDENCE_KEYS",
+        Object.keys(
+            publicEvidencePackage || {}
+        )
+    );
 
-  console.log(
-    "HAS_READABLE_CONTENT",
-    publicEvidencePackage?.hasReadableContent
-  );
+    console.log(
+        "VISIBLE_TEXT_LENGTH",
+        publicEvidencePackage?.visibleTextLength
+    );
 
-  console.log(
-    "PUBLIC_SIGNALS",
-    publicEvidencePackage?.publicSignals?.length
-  );
+    console.log(
+        "HAS_READABLE_CONTENT",
+        publicEvidencePackage?.hasReadableContent
+    );
+
+    console.log(
+        "PUBLIC_SIGNALS",
+        publicEvidencePackage?.publicSignals?.length
+    );
+
+}
+
+} catch (e) {
+
+    console.error(
+        "PROFILE_SYSTEM_BRAIN_ERROR",
+        e
+    );
+
+    publicEvidencePackage = null;
 
 }
 
