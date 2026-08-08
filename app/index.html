@@ -2046,15 +2046,19 @@ return text
     .replace(/\n/g,"<br>");
 }
 
-    const summary = getSection("📋");
-    const findings = getSection("🧩");
-    const mechanism = getSection("⚙");
-    const publicEvidence = getSection("🌐");
-    const crossEvidence = getSection("🔍");
-    const confidence = getSection("📊");
-    const reflection = getSection("💡");
-    const action = getSection("🎯");
+    const summary = getSection("1️⃣");
 
+const crossAnalysis = getSection("2️⃣");
+
+const contradictions = getSection("3️⃣");
+
+const strongPatterns = getSection("4️⃣");
+
+const weakPatterns = getSection("5️⃣");
+
+const hiddenPattern = getSection("6️⃣");
+
+const finalInvestigation = getSection("7️⃣");
     return `
 
 <div class="truthLoopReport">
@@ -2062,46 +2066,42 @@ return text
 <h1>🧠 TruthLoop Investigation Report</h1>
 
 <div id="investigationSummary">
-<h2>📋 Investigation Summary</h2>
+<h2>1️⃣ Investigation Summary</h2>
 ${summary}
 </div>
 
-<div id="behavioralFindings">
-<h2>🧩 Behavioral Findings</h2>
-${findings}
+<div id="crossAnalysis">
+<h2>2️⃣ Cross Analysis</h2>
+${crossAnalysis}
 </div>
 
-<div id="hiddenMechanism">
-<h2>⚙ Hidden Mechanism</h2>
-${mechanism}
+<div id="contradictions">
+<h2>3️⃣ Contradictions</h2>
+${contradictions}
 </div>
 
-${publicEvidence ? `
-<div id="publicEvidence">
-<h2>🌐 Public Evidence</h2>
-${publicEvidence}
+<div id="strongPatterns">
+<h2>4️⃣ Strong Patterns</h2>
+${strongPatterns}
+</div>
+
+<div id="weakPatterns">
+<h2>5️⃣ Weak Patterns</h2>
+${weakPatterns}
+</div>
+
+<div id="hiddenPattern">
+<h2>6️⃣ Hidden Pattern</h2>
+${hiddenPattern}
+</div>
+
+<div id="finalInvestigation">
+<h2>7️⃣ Final Investigation</h2>
+${finalInvestigation}
 </div>
 ` : ""}
 
-<div id="crossEvidence">
-<h2>🔍 Cross Evidence</h2>
-${crossEvidence}
-</div>
 
-<div id="evidenceConfidence">
-<h2>📊 Evidence Confidence</h2>
-${confidence}
-</div>
-
-<div id="finalReflection">
-<h2>💡 Final Reflection</h2>
-${reflection}
-</div>
-
-<div id="oneNextAction">
-<h2>🎯 One Next Action</h2>
-${action}
-</div>
 <div style="margin-top:30px;text-align:center;">
     <button id="downloadReportBtn">
         📄 Download Report
