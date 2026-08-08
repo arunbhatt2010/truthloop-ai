@@ -1224,6 +1224,16 @@ result.content = {
     hasReadableContent: extractedPackage.hasReadableContent,
 
     extractionQuality: extractedPackage.extractionQuality
+    result.visibleText = extractedPackage.visibleText;
+
+result.visibleTextLength =
+    extractedPackage.visibleTextLength || 0;
+
+result.hasReadableContent =
+    extractedPackage.hasReadableContent || false;
+
+result.extractionQuality =
+    extractedPackage.extractionQuality || "low";
 
 };
     // Normalize Timeline
