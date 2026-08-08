@@ -1173,6 +1173,11 @@ export function normalizePublicEvidence(extractedPackage) {
         return result;
 
     }
+    console.log("NORMALIZE INPUT", {
+  visibleTextLength: extractedPackage?.visibleTextLength,
+  hasReadableContent: extractedPackage?.hasReadableContent,
+  extractionQuality: extractedPackage?.extractionQuality
+});
 // Normalize Profile
 
 result.profile = {
