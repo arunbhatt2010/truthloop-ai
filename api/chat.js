@@ -2231,7 +2231,7 @@ paywall:false
   }
 
   catch (error) {
-
+console.error("LOOP7 CRASH", error);
  return res.status(500).json({
 
   reply:"SERVER CRASH",
