@@ -1345,27 +1345,29 @@ if (extractedPackage.communities?.length) {
     }));
 
 }
-    // Normalize Timeline
-
-result.timeline = [];
+// Additional Timeline Events
 
 if (extractedPackage.timeline?.length) {
 
-    result.timeline = extractedPackage.timeline.map(event => ({
+    result.timeline.push(
 
-        type: "timeline",
+        ...extractedPackage.timeline.map(event => ({
 
-        date: event.date || null,
+            type: "timeline",
 
-        label: event.label || null,
+            date: event.date || null,
 
-        source: event.source || null,
+            label: event.label || null,
 
-        verified: event.verified === true
+            source: event.source || null,
 
-    }));
+            verified: event.verified === true
 
-        }
+        }))
+
+    );
+
+}
     // Normalize Activity
 
 result.activity = [];
