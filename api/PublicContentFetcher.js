@@ -1234,7 +1234,7 @@ result.hasReadableContent =
 result.extractionQuality =
     extractedPackage.extractionQuality || "low";
 
-};
+
     // Normalize Timeline
 
 result.timeline.push({
