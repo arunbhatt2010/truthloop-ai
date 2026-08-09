@@ -260,10 +260,7 @@ if (hasProfileLinks) {
             cleanPackage
         );
 
-    const extractedPackage =
-    extractPublicContent(
-        cleanPackage
-    );
+
 
 const publicContentPackage =
     buildPublicContentPackage(
@@ -307,12 +304,7 @@ if (!publicContentPackage?.success) {
 
 }
 
-    publicContentPackage =
-        buildPublicContentPackage(
-            rawPackage,
-            extractedPackage
-        );
-
+    
     
 
     console.log(
