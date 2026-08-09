@@ -241,7 +241,7 @@ if (!publicContentPackage?.success) {
     };
 
 }
-    }
+    
 
 /*
  TEMP TEST:
