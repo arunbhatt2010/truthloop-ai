@@ -1763,7 +1763,15 @@ export function buildPublicContentPackage(
     rawPackage,
     extractedPackage
 ) {
+console.log(
+  "BUILD_INPUT_KEYS",
+  Object.keys(extractedPackage || {})
+);
 
+console.log(
+  "BUILD_INPUT_FULL",
+  extractedPackage
+);
     console.log("BUILD_PUBLIC_CONTENT_PACKAGE_BYPASSED", {
 
         rawSuccess: rawPackage?.success,
