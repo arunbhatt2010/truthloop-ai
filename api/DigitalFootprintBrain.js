@@ -199,93 +199,117 @@ if (!hasEvidenceSource) {
     };
 
 }
-    // Normalize current Evidence Source
-publicContentPackage =
-    buildPublicContentPackage(
-        rawPackage,
-        extractedPackage
-    );
 
-console.log(
-    "FINAL_PUBLIC_PACKAGE",
-    {
-        success:
-            publicContentPackage?.success,
-
-        title:
-            publicContentPackage?.title,
-
-        visibleTextLength:
-            publicContentPackage?.visibleText?.length || 0,
-
-        links:
-            publicContentPackage?.links?.length || 0,
-
-        headings:
-            publicContentPackage?.headings?.length || 0
-    }
-);
-
-if (!publicContentPackage?.success) {
-
-    return {
-
-        success: false,
-
-        stage: "Public Evidence Pipeline",
-
-        reason:
-            publicContentPackage?.reason ||
-            "Public Content Package failed."
-
-    };
-
-}
     
 
-/*
- TEMP TEST:
- bypass signalPackage
-*/
+// =====================================================
+// STEP 3
+// Public Profile / Website Adapter
+// =====================================================
 
-publicContentPackage =
-    buildPublicContentPackage(
-        rawPackage,
-        extractedPackage
-    );
-    console.log(
-    "FINAL_PUBLIC_PACKAGE",
-    {
-        success:
-            publicContentPackage?.success,
+if (hasProfileLinks) {
 
-        title:
-            publicContentPackage?.title,
+    const urlPackage =
+        await loadPublicContentFetcher({
+            url: normalizedProfileLinks[0]
+        });
 
-        visibleTextLength:
-            publicContentPackage?.visibleText?.length || 0,
+    const rawPackage =
+        await acquirePublicContent(
+            urlPackage
+        );
 
-        links:
-            publicContentPackage?.links?.length || 0,
+    const validatedPackage =
+        validatePublicContent(
+            rawPackage
+        );
 
-        headings:
-            publicContentPackage?.headings?.length || 0
+    const cleanPackage =
+        cleanPublicContent(
+            validatedPackage
+        );
+
+    const extractedPackage =
+        extractPublicContent(
+            cleanPackage
+        );
+
+    const normalizedPackage =
+        normalizePublicEvidence(
+            extractedPackage
+        );
+
+    const mergedPackage =
+        mergePublicEvidence(
+            normalizedPackage
+        );
+
+    const signalPackage =
+        discoverPublicSignals(
+            mergedPackage
+        );
+
+    if (!signalPackage.success) {
+
+        return {
+
+            success: false,
+
+            stage: "Public Evidence Pipeline",
+
+            reason:
+                signalPackage.reason ||
+                "Public Evidence Pipeline failed."
+
+        };
+
     }
-);
-if (!publicContentPackage.success) {
 
-    return {
+    publicContentPackage =
+        buildPublicContentPackage(
+            rawPackage,
+            extractedPackage
+        );
 
-        success: false,
+    console.log(
+        "FINAL_PUBLIC_PACKAGE",
+        {
+            success:
+                publicContentPackage?.success,
 
-        stage: "Public Evidence Adapter",
+            sourceType:
+                publicContentPackage?.sourceType,
 
-        reason:
-            publicContentPackage.reason
+            visibleTextLength:
+                publicContentPackage?.visibleTextLength,
 
-    };
+            hasReadableContent:
+                publicContentPackage?.hasReadableContent,
+
+            extractionQuality:
+                publicContentPackage?.extractionQuality
+        }
+    );
+
+    if (!publicContentPackage?.success) {
+
+        return {
+
+            success: false,
+
+            stage: "Public Evidence Adapter",
+
+            reason:
+                publicContentPackage?.reason ||
+                "Public Content Package failed."
+
+        };
+
+    }
 
 }
+
+
     else if (hasBusinessData) {
 console.log("===== BUSINESS DATA ADAPTER =====");
 console.log("Business Data Length:", businessData.length);
