@@ -983,7 +983,12 @@ export function extractActivity(html) {
 }
 
 export function extractPublicContent(cleanPackage) {
+console.log("EXTRACT_PUBLIC_CONTENT_ENTERED");
 
+    console.log({
+        cleanPackageSuccess: cleanPackage?.success,
+        cleanContentLength: cleanPackage?.cleanContent?.length || 0
+    });
     const result = {
 
         success: false,
@@ -1043,7 +1048,10 @@ collectionWindow: cleanPackage?.collectionWindow || "90 Days",
     }
 
     const html = cleanPackage.cleanContent;
-
+console.log("HTML_RECEIVED", {
+    length: html?.length || 0,
+    sample: html?.slice(0, 300)
+});
     result.title =
         html.match(/<title>(.*?)<\/title>/i)?.[1]?.trim() || null;
 
