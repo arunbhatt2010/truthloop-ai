@@ -215,9 +215,10 @@ let publicContentPackage = null;
 if (hasProfileLinks) {
 
     const urlPackage =
-        await loadPublicContentFetcher({
-            url: normalizedProfileLinks[0]
-        });
+    await loadPublicContentFetcher({
+        profileLinks:
+            normalizedProfileLinks
+    });
 
     const rawPackage =
         await acquirePublicContent(
