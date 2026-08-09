@@ -1378,7 +1378,7 @@ const requestBody = {
 };
       
 
-  try {
+  
 
   // Execute Universal Evidence Intelligence Request
 
