@@ -232,7 +232,7 @@ const normalizedProfileLinks =
         : [];
 
 // Public Profile / Website Adapter
-
+let publicContentPackage = null;
 if (hasProfileLinks) {
 
     const urlPackage =
@@ -265,7 +265,7 @@ console.log(
 
 
 
-const publicContentPackage =
+ publicContentPackage =
     buildPublicContentPackage(
         rawPackage,
         extractedPackage
