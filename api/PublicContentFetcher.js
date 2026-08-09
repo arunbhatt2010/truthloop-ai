@@ -532,6 +532,30 @@ result.activity = extractActivity(html);
     return result;
 
 }
+
+function extractPosts(html) {
+    return [];
+}
+
+function extractComments(html) {
+    return [];
+}
+
+function extractArticles(html) {
+    return [];
+}
+
+function extractCommunities(html) {
+    return [];
+}
+
+function extractTimeline(html) {
+    return [];
+}
+
+function extractActivity(html) {
+    return [];
+       }
 /*
 ==============================================================
 BLOCK 3
