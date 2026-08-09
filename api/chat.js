@@ -1826,6 +1826,20 @@ Users stay engaged when they feel understood, not analyzed.
 `;
 
 const systemPrompt = `
+
+${corePrompt}
+
+${investigationRules}
+
+${loop7Instruction}
+
+${loopRules}
+
+${outputRules}
+
+${finalReview}
+`;
+
 console.log("===== PROMPT_BLOCK_DEBUG =====");
 
 console.log(
@@ -1864,20 +1878,7 @@ console.log(
 );
 
 console.log("===== END PROMPT_BLOCK_DEBUG =====");
-${corePrompt}
-
-${investigationRules}
-
-${loop7Instruction}
-
-${loopRules}
-
-${outputRules}
-
-${finalReview}
-`;
-
-
+    
     /* =========================
        🤖 AI CALL
     ========================= */
