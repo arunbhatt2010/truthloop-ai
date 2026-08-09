@@ -259,6 +259,7 @@ Rules:
 `;
 }
 export default async function handler(req, res) {
+
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -267,28 +268,137 @@ export default async function handler(req, res) {
   }
 
   try {
+
     const body = req.body || {};
+
+    const profileLink =
+      body.profileLink || "";
+
+    const publicEvidencePackage =
+      body.publicEvidencePackage || null;
+
+    const truthLoopPackage =
+      body.truthLoopPackage || null;
 
     console.log("===== LOOP7 API START =====");
 
-    console.log("LOOP7 INPUT", {
-      hasConversation: Array.isArray(body.conversation),
-      hasEvidencePackage: !!body.evidencePackage,
-      currentLoop: body.currentLoop
-    });
+    console.log("LOOP7_PROFILE_LINK:", profileLink);
+
+    console.log(
+      "LOOP7_PUBLIC_EVIDENCE:",
+      !!publicEvidencePackage
+    );
+
+    console.log(
+      "LOOP7_TRUTHLOOP_PACKAGE:",
+      !!truthLoopPackage
+    );
+
+    const loop7Instruction =
+      buildLoop7Instruction({
+        profileLink,
+        publicEvidencePackage
+      });
+
+    const truthLoopEvidence =
+      truthLoopPackage
+        ? JSON.stringify(truthLoopPackage, null, 2)
+        : "Not Available";
+
+    const finalPrompt = `
+TRUTHLOOP PACKAGE
+━━━━━━━━━━━━━━━━━━━━
+
+${truthLoopEvidence}
+
+━━━━━━━━━━━━━━━━━━━━
+LOOP 7 INVESTIGATION INSTRUCTION
+━━━━━━━━━━━━━━━━━━━━
+
+${loop7Instruction}
+`;
+
+    console.log(
+      "LOOP7_PROMPT_CHARS:",
+      finalPrompt.length
+    );
+
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization":
+            "Bearer " + process.env.GROQ_API_KEY
+        },
+
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+
+          messages: [
+            {
+              role: "user",
+              content: finalPrompt
+            }
+          ],
+
+          temperature: 0.3,
+          max_tokens: 1800
+        })
+      }
+    );
+
+    console.log(
+      "LOOP7_GROQ_STATUS:",
+      response.status
+    );
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      console.error(
+        "LOOP7_GROQ_ERROR:",
+        errorText
+      );
+
+      return res.status(500).json({
+        success: false,
+        error: "Loop 7 AI service failed"
+      });
+    }
+
+    const data =
+      await response.json();
+
+    const report =
+      data?.choices?.[0]?.message?.content || "";
+
+    console.log(
+      "LOOP7_REPORT_CHARS:",
+      report.length
+    );
+
+    console.log("===== LOOP7 API END =====");
 
     return res.status(200).json({
       success: true,
-      stage: "loop7-api-ready",
-      message: "Loop 7 API received the request."
+      report
     });
 
   } catch (error) {
-    console.error("LOOP7 API ERROR", error);
+
+    console.error(
+      "LOOP7_API_ERROR:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
-      error: "Loop 7 API failed."
+      error: "Loop 7 generation failed"
     });
   }
 }
