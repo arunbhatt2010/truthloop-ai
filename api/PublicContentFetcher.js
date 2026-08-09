@@ -872,3 +872,59 @@ result.activity = extractedPackage.activity || [];
     return result;
 
            }
+
+export function buildUnifiedEvidencePackage(
+    fetchedPackage
+) {
+
+    const result = {
+
+        success: false,
+
+        sources: [],
+
+        platforms: [],
+
+        evidenceCount: 0,
+
+        visibleText: "",
+
+        posts: [],
+
+        comments: [],
+
+        articles: [],
+
+        communities: [],
+
+        timeline: [],
+
+        activity: [],
+
+        reason: null
+
+    };
+
+    if (!fetchedPackage?.success) {
+
+        result.reason =
+            "Evidence collection failed.";
+
+        return result;
+
+    }
+
+    result.sources =
+        fetchedPackage.sources || [];
+
+    result.platforms =
+        fetchedPackage.platforms || [];
+
+    result.evidenceCount =
+        fetchedPackage.evidenceCount || 0;
+
+    result.success = true;
+
+    return result;
+
+       }
