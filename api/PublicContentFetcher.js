@@ -129,17 +129,16 @@ export async function loadPublicContentFetcher({
 
                 const parsed =
                     new URL(String(link).trim());
-               const platform =
+               const detectedPlatform =
     detectPlatform(parsed.href);
 
-result.platforms.push(platform);
+result.platforms.push(detectedPlatform);
 
 result.validLinks.push({
     url: parsed.href,
     hostname: parsed.hostname,
-    platform
+    platform: detectedPlatform
 });
-
                 const protocol =
                     parsed.protocol.toLowerCase();
 
