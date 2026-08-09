@@ -4,9 +4,6 @@ import {
     validatePublicContent,
     cleanPublicContent,
     extractPublicContent,
-    normalizePublicEvidence,
-    mergePublicEvidence,
-    discoverPublicSignals,
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
 import {
@@ -203,92 +200,33 @@ if (!hasEvidenceSource) {
 
 }
     // Normalize current Evidence Source
-const normalizedProfileLinks =
-    hasProfileLinks
-        ? profileLinks
-              .map(link => link?.trim())
-              .filter(Boolean)
-        : [];
-    // Build Universal Evidence Context
-    const footprintContextPackage =
-    await loadFootprintSupport({
-
-    truthLoopPackage,
-
-    profileLinks:
-        normalizedProfileLinks,
-
-    currentLoop
-
-});
-if (!footprintContextPackage.success) {
-
-    return footprintContextPackage;
-
-}
-/// STEP 2.5
-// Universal Evidence Router
-
-let publicContentPackage = null;
-
-if (hasProfileLinks) {
-    const crossEvidencePackage =
-    await loadCrossEvidenceBrain({
-
-        profileLinks:
-            normalizedProfileLinks
-
-    });
+publicContentPackage =
+    buildPublicContentPackage(
+        rawPackage,
+        extractedPackage
+    );
 
 console.log(
-    "CROSS_EVIDENCE_PACKAGE",
-    JSON.stringify(
-        crossEvidencePackage,
-        null,
-        2
-    )
+    "FINAL_PUBLIC_PACKAGE",
+    {
+        success:
+            publicContentPackage?.success,
+
+        title:
+            publicContentPackage?.title,
+
+        visibleTextLength:
+            publicContentPackage?.visibleText?.length || 0,
+
+        links:
+            publicContentPackage?.links?.length || 0,
+
+        headings:
+            publicContentPackage?.headings?.length || 0
+    }
 );
-    const urlPackage =
-    await loadPublicContentFetcher({
-        url: normalizedProfileLinks[0]
-    });
 
-const rawPackage =
-    await acquirePublicContent(urlPackage);
-
-console.log("RAW PACKAGE", rawPackage);
-
-const validatedPackage =
-    validatePublicContent(rawPackage);
-
-console.log("VALIDATED PACKAGE", validatedPackage);
-
-const cleanPackage =
-    cleanPublicContent(validatedPackage);
-
-console.log("CLEAN PACKAGE", cleanPackage);
-
-const extractedPackage =
-    extractPublicContent(cleanPackage);
-
-console.log("EXTRACTED PACKAGE", extractedPackage);
-
-const normalizedPackage =
-    normalizePublicEvidence(extractedPackage);
-
-console.log("NORMALIZED PACKAGE", {
-    visibleTextLength: normalizedPackage.visibleTextLength,
-    hasReadableContent: normalizedPackage.hasReadableContent,
-    extractionQuality: normalizedPackage.extractionQuality
-});
-
-const mergedPackage =
-    mergePublicEvidence(normalizedPackage);
-
-const signalPackage =
-    discoverPublicSignals(mergedPackage);
-
-if (!signalPackage.success) {
+if (!publicContentPackage?.success) {
 
     return {
 
@@ -297,8 +235,8 @@ if (!signalPackage.success) {
         stage: "Public Evidence Pipeline",
 
         reason:
-            signalPackage.reason ||
-            "Public Evidence Pipeline failed."
+            publicContentPackage?.reason ||
+            "Public Content Package failed."
 
     };
 
@@ -313,22 +251,27 @@ if (!signalPackage.success) {
 publicContentPackage =
     buildPublicContentPackage(
         rawPackage,
-        normalizedPackage
+        extractedPackage
     );
     console.log(
-  "FINAL_PUBLIC_PACKAGE",
-  {
-    visibleTextLength:
-      result.visibleTextLength,
+    "FINAL_PUBLIC_PACKAGE",
+    {
+        success:
+            publicContentPackage?.success,
 
-    hasReadableContent:
-      result.hasReadableContent,
+        title:
+            publicContentPackage?.title,
 
-    extractionQuality:
-      result.extractionQuality
-  }
+        visibleTextLength:
+            publicContentPackage?.visibleText?.length || 0,
+
+        links:
+            publicContentPackage?.links?.length || 0,
+
+        headings:
+            publicContentPackage?.headings?.length || 0
+    }
 );
-
 if (!publicContentPackage.success) {
 
     return {
