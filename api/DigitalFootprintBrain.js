@@ -1376,92 +1376,97 @@ const requestBody = {
     }
 
 };
-        // Execute Universal Evidence Intelligence Request
+      
 
-console.log("===== CEREBRAS REQUEST =====");
-console.log("MODEL:", requestBody.model);
+  try {
 
-console.log(
-  "===== CEREBRAS MESSAGES =====",
-  JSON.stringify(requestBody.messages, null, 2)
-);
+  // Execute Universal Evidence Intelligence Request
 
-console.log(
-  "===== CEREBRAS REQUEST BODY =====",
-  JSON.stringify(requestBody, null, 2)
-);
+  console.log("===== CEREBRAS REQUEST =====");
+  console.log("MODEL:", requestBody.model);
 
-console.log("🔥 BEFORE CEREBRAS FETCH 🔥");
-console.log(
-  "API KEY EXISTS:",
-  !!process.env.CEREBRAS_API_KEY
-);
-console.log("ENDPOINT:", endpoint);
-
-const response = await fetch(endpoint, {
-  method: "POST",
-
-  headers: {
-    "Content-Type": "application/json",
-
-    Authorization:
-      `Bearer ${process.env.CEREBRAS_API_KEY}`
-  },
-
-  body: JSON.stringify(requestBody)
-});
-
-console.log("🔥 AFTER CEREBRAS FETCH 🔥");
-console.log("STATUS:", response.status);
-
-if (!response.ok) {
-
-  const errorText = await response.text();
-
-  console.error(
-    "🔥 CEREBRAS HTTP ERROR 🔥",
-    errorText
+  console.log(
+    "===== CEREBRAS MESSAGES =====",
+    JSON.stringify(requestBody.messages, null, 2)
   );
 
-  intelligence.errors.push(
-    `Universal Evidence API Error: HTTP ${response.status}`
+  console.log(
+    "===== CEREBRAS REQUEST BODY =====",
+    JSON.stringify(requestBody, null, 2)
   );
+
+  console.log("🔥 BEFORE CEREBRAS FETCH 🔥");
+  console.log(
+    "API KEY EXISTS:",
+    !!process.env.CEREBRAS_API_KEY
+  );
+
+  console.log("ENDPOINT:", endpoint);
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+
+      Authorization:
+        `Bearer ${process.env.CEREBRAS_API_KEY}`
+    },
+
+    body: JSON.stringify(requestBody)
+  });
+
+  console.log("🔥 AFTER CEREBRAS FETCH 🔥");
+  console.log("STATUS:", response.status);
+
+  if (!response.ok) {
+
+    const errorText = await response.text();
+
+    console.error(
+      "🔥 CEREBRAS HTTP ERROR 🔥",
+      errorText
+    );
+
+    intelligence.errors.push(
+      `Universal Evidence API Error: HTTP ${response.status}`
+    );
+
+    return intelligence;
+  }
+
+  const result = await response.json();
+
+  console.log("🔥 CEREBRAS JSON RECEIVED 🔥");
+
+  intelligence.rawResponse = result;
+
+  console.log(
+    "CEREBRAS_RESPONSE",
+    JSON.stringify(result, null, 2)
+  );
+
+  const content =
+    result?.choices?.[0]?.message?.content;
+
+  if (!content) {
+
+    intelligence.errors.push(
+      "No response content returned."
+    );
+
+    return intelligence;
+  }
+
+  intelligence.evidence = content;
+
+  intelligence.success = true;
+
+  console.log("🔥 CEREBRAS SUCCESS 🔥");
 
   return intelligence;
-}
 
-const result = await response.json();
-
-console.log("🔥 CEREBRAS JSON RECEIVED 🔥");
-
-intelligence.rawResponse = result;
-
-console.log(
-  "CEREBRAS_RESPONSE",
-  JSON.stringify(result, null, 2)
-);
-
-const content =
-  result?.choices?.[0]?.message?.content;
-
-if (!content) {
-
-  intelligence.errors.push(
-    "No response content returned."
-  );
-
-  return intelligence;
-}
-
-intelligence.evidence = content;
-
-intelligence.success = true;
-
-console.log("🔥 CEREBRAS SUCCESS 🔥");
-
-return intelligence;
-
-    catch (error) {
+} catch (error) {
 
   console.error(
     "🚨 CEREBRAS CRASH 🚨"
@@ -1474,9 +1479,7 @@ return intelligence;
   );
 
   return intelligence;
-    }
-
-}
+      }
 
 async function ProfileMainBrain({
 
