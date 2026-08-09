@@ -1826,6 +1826,44 @@ Users stay engaged when they feel understood, not analyzed.
 `;
 
 const systemPrompt = `
+console.log("===== PROMPT_BLOCK_DEBUG =====");
+
+console.log(
+    "CORE_PROMPT_CHARS:",
+    corePrompt?.length || 0
+);
+
+console.log(
+    "INVESTIGATION_RULES_CHARS:",
+    investigationRules?.length || 0
+);
+
+console.log(
+    "LOOP7_INSTRUCTION_CHARS:",
+    loop7Instruction?.length || 0
+);
+
+console.log(
+    "LOOP_RULES_CHARS:",
+    loopRules?.length || 0
+);
+
+console.log(
+    "OUTPUT_RULES_CHARS:",
+    outputRules?.length || 0
+);
+
+console.log(
+    "FINAL_REVIEW_CHARS:",
+    finalReview?.length || 0
+);
+
+console.log(
+    "SYSTEM_PROMPT_TOTAL:",
+    systemPrompt?.length || 0
+);
+
+console.log("===== END PROMPT_BLOCK_DEBUG =====");
 ${corePrompt}
 
 ${investigationRules}
