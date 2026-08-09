@@ -1895,6 +1895,93 @@ if (loopLevel === 7) {
   });
 
 }
+    /* ==========================================
+   LOOP 7 API MODULE ROUTER
+   ========================================== */
+
+if (loopLevel === 7) {
+
+  console.log("===== LOOP7 MODULE ROUTE =====");
+
+  try {
+
+    const loop7Response = await fetch(
+      "https://truthloop.in/api/Loop7",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          profileLink,
+
+          truthLoopPackage,
+
+          publicEvidencePackage
+
+        })
+      }
+    );
+
+    console.log(
+      "LOOP7_MODULE_STATUS:",
+      loop7Response.status
+    );
+
+    if (!loop7Response.ok) {
+
+      const loop7Error =
+        await loop7Response.text();
+
+      console.error(
+        "LOOP7_MODULE_ERROR:",
+        loop7Error
+      );
+
+      return res.status(500).json({
+        reply: "Loop 7 investigation service failed."
+      });
+
+    }
+
+    const loop7Data =
+      await loop7Response.json();
+
+    console.log(
+      "LOOP7_MODULE_SUCCESS:",
+      loop7Data?.success
+    );
+
+    console.log(
+      "LOOP7_REPORT_CHARS:",
+      loop7Data?.report?.length || 0
+    );
+
+    return res.status(200).json({
+
+      reply:
+        loop7Data?.report || "Evidence Unavailable"
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "LOOP7_MODULE_REQUEST_ERROR:",
+      error
+    );
+
+    return res.status(500).json({
+      reply: "Loop 7 investigation failed."
+    });
+
+  }
+
+  }
+    
     const maxTokens =
   loopLevel === 7 ? 900 : 220;
     console.log("===== GROQ_PAYLOAD_DEBUG =====");
