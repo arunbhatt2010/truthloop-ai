@@ -588,11 +588,12 @@ if (publicEvidencePackage) {
     );*/
 }
   } catch (e) {
-  console.error(
-    "PROFILE_SYSTEM_BRAIN_ERROR",
-    e
-  );
-  }
+
+    console.error(
+      "PROFILE_SYSTEM_BRAIN_ERROR",
+      e
+    );
+
     publicEvidencePackage = null;
   }
 
