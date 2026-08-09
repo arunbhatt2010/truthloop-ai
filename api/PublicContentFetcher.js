@@ -453,6 +453,17 @@ export function extractPublicContent(cleanPackage) {
         images: [],
 
         visibleText: null,
+       posts: [],
+
+comments: [],
+
+articles: [],
+
+communities: [],
+
+timeline: [],
+
+activity: [],
 
         reason: null
 
@@ -504,6 +515,17 @@ export function extractPublicContent(cleanPackage) {
         html.replace(/<[^>]+>/g, " ")
             .replace(/\s+/g, " ")
             .trim();
+   result.posts = extractPosts(html);
+
+result.comments = extractComments(html);
+
+result.articles = extractArticles(html);
+
+result.communities = extractCommunities(html);
+
+result.timeline = extractTimeline(html);
+
+result.activity = extractActivity(html);
 
     result.success = true;
 
@@ -570,6 +592,7 @@ export function buildPublicContentPackage(
         contentLength: rawPackage?.contentLength || 0,
 
         fetchedAt: rawPackage?.fetchedAt || null,
+       
 
         title: null,
 
@@ -588,7 +611,18 @@ export function buildPublicContentPackage(
         visibleText: null,
 
         normalizedAt: null,
+posts: [],
 
+comments: [],
+
+articles: [],
+
+communities: [],
+
+timeline: [],
+
+activity: [],
+       evidenceCount: 0,
         reason: null
 
     };
@@ -624,7 +658,24 @@ export function buildPublicContentPackage(
     result.images = extractedPackage.images;
 
     result.visibleText = extractedPackage.visibleText;
+result.posts = extractedPackage.posts || [];
 
+result.comments = extractedPackage.comments || [];
+
+result.articles = extractedPackage.articles || [];
+
+result.communities = extractedPackage.communities || [];
+
+result.timeline = extractedPackage.timeline || [];
+
+result.activity = extractedPackage.activity || [];
+   result.evidenceCount =
+    result.posts.length +
+    result.comments.length +
+    result.articles.length +
+    result.communities.length +
+    result.timeline.length +
+    result.activity.length;
     result.normalizedAt =
         new Date().toISOString();
 
