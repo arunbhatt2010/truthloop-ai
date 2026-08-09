@@ -29,9 +29,6 @@ import {
     validatePublicContent,
     cleanPublicContent,
     extractPublicContent,
-    normalizePublicEvidence,
-    mergePublicEvidence,
-    discoverPublicSignals,
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
 
@@ -201,38 +198,51 @@ async function collectSourceEvidence(url) {
                 cleanPackage
             );
 
-        const normalizedPackage =
-            normalizePublicEvidence(
-                extractedPackage
-            );
-
-        const mergedPackage =
-            mergePublicEvidence(
-                normalizedPackage
-            );
-
-        const signalPackage =
-            discoverPublicSignals(
-                mergedPackage
-            );
-
         const finalPackage =
             buildPublicContentPackage(
                 rawPackage,
-                signalPackage
+                extractedPackage
             );
+
+        console.log(
+            "CROSS_EVIDENCE_FINAL_PACKAGE",
+            {
+                success:
+                    finalPackage?.success,
+
+                title:
+                    finalPackage?.title,
+
+                visibleTextLength:
+                    finalPackage?.visibleText?.length || 0,
+
+                links:
+                    finalPackage?.links?.length || 0,
+
+                headings:
+                    finalPackage?.headings?.length || 0
+            }
+        );
 
         return {
 
-            success: finalPackage.success,
+            success:
+                finalPackage.success,
 
-            package: finalPackage,
+            package:
+                finalPackage,
 
-            reason: finalPackage.reason || null
+            reason:
+                finalPackage.reason || null
 
         };
 
     } catch (error) {
+
+        console.error(
+            "COLLECT_SOURCE_EVIDENCE_ERROR",
+            error
+        );
 
         return {
 
@@ -243,6 +253,7 @@ async function collectSourceEvidence(url) {
         };
 
     }
+
 }
 function mergeEvidencePackages(packages) {
 
