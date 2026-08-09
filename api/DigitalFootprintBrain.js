@@ -1377,7 +1377,8 @@ const requestBody = {
 
 };
         // Execute Universal Evidence Intelligence Request
-        console.log("===== CEREBRAS REQUEST =====");
+
+console.log("===== CEREBRAS REQUEST =====");
 console.log("MODEL:", requestBody.model);
 
 console.log(
@@ -1389,78 +1390,90 @@ console.log(
   "===== CEREBRAS REQUEST BODY =====",
   JSON.stringify(requestBody, null, 2)
 );
-        console.log("🔥 BEFORE CEREBRAS FETCH 🔥");
-console.log("API KEY EXISTS:", !!process.env.CEREBRAS_API_KEY);
+
+console.log("🔥 BEFORE CEREBRAS FETCH 🔥");
+console.log(
+  "API KEY EXISTS:",
+  !!process.env.CEREBRAS_API_KEY
+);
 console.log("ENDPOINT:", endpoint);
-       const response = await fetch(endpoint, {
+
+const response = await fetch(endpoint, {
+  method: "POST",
+
+  headers: {
+    "Content-Type": "application/json",
+
+    Authorization:
+      `Bearer ${process.env.CEREBRAS_API_KEY}`
+  },
+
+  body: JSON.stringify(requestBody)
+});
+
 console.log("🔥 AFTER CEREBRAS FETCH 🔥");
 console.log("STATUS:", response.status);
-    method: "POST",
-
-    headers: {
-
-        "Content-Type": "application/json",
-
-        "Authorization":
-            `Bearer ${process.env.CEREBRAS_API_KEY}`
-
-    },
-
-    body: JSON.stringify(requestBody)
-
-});
 
 if (!response.ok) {
 
-    intelligence.errors.push(
+  const errorText = await response.text();
 
-        `Universal Evidence API Error: HTTP ${response.status}`
+  console.error(
+    "🔥 CEREBRAS HTTP ERROR 🔥",
+    errorText
+  );
 
-    );
+  intelligence.errors.push(
+    `Universal Evidence API Error: HTTP ${response.status}`
+  );
 
-    return intelligence;
-
+  return intelligence;
 }
+
 const result = await response.json();
-    console.log("🔥 CEREBRAS JSON RECEIVED 🔥");
+
+console.log("🔥 CEREBRAS JSON RECEIVED 🔥");
+
 intelligence.rawResponse = result;
 
-const content =
-    result?.choices?.[0]?.message?.content;
 console.log(
-    "CEREBRAS_RESPONSE",
-    JSON.stringify(result, null, 2)
+  "CEREBRAS_RESPONSE",
+  JSON.stringify(result, null, 2)
 );
+
+const content =
+  result?.choices?.[0]?.message?.content;
+
 if (!content) {
 
-    intelligence.errors.push(
-        "No response content returned."
-    );
+  intelligence.errors.push(
+    "No response content returned."
+  );
 
-    return intelligence;
-
+  return intelligence;
 }
 
 intelligence.evidence = content;
 
 intelligence.success = true;
 
-return intelligence;
+console.log("🔥 CEREBRAS SUCCESS 🔥");
 
-    }
-console.error("🚨 CEREBRAS CRASH 🚨");
-console.error(error);
+return intelligence;
 
     catch (error) {
 
-        intelligence.errors.push(
+  console.error(
+    "🚨 CEREBRAS CRASH 🚨"
+  );
 
-            error.message
+  console.error(error);
 
-        );
+  intelligence.errors.push(
+    error.message
+  );
 
-        return intelligence;
-
+  return intelligence;
     }
 
 }
