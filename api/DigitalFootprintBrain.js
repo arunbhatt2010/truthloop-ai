@@ -1480,7 +1480,7 @@ const requestBody = {
 
   return intelligence;
       }
-
+    }
 async function ProfileMainBrain({
 
     profileEvidence,
