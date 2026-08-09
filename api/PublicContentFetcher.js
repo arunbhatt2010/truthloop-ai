@@ -62,56 +62,120 @@ Fetcher never performs AI analysis.
 ═══════════════════════════════════════════════════════════════
 */
 export async function loadPublicContentFetcher({
-    url = ""
+    profileLinks = []
 }) {
 
     const result = {
+
         success: false,
-
-        originalUrl: url,
-
-        normalizedUrl: null,
-
-        protocol: null,
-
-        hostname: null,
-
-        platform: "unknown",
 
         valid: false,
 
+        platforms: [],
+
+        validLinks: [],
+
+        invalidLinks: [],
+
+        totalLinks: 0,
+
         reason: null
+
     };
 
     try {
 
-        url = String(url).trim();
+        result.totalLinks = profileLinks.length;
 
-        if (!url) {
-            result.reason = "Public URL is required.";
-            return result;
+        for (const link of profileLinks) {
+
+            try {
+
+                const parsed =
+                    new URL(String(link).trim());
+
+                const protocol =
+                    parsed.protocol.toLowerCase();
+
+                if (
+                    protocol !== "http:" &&
+                    protocol !== "https:"
+                ) {
+                    result.invalidLinks.push(link);
+                    continue;
+                }
+
+                const hostname =
+                    parsed.hostname.toLowerCase();
+
+                let platform = "website";
+
+                if (hostname.includes("linkedin")) {
+                    platform = "linkedin";
+                }
+
+                else if (hostname.includes("github")) {
+                    platform = "github";
+                }
+
+                else if (hostname.includes("facebook")) {
+                    platform = "facebook";
+                }
+
+                else if (hostname.includes("instagram")) {
+                    platform = "instagram";
+                }
+
+                else if (
+                    hostname.includes("x.com") ||
+                    hostname.includes("twitter")
+                ) {
+                    platform = "x";
+                }
+
+                else if (
+                    hostname.includes("youtube")
+                ) {
+                    platform = "youtube";
+                }
+
+                result.platforms.push(platform);
+
+                result.validLinks.push({
+
+                    url: parsed.href,
+
+                    hostname,
+
+                    platform
+
+                });
+
+            } catch {
+
+                result.invalidLinks.push(link);
+
+            }
+
         }
 
-        const parsed = new URL(url);
-const protocol = parsed.protocol.toLowerCase();
+        result.valid =
+            result.validLinks.length > 0;
 
-if (protocol !== "http:" && protocol !== "https:") {
-    result.reason = "Only HTTP and HTTPS URLs are supported.";
-    return result;
-       }
-       result.protocol = protocol.replace(":", "");
-        result.normalizedUrl = parsed.href;
-        
-        result.hostname = parsed.hostname.toLowerCase();
+        result.success =
+            result.validLinks.length > 0;
 
-        result.valid = true;
-        result.success = true;
+        if (!result.success) {
+            result.reason =
+                "No valid public profile links found.";
+        }
 
         return result;
 
     } catch {
 
-        result.reason = "Invalid public URL.";
+        result.reason =
+            "Public profile processing failed.";
 
         return result;
 
