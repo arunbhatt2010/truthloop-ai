@@ -1229,7 +1229,7 @@ Rewrite the failing section.
 Return only the final validated investigation package.
 
 `;
-        throw new Error(
+        /*throw new Error(
   JSON.stringify({
     userPromptLength: userPrompt.length,
 
@@ -1242,7 +1242,7 @@ Return only the final validated investigation package.
     preview:
       userPrompt.substring(0, 500)
   })
-);
+);*/
         /* ==========================================
    AI REQUEST CONTRACT
 
