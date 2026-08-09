@@ -188,9 +188,9 @@ export async function acquirePublicContent(urlPackage) {
 
         success: false,
 
-        source: "unknown",
+        sources: [],
 
-        url: urlPackage.normalizedUrl,
+evidenceCount: 0,
 
         status: null,
 
@@ -216,56 +216,84 @@ export async function acquirePublicContent(urlPackage) {
 
         }
 
-        const response = await fetch(urlPackage.normalizedUrl, {
+        for (const source of urlPackage.validLinks) {
 
-            method: "GET",
+    try {
 
-            redirect: "follow",
+        const response =
+            await fetch(source.url, {
 
-            headers: {
+                method: "GET",
 
-                "User-Agent": "TruthLoop Public Content Fetcher"
+                redirect: "follow",
 
-            }
+                headers: {
+                    "User-Agent":
+                    "TruthLoop Public Content Fetcher"
+                }
+
+            });
+
+        if (!response.ok) {
+            continue;
+        }
+
+        const html =
+            await response.text();
+
+        result.sources.push({
+
+            url: source.url,
+
+            platform: source.platform,
+
+            hostname: source.hostname,
+
+            status: response.status,
+
+            contentType:
+                response.headers.get(
+                    "content-type"
+                ),
+
+            rawContent: html
 
         });
 
-        result.status = response.status;
+    } catch {
 
-        result.contentType =
-            response.headers.get("content-type");
-
-        result.contentLength =
-            Number(response.headers.get("content-length")) || 0;
-
-        if (!response.ok) {
-
-            result.reason =
-                `HTTP ${response.status}`;
-
-            return result;
-
-        }
-
-        result.rawContent =
-            await response.text();
-
-        result.fetchedAt =
-            new Date().toISOString();
-
-        result.success = true;
-
-        return result;
-
-    } catch (error) {
-
-        result.reason = error.message;
-
-        return result;
+        continue;
 
     }
 
-                     }
+        }
+        result.evidenceCount =
+    result.sources.length;
+
+result.success =
+    result.sources.length > 0;
+
+result.fetchedAt =
+    new Date().toISOString();
+
+if (!result.success) {
+
+    result.reason =
+        "No public evidence collected.";
+
+}
+
+return result;
+
+} catch (error) {
+
+    result.reason = error.message;
+
+    return result;
+
+}
+
+}
 /*
 ==============================================================
 BLOCK 3
