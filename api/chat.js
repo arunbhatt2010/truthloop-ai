@@ -1830,6 +1830,8 @@ ${corePrompt}
 
 ${investigationRules}
 
+${loop7Instruction}
+
 ${loopRules}
 
 ${outputRules}
