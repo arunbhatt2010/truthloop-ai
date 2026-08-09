@@ -4,6 +4,9 @@ import {
     validatePublicContent,
     cleanPublicContent,
     extractPublicContent,
+    normalizePublicEvidence,
+    mergePublicEvidence,
+    discoverPublicSignals,
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
 import {
@@ -207,6 +210,32 @@ if (!hasEvidenceSource) {
 // Public Profile / Website Adapter
 // =====================================================
 
+if (!hasEvidenceSource) {
+
+    return {
+
+        success: false,
+
+        stage: "Input Validation",
+
+        reason:
+            "A valid Evidence Source is required."
+
+    };
+
+}
+
+// Normalize current Evidence Source
+
+const normalizedProfileLinks =
+    hasProfileLinks
+        ? profileLinks
+              .map(link => link?.trim())
+              .filter(Boolean)
+        : [];
+
+// Public Profile / Website Adapter
+
 if (hasProfileLinks) {
 
     const urlPackage =
@@ -270,6 +299,8 @@ if (hasProfileLinks) {
             rawPackage,
             extractedPackage
         );
+
+    
 
     console.log(
         "FINAL_PUBLIC_PACKAGE",
