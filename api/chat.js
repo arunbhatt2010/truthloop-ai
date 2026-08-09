@@ -1858,6 +1858,34 @@ if (loopLevel === 7) {
 }
     const maxTokens =
   loopLevel === 7 ? 900 : 220;
+    console.log("===== GROQ_PAYLOAD_DEBUG =====");
+
+console.log(
+    "SYSTEM_PROMPT_CHARS:",
+    systemPrompt?.length || 0
+);
+
+console.log(
+    "MESSAGE_COUNT:",
+    loopLevel === 7
+        ? messages.slice(-8).length
+        : messages.slice(-2).length
+);
+
+console.log(
+    "MESSAGE_CHARS:",
+    (loopLevel === 7 ? messages.slice(-8) : messages.slice(-2))
+        .reduce((total, m) => total + (m?.content?.length || 0), 0)
+);
+
+console.log(
+    "TOTAL_INPUT_CHARS:",
+    (systemPrompt?.length || 0) +
+    (loopLevel === 7 ? messages.slice(-8) : messages.slice(-2))
+        .reduce((total, m) => total + (m?.content?.length || 0), 0)
+);
+
+console.log("===== END GROQ_PAYLOAD_DEBUG =====");
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
