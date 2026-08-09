@@ -61,6 +61,42 @@ Fetcher never performs AI analysis.
 
 ═══════════════════════════════════════════════════════════════
 */
+function detectPlatform(url = "") {
+
+    const hostname =
+        new URL(url).hostname.toLowerCase();
+
+    if (hostname.includes("linkedin.com"))
+        return "linkedin";
+
+    if (hostname.includes("github.com"))
+        return "github";
+
+    if (hostname.includes("facebook.com"))
+        return "facebook";
+
+    if (hostname.includes("instagram.com"))
+        return "instagram";
+
+    if (hostname.includes("x.com"))
+        return "x";
+
+    if (hostname.includes("twitter.com"))
+        return "x";
+
+    if (hostname.includes("youtube.com"))
+        return "youtube";
+
+    if (hostname.includes("medium.com"))
+        return "medium";
+
+    if (hostname.includes("substack.com"))
+        return "substack";
+
+    return "website";
+        }
+
+
 export async function loadPublicContentFetcher({
     profileLinks = []
 }) {
@@ -93,6 +129,16 @@ export async function loadPublicContentFetcher({
 
                 const parsed =
                     new URL(String(link).trim());
+               const platform =
+    detectPlatform(parsed.href);
+
+result.platforms.push(platform);
+
+result.validLinks.push({
+    url: parsed.href,
+    hostname: parsed.hostname,
+    platform
+});
 
                 const protocol =
                     parsed.protocol.toLowerCase();
@@ -154,7 +200,6 @@ export async function loadPublicContentFetcher({
             } catch {
 
                 result.invalidLinks.push(link);
-
             }
 
         }
@@ -272,6 +317,12 @@ evidenceCount: 0,
 
 result.success =
     result.sources.length > 0;
+       result.platforms =
+    [...new Set(
+        result.sources.map(
+            source => source.platform
+        )
+    )];
 
 result.fetchedAt =
     new Date().toISOString();
@@ -351,7 +402,7 @@ export function validatePublicContent(rawPackage) {
 
         valid: false,
 
-        rawContent: null,
+        sources: [],
 
         reason: null
 
@@ -359,34 +410,36 @@ export function validatePublicContent(rawPackage) {
 
     if (!rawPackage?.success) {
 
-        result.reason = "Public content acquisition failed.";
-
-        return result;
-
-    }
-
-    if (rawPackage.status !== 200) {
-
-        result.reason = "Invalid HTTP response.";
-
-        return result;
-
-    }
-
-    if (!rawPackage.rawContent) {
-
-        result.reason = "No public content found.";
+        result.reason =
+            "Public content acquisition failed.";
 
         return result;
 
     }
 
     if (
-        !rawPackage.contentType ||
-        !rawPackage.contentType.includes("text/html")
+        !Array.isArray(rawPackage.sources) ||
+        rawPackage.sources.length === 0
     ) {
 
-        result.reason = "Unsupported content type.";
+        result.reason =
+            "No public evidence sources found.";
+
+        return result;
+
+    }
+
+    result.sources =
+        rawPackage.sources.filter(source =>
+            source.status === 200 &&
+            source.rawContent &&
+            source.contentType?.includes("text/html")
+        );
+
+    if (result.sources.length === 0) {
+
+        result.reason =
+            "No valid public evidence found.";
 
         return result;
 
@@ -396,11 +449,8 @@ export function validatePublicContent(rawPackage) {
 
     result.valid = true;
 
-    result.rawContent = rawPackage.rawContent;
-
     return result;
-
-        }
+}
 /*
 ==============================================================
 BLOCK 3
