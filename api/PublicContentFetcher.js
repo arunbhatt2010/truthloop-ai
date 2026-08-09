@@ -1764,145 +1764,64 @@ export function buildPublicContentPackage(
     extractedPackage
 ) {
 
-    const result = {
+    console.log("BUILD_PUBLIC_CONTENT_PACKAGE_BYPASSED", {
 
-        success: false,
+        rawSuccess: rawPackage?.success,
 
-        source: "public",
+        extractedSuccess: extractedPackage?.success,
 
-        url: rawPackage?.url || null,
+        visibleTextLength:
+            extractedPackage?.visibleTextLength,
 
-        status: rawPackage?.status || null,
+        hasReadableContent:
+            extractedPackage?.hasReadableContent,
 
-        contentType: rawPackage?.contentType || null,
+        extractionQuality:
+            extractedPackage?.extractionQuality,
 
-        contentLength: rawPackage?.contentLength || 0,
+        posts:
+            extractedPackage?.posts?.length || 0,
 
-        fetchedAt: rawPackage?.fetchedAt || null,
+        comments:
+            extractedPackage?.comments?.length || 0,
 
-        title: null,
+        articles:
+            extractedPackage?.articles?.length || 0,
 
-        description: null,
+        communities:
+            extractedPackage?.communities?.length || 0,
 
-        canonicalUrl: null,
+        timeline:
+            extractedPackage?.timeline?.length || 0,
 
-        language: null,
+        activity:
+            extractedPackage?.activity?.length || 0
 
-        headings: [],
+    });
 
-        links: [],
-
-        images: [],
-        posts: [],
-
-comments: [],
-
-articles: [],
-
-communities: [],
-
-timeline: [],
-
-activity: [],
-
-        visibleText: null,
-
-        normalizedAt: null,
-
-        reason: null,
-        // TES
-sourceType: extractedPackage?.sourceType || "PublicEvidence",
-evidenceStandard: extractedPackage?.evidenceStandard || "TES-1.0",
-collectionWindow: extractedPackage?.collectionWindow || "90 Days",
-
-    };
-
-    if (!rawPackage?.success) {
-
-        result.reason = "Invalid raw content package.";
-
-        return result;
-
-    }
-
-    if (!extractedPackage?.success) {
-
-        result.reason = "Content extraction failed.";
-
-        return result;
-
-    }
-
-    result.title = extractedPackage.title;
-
-    result.description = extractedPackage.description;
-
-    result.canonicalUrl = extractedPackage.canonicalUrl;
-
-    result.language = extractedPackage.language;
-
-    result.headings = extractedPackage.headings;
-
-    result.links = extractedPackage.links;
-
-    result.images = extractedPackage.images;
-
-    result.visibleText = extractedPackage.visibleText;
-    // Public Evidence
-
-result.posts = extractedPackage.posts || [];
-
-result.comments = extractedPackage.comments || [];
-
-result.articles = extractedPackage.articles || [];
-
-result.communities = extractedPackage.communities || [];
-
-result.timeline = extractedPackage.timeline || [];
-
-result.activity = extractedPackage.activity || [];
-    // TES Evidence
-
-result.evidenceCoverage =
-    extractedPackage.evidenceCoverage || {};
-
-result.publicSignals =
-    extractedPackage.publicSignals || [];
-
-result.missingSignals =
-    extractedPackage.missingSignals || [];
-
-result.traceability =
-    extractedPackage.traceability || [];
     console.log(
-  "EXTRACTED_PACKAGE_KEYS",
-  Object.keys(extractedPackage)
-);
+        "EXTRACTED_PACKAGE_KEYS",
+        Object.keys(extractedPackage || {})
+    );
+
     console.log(
-  "EXTRACTED_PACKAGE_SAMPLE",
-  extractedPackage
-);
-console.log("NORMALIZED_OUTPUT_DEBUG", {
-  visibleTextLength: extractedPackage.visibleTextLength,
-  hasReadableContent: extractedPackage.hasReadableContent,
-  extractionQuality: extractedPackage.extractionQuality
-});
-result.visibleTextLength =
-    extractedPackage.visibleTextLength || 0;
+        "EXTRACTED_PACKAGE_SAMPLE",
+        extractedPackage
+    );
 
-result.hasReadableContent =
-    extractedPackage.hasReadableContent || false;
+    console.log("NORMALIZED_OUTPUT_DEBUG", {
 
-result.extractionQuality =
-    extractedPackage.extractionQuality || "low";
+        visibleTextLength:
+            extractedPackage?.visibleTextLength,
 
-    result.normalizedAt =
-        new Date().toISOString();
+        hasReadableContent:
+            extractedPackage?.hasReadableContent,
 
-    result.success = true;
-result.sourceType = extractedPackage.sourceType;
-result.evidenceStandard = extractedPackage.evidenceStandard;
-result.collectionWindow = extractedPackage.collectionWindow;
-    return result;
+        extractionQuality:
+            extractedPackage?.extractionQuality
 
-           }
+    });
+
+    return extractedPackage;
+
+}
