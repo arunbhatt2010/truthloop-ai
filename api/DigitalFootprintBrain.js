@@ -260,36 +260,52 @@ if (hasProfileLinks) {
             cleanPackage
         );
 
-    const normalizedPackage =
-        normalizePublicEvidence(
-            extractedPackage
-        );
+    const extractedPackage =
+    extractPublicContent(
+        cleanPackage
+    );
 
-    const mergedPackage =
-        mergePublicEvidence(
-            normalizedPackage
-        );
+const publicContentPackage =
+    buildPublicContentPackage(
+        rawPackage,
+        extractedPackage
+    );
 
-    const signalPackage =
-        discoverPublicSignals(
-            mergedPackage
-        );
+console.log(
+    "FINAL_PUBLIC_PACKAGE",
+    {
+        success:
+            publicContentPackage?.success,
 
-    if (!signalPackage.success) {
+        sourceType:
+            publicContentPackage?.sourceType,
 
-        return {
+        visibleTextLength:
+            publicContentPackage?.visibleText?.length || 0,
 
-            success: false,
+        hasReadableContent:
+            publicContentPackage?.hasReadableContent,
 
-            stage: "Public Evidence Pipeline",
-
-            reason:
-                signalPackage.reason ||
-                "Public Evidence Pipeline failed."
-
-        };
-
+        extractionQuality:
+            publicContentPackage?.extractionQuality
     }
+);
+
+if (!publicContentPackage?.success) {
+
+    return {
+
+        success: false,
+
+        stage: "Public Evidence Adapter",
+
+        reason:
+            publicContentPackage?.reason ||
+            "Public Content Package failed."
+
+    };
+
+}
 
     publicContentPackage =
         buildPublicContentPackage(
