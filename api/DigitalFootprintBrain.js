@@ -583,6 +583,7 @@ async function ProfileIntelligenceAPI({
 }) {
 console.log("===== ProfileIntelligenceAPI START =====");
 console.log(publicContentPackage);
+    console.log("🔥 CEREBRAS FUNCTION ENTERED 🔥");
     const intelligence = {
 
         success: false,
@@ -1388,9 +1389,12 @@ console.log(
   "===== CEREBRAS REQUEST BODY =====",
   JSON.stringify(requestBody, null, 2)
 );
-        
+        console.log("🔥 BEFORE CEREBRAS FETCH 🔥");
+console.log("API KEY EXISTS:", !!process.env.CEREBRAS_API_KEY);
+console.log("ENDPOINT:", endpoint);
        const response = await fetch(endpoint, {
-
+console.log("🔥 AFTER CEREBRAS FETCH 🔥");
+console.log("STATUS:", response.status);
     method: "POST",
 
     headers: {
@@ -1418,6 +1422,7 @@ if (!response.ok) {
 
 }
 const result = await response.json();
+    console.log("🔥 CEREBRAS JSON RECEIVED 🔥");
 intelligence.rawResponse = result;
 
 const content =
@@ -1443,6 +1448,8 @@ intelligence.success = true;
 return intelligence;
 
     }
+console.error("🚨 CEREBRAS CRASH 🚨");
+console.error(error);
 
     catch (error) {
 
