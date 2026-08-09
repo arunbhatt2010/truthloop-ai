@@ -244,7 +244,10 @@ if (hasProfileLinks) {
         await acquirePublicContent(
             urlPackage
         );
-
+console.log(
+    "RAW_PACKAGE_DEBUG",
+    JSON.stringify(rawPackage, null, 2)
+);
     const validatedPackage =
         validatePublicContent(
             rawPackage
