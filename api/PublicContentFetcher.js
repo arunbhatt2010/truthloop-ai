@@ -1905,6 +1905,14 @@ result.missingSignals =
 
 result.traceability =
     extractedPackage.traceability || [];
+    console.log(
+  "EXTRACTED_PACKAGE_KEYS",
+  Object.keys(extractedPackage)
+);
+    console.log(
+  "EXTRACTED_PACKAGE_SAMPLE",
+  extractedPackage
+);
 console.log("NORMALIZED_OUTPUT_DEBUG", {
   visibleTextLength: extractedPackage.visibleTextLength,
   hasReadableContent: extractedPackage.hasReadableContent,
