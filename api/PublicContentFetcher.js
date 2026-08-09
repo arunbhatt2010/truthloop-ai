@@ -1426,59 +1426,27 @@ console.log("NORMALIZED_FINAL_DEBUG", {
 }
 export function mergePublicEvidence(normalizedPackage) {
 
-    const result = structuredClone(normalizedPackage);
+    if (!normalizedPackage) {
+        return {
+            success: false,
+            reason: "Missing normalized package."
+        };
+    }
 
-    const deduplicate = (items, keyBuilder) => {
+    console.log("MERGE_BYPASSED", {
+        posts: normalizedPackage.posts?.length || 0,
+        comments: normalizedPackage.comments?.length || 0,
+        articles: normalizedPackage.articles?.length || 0,
+        communities: normalizedPackage.communities?.length || 0,
+        timeline: normalizedPackage.timeline?.length || 0,
+        activity: normalizedPackage.activity?.length || 0
+    });
 
-        const seen = new Set();
+    return structuredClone(normalizedPackage);
 
-        return (items || []).filter(item => {
+}
 
-            const key = keyBuilder(item);
-
-            if (!key || seen.has(key)) return false;
-
-            seen.add(key);
-
-            return true;
-
-        });
-
-    };
-
-    result.posts = deduplicate(
-        result.posts,
-        item => `${item.title}|${item.url}`
-    );
-
-    result.comments = deduplicate(
-        result.comments,
-        item => item.content
-    );
-
-    result.articles = deduplicate(
-        result.articles,
-        item => `${item.title}|${item.url}`
-    );
-
-    result.communities = deduplicate(
-        result.communities,
-        item => item.content
-    );
-
-    result.timeline = deduplicate(
-        result.timeline,
-        item => `${item.date}|${item.label}`
-    );
-
-    result.activity = deduplicate(
-        result.activity,
-        item => item.content
-    );
-
-    return result;
-
-                                                    }
+                                                    
 
 export function discoverPublicSignals(extractedPackage) {
 
