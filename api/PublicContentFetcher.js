@@ -1110,7 +1110,7 @@ result.extractionQuality =
         ? "medium"
         : "low";
     // Placeholder for future evidence extractors
-
+console.log("BEFORE_HELPERS");
 result.posts = extractPosts(html);
 
 result.comments = extractComments(html);
@@ -1121,6 +1121,7 @@ result.communities = extractCommunities(html);
 result.timeline = extractTimeline(html);
 
 result.activity = extractActivity(html);
+    console.log("AFTER_HELPERS");
     result.success = true;
 result.sourceType = cleanPackage.sourceType;
 result.evidenceStandard = cleanPackage.evidenceStandard;
