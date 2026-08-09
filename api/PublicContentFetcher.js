@@ -534,7 +534,18 @@ result.activity = extractActivity(html);
 }
 
 function extractPosts(html) {
-    return [];
+
+    const matches =
+        [...html.matchAll(/<p[^>]*>(.*?)<\/p>/gi)]
+        .map(match =>
+            match[1]
+                .replace(/<[^>]+>/g, "")
+                .replace(/\s+/g, " ")
+                .trim()
+        )
+        .filter(text => text.length > 50);
+
+    return matches.slice(0, 50);
 }
 
 function extractComments(html) {
@@ -542,7 +553,18 @@ function extractComments(html) {
 }
 
 function extractArticles(html) {
-    return [];
+
+    const matches =
+        [...html.matchAll(/<article[\s\S]*?<\/article>/gi)]
+        .map(match =>
+            match[0]
+                .replace(/<[^>]+>/g, "")
+                .replace(/\s+/g, " ")
+                .trim()
+        )
+        .filter(text => text.length > 100);
+
+    return matches.slice(0, 20);
 }
 
 function extractCommunities(html) {
@@ -555,7 +577,7 @@ function extractTimeline(html) {
 
 function extractActivity(html) {
     return [];
-       }
+}
 /*
 ==============================================================
 BLOCK 3
