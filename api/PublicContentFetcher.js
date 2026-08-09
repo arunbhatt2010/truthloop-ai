@@ -1900,7 +1900,11 @@ result.missingSignals =
 
 result.traceability =
     extractedPackage.traceability || [];
-
+console.log("NORMALIZED_OUTPUT_DEBUG", {
+  visibleTextLength: extractedPackage.visibleTextLength,
+  hasReadableContent: extractedPackage.hasReadableContent,
+  extractionQuality: extractedPackage.extractionQuality
+});
 result.visibleTextLength =
     extractedPackage.visibleTextLength || 0;
 
