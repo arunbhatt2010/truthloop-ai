@@ -4,9 +4,6 @@ import {
     validatePublicContent,
     cleanPublicContent,
     extractPublicContent,
-    normalizePublicEvidence,
-    mergePublicEvidence,
-    discoverPublicSignals,
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
 import {
