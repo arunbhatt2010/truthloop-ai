@@ -1414,7 +1414,12 @@ if (extractedPackage.activity?.length) {
 }
     
     result.success = true;
-
+// DEBUG
+console.log("NORMALIZED_FINAL_DEBUG", {
+  visibleTextLength: result.visibleTextLength,
+  hasReadableContent: result.hasReadableContent,
+  extractionQuality: result.extractionQuality
+});
     return result;
 
 }
