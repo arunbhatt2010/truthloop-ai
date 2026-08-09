@@ -256,6 +256,493 @@ Rules:
 • Find repeated signals across sources
 
 • Use evidence, not assumptions
+
+1️⃣ Investigation Summary
+
+Purpose:
+
+Summarize:
+
+A. What the user repeatedly expressed
+across Loop 1–6.
+
+B. What verified public evidence
+repeatedly suggests.
+
+Do not analyze.
+Do not explain patterns.
+Do not explain contradictions.
+Do not give conclusions.
+
+Output:
+
+⏩ User Narrative
+Evidence: TruthLoop Package
+
+⏩ Digital Footprint Narrative
+Evidence: Real Source
+
+⏩ Investigation Starting Point
+Evidence: Real Source
+
+Rules:
+
+• Use repeated signals only
+• Ignore one-time statements
+• Maximum 3 bullets
+• Every bullet requires evidence
+• No assumptions
+• No advice
+• No hidden patterns
+• No contradictions
+Investigation Summary is not allowed
+to reveal the final answer.
+
+Its job is only to frame the case.
+
+The investigation begins afterwards.
+EXAMPLE DO NOT COPY THIS EXAMPLE ONLY UNDERSTAND 
+1️⃣ Investigation Summary
+
+⏩ User Narrative:
+The user repeatedly expresses a desire
+to build authority through TruthLoop AI,
+attract the right audience,
+and create meaningful long-term growth.
+
+Evidence:
+TruthLoop Conversation
+
+⏩ Digital Footprint Narrative:
+Public content consistently focuses on
+behavioral patterns,
+hidden mechanisms,
+and decision-making psychology.
+
+Evidence:
+Website Content
+
+⏩ Investigation Starting Point:
+The user's stated goal and public content
+appear aligned around pattern recognition,
+but the relationship between effort,
+consistency,
+and growth remains unresolved.
+
+Evidence:
+TruthLoop Conversation + Website Content
+
+2️⃣ Cross Analysis
+
+Purpose:
+
+Compare evidence sources.
+
+Identify:
+
+• Alignment
+• Mismatch
+• Missing Connection
+
+Output:
+
+⏩ Cross Evidence Finding
+Evidence: Source A + Source B
+
+⏩ Cross Evidence Finding
+Evidence: Source A + Source B
+
+⏩ Cross Evidence Finding
+Evidence: Source A + Source B
+
+Rules:
+
+• 3 bullets only
+
+• Compare multiple sources
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• No advice
+
+• No conclusions
+
+• No contradictions
+
+• No hidden patterns
+Cross Analysis answers:
+
+"What do different evidence sources say when viewed together?"
+
+It does NOT answer:
+
+"Why does it happen?"
+
+Example:
+
+⏩ Content targets founders but audience engagement comes mainly from beginners.
+
+Evidence:
+Posts + Comments
+
+⏩ Website messaging emphasizes pattern recognition while community discussions focus on growth problems.
+
+Evidence:
+Website + Community
+
+⏩ Published content is consistent but audience questions repeatedly shift toward execution challenges.
+
+Evidence:
+Posts + Audience Responses
+
+3️⃣ Contradictions
+
+Purpose:
+
+Identify gaps between:
+
+• Intent
+• Action
+• Outcome
+
+Output:
+
+⏩ Contradiction Finding
+Evidence: Source
+
+⏩ Contradiction Finding
+Evidence: Source
+
+⏩ Contradiction Finding
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Compare intent vs action
+
+• Compare action vs outcome
+
+• Compare stated goals vs observed behavior
+
+• No advice
+
+• No solutions
+
+• No hidden patterns
+Contradictions answers:
+
+"What is not matching?"
+
+It does NOT answer:
+
+"Why is it not matching?"
+
+Example:
+
+⏩ The stated goal is building authority, but published content repeatedly changes direction across unrelated topics.
+
+Evidence:
+Posts + Website Content
+
+⏩ The goal is audience growth, but most effort is invested in content creation rather than audience interaction.
+
+Evidence:
+Posts + Comments
+
+⏩ Consistency is described as important, but activity appears in bursts followed by long gaps.
+
+Evidence:
+Timeline Activity
+
+4️⃣ Strong Patterns
+
+Purpose:
+
+Identify repeated behaviors,
+themes,
+or signals strongly supported by evidence.
+
+Output:
+
+⏩ Strong Pattern
+Evidence: Source
+
+⏩ Strong Pattern
+Evidence: Source
+
+⏩ Strong Pattern
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Pattern must appear repeatedly
+
+• Pattern must be supported by multiple signals
+
+• Ignore one-time events
+
+• No advice
+
+• No conclusions
+
+• No hidden patterns
+
+A Strong Pattern must satisfy:
+
+Repeated
++
+Observable
++
+Evidence Supported
+
+If any one is missing,
+it is not a Strong Pattern.
+
+Example:
+
+⏩ Content repeatedly focuses on hidden mechanisms rather than surface-level advice.
+
+Evidence:
+Posts + Website Content
+
+⏩ Audience engagement increases when pattern-recognition topics are discussed.
+
+Evidence:
+Posts + Comments
+
+⏩ Problem diagnosis appears more frequently than solution-focused content.
+
+Evidence:
+Posts + Articles
+
+5️⃣ Weak Patterns
+
+Purpose:
+
+Identify repeated behaviors,
+habits,
+or signals that consistently weaken growth,
+consistency,
+reach,
+or outcomes.
+
+Output:
+
+⏩ Weak Pattern
+Evidence: Source
+
+⏩ Weak Pattern
+Evidence: Source
+
+⏩ Weak Pattern
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Pattern must repeat
+
+• Pattern must reduce growth or outcomes
+
+• Ignore one-time events
+
+• No advice
+
+• No solutions
+
+• No conclusions
+A Weak Pattern must satisfy:
+
+Repeated
++
+Evidence Supported
++
+Growth Limiting
+
+If any one is missing,
+it is not a Weak Pattern.
+
+Example:
+
+⏩ Topic focus repeatedly shifts before momentum becomes measurable.
+
+Evidence:
+Posts + Timeline
+
+⏩ Audience interaction appears less consistent than content publishing activity.
+
+Evidence:
+Posts + Comments
+
+⏩ Multiple directions compete for attention, reducing message clarity.
+
+Evidence:
+Website + Posts
+
+6️⃣ Hidden Pattern
+
+Purpose:
+
+Identify the strongest hidden mechanism
+connecting:
+
+• Cross Analysis
+
+• Contradictions
+
+• Strong Patterns
+
+• Weak Patterns
+
+Output:
+
+⏩ Hidden Pattern
+
+Evidence: Source
+
+⏩ Hidden Pattern Impact
+
+Evidence: Source
+
+⏩ Hidden Pattern Result
+
+Evidence: Source
+
+Rules:
+
+• 3 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Must explain multiple findings
+
+• Must connect repeated evidence
+
+• Must explain observed outcomes
+
+• No advice
+
+• No solutions
+
+• No conclusions
+A Hidden Pattern must satisfy:
+
+Evidence Supported
++
+Explains Multiple Findings
++
+Explains Outcomes
+
+If any one is missing,
+it is not a Hidden Pattern.
+Example:
+
+⏩ Growth effort repeatedly expands into multiple directions before a single direction becomes measurable.
+
+Evidence:
+Posts + Timeline + Website
+
+⏩ This creates recurring focus fragmentation across content, audience, and positioning.
+
+Evidence:
+Cross Analysis + Contradictions
+
+⏩ As a result, effort remains high while measurable momentum remains inconsistent.
+
+Evidence:
+Timeline + Outcomes
+
+7️⃣ Final Investigation
+
+A. Conclusion
+
+Purpose:
+
+Deliver the final investigation verdict.
+
+Output:
+
+⏩ Conclusion
+
+Evidence: Source
+
+⏩ Conclusion
+
+Evidence: Source
+
+Rules:
+
+• 2 bullets only
+
+• Evidence mandatory
+
+• Use real evidence only
+
+• Must be supported by previous findings
+
+• No new findings
+
+• No assumptions
+
+• No motivation
+
+━━━━━━━━━━━━━━━━━━━━
+
+B. One Next Step
+
+Purpose:
+
+Identify the single highest-impact action
+based on the investigation.
+
+Output:
+
+⏩ One Next Step
+
+Evidence: Source
+
+Rules:
+
+• 1 bullet only
+
+• Evidence mandatory
+
+• Must address the strongest constraint
+
+• Must be supported by findings
+
+• Must be specific
+
+• No generic advice
+
+Example:
+
+⏩ Commit to one primary content direction for the next 30 days before introducing new themes.
+
+Evidence:
+Weak Patterns + Hidden Pattern
+
 `;
 }
 export default async function handler(req, res) {
