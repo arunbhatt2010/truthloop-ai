@@ -580,7 +580,7 @@ function detectPlatform(profileLink) {
 ========================================== */
 async function ProfileIntelligenceAPI({
 
-    publicContentPackage,
+    universalEvidencePackage,
 
     truthLoopPackage,
 
@@ -589,9 +589,15 @@ async function ProfileIntelligenceAPI({
     provider = "Cerebras"
 
 }) {
-console.log("===== ProfileIntelligenceAPI START =====");
-console.log(publicContentPackage);
-    console.log("🔥 CEREBRAS FUNCTION ENTERED 🔥");
+
+    console.log(
+        "===== ProfileIntelligenceAPI START ====="
+    );
+
+    console.log(
+        "CEREBRAS FUNCTION ENTERED 🔥"
+    );
+
     const intelligence = {
 
         success: false,
@@ -600,17 +606,12 @@ console.log(publicContentPackage);
 
         model: null,
 
-        profileLink:
-    publicContentPackage.url || null,
         timestamp:
-
             new Date().toISOString(),
 
-        rawResponse: null,
-sourceType:
-    publicContentPackage.sourceType || "Unknown",
+        packageType:
+            "UniversalEvidencePackage",
 
-packageType: "UniversalEvidencePackage",
         evidence: null,
 
         errors: []
@@ -619,14 +620,287 @@ packageType: "UniversalEvidencePackage",
 
     try {
 
-const model = "gpt-oss-120b";
+        const packageSize =
+            JSON.stringify(
+                universalEvidencePackage || {}
+            ).length;
 
-const endpoint =
-    "https://api.cerebras.ai/v1/chat/completions";
+        console.log(
+            "UNIVERSAL_PACKAGE_SIZE",
+            packageSize
+        );
 
-intelligence.model = model;
+        console.log(
+            "UNIVERSAL_PACKAGE_KEYS",
+            Object.keys(
+                universalEvidencePackage || {}
+            )
+        );
 
-const systemPrompt = `
+        if (
+            !universalEvidencePackage ||
+            packageSize < 1000
+        ) {
+
+            return {
+
+                success: false,
+
+                stage:
+                    "Universal Evidence Validation",
+
+                reason:
+                    "UniversalEvidencePackage is empty.",
+
+                packageSize
+
+            };
+
+        }
+
+        const identity =
+            universalEvidencePackage.identity || {};
+
+        const footprint =
+            universalEvidencePackage.footprint || {};
+
+        const findings =
+            universalEvidencePackage.findings || {};
+
+        const confidence =
+            universalEvidencePackage.confidence || {};
+
+        const evidence =
+            universalEvidencePackage.evidence || {};
+
+        console.log(
+            "IDENTITY_PRESENT",
+            !!identity
+        );
+
+        console.log(
+            "FOOTPRINT_PRESENT",
+            !!footprint
+        );
+
+        console.log(
+            "FINDINGS_PRESENT",
+            !!findings
+        );
+
+        console.log(
+            "CONFIDENCE_PRESENT",
+            !!confidence
+        );
+
+        console.log(
+            "EVIDENCE_PRESENT",
+            !!evidence
+        );
+
+        const model =
+            "gpt-oss-120b";
+
+        const endpoint =
+            "https://api.cerebras.ai/v1/chat/completions";
+
+        intelligence.model =
+            model;
+
+        const systemPrompt = `
+
+You are TruthLoop Digital Footprint Intelligence.
+
+PRIMARY SOURCE
+
+UniversalEvidencePackage
+
+The package already contains:
+
+- Identity Signals
+- Footprint Signals
+- Findings
+- Confidence Signals
+- Cross Evidence
+- Normalized Evidence
+
+CRITICAL RULES
+
+Never ignore populated fields.
+
+Never discard evidence.
+
+Never invent evidence.
+
+Never generate evidence.
+
+Never create facts.
+
+Never create sources.
+
+Never create timelines.
+
+Never create identities.
+
+Never create organizations.
+
+Never create websites.
+
+Never create social profiles.
+
+Treat UniversalEvidencePackage as verified structured evidence.
+
+CrossEvidence findings have higher priority than raw content.
+
+Evidence priority:
+
+1. Cross Evidence
+2. Findings
+3. Identity
+4. Footprint
+5. Raw Evidence
+
+Ignore:
+
+- HTML
+- CSS
+- Javascript
+- SVG
+- Navigation
+- Templates
+- Headers
+- Footers
+- Boilerplate
+
+Return evidence intelligence only.
+
+Never return website analysis.
+
+Never return company analysis.
+
+Never return platform analysis.
+
+Focus only on signals created by the profile owner.
+
+`;
+
+        const evidencePayload = {
+
+            packageType:
+                "UniversalEvidencePackage",
+
+            currentLoop,
+
+            identity,
+
+            footprint,
+
+            findings,
+
+            confidence,
+
+            evidence,
+
+            truthLoopPackage
+
+        };
+
+        console.log(
+            "EVIDENCE_PAYLOAD_SIZE",
+            JSON.stringify(
+                evidencePayload
+            ).length
+        );
+
+        const userPrompt = `
+
+UNIVERSAL EVIDENCE PACKAGE
+
+${JSON.stringify(
+    evidencePayload,
+    null,
+    2
+)}
+
+`;
+
+        const response =
+            await fetch(
+                endpoint,
+                {
+                    method: "POST",
+
+                    headers: {
+                        Authorization:
+                            \`Bearer ${process.env.CEREBRAS_API_KEY}\`,
+
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        model,
+
+                        temperature: 0.2,
+
+                        messages: [
+
+                            {
+                                role: "system",
+                                content:
+                                    systemPrompt
+                            },
+
+                            {
+                                role: "user",
+                                content:
+                                    userPrompt
+                            }
+
+                        ]
+
+                    })
+
+                }
+            );
+
+        const result =
+            await response.json();
+
+        intelligence.success = true;
+
+        intelligence.evidence =
+            result;
+
+        intelligence.rawResponse =
+            result;
+
+        return intelligence;
+
+    } catch (error) {
+
+        console.error(
+            "PROFILE_INTELLIGENCE_ERROR",
+            error
+        );
+
+        return {
+
+            success: false,
+
+            stage:
+                "Profile Intelligence",
+
+            reason:
+                error.message
+
+        };
+
+    }
+
+}
+/*
 You are TruthLoop DigitalFootprintBrain.
 
 ROLE
@@ -1118,10 +1392,9 @@ OUTPUT MUST BE EVIDENCE-DRIVEN.
 OUTPUT MUST BE TRACEABLE.
 
 OUTPUT MUST PASS SELF VALIDATION BEFORE RETURNING.
-`;
+*/
 
-const userPrompt = `
-
+/*
 LOOP 7 INVESTIGATION REQUEST
 
 CURRENT LOOP
@@ -1330,7 +1603,7 @@ Rewrite the failing section.
 
 Return only the final validated investigation package.
 
-`;
+*/
         /*throw new Error(
   JSON.stringify({
     userPromptLength: userPrompt.length,
