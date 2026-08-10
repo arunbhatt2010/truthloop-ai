@@ -825,6 +825,7 @@ function buildLoop7EvidencePackage({
     patternSignals,
 
     crossPlatformSignals,
+    crossEvidence,
 
     evidenceConfidence,
     evidenceGaps
@@ -851,6 +852,7 @@ function buildLoop7EvidencePackage({
         patternSignals,
 
         crossPlatformSignals,
+        crossEvidence,
 
         evidenceConfidence,
 
