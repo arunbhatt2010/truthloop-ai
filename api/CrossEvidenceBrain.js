@@ -564,10 +564,37 @@ Output:
 Normalized Evidence Package
 */
 async function EvidenceNormalizer(
-    evidencePackage
+    evidencePackages = []
 ) {
 
-    return evidencePackage;
+    const normalized = {
+        success: true,
+        sources: []
+    };
+
+    const seen = new Set();
+
+    for (const evidence of evidencePackages) {
+
+        if (!evidence) continue;
+
+        const key =
+            evidence.url ||
+            JSON.stringify(evidence);
+
+        if (seen.has(key)) {
+            continue;
+        }
+
+        seen.add(key);
+
+        normalized.sources.push(
+            evidence
+        );
+
+    }
+
+    return normalized;
 
 }
 
@@ -592,16 +619,96 @@ Rules:
 
 Output:
 Cross Evidence Package
-*/
-async function CrossEvidenceAnalyzer(
+*/async function CrossEvidenceAnalyzer(
     evidencePackage
 ) {
 
-    return {
-        findings: []
-    };
+    const findings = [];
 
-}
+    try {
+
+        const sources =
+            evidencePackage?.sources || [];
+
+        const links =
+            evidencePackage?.links || [];
+
+        const headings =
+            evidencePackage?.headings || [];
+
+        const keywords =
+            evidencePackage?.keywords || [];
+
+        if (sources.length > 1) {
+
+            findings.push({
+                type: "multi-source",
+                message:
+                    `${sources.length} evidence sources found`
+            });
+
+        }
+
+        if (links.length > 0) {
+
+            findings.push({
+                type: "link-footprint",
+                message:
+                    `${links.length} discovered links`
+            });
+
+        }
+
+        if (headings.length > 0) {
+
+            findings.push({
+                type: "content-structure",
+                message:
+                    `${headings.length} content sections found`
+            });
+
+        }
+
+        if (keywords.length > 0) {
+
+            findings.push({
+                type: "keyword-pattern",
+                message:
+                    `${keywords.length} recurring keywords found`
+            });
+
+        }
+
+        return {
+
+            success: true,
+
+            findings,
+
+            sourceCount:
+                sources.length,
+
+            linkCount:
+                links.length
+
+        };
+
+    } catch (error) {
+
+        return {
+
+            success: false,
+
+            findings: [],
+
+            reason:
+                error.message
+
+        };
+
+    }
+
+               }
 
 // ====================================
 // Evidence Confidence Engine
@@ -629,8 +736,73 @@ async function EvidenceConfidenceEngine(
     evidencePackage
 ) {
 
-    return {
-        confidence: 0
-    };
+    try {
 
-       }
+        const sources =
+            evidencePackage?.sources || [];
+
+        const links =
+            evidencePackage?.links || [];
+
+        const findings =
+            evidencePackage?.findings || [];
+
+        let confidence = 0;
+
+        confidence +=
+            Math.min(
+                sources.length * 20,
+                40
+            );
+
+        confidence +=
+            Math.min(
+                links.length * 2,
+                30
+            );
+
+        confidence +=
+            Math.min(
+                findings.length * 10,
+                30
+            );
+
+        confidence =
+            Math.min(
+                confidence,
+                100
+            );
+
+        return {
+
+            success: true,
+
+            confidence,
+
+            sourceCount:
+                sources.length,
+
+            linkCount:
+                links.length,
+
+            findingCount:
+                findings.length
+
+        };
+
+    } catch (error) {
+
+        return {
+
+            success: false,
+
+            confidence: 0,
+
+            reason:
+                error.message
+
+        };
+
+    }
+
+           }
