@@ -285,6 +285,11 @@ evidenceCount: 0,
 });
 
         if (!response.ok) {
+           console.error(
+    "BAD_RESPONSE",
+    source.url,
+    response.status
+  );
             continue;
         }
 
