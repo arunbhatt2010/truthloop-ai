@@ -71,6 +71,15 @@ export async function loadCrossEvidenceBrain({
 
             return result;
         }
+       const identityPackage =
+    await IdentityExtractionBrain({
+        profileLinks
+    });
+
+const discoveryPackage =
+    await FootprintDiscoveryBrain(
+        identityPackage
+    );
 
         for (const url of profileLinks) {
 
@@ -172,7 +181,24 @@ function calculateEvidenceScore(
 async function collectSourceEvidence(url) {
 
     try {
+       const identityPackage =
+  await IdentityExtractionBrain({
+    sourceUrl: url
+  });
 
+console.log(
+  "IDENTITY_PACKAGE",
+  identityPackage
+);
+const footprintPackage =
+  await FootprintDiscoveryBrain({
+    identityPackage
+  });
+
+console.log(
+  "FOOTPRINT_PACKAGE",
+  footprintPackage
+);
         const urlPackage =
             await loadPublicContentFetcher({
                 url
@@ -295,14 +321,33 @@ function mergeEvidencePackages(packages) {
 // Identity Extraction Brain
 // ====================================
 
-async function IdentityExtractionBrain(
-    evidencePackage
-) {
+async function IdentityExtractionBrain({
+    profileLinks = []
+}) {
 
-    return {
+    const result = {
         success: false,
         identities: []
     };
+
+    for (const url of profileLinks) {
+
+        result.identities.push({
+            type: "profile",
+            value: url
+        });
+
+    }
+
+    result.success =
+        result.identities.length > 0;
+
+    console.log(
+        "IDENTITY_PACKAGE",
+        result
+    );
+
+    return result;
 
 }
 
@@ -314,10 +359,37 @@ async function FootprintDiscoveryBrain(
     identityPackage
 ) {
 
-    return {
+    const result = {
         success: false,
         discoveredProfiles: []
     };
+
+    for (
+        const identity of
+        identityPackage.identities
+    ) {
+
+        if (
+            identity.type === "profile"
+        ) {
+
+            result.discoveredProfiles.push(
+                identity.value
+            );
+
+        }
+
+    }
+
+    result.success =
+        result.discoveredProfiles.length > 0;
+
+    console.log(
+        "DISCOVERY_PACKAGE",
+        result
+    );
+
+    return result;
 
 }
 
