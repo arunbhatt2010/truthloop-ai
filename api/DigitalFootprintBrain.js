@@ -900,6 +900,10 @@ ${JSON.stringify(
     }
 
 }
+
+const systemPrompt = `
+test
+`;
 /*
 You are TruthLoop DigitalFootprintBrain.
 
@@ -1393,7 +1397,9 @@ OUTPUT MUST BE TRACEABLE.
 
 OUTPUT MUST PASS SELF VALIDATION BEFORE RETURNING.
 */
-
+const userPrompt = `
+test
+`;
 /*
 LOOP 7 INVESTIGATION REQUEST
 
