@@ -215,6 +215,24 @@ try {
         discoveredProfiles
 
     });
+    const loop7EvidencePackage =
+    buildLoop7EvidencePackage({
+
+        profileLink,
+
+        platform,
+
+        evidenceSummary,
+
+        patternSignals,
+
+        crossPlatformSignals,
+
+        evidenceConfidence,
+
+        evidenceGaps
+
+    });
     // --------------------------------------------------
     // STEP 8
     // FINAL PACKAGE
@@ -231,39 +249,13 @@ try {
 
     platform,
 
-    evidenceConfidence,
-        signals.signalCount > 5
-            ? "High"
-            : signals.signalCount > 2
-            ? "Medium"
-            : "Low",
-
-    profileLink,
-platform,
-
-publicContentPackage,
-
-signals,
-evidenceSignals,
-patternSignals,
-
-socialLinks,
-discoveredProfiles,
-
-crossPlatformSignals,
-identitySignals,
-
-evidenceSummary,
-evidenceGaps,
-
-crossEvidence,
-
-evidenceConfidence,
+    loop7EvidencePackage,
 
     generatedAt:
         new Date().toISOString()
 
 };
+    
 function detectPlatform(profileLink = "") {
 
     try {
@@ -830,6 +822,49 @@ function buildCrossPlatformSignals({
 
         multiPlatformPresence:
             uniquePlatforms.length > 1
+
+    };
+
+        }
+function buildLoop7EvidencePackage({
+
+    profileLink,
+    platform,
+
+    evidenceSummary,
+    patternSignals,
+
+    crossPlatformSignals,
+
+    evidenceConfidence,
+    evidenceGaps
+
+}) {
+
+    return {
+
+        packageType:
+            "Loop7EvidencePackage",
+
+        contractVersion:
+            "L7EP-1.0",
+
+        generatedAt:
+            new Date().toISOString(),
+
+        profileLink,
+
+        platform,
+
+        evidenceSummary,
+
+        patternSignals,
+
+        crossPlatformSignals,
+
+        evidenceConfidence,
+
+        evidenceGaps
 
     };
 
