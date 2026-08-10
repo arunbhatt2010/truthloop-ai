@@ -509,7 +509,15 @@ export function cleanPublicContent(validatedPackage) {
 
     }
 
-    let html = validatedPackage.rawContent;
+    let html = validatedPackage.rawContent || "";
+
+    if (!html) {
+
+        result.reason = "No raw content found.";
+
+        return result;
+
+    }
 
     html = html.replace(/<script[\s\S]*?<\/script>/gi, "");
 
@@ -531,7 +539,7 @@ export function cleanPublicContent(validatedPackage) {
 
     return result;
 
-}
+                        }
 /*
 ==============================================================
 BLOCK 3
