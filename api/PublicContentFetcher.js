@@ -277,6 +277,12 @@ evidenceCount: 0,
                 }
 
             });
+       console.log("FETCH_STATUS", {
+  url: source.url,
+  status: response.status,
+  ok: response.ok,
+  contentType: response.headers.get("content-type")
+});
 
         if (!response.ok) {
             continue;
@@ -284,6 +290,11 @@ evidenceCount: 0,
 
         const html =
             await response.text();
+       console.log("HTML_DEBUG", {
+  url: source.url,
+  htmlLength: html?.length || 0,
+  first200: html?.slice(0, 200)
+});
 
         result.sources.push({
 
@@ -309,11 +320,16 @@ socialLinks:
 
         });
 
-    } catch {
+    catch(error) {
 
-        continue;
+  console.error(
+    "FETCH_ERROR",
+    source.url,
+    error.message
+  );
 
-    }
+  continue;
+               }
 
         }
         result.evidenceCount =
