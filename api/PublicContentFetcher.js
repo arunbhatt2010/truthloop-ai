@@ -319,13 +319,17 @@ socialLinks:
         result.evidenceCount =
     result.sources.length;
 console.log(
-    "SOCIAL_LINKS_FOUND",
-    result.sources.map(
-        source => ({
-            url: source.url,
-            socialLinks: source.socialLinks
-        })
-    )
+  "SOCIAL_LINKS_FOUND:",
+  result.sources.reduce(
+    (count, source) =>
+      count + (source.socialLinks?.length || 0),
+    0
+  )
+);
+
+console.log(
+  "PAGE_TITLE:",
+  result.sources[0]?.pageTitle
 );
 result.success =
     result.sources.length > 0;
