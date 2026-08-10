@@ -177,6 +177,44 @@ try {
         discoveredProfiles
 
     });
+    const evidenceSummary =
+    generateEvidenceSummary({
+
+        platform,
+
+        signals,
+
+        evidenceSignals,
+
+        discoveredProfiles,
+
+        evidenceConfidence
+
+    });
+    const evidenceGaps =
+    findEvidenceGaps({
+
+        publicContentPackage,
+
+        discoveredProfiles
+
+    });
+    const patternSignals =
+    generatePatternSignals({
+
+        signals,
+
+        evidenceSignals
+
+    });
+    const crossPlatformSignals =
+    buildCrossPlatformSignals({
+
+        platform,
+
+        discoveredProfiles
+
+    });
     // --------------------------------------------------
     // STEP 8
     // FINAL PACKAGE
@@ -201,21 +239,26 @@ try {
             : "Low",
 
     profileLink,
-  platform,
+platform,
 
-  publicContentPackage,
+publicContentPackage,
 
-  signals,
-  evidenceSignals,
+signals,
+evidenceSignals,
+patternSignals,
 
-  socialLinks,
-  discoveredProfiles,
+socialLinks,
+discoveredProfiles,
 
-  identitySignals,
+crossPlatformSignals,
+identitySignals,
 
-  crossEvidence,
+evidenceSummary,
+evidenceGaps,
 
-  evidenceConfidence
+crossEvidence,
+
+evidenceConfidence,
 
     generatedAt:
         new Date().toISOString()
@@ -642,3 +685,152 @@ function buildIdentitySignals({
     };
 
 }
+function generateEvidenceSummary({
+
+    platform,
+    signals,
+    evidenceSignals,
+    discoveredProfiles,
+    evidenceConfidence
+
+}) {
+
+    const topTopics =
+        evidenceSignals?.repeatedTopics
+            ?.slice(0, 10)
+            ?.map(item => item.topic) || [];
+
+    const topSignals =
+        signals?.signals
+            ?.sort(
+                (a, b) =>
+                    b.mentions - a.mentions
+            )
+            ?.slice(0, 10) || [];
+
+    return {
+
+        primaryPlatform:
+            platform,
+
+        confidence:
+            evidenceConfidence,
+
+        topTopics,
+
+        topSignals,
+
+        discoveredProfiles:
+            discoveredProfiles?.count || 0
+
+    };
+
+}
+function findEvidenceGaps({
+
+    publicContentPackage,
+    discoveredProfiles
+
+}) {
+
+    const gaps = [];
+
+    const textLength =
+        publicContentPackage
+            ?.visibleText
+            ?.length || 0;
+
+    if (textLength < 1000) {
+
+        gaps.push(
+            "Limited public content"
+        );
+
+    }
+
+    if (
+        !discoveredProfiles?.count
+    ) {
+
+        gaps.push(
+            "No connected public profiles"
+        );
+
+    }
+
+    return gaps;
+
+        }
+function generatePatternSignals({
+
+    signals,
+    evidenceSignals
+
+}) {
+
+    const repeatedTopics =
+        evidenceSignals?.repeatedTopics || [];
+
+    const repeatedThemes =
+        signals?.signals || [];
+
+    const repeatedLanguage =
+        repeatedTopics
+            .slice(0, 10)
+            .map(item => item.topic);
+
+    const repeatedFocusAreas =
+        repeatedThemes
+            .map(item => item.signal);
+
+    return {
+
+        repeatedTopics,
+
+        repeatedThemes,
+
+        repeatedLanguage,
+
+        repeatedFocusAreas,
+
+        confidence:
+            repeatedTopics.length >= 10
+                ? "High"
+                : repeatedTopics.length >= 5
+                ? "Medium"
+                : "Low"
+
+    };
+
+        }
+function buildCrossPlatformSignals({
+
+    platform,
+    discoveredProfiles
+
+}) {
+
+    const platforms =
+        discoveredProfiles?.profiles
+            ?.map(item => item.platform) || [];
+
+    const uniquePlatforms =
+        [...new Set([
+            platform,
+            ...platforms
+        ])];
+
+    return {
+
+        totalPlatforms:
+            uniquePlatforms.length,
+
+        platforms:
+            uniquePlatforms,
+
+        multiPlatformPresence:
+            uniquePlatforms.length > 1
+
+    };
+
+        }
