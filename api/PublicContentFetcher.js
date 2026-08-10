@@ -325,7 +325,7 @@ socialLinks:
 
         });
 
-    catch(error) {
+    } catch(error) {
 
   console.error(
     "FETCH_ERROR",
