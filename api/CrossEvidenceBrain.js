@@ -238,7 +238,7 @@ async function collectSourceEvidence(url) {
     try {
        const identityPackage =
   await IdentityExtractionBrain({
-    sourceUrl: url
+    sourceUrl: profileLinks
   });
 
 console.log(
@@ -666,7 +666,8 @@ Rules:
 
 Output:
 Cross Evidence Package
-*/async function CrossEvidenceAnalyzer(
+*/
+async function CrossEvidenceAnalyzer(
     evidencePackage
 ) {
 
@@ -870,6 +871,7 @@ Rules:
 
 Output:
 Cross Evidence Package*/
+
 async function CrossEvidencePackageBuilder({
 
     identityPackage,
