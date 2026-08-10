@@ -110,6 +110,10 @@ export async function loadDigitalFootprintBrain({
 
     const socialLinks =
         discoverSocialLinks(publicContentPackage);
+    const discoveredProfiles =
+    await crawlDiscoveredProfiles(
+        socialLinks
+    );
 
     // --------------------------------------------------
     // STEP 7
@@ -161,6 +165,18 @@ try {
         socialLinks
 
     });
+    const identitySignals =
+    buildIdentitySignals({
+
+        platform,
+
+        signals,
+
+        evidenceSignals,
+
+        discoveredProfiles
+
+    });
     // --------------------------------------------------
     // STEP 8
     // FINAL PACKAGE
@@ -177,20 +193,29 @@ try {
 
     platform,
 
-    evidenceConfidence:
+    evidenceConfidence,
         signals.signalCount > 5
             ? "High"
             : signals.signalCount > 2
             ? "Medium"
             : "Low",
 
-    publicContentPackage,
+    profileLink,
+  platform,
 
-    socialLinks,
+  publicContentPackage,
 
-    signals,
+  signals,
+  evidenceSignals,
 
-    crossEvidence,
+  socialLinks,
+  discoveredProfiles,
+
+  identitySignals,
+
+  crossEvidence,
+
+  evidenceConfidence
 
     generatedAt:
         new Date().toISOString()
@@ -539,3 +564,81 @@ function discoverSocialLinks(
     return "Low";
 
                    }
+async function crawlDiscoveredProfiles(
+    socialLinks = []
+) {
+
+    const profiles = [];
+
+    for (const url of socialLinks.slice(0, 10)) {
+
+        try {
+
+            const platform =
+                detectPlatform(url);
+
+            if (
+                platform === "unknown"
+            ) {
+                continue;
+            }
+
+            profiles.push({
+
+                url,
+
+                platform
+
+            });
+
+        } catch {
+
+            continue;
+
+        }
+
+    }
+
+    return {
+
+        success: true,
+
+        profiles,
+
+        count: profiles.length
+
+    };
+
+}
+function buildIdentitySignals({
+
+    platform,
+
+    signals,
+
+    evidenceSignals,
+
+    discoveredProfiles
+
+}) {
+
+    return {
+
+        primaryPlatform:
+            platform,
+
+        signalCount:
+            signals?.signalCount || 0,
+
+        repeatedTopicCount:
+            evidenceSignals
+                ?.repeatedTopics
+                ?.length || 0,
+
+        discoveredProfiles:
+            discoveredProfiles
+                ?.count || 0
+
+    };
+
+}
