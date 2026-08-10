@@ -300,7 +300,7 @@ evidenceCount: 0,
                     "content-type"
                 ),
 
-            rawContent: html
+            rawContent: html,
            pageTitle:
     extractTitle(html),
 
