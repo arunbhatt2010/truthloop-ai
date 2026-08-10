@@ -126,7 +126,54 @@ const discoveryPackage =
             calculateEvidenceScore(
                 result.mergedEvidence
             );
+const normalizedEvidence =
+    await EvidenceNormalizer(
+        result.mergedEvidence
+    );
 
+console.log(
+    "NORMALIZED_EVIDENCE",
+    JSON.stringify(
+        normalizedEvidence,
+        null,
+        2
+    )
+);
+
+const findingsPackage =
+    await CrossEvidenceAnalyzer(
+        normalizedEvidence
+    );
+
+console.log(
+    "FINDINGS_PACKAGE",
+    JSON.stringify(
+        findingsPackage,
+        null,
+        2
+    )
+);
+
+const confidencePackage =
+    await EvidenceConfidenceEngine(
+        {
+            ...normalizedEvidence,
+            findings:
+                findingsPackage.findings
+        }
+    );
+
+const crossEvidencePackage =
+    await CrossEvidencePackageBuilder({
+        identityPackage,
+        footprintPackage:
+            discoveryPackage,
+        findingsPackage,
+        confidencePackage
+    });
+
+result.crossEvidencePackage =
+    crossEvidencePackage;
         result.success = true;
 
         return result;
@@ -804,5 +851,53 @@ async function EvidenceConfidenceEngine(
         };
 
     }
+
+           }
+/*CROSS EVIDENCE PACKAGE BUILDER
+
+Goal:
+Create one final evidence package.
+
+Rules:
+- Never generate evidence.
+- Never modify evidence.
+- Preserve traceability.
+- Merge brain outputs.
+- Keep source links.
+- Keep confidence.
+- Keep findings.
+- Return one package only.
+
+Output:
+Cross Evidence Package*/
+async function CrossEvidencePackageBuilder({
+
+    identityPackage,
+
+    footprintPackage,
+
+    findingsPackage,
+
+    confidencePackage
+
+}) {
+
+    return {
+
+        success: true,
+
+        identity:
+            identityPackage,
+
+        footprints:
+            footprintPackage,
+
+        findings:
+            findingsPackage,
+
+        confidence:
+            confidencePackage
+
+    };
 
            }
