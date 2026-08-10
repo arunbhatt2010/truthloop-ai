@@ -1632,7 +1632,7 @@ Return only the final validated investigation package.
 
    JSON only.
 ========================================== */
-const requestBody = {
+/* const requestBody = {
 
     model,
 
@@ -1758,6 +1758,7 @@ const requestBody = {
   intelligence.errors.push(
     error.message
   );
+  */
 
   return intelligence;
       }
