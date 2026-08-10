@@ -250,6 +250,10 @@ console.log(
         rawPackage,
         extractedPackage
     );
+    console.log(
+    "EXTRACTED_PACKAGE_DEBUG",
+    JSON.stringify(extractedPackage, null, 2)
+);
 
 console.log(
     "FINAL_PUBLIC_PACKAGE",
