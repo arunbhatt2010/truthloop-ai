@@ -392,7 +392,6 @@ Validated Public Content Package
 
 ==============================================================
 */
-
 export function validatePublicContent(rawPackage) {
 
     const result = {
@@ -402,6 +401,12 @@ export function validatePublicContent(rawPackage) {
         valid: false,
 
         sources: [],
+
+        rawContent: null,
+
+        contentType: null,
+
+        url: null,
 
         reason: null
 
@@ -444,10 +449,31 @@ export function validatePublicContent(rawPackage) {
 
     }
 
+    // Primary source for downstream pipeline
+    const primarySource = result.sources[0];
+
+    result.rawContent =
+        primarySource?.rawContent || null;
+
+    result.contentType =
+        primarySource?.contentType || null;
+
+    result.url =
+        primarySource?.url || null;
+
     result.success = true;
 
     result.valid = true;
-
+console.log(
+    "VALIDATED_PACKAGE_DEBUG",
+    JSON.stringify({
+        success: result.success,
+        valid: result.valid,
+        sourceCount: result.sources.length,
+        rawContentLength:
+            result.rawContent?.length || 0
+    }, null, 2)
+);
     return result;
 }
 /*
