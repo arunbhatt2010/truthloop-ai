@@ -223,6 +223,10 @@ if (hasProfileLinks) {
         await acquirePublicContent(
             urlPackage
         );
+    console.log(
+  "URL_PACKAGE_DEBUG",
+  JSON.stringify(urlPackage, null, 2)
+);
 console.log(
     "RAW_PACKAGE_DEBUG",
     JSON.stringify(rawPackage, null, 2)
