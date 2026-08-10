@@ -313,7 +313,15 @@ evidenceCount: 0,
         }
         result.evidenceCount =
     result.sources.length;
-
+console.log(
+    "SOCIAL_LINKS_FOUND",
+    result.sources.map(
+        source => ({
+            url: source.url,
+            socialLinks: source.socialLinks
+        })
+    )
+);
 result.success =
     result.sources.length > 0;
        result.platforms =
@@ -343,6 +351,54 @@ return result;
 
 }
 
+}
+function extractTitle(html) {
+
+    const match =
+        html.match(
+            /<title[^>]*>(.*?)<\/title>/i
+        );
+
+    return match
+        ? match[1].trim()
+        : null;
+}
+function extractSocialLinks(html) {
+
+    const links = [];
+
+    const patterns = [
+
+        /https?:\/\/(www\.)?linkedin\.com\/[^\s"'<>]+/gi,
+
+        /https?:\/\/(www\.)?twitter\.com\/[^\s"'<>]+/gi,
+
+        /https?:\/\/(www\.)?x\.com\/[^\s"'<>]+/gi,
+
+        /https?:\/\/(www\.)?facebook\.com\/[^\s"'<>]+/gi,
+
+        /https?:\/\/(www\.)?instagram\.com\/[^\s"'<>]+/gi,
+
+        /https?:\/\/(www\.)?youtube\.com\/[^\s"'<>]+/gi,
+
+        /https?:\/\/(www\.)?github\.com\/[^\s"'<>]+/gi
+
+    ];
+
+    patterns.forEach(pattern => {
+
+        const matches =
+            html.match(pattern);
+
+        if (matches) {
+
+            links.push(...matches);
+
+        }
+
+    });
+
+    return [...new Set(links)];
 }
 /*
 ==============================================================
