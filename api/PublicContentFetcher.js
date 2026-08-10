@@ -301,6 +301,11 @@ evidenceCount: 0,
                 ),
 
             rawContent: html
+           pageTitle:
+    extractTitle(html),
+
+socialLinks:
+    extractSocialLinks(html)
 
         });
 
