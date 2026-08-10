@@ -1629,33 +1629,98 @@ const normalizedEvidence = {
 
 const refinedEvidence = {
 
-    mission: "Build one verified Universal Evidence Package.",
+    mission:
+        "Build one verified Universal Evidence Package.",
 
     rules: [
-"Discover every available Evidence Source.",
 
-"Collect every measurable Evidence Signal.",
+        // Core Mission
+        "Evidence first.",
+        "Verification second.",
+        "Conclusions last.",
 
-"Validate every claim.",
+        // Discovery
+        "Discover every available Evidence Source.",
+        "Collect every measurable Evidence Signal.",
+        "Validate every claim.",
+        "Cross-check every Domin Filter.",
+        "Normalize duplicate evidence.",
 
-"Normalize duplicate evidence.",
+        // Preservation
+        "Preserve entities.",
+        "Preserve names.",
+        "Preserve organizations.",
+        "Preserve domains.",
+        "Preserve profile links.",
+        "Preserve timelines.",
+        "Preserve numerical data.",
+        "Preserve source traceability.",
 
-"Cross-check every Domin Filter.",
+        // Structured Evidence Priority
+        "The PublicContentPackage already contains verified structured evidence.",
+        "Treat every populated field as verified input.",
+        "Never discard structured evidence unless duplicated or invalid.",
 
-"Preserve entities, Domin Filters, timelines and numerical data.",
-"The PublicContentPackage already contains verified structured evidence.",
+        // Anti-Noise Rules
+        "Never return raw HTML.",
+        "Never return page source.",
+        "Never return CSS.",
+        "Never return JavaScript.",
+        "Never return SVG code.",
+        "Never return templates.",
+        "Never return navigation menus.",
+        "Never return headers.",
+        "Never return footers.",
+        "Never return cookie banners.",
+        "Never return layout code.",
+        "Never return styling code.",
+        "Never return framework code.",
+        "Never return boilerplate content.",
 
-"Treat every populated field as verified input.",
+        // Compression Rules
+        "Convert content into evidence signals.",
+        "Convert pages into structured facts.",
+        "Convert profiles into identity signals.",
+        "Convert websites into footprint signals.",
+        "Keep only high-value evidence.",
+        "Remove repetitive content.",
+        "Remove duplicate content.",
+        "Remove presentation-only content.",
+        "Remove non-evidence text.",
+        "Compress evidence aggressively.",
 
-"Never discard structured evidence unless it is duplicated or invalid.",
-"Keep only reusable evidence.",
+        // Evidence Output Rules
+        "Keep titles.",
+        "Keep descriptions.",
+        "Keep headings.",
+        "Keep public facts.",
+        "Keep public identities.",
+        "Keep social profiles.",
+        "Keep websites.",
+        "Keep organizations.",
+        "Keep authors.",
+        "Keep external references.",
+        "Keep source links.",
 
-"Evidence first.",
+        // Universal Package Guard
+        "Return evidence, not content.",
+        "Return signals, not webpages.",
+        "Return facts, not markup.",
+        "Return intelligence, not HTML.",
+        "Output only reusable evidence."
+    ],
 
-"Verification second.",
+    identity:
+        identityPackage,
 
-"Conclusions last."
-],
+    footprint:
+        discoveryPackage,
+
+    findings:
+        findingsPackage,
+
+    confidence:
+        confidencePackage,
 
     evidence:
         normalizedEvidence
