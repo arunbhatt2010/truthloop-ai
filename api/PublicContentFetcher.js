@@ -450,16 +450,30 @@ export function validatePublicContent(rawPackage) {
     }
 
     // Primary source for downstream pipeline
-    const primarySource = result.sources[0];
+    const primarySource =
+    result.sources.find(
+        source =>
+            source.rawContent &&
+            source.rawContent.length > 100
+    );
 
-    result.rawContent =
-        primarySource?.rawContent || null;
+if (!primarySource) {
 
-    result.contentType =
-        primarySource?.contentType || null;
+    result.reason =
+        "No readable public content found.";
 
-    result.url =
-        primarySource?.url || null;
+    return result;
+
+}
+
+result.rawContent =
+    primarySource.rawContent;
+
+result.contentType =
+    primarySource.contentType || null;
+
+result.url =
+    primarySource.url || null;
 
     result.success = true;
 
