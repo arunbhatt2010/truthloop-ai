@@ -75,6 +75,14 @@ export async function loadCrossEvidenceBrain({
     await IdentityExtractionBrain({
         profileLinks
     });
+       console.log(
+  "IDENTITY_PACKAGE",
+  JSON.stringify(
+    identityPackage,
+    null,
+    2
+  )
+);
 
 const discoveryPackage =
     await FootprintDiscoveryBrain(
@@ -320,41 +328,89 @@ function mergeEvidencePackages(packages) {
 // ====================================
 // Identity Extraction Brain
 // ====================================
+/*IDENTITY EXTRACTION BRAIN
 
+Goal:
+Extract observable identity signals.
+
+Rules:
+- Use only provided profile links.
+- Never guess.
+- Never perform investigation.
+- Never generate conclusions.
+- Extract names if visible.
+- Extract usernames.
+- Extract company names.
+- Extract websites.
+- Extract public identifiers.
+- Return structured identity package only.
+
+Output:
+Identity Package*/
 async function IdentityExtractionBrain({
-    profileLinks = []
+  profileLinks = []
 }) {
 
-    const result = {
-        success: false,
-        identities: []
-    };
+  const identity = {
 
-    for (const url of profileLinks) {
+    success: false,
 
-        result.identities.push({
-            type: "profile",
-            value: url
-        });
+    name: null,
 
+    company: null,
+
+    website: null,
+
+    title: null,
+
+    keywords: [],
+
+    sourceLinks: profileLinks
+
+  };
+
+  try {
+
+    if (!profileLinks.length) {
+      return identity;
     }
 
-    result.success =
-        result.identities.length > 0;
+    identity.success = true;
 
-    console.log(
-        "IDENTITY_PACKAGE",
-        result
-    );
+    return identity;
 
-    return result;
+  } catch (error) {
+
+    return {
+      ...identity,
+      reason: error.message
+    };
+
+  }
 
 }
 
 // ====================================
 // Footprint Discovery Brain
 // ====================================
+/*FOOTPRINT DISCOVERY BRAIN
 
+Goal:
+Find possible public footprint locations.
+
+Rules:
+- Start from Identity Package.
+- Never guess hidden accounts.
+- Never create evidence.
+- Discover only public candidate sources.
+- Look for websites.
+- Look for social profiles.
+- Look for company pages.
+- Preserve traceability.
+- Return discovery package only.
+
+Output:
+Discovery Package*/
 async function FootprintDiscoveryBrain(
     identityPackage
 ) {
@@ -396,7 +452,25 @@ async function FootprintDiscoveryBrain(
 // ====================================
 // Evidence Normalizer
 // ====================================
+/*
+EVIDENCE NORMALIZER
 
+Goal:
+Convert evidence into one format.
+
+Rules:
+- Never analyze.
+- Never infer.
+- Never score.
+- Preserve source.
+- Preserve content.
+- Preserve traceability.
+- Remove duplicates.
+- Return normalized package only.
+
+Output:
+Normalized Evidence Package
+*/
 async function EvidenceNormalizer(
     evidencePackage
 ) {
@@ -408,7 +482,25 @@ async function EvidenceNormalizer(
 // ====================================
 // Cross Evidence Analyzer
 // ====================================
+/*
+CROSS EVIDENCE ANALYZER
 
+Goal:
+Compare evidence sources.
+
+Rules:
+- Evidence first.
+- Never guess.
+- Never invent evidence.
+- Find overlaps.
+- Find contradictions.
+- Find repeated signals.
+- Preserve traceability.
+- Return findings only.
+
+Output:
+Cross Evidence Package
+*/
 async function CrossEvidenceAnalyzer(
     evidencePackage
 ) {
@@ -422,7 +514,25 @@ async function CrossEvidenceAnalyzer(
 // ====================================
 // Evidence Confidence Engine
 // ====================================
+/*
+EVIDENCE CONFIDENCE BRAIN
 
+Goal:
+Measure evidence strength.
+
+Rules:
+- Use evidence only.
+- Never analyze psychology.
+- Never generate patterns.
+- Count sources.
+- Count confirmations.
+- Count contradictions.
+- Assign confidence.
+- Return confidence package only.
+
+Output:
+Confidence Package
+*/
 async function EvidenceConfidenceEngine(
     evidencePackage
 ) {
