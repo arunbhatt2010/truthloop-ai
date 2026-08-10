@@ -234,12 +234,18 @@ console.log(
         validatePublicContent(
             rawPackage
         );
-
+console.log(
+    "VALIDATED_SOURCES_COUNT",
+    validatedPackage?.sources?.length || 0
+);
     const cleanPackage =
         cleanPublicContent(
             validatedPackage
         );
-
+console.log(
+    "CLEAN_CONTENT_LENGTH",
+    cleanPackage?.cleanContent?.length || 0
+);
     const extractedPackage =
         extractPublicContent(
             cleanPackage
