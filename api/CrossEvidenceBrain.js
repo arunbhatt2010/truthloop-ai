@@ -364,8 +364,10 @@ async function IdentityExtractionBrain({
     title: null,
 
     keywords: [],
-
+identities: [],
     sourceLinks: profileLinks
+     
+     
 
   };
 
@@ -374,6 +376,96 @@ async function IdentityExtractionBrain({
     if (!profileLinks.length) {
       return identity;
     }
+     for (const link of profileLinks) {
+
+  try {
+
+    const url = new URL(link);
+
+    identity.identities.push({
+      type: "hostname",
+      value: url.hostname
+    });
+
+    identity.identities.push({
+      type: "pathname",
+      value: url.pathname
+    });
+     const segments =
+  url.pathname
+    .split("/")
+    .filter(Boolean);
+
+if (segments.length > 0) {
+
+  const username =
+    segments[
+      segments.length - 1
+    ];
+
+  identity.identities.push({
+    type: "username",
+    value: username
+  });
+
+     }
+     let platform = "unknown";
+
+if (
+  url.hostname.includes(
+    "linkedin"
+  )
+) {
+  platform = "linkedin";
+}
+else if (
+  url.hostname.includes(
+    "github"
+  )
+) {
+  platform = "github";
+}
+else if (
+  url.hostname.includes(
+    "twitter"
+  ) ||
+  url.hostname.includes(
+    "x.com"
+  )
+) {
+  platform = "x";
+}
+else if (
+  url.hostname.includes(
+    "facebook"
+  )
+) {
+  platform = "facebook";
+}
+
+identity.identities.push({
+  type: "platform",
+  value: platform
+});
+
+  } catch (error) {
+
+    console.log(
+      "IDENTITY_PARSE_ERROR",
+      error.message
+    );
+
+  }
+
+   }
+     console.log(
+  "IDENTITY_PACKAGE",
+  JSON.stringify(
+    identity,
+    null,
+    2
+  )
+);
 
     identity.success = true;
 
