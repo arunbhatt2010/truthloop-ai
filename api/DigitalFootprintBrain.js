@@ -98,6 +98,10 @@ export async function loadDigitalFootprintBrain({
 
     const signals =
         extractSignals(publicContentPackage);
+    const evidenceSignals =
+    buildEvidenceSignals(
+        publicContentPackage
+    );
 
     // --------------------------------------------------
     // STEP 6
@@ -112,7 +116,11 @@ export async function loadDigitalFootprintBrain({
     // CROSS EVIDENCE
     // --------------------------------------------------
 
-    const crossEvidence =
+    let crossEvidence = null;
+
+try {
+
+    crossEvidence =
         await loadCrossEvidenceBrain({
 
             platform,
@@ -127,6 +135,32 @@ export async function loadDigitalFootprintBrain({
 
         });
 
+} catch (error) {
+
+    console.log(
+        "CrossEvidenceBrain skipped:",
+        error.message
+    );
+
+    crossEvidence = {
+
+        success: false,
+
+        reason: error.message
+
+    };
+
+}
+    const evidenceConfidence =
+    calculateEvidenceConfidence({
+
+        publicContentPackage,
+
+        signals,
+
+        socialLinks
+
+    });
     // --------------------------------------------------
     // STEP 8
     // FINAL PACKAGE
@@ -134,29 +168,34 @@ export async function loadDigitalFootprintBrain({
 
     return {
 
-        success: true,
+    success: true,
 
-        packageType:
-            "DigitalFootprintPackage",
+    packageType:
+        "DigitalFootprintPackage",
 
-        profileLink,
+    profileLink,
 
-        platform,
+    platform,
 
-        publicContentPackage,
+    evidenceConfidence:
+        signals.signalCount > 5
+            ? "High"
+            : signals.signalCount > 2
+            ? "Medium"
+            : "Low",
 
-        socialLinks,
+    publicContentPackage,
 
-        signals,
+    socialLinks,
 
-        crossEvidence,
+    signals,
 
-        generatedAt:
-            new Date().toISOString()
+    crossEvidence,
 
-    };
+    generatedAt:
+        new Date().toISOString()
 
-}
+};
 function detectPlatform(profileLink = "") {
 
     try {
@@ -268,13 +307,95 @@ function extractSignals(
 
     const text = [
 
-        publicContentPackage?.title,
-        publicContentPackage?.description,
-        publicContentPackage?.visibleText
+        publicContentPackage?.title || "",
+        publicContentPackage?.description || "",
+        publicContentPackage?.visibleText || ""
 
     ]
-        .filter(Boolean)
-        .join("\n");
+        .join("\n")
+        .toLowerCase();
+
+    const signalGroups = {
+
+        ai: [
+            "ai",
+            "artificial intelligence",
+            "machine learning",
+            "llm",
+            "gpt"
+        ],
+
+        founder: [
+            "founder",
+            "startup",
+            "entrepreneur",
+            "business"
+        ],
+
+        systems: [
+            "system",
+            "systems",
+            "framework",
+            "process"
+        ],
+
+        education: [
+            "teach",
+            "teaching",
+            "education",
+            "learn",
+            "learning"
+        ],
+
+        marketing: [
+            "marketing",
+            "growth",
+            "audience",
+            "content"
+        ]
+
+    };
+
+    const signals = [];
+
+    for (const [name, keywords] of Object.entries(signalGroups)) {
+
+        let count = 0;
+
+        for (const keyword of keywords) {
+
+            const matches =
+                text.match(
+                    new RegExp(
+                        keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                        "gi"
+                    )
+                );
+
+            count += matches?.length || 0;
+
+        }
+
+        if (count > 0) {
+
+            signals.push({
+
+                signal: name,
+
+                mentions: count,
+
+                confidence:
+                    count >= 10
+                        ? "High"
+                        : count >= 5
+                        ? "Medium"
+                        : "Low"
+
+            });
+
+        }
+
+    }
 
     return {
 
@@ -282,7 +403,9 @@ function extractSignals(
 
         textLength: text.length,
 
-        evidenceText: text
+        signalCount: signals.length,
+
+        signals
 
     };
 
@@ -307,3 +430,112 @@ function discoverSocialLinks(
     ];
 
 }
+    function buildEvidenceSignals(
+    publicContentPackage = {}
+) {
+
+    const text = [
+
+        publicContentPackage?.title || "",
+        publicContentPackage?.description || "",
+        publicContentPackage?.visibleText || ""
+
+    ]
+        .join(" ")
+        .toLowerCase();
+
+    const stopWords = new Set([
+        "the","and","for","with",
+        "this","that","from",
+        "have","will","your",
+        "into","about","their",
+        "they","them","been"
+    ]);
+
+    const words = text
+        .replace(/[^a-z0-9\s]/g, " ")
+        .split(/\s+/)
+        .filter(
+            word =>
+                word &&
+                word.length > 3 &&
+                !stopWords.has(word)
+        );
+
+    const frequency = {};
+
+    for (const word of words) {
+
+        frequency[word] =
+            (frequency[word] || 0) + 1;
+
+    }
+
+    const repeatedTopics =
+        Object.entries(frequency)
+            .sort(
+                (a, b) =>
+                    b[1] - a[1]
+            )
+            .slice(0, 20)
+            .map(([topic, count]) => ({
+                topic,
+                mentions: count
+            }));
+
+    return {
+
+        success: true,
+
+        repeatedTopics,
+
+        uniqueTopics:
+            Object.keys(frequency).length
+
+    };
+
+            }
+    function calculateEvidenceConfidence({
+
+    publicContentPackage,
+    signals,
+    socialLinks
+
+}) {
+
+    let score = 0;
+
+    const textLength =
+        publicContentPackage
+            ?.visibleText
+            ?.length || 0;
+
+    score +=
+        Math.min(
+            40,
+            Math.floor(textLength / 500)
+        );
+
+    score +=
+        Math.min(
+            30,
+            signals?.signalCount * 5
+        );
+
+    score +=
+        Math.min(
+            30,
+            socialLinks?.length * 3
+        );
+
+    if (score >= 70) {
+        return "High";
+    }
+
+    if (score >= 40) {
+        return "Medium";
+    }
+
+    return "Low";
+
+                   }
