@@ -165,18 +165,7 @@ try {
         socialLinks
 
     });
-    const identitySignals =
-    buildIdentitySignals({
-
-        platform,
-
-        signals,
-
-        evidenceSignals,
-
-        discoveredProfiles
-
-    });
+    
     const evidenceSummary =
     generateEvidenceSummary({
 
@@ -255,6 +244,7 @@ try {
         new Date().toISOString()
 
 };
+        }
     
 function detectPlatform(profileLink = "") {
 
