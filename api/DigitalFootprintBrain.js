@@ -216,6 +216,7 @@ try {
         patternSignals,
 
         crossPlatformSignals,
+        crossEvidence,
 
         evidenceConfidence,
 
