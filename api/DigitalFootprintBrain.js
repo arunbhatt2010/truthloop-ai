@@ -36,7 +36,7 @@ export async function loadDigitalFootprintBrain({
     currentLoop = 7,
     truthLoopPackage = {}
 
-} = {})
+} = {}) {
 
     console.log("===== DIGITAL FOOTPRINT BRAIN v2 =====");
 
