@@ -320,9 +320,13 @@ evidenceCount: 0,
            pageTitle:
     extractTitle(html),
 
-socialLinks:
-    extractSocialLinks(html)
-           console.log(
+const html =
+    await response.text();
+
+const socialLinks =
+    extractSocialLinks(html);
+
+console.log(
     "EXTRACTED_SOCIAL_LINKS",
     socialLinks
 );
@@ -338,9 +342,6 @@ result.sources.push({
         extractTitle(html),
     socialLinks
 });
-
-        });
-
     } catch(error) {
 
   console.error(
