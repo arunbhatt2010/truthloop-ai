@@ -1079,62 +1079,95 @@ NORMALIZED PUBLIC EVIDENCE:
 ${JSON.stringify(normalizedEvidence)}
 `;
 
-    const response =
-        await fetch(
-            "https://api.cerebras.ai/v1/chat/completions",
-            {
-                method: "POST",
-                headers: {
-                    Authorization:
-                        `Bearer ${process.env.CEREBRAS_API_KEY}`,
-                    "Content-Type":
-                        "application/json"
-                },
-                body: JSON.stringify({
-                    model:
-                        "qwen-3-235b-a22b-thinking-2507",
-                    messages: [
-                        {
-                            role: "user",
-                            content: prompt
-                        }
-                    ],
-                    temperature: 0.1,
-                    max_completion_tokens: 3000
-                })
-            }
-        );
+  console.log("CEREBRAS_BEFORE");
 
-    const data =
-        await response.json();
+const response =
+    await fetch(
+        "https://api.cerebras.ai/v1/chat/completions",
+        {
+            method: "POST",
+            headers: {
+                Authorization:
+                    `Bearer ${process.env.CEREBRAS_API_KEY}`,
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify({
+                model:
+                    "qwen-3-235b-a22b-thinking-2507",
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                temperature: 0.1,
+                max_completion_tokens: 3000
+            })
+        }
+    );
 
-    const content =
-        data?.choices?.[0]?.message?.content || "{}";
-
-    let universalPackage = {};
-
-    try {
-
-        universalPackage =
-            JSON.parse(content);
-
-    } catch {
-
-        universalPackage = {
-            error: "Invalid JSON returned by Cerebras"
-        };
-
+console.log(
+    "CEREBRAS_TRIGGER",
+    {
+        status: response.status,
+        ok: response.ok
     }
+);
 
-    return {
+const data =
+    await response.json();
 
-        success: true,
+console.log(
+    "CEREBRAS_RESPONSE_KEYS",
+    Object.keys(data || {})
+);
 
-        source: "cerebras",
+const content =
+    data?.choices?.[0]?.message?.content || "{}";
 
-        universalPackage
+console.log(
+    "CEREBRAS_CONTENT_LENGTH",
+    content.length
+);
 
+let universalPackage = {};
+
+try {
+
+    universalPackage =
+        JSON.parse(content);
+
+    console.log(
+        "CEREBRAS_AFTER",
+        {
+            success: true
+        }
+    );
+
+} catch (error) {
+
+    console.error(
+        "CEREBRAS_JSON_PARSE_ERROR",
+        error
+    );
+
+    universalPackage = {
+        error:
+            "Invalid JSON returned by Cerebras"
     };
+
+}
+
+return {
+
+    success: response.ok,
+
+    source: "cerebras",
+
+    universalPackage
+
+};
 
 }
 
