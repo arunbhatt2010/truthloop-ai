@@ -350,6 +350,10 @@ console.log(
                     finalPackage?.headings?.length || 0
             }
         );
+       console.log(
+    "FINAL_PACKAGE_BEFORE_CEREBRAS",
+    JSON.stringify(finalPackage, null, 2)
+);
 
         return {
 
