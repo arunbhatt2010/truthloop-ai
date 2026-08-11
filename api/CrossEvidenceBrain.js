@@ -719,6 +719,45 @@ async function EvidenceNormalizer(
     evidencePackages = []
 ) {
 
+    console.log(
+        "NORMALIZER_ENTERED"
+    );
+
+    console.log(
+        "NORMALIZER_RAW_TYPE",
+        typeof evidencePackages
+    );
+
+    console.log(
+        "NORMALIZER_IS_ARRAY",
+        Array.isArray(
+            evidencePackages
+        )
+    );
+
+    console.log(
+        "NORMALIZER_RAW_VALUE",
+        JSON.stringify(
+            evidencePackages,
+            null,
+            2
+        )
+    );
+
+    if (
+        !Array.isArray(
+            evidencePackages
+        )
+    ) {
+        evidencePackages =
+            [evidencePackages];
+    }
+
+    console.log(
+        "NORMALIZER_AFTER_WRAP",
+        evidencePackages.length
+    );
+
     const normalized = {
         success: true,
         sources: []
@@ -732,7 +771,9 @@ async function EvidenceNormalizer(
 
         const key =
             evidence.url ||
-            JSON.stringify(evidence);
+            JSON.stringify(
+                evidence
+            );
 
         if (seen.has(key)) {
             continue;
@@ -746,10 +787,14 @@ async function EvidenceNormalizer(
 
     }
 
+    console.log(
+        "NORMALIZER_DONE",
+        normalized.sources.length
+    );
+
     return normalized;
 
 }
-
 // ====================================
 // Cross Evidence Analyzer
 // ====================================
