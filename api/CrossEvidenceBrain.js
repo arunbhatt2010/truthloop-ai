@@ -267,9 +267,9 @@ console.log(
   identityPackage
 );
 const footprintPackage =
-  await FootprintDiscoveryBrain({
+  await FootprintDiscoveryBrain(
     identityPackage
-  });
+);
 
 console.log(
   "FOOTPRINT_PACKAGE",
