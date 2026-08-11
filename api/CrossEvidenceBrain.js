@@ -126,15 +126,17 @@ const discoveryPackage =
             mergeEvidencePackages(
                 result.evidencePackages
             );
-
+console.log("STEP_1_MERGE_DONE");
         result.confidenceScore =
             calculateEvidenceScore(
                 result.mergedEvidence
             );
+       console.log("STEP_2_NORMALIZER_START");
 const normalizedEvidence =
     await EvidenceNormalizer(
         result.mergedEvidence
     );
+       console.log("STEP_3_NORMALIZER_DONE");
        const profileIntelligence =
     await ProfileIntelligenceAPI({
 
