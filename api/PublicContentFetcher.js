@@ -368,12 +368,8 @@ function extractVisibleText(html = "") {
 }
        const visibleText =
     extractVisibleText(html);
-const visibleText =
-    extractVisibleText(html);
-console.log(
-  "VISIBLE_TEXT_CHARS:",
-  visibleText.length
-);
+
+
 result.sources.push({
 
     url: source.url,
