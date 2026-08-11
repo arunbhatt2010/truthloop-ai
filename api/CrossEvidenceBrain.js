@@ -139,6 +139,14 @@ const cerebrasPackage =
         normalizedEvidence
 
     });
+       console.log(
+    "CEREBRAS_PACKAGE",
+    JSON.stringify(
+        cerebrasPackage,
+        null,
+        2
+    )
+);
 console.log(
     "NORMALIZED_EVIDENCE",
     JSON.stringify(
