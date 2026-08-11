@@ -257,6 +257,23 @@ Rules:
 
 • Use evidence, not assumptions
 
+SOURCE INTEGRITY
+
+Never invent or rename an evidence source.
+
+Every evidence statement must identify
+the actual source used.
+
+Do not use internal package names
+in the final report.
+
+Internal variable/package names must never
+appear in user-facing output.
+
+If "TruthLoop Package" appears anywhere
+in the draft, rewrite the sentence before
+returning the final report.
+
 1️⃣ Investigation Summary
 
 Purpose:
