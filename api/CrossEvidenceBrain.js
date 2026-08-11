@@ -967,79 +967,76 @@ async function CrossEvidencePackageBuilder({
 
            }
 async function ProfileIntelligenceAPI({
-    truthLoopPackage = {},
     normalizedEvidence = {}
 }) {
 
-const prompt = `
-You are TruthLoop's Profile Intelligence Engine.
+    const prompt = `
+You are TruthLoop's Universal Public Evidence Package Generator.
 
-Your ONLY job is to convert public evidence into a compact, factual intelligence package for downstream evidence analysis.
+Your ONLY job is to compress normalized public evidence into ONE
+small, factual Universal Package for downstream Loop 7 analysis.
 
 INPUT:
-Public evidence may contain raw HTML, CSS, JavaScript, navigation, images, metadata, links, social profiles, article text, author information, and repeated content.
+Normalized public evidence.
 
-EXTRACT ONLY USEFUL PUBLIC SIGNALS:
+EXTRACT ONLY:
 
-1. IDENTITY
-- person name
-- company / organization / brand
+- verified identity
+- name
 - title / role
+- company / brand
 - website
 - location
 - public platforms
-
-2. PUBLIC POSITIONING
-- what the person/brand appears to do
-- primary niche
-- expertise areas
 - recurring topics
-- audience served
+- expertise signals
+- audience signals
+- business / creator signals
+- public activity signals
+- repeated behavioral signals explicitly supported by evidence
+- contradictions explicitly supported by evidence
+- important public evidence
+- source URLs
 
-3. BUSINESS / CREATOR SIGNALS
-- products or services explicitly mentioned
-- business positioning
-- creator / founder / professional signals
-- public calls-to-action
-- meaningful external profile links
+REMOVE COMPLETELY:
 
-4. EVIDENCE SIGNALS
-- repeated themes
-- stated goals
-- public claims
-- notable behavioral or professional signals explicitly present in the evidence
-
-FILTER OUT COMPLETELY:
 - HTML
 - CSS
 - JavaScript
 - page layout
-- styling
 - navigation
 - menus
-- footer boilerplate
-- cookie/privacy boilerplate
-- tracking parameters
-- image URLs
+- styling
+- images
 - technical metadata
 - duplicate text
-- generic website filler
+- boilerplate
+- raw content dumps
+- generic descriptions
 
 RULES:
-- Use ONLY information explicitly supported by the evidence.
-- Never guess identity, role, company, location, expertise, or intent.
-- If a field is unknown, return null or [].
-- Preserve useful social/profile URLs when they are explicitly present.
-- Prefer concise facts over explanations.
-- Do not reproduce raw evidence.
-- Do not perform psychological diagnosis or deep behavioral interpretation.
-- Do not generate advice.
-- Do not explain your reasoning.
-- Output must be a compact universal intelligence package.
-- Maximum output: 3000 characters.
-- Return valid JSON only.
 
-OUTPUT FORMAT:
+- Use only evidence explicitly present.
+- Never guess.
+- Never infer unsupported identity.
+- Never invent behavior.
+- Never diagnose psychology.
+- Never generate advice.
+- Never explain reasoning.
+- Preserve useful source URLs.
+- Prefer repeated and strongly supported signals.
+- Missing information must remain null or [].
+- Do not reproduce raw evidence.
+
+OUTPUT:
+
+Return ONLY one Universal Public Evidence Package.
+
+Maximum total output: 3000 characters.
+
+Return valid JSON only.
+
+FORMAT:
 {
   "identity": {
     "name": null,
@@ -1058,13 +1055,16 @@ OUTPUT FORMAT:
   "businessSignals": [],
   "creatorSignals": [],
   "recurringTopics": [],
-  "evidenceSignals": [],
+  "behavioralSignals": [],
+  "contradictions": [],
+  "evidence": [],
   "sourceLinks": []
 }
 
-PUBLIC EVIDENCE:
+NORMALIZED PUBLIC EVIDENCE:
 ${JSON.stringify(normalizedEvidence)}
 `;
+
     const response =
         await fetch(
             "https://api.cerebras.ai/v1/chat/completions",
@@ -1085,7 +1085,7 @@ ${JSON.stringify(normalizedEvidence)}
                             content: prompt
                         }
                     ],
-                    temperature: 0.2,
+                    temperature: 0.1,
                     max_completion_tokens: 3000
                 })
             }
@@ -1097,17 +1097,17 @@ ${JSON.stringify(normalizedEvidence)}
     const content =
         data?.choices?.[0]?.message?.content || "{}";
 
-    let intelligencePackage = {};
+    let universalPackage = {};
 
     try {
 
-        intelligencePackage =
+        universalPackage =
             JSON.parse(content);
 
     } catch {
 
-        intelligencePackage = {
-            rawResponse: content
+        universalPackage = {
+            error: "Invalid JSON returned by Cerebras"
         };
 
     }
@@ -1118,15 +1118,11 @@ ${JSON.stringify(normalizedEvidence)}
 
         source: "cerebras",
 
-        intelligencePackage,
-
-        normalizedEvidence,
-
-        truthLoopPackage
+        universalPackage
 
     };
 
-           }
+}
 
 
 async function CerebrasEvidenceIntelligence({
