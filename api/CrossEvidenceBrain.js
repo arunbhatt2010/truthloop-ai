@@ -1265,15 +1265,21 @@ const response =
     );
 
 console.log(
-    "CEREBRAS_TRIGGER",
-    {
-        status: response.status,
-        ok: response.ok
-    }
+    "CEREBRAS_HTTP_STATUS",
+    response.status
 );
 
 const data =
     await response.json();
+
+console.log(
+    "CEREBRAS_RESPONSE",
+    JSON.stringify(
+        data,
+        null,
+        2
+    )
+);
 
 console.log(
     "CEREBRAS_AFTER",
@@ -1281,12 +1287,19 @@ console.log(
         hasChoices:
             !!data?.choices,
         choicesLength:
-            data?.choices?.length || 0
+            data?.choices?.length || 0,
+        hasError:
+            !!data?.error
     }
 );
 
 const content =
-    data?.choices?.[0]?.message?.content || "{}";
+    data?.choices?.[0]?.message?.content || "";
+
+console.log(
+    "CEREBRAS_CONTENT",
+    content
+);
 
 let intelligencePackage = {};
 
@@ -1300,6 +1313,15 @@ try {
     );
 
 } catch (error) {
+   console.log(
+    "CEREBRAS_FATAL_ERROR",
+    error?.message
+);
+
+console.log(
+    "CEREBRAS_FATAL_STACK",
+    error?.stack
+);
 
     console.log(
         "CEREBRAS_JSON_PARSE_ERROR",
@@ -1307,8 +1329,16 @@ try {
     );
 
     intelligencePackage = {
+
+        rawContent:
+            content,
+
+        parseError:
+            error?.message,
+
         error:
             "Invalid JSON returned by Cerebras"
+
     };
 
 }
