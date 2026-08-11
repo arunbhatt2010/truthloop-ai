@@ -135,20 +135,21 @@ export async function loadDigitalFootprintBrain({
 try {
 
     crossEvidence =
-        await loadCrossEvidenceBrain({
+    await loadCrossEvidenceBrain({
 
-            platform,
+        profileLinks: [profileLink],
 
-            signals,
+        platform,
 
-            socialLinks,
+        signals,
 
-            publicContentPackage,
+        socialLinks,
 
-            truthLoopPackage
+        publicContentPackage,
 
-        });
+        truthLoopPackage
 
+    });
 } catch (error) {
 
     console.log(
