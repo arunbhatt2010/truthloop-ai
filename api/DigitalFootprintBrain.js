@@ -40,6 +40,15 @@ export async function loadDigitalFootprintBrain({
 
     console.log("===== DIGITAL FOOTPRINT BRAIN v2 =====");
 
+    console.log(
+        "PROFILE_LINK_RECEIVED",
+        profileLink
+    );
+
+    console.log(
+        "PROFILE_LINKS_RECEIVED",
+        profileLinks
+    );
     // --------------------------------------------------
     // STEP 1
     // LOOP SECURITY
