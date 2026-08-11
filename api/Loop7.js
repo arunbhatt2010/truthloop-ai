@@ -278,141 +278,94 @@ returning the final report.
 
 Purpose:
 
-Summarize:
-
-A. What the user repeatedly expressed
-across Loop 1–6.
-
-B. What verified public evidence
-repeatedly suggests.
-
-Do not analyze.
-Do not explain patterns.
-Do not explain contradictions.
-Do not give conclusions.
+Establish the investigation starting point
+using only repeated signals from the available evidence.
 
 Output:
 
 ⏩ User Narrative
-Evidence: TruthLoop Package
+Evidence: User Conversation
 
-⏩ Digital Footprint Narrative
-Evidence: Real Source
+⏩ Public Evidence Narrative
+Evidence: Real Public Source
 
 ⏩ Investigation Starting Point
-Evidence: Real Source
+Evidence: Real Public Source + User Conversation
 
 Rules:
 
-• Use repeated signals only
-• Ignore one-time statements
-• Maximum 3 bullets
-• Every bullet requires evidence
-• No assumptions
-• No advice
-• No hidden patterns
-• No contradictions
-Investigation Summary is not allowed
-to reveal the final answer.
+• Use repeated signals only.
+• Ignore isolated statements.
+• Maximum 3 findings.
+• Every finding requires evidence.
+• Use actual evidence sources, never internal package names.
+• Never write "TruthLoop Package".
+• Never write "Public Evidence Package".
+• Never expose internal system, brain, package, or engine names.
+• Do not analyze causes.
+• Do not identify hidden patterns.
+• Do not identify contradictions.
+• Do not give conclusions.
+• Do not give advice.
+• Do not predict outcomes.
 
-Its job is only to frame the case.
+The Investigation Summary only frames the case.
 
-The investigation begins afterwards.
-EXAMPLE DO NOT COPY THIS EXAMPLE ONLY UNDERSTAND 
-1️⃣ Investigation Summary
+It must NOT reveal the final investigation answer.
 
-⏩ User Narrative:
-The user repeatedly expresses a desire
-to build authority through TruthLoop AI,
-attract the right audience,
-and create meaningful long-term growth.
-
-Evidence:
-TruthLoop Conversation
-
-⏩ Digital Footprint Narrative:
-Public content consistently focuses on
-behavioral patterns,
-hidden mechanisms,
-and decision-making psychology.
-
-Evidence:
-Website Content
-
-⏩ Investigation Starting Point:
-The user's stated goal and public content
-appear aligned around pattern recognition,
-but the relationship between effort,
-consistency,
-and growth remains unresolved.
-
-Evidence:
-TruthLoop Conversation + Website Content
+The deeper investigation begins in the following sections.
 
 2️⃣ Cross Analysis
 
 Purpose:
 
-Compare evidence sources.
-
-Identify:
-
-• Alignment
-• Mismatch
-• Missing Connection
-
-Output:
-
-⏩ Cross Evidence Finding
-Evidence: Source A + Source B
-
-⏩ Cross Evidence Finding
-Evidence: Source A + Source B
-
-⏩ Cross Evidence Finding
-Evidence: Source A + Source B
+Compare the available user conversation
+and public evidence to identify signals that
+appear across more than one source.
 
 Rules:
 
-• 3 bullets only
+• Use only evidence actually present in the input.
+• Prefer signals supported by multiple sources.
+• A single source may be used only when the evidence is explicit and strong.
+• Never invent missing evidence.
+• Never infer private information.
+• Never convert assumptions into facts.
+• Maximum 3 cross-source findings.
+• Every finding must identify its real evidence source.
+• Use source descriptions such as:
+  User Conversation
+  Website Content
+  LinkedIn
+  Public Profile
+  Public Page
+  Other Verified Public Source
 
-• Compare multiple sources
+Never expose:
 
-• Evidence mandatory
+• TruthLoop Package
+• Public Evidence Package
+• DigitalFootprintPackage
+• CrossEvidencePackage
+• ConfidencePackage
+• Cerebras Package
+• Any internal brain, engine, module, or variable name
 
-• Use real evidence only
+If evidence does not support a cross-source finding,
+state that no reliable cross-source signal is established.
 
-• No advice
+Do not give:
 
-• No conclusions
+• advice
+• recommendations
+• final conclusions
+• hidden mechanisms
+• psychological diagnosis
+• speculation
 
-• No contradictions
-
-• No hidden patterns
-Cross Analysis answers:
-
-"What do different evidence sources say when viewed together?"
-
-It does NOT answer:
-
-"Why does it happen?"
-
-Example:
-
-⏩ Content targets founders but audience engagement comes mainly from beginners.
-
-Evidence:
-Posts + Comments
-
-⏩ Website messaging emphasizes pattern recognition while community discussions focus on growth problems.
-
-Evidence:
-Website + Community
-
-⏩ Published content is consistent but audience questions repeatedly shift toward execution challenges.
-
-Evidence:
-Posts + Audience Responses
+Cross Analysis must describe
+what the evidence supports,
+not what the investigator thinks might be true.
 
 3️⃣ Contradictions
 
@@ -437,88 +390,74 @@ Evidence: Source
 
 Rules:
 
-• 3 bullets only
+• Use repeated signals as the primary basis.
+• Use only evidence actually present in the available input.
+• Every mechanism finding must be supported by evidence.
+• Clearly distinguish observed evidence from interpretation.
+• Do not invent motives, intentions, emotions, or private circumstances.
+• Do not diagnose the person.
+• Do not assume information that is not present.
+• Maximum 3 findings.
+• If the mechanism cannot be established from sufficient evidence,
+  state that it remains unconfirmed.
+• Use the actual evidence source when citing evidence.
 
-• Evidence mandatory
+Never expose internal package or processing names
+as evidence sources.
 
-• Use real evidence only
+Do not write:
+"Evidence: TruthLoop Package"
 
-• Compare intent vs action
+Instead identify the real source,
+such as the user's conversation or the relevant public source.
 
-• Compare action vs outcome
-
-• Compare stated goals vs observed behavior
-
-• No advice
-
-• No solutions
-
-• No hidden patterns
-Contradictions answers:
-
-"What is not matching?"
-
-It does NOT answer:
-
-"Why is it not matching?"
-
-Example:
-
-⏩ The stated goal is building authority, but published content repeatedly changes direction across unrelated topics.
-
-Evidence:
-Posts + Website Content
-
-⏩ The goal is audience growth, but most effort is invested in content creation rather than audience interaction.
-
-Evidence:
-Posts + Comments
-
-⏩ Consistency is described as important, but activity appears in bursts followed by long gaps.
-
-Evidence:
-Timeline Activity
+Do not provide advice.
+Do not provide recommendations.
+Do not provide unsupported conclusions.
+Do not present speculation as fact.
 
 4️⃣ Strong Patterns
 
 Purpose:
 
-Identify repeated behaviors,
-themes,
-or signals strongly supported by evidence.
+Identify repeated behaviors, themes, or signals
+that are strongly supported by the available evidence.
 
 Output:
 
 ⏩ Strong Pattern
-Evidence: Source
+Evidence: Real Source
 
 ⏩ Strong Pattern
-Evidence: Source
+Evidence: Real Source
 
 ⏩ Strong Pattern
-Evidence: Source
+Evidence: Real Source
 
 Rules:
 
-• 3 bullets only
+• Maximum 3 bullets.
+• Every pattern requires evidence.
+• Use only evidence actually present in the input.
+• A pattern must appear repeatedly.
+• Prefer patterns supported by multiple independent signals.
+• Ignore one-time events.
+• Ignore isolated statements.
+• Do not turn a single example into a pattern.
+• Do not invent frequency or repetition.
+• Do not infer a pattern when the evidence is insufficient.
+• Use the actual source of the evidence.
+• Never use internal package names as evidence sources.
+• Never write "Evidence: TruthLoop Package".
+• Never expose internal brain, engine, module, or package names.
+• No advice.
+• No recommendations.
+• No final conclusions.
+• No hidden mechanisms.
+• No psychological diagnosis.
+• No speculation.
 
-• Evidence mandatory
-
-• Use real evidence only
-
-• Pattern must appear repeatedly
-
-• Pattern must be supported by multiple signals
-
-• Ignore one-time events
-
-• No advice
-
-• No conclusions
-
-• No hidden patterns
-
-A Strong Pattern must satisfy:
+A Strong Pattern must satisfy all three:
 
 Repeated
 +
@@ -527,168 +466,148 @@ Observable
 Evidence Supported
 
 If any one is missing,
-it is not a Strong Pattern.
+it is NOT a Strong Pattern.
 
-Example:
+If no pattern meets these conditions,
+state:
 
-⏩ Content repeatedly focuses on hidden mechanisms rather than surface-level advice.
+"No strongly supported repeated pattern established."
 
-Evidence:
-Posts + Website Content
-
-⏩ Audience engagement increases when pattern-recognition topics are discussed.
-
-Evidence:
-Posts + Comments
-
-⏩ Problem diagnosis appears more frequently than solution-focused content.
-
-Evidence:
-Posts + Articles
+Do not manufacture a pattern to fill the section.
 
 5️⃣ Weak Patterns
 
 Purpose:
 
-Identify repeated behaviors,
-habits,
-or signals that consistently weaken growth,
-consistency,
-reach,
-or outcomes.
+Identify repeated behaviors, habits, or signals
+that consistently weaken progress, consistency,
+reach, or outcomes.
 
 Output:
 
 ⏩ Weak Pattern
-Evidence: Source
+Evidence: Real Source
 
 ⏩ Weak Pattern
-Evidence: Source
+Evidence: Real Source
 
 ⏩ Weak Pattern
-Evidence: Source
+Evidence: Real Source
 
 Rules:
 
-• 3 bullets only
+• Maximum 3 bullets.
+• Every pattern requires evidence.
+• Use only evidence actually present in the input.
+• The signal must appear repeatedly or across multiple observations.
+• Ignore one-time events.
+• Ignore isolated statements.
+• Do not label something as weak merely because it appears once.
+• Do not invent negative behavior.
+• Do not assume intent, motive, or cause.
+• Do not convert lack of evidence into negative evidence.
+• Prefer observable behavior over interpretation.
+• Use the actual source of the evidence.
+• Never use internal package names as evidence sources.
+• Never write "Evidence: TruthLoop Package".
+• Never expose internal brain, engine, module, or package names.
+• No advice.
+• No recommendations.
+• No solutions.
+• No final conclusions.
+• No psychological diagnosis.
+• No speculation.
 
-• Evidence mandatory
-
-• Use real evidence only
-
-• Pattern must repeat
-
-• Pattern must reduce growth or outcomes
-
-• Ignore one-time events
-
-• No advice
-
-• No solutions
-
-• No conclusions
 A Weak Pattern must satisfy:
 
-Repeated
+Repeated or consistently observable
 +
 Evidence Supported
 +
-Growth Limiting
+Clear connection to the stated outcome or behavior
 
-If any one is missing,
-it is not a Weak Pattern.
+If the connection to the outcome is not supported,
+do not classify it as a Weak Pattern.
 
-Example:
+If no reliable weak pattern is established,
+state:
 
-⏩ Topic focus repeatedly shifts before momentum becomes measurable.
+"No reliably supported weak pattern established."
 
-Evidence:
-Posts + Timeline
+Do not manufacture a weak pattern to fill the section.
 
-⏩ Audience interaction appears less consistent than content publishing activity.
-
-Evidence:
-Posts + Comments
-
-⏩ Multiple directions compete for attention, reducing message clarity.
-
-Evidence:
-Website + Posts
-
+6️⃣ Hidden Pattern
 6️⃣ Hidden Pattern
 
 Purpose:
 
-Identify the strongest hidden mechanism
-connecting:
+Identify the strongest underlying pattern
+that connects multiple independently supported findings.
+
+The Hidden Pattern must emerge from:
 
 • Cross Analysis
-
 • Contradictions
-
 • Strong Patterns
-
 • Weak Patterns
 
 Output:
 
 ⏩ Hidden Pattern
-
-Evidence: Source
+Evidence: Real Source
 
 ⏩ Hidden Pattern Impact
-
-Evidence: Source
+Evidence: Real Source
 
 ⏩ Hidden Pattern Result
-
-Evidence: Source
+Evidence: Real Source
 
 Rules:
 
-• 3 bullets only
+• Maximum 3 bullets.
+• Every finding requires evidence.
+• Use only patterns already supported by the evidence.
+• Connect multiple established findings.
+• Prefer repeated signals across independent sources.
+• Clearly separate observed evidence from interpretation.
+• Do not invent a mechanism that is not supported by evidence.
+• Do not treat correlation as proven causation.
+• Do not claim intent, motive, or psychological state without direct evidence.
+• Do not introduce a new fact that was not established earlier.
+• Do not turn an assumption into a hidden pattern.
+• Use the actual evidence source.
+• Never use internal package names as evidence sources.
+• Never write "Evidence: TruthLoop Package".
+• Never expose internal brain, engine, module, or package names.
+• No advice.
+• No solutions.
+• No recommendations.
+• No unsupported conclusions.
+• No diagnosis.
+• No speculation.
 
-• Evidence mandatory
-
-• Use real evidence only
-
-• Must explain multiple findings
-
-• Must connect repeated evidence
-
-• Must explain observed outcomes
-
-• No advice
-
-• No solutions
-
-• No conclusions
-A Hidden Pattern must satisfy:
+A Hidden Pattern must satisfy all three:
 
 Evidence Supported
 +
-Explains Multiple Findings
+Explains Multiple Established Findings
 +
-Explains Outcomes
+Supported Connection to Observed Outcomes
 
 If any one is missing,
-it is not a Hidden Pattern.
-Example:
+it is NOT a Hidden Pattern.
 
-⏩ Growth effort repeatedly expands into multiple directions before a single direction becomes measurable.
+If the evidence does not establish
+a reliable hidden pattern, state:
 
-Evidence:
-Posts + Timeline + Website
+"No reliably supported hidden pattern established."
 
-⏩ This creates recurring focus fragmentation across content, audience, and positioning.
+Do not manufacture a hidden pattern
+just to complete the section.
 
-Evidence:
-Cross Analysis + Contradictions
-
-⏩ As a result, effort remains high while measurable momentum remains inconsistent.
-
-Evidence:
-Timeline + Outcomes
+The Hidden Pattern must remain
+an evidence-based interpretation,
+not a claim of certainty.
 
 7️⃣ Final Investigation
 
@@ -696,33 +615,44 @@ A. Conclusion
 
 Purpose:
 
-Deliver the final investigation verdict.
+Deliver the final evidence-based investigation verdict
+using only findings established in Sections 1–6.
 
 Output:
 
 ⏩ Conclusion
-
-Evidence: Source
+Evidence: Real Source
 
 ⏩ Conclusion
-
-Evidence: Source
+Evidence: Real Source
 
 Rules:
 
-• 2 bullets only
+• Maximum 2 bullets.
+• Every conclusion requires real evidence.
+• Use only findings already established.
+• Connect the strongest supported findings.
+• State what the evidence most strongly indicates.
+• Do not introduce new evidence.
+• Do not introduce a new pattern.
+• Do not invent causation.
+• Do not claim certainty beyond the evidence.
+• Do not mention internal packages, brains, engines, or prompts.
+• Never write "Evidence: TruthLoop Package".
+• Use the actual source of the evidence.
+• No assumptions.
+• No speculation.
+• No motivation.
+• No generic summary.
+• No advice.
 
-• Evidence mandatory
+The Conclusion must answer:
 
-• Use real evidence only
+"What does the complete evidence most strongly establish?"
 
-• Must be supported by previous findings
+It must NOT answer:
 
-• No new findings
-
-• No assumptions
-
-• No motivation
+"What should the user do?"
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -730,35 +660,41 @@ B. One Next Step
 
 Purpose:
 
-Identify the single highest-impact action
-based on the investigation.
+Identify one concrete action directly connected
+to the strongest supported constraint or finding.
 
 Output:
 
 ⏩ One Next Step
-
-Evidence: Source
+Evidence: Real Source
 
 Rules:
 
-• 1 bullet only
+• 1 bullet only.
+• Evidence mandatory.
+• Must directly address the strongest supported constraint.
+• Must be derived from the investigation.
+• Must be specific and actionable.
+• Must be realistically connected to the evidence.
+• No generic advice.
+• No multiple actions.
+• No action list.
+• No motivation.
+• No unsupported recommendation.
+• Do not introduce new facts.
+• Do not introduce new patterns.
+• Never write "Evidence: TruthLoop Package".
+• Use the actual evidence source.
 
-• Evidence mandatory
+The One Next Step must answer:
 
-• Must address the strongest constraint
+"What single action follows most directly
+from the strongest supported finding?"
 
-• Must be supported by findings
+If no evidence supports a specific action,
+output:
 
-• Must be specific
-
-• No generic advice
-
-Example:
-
-⏩ Commit to one primary content direction for the next 30 days before introducing new themes.
-
-Evidence:
-Weak Patterns + Hidden Pattern
+"No evidence-supported next step established."
 
 `;
 }
