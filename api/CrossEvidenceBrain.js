@@ -259,7 +259,7 @@ async function collectSourceEvidence(url) {
     try {
        const identityPackage =
   await IdentityExtractionBrain({
-    sourceUrl: profileLinks
+    sourceUrl: url
   });
 
 console.log(
