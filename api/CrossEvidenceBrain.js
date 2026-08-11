@@ -661,41 +661,6 @@ async function EvidenceNormalizer(
     return normalized;
 
 }
-// ====================================
-// Cerebras Evidence Intelligence
-// ====================================
-
-async function CerebrasEvidenceIntelligence({
-
-    truthLoopPackage = {},
-
-    normalizedEvidence = {}
-
-}) {
-
-    return {
-
-        success: true,
-
-        evidenceStrategy: {
-
-            userContext:
-                truthLoopPackage,
-
-            prioritizedSources:
-                normalizedEvidence.sources || [],
-
-            filteredSources:
-                normalizedEvidence.sources || [],
-
-            reasoning:
-                "Context-aware evidence collection enabled"
-
-        }
-
-    };
-
-}
 
 // ====================================
 // Cross Evidence Analyzer
