@@ -301,46 +301,42 @@ evidenceCount: 0,
   first200: html?.slice(0, 200)
 });
 
-        result.sources.push({
-
-            url: source.url,
-
-            platform: source.platform,
-
-            hostname: source.hostname,
-
-            status: response.status,
-
-            contentType:
-                response.headers.get(
-                    "content-type"
-                ),
-
-            rawContent: html,
-           pageTitle:
-    extractTitle(html),
-
-const html =
-    await response.text();
-
-const socialLinks =
+        const extractedLinks =
     extractSocialLinks(html);
 
 console.log(
     "EXTRACTED_SOCIAL_LINKS",
-    socialLinks
+    {
+        source: source.url,
+        platform: source.platform,
+        total: extractedLinks.length,
+        links: extractedLinks
+    }
 );
 
 result.sources.push({
+
     url: source.url,
+
     platform: source.platform,
+
     hostname: source.hostname,
+
     status: response.status,
+
     contentType:
-        response.headers.get("content-type"),
+        response.headers.get(
+            "content-type"
+        ),
+
+    rawContent: html,
+
     pageTitle:
         extractTitle(html),
-    socialLinks
+
+    socialLinks:
+        extractedLinks
+
 });
     } catch(error) {
 
