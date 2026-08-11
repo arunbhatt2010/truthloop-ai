@@ -60,7 +60,11 @@ export async function loadCrossEvidenceBrain({
     };
 
     try {
-
+       
+console.log(
+    "CROSS_EVIDENCE_PROFILE_LINKS",
+    profileLinks
+);
         if (
             !Array.isArray(profileLinks) ||
             !profileLinks.length
