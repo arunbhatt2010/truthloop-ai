@@ -276,9 +276,9 @@ console.log(
   footprintPackage
 );
         const urlPackage =
-            await loadPublicContentFetcher({
-                url
-            });
+await loadPublicContentFetcher({
+    profileLinks: [url]
+});
 console.log(
     "URL_PACKAGE",
     JSON.stringify(urlPackage, null, 2)
