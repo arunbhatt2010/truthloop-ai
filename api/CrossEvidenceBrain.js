@@ -150,6 +150,19 @@ console.log("STEP_1_MERGE_DONE");
                 result.mergedEvidence
             );
        console.log("STEP_2_NORMALIZER_START");
+       console.log(
+    "MERGED_EVIDENCE_TYPE",
+    typeof result.mergedEvidence
+);
+
+console.log(
+    "MERGED_EVIDENCE",
+    JSON.stringify(
+        result.mergedEvidence,
+        null,
+        2
+    )
+);
 const normalizedEvidence =
     await EvidenceNormalizer(
         result.mergedEvidence
