@@ -1126,167 +1126,93 @@ ${JSON.stringify(normalizedEvidence)}
 
 
 async function CerebrasEvidenceIntelligence({
-
-    truthLoopPackage,
-
-    normalizedEvidence
-
+    truthLoopPackage = {},
+    profileIntelligence = {}
 }) {
 
     const prompt = `
-TruthLoop Context:
-${JSON.stringify(truthLoopPackage)}
+You are TruthLoop's Evidence Intelligence Engine.
 
-Public Evidence:
+Your ONLY job is to convert the Universal Public Evidence Package
+into compact investigation-ready evidence intelligence.
+
+Use ONLY the supplied Universal Package.
+
+IDENTIFY:
+
+- strongest verified identity signals
+- strongest public positioning signals
+- repeated themes
+- meaningful behavioral signals
+- business / creator signals
+- contradictions
+- supporting evidence
+- missing evidence
+- cross-platform signals
+- source links
+
+RULES:
+
+- Evidence first.
+- Never guess.
+- Never invent evidence.
+- Never diagnose psychology.
+- Never generate advice.
+- Never return raw evidence.
+- Never return HTML or technical data.
+- Never return the TruthLoop conversation.
+- Every important finding must be supported by a source URL.
+- If evidence is missing, mark it as missing.
+- Keep the package compact.
+- Maximum output: 3000 characters.
+- Return valid JSON only.
+
+OUTPUT:
+{
+  "identitySignals": [],
+  "positioningSignals": [],
+  "repeatedThemes": [],
+  "behavioralSignals": [],
+  "businessSignals": [],
+  "contradictions": [],
+  "supportingEvidence": [],
+  "missingEvidence": [],
+  "crossPlatformSignals": [],
+  "sourceLinks": []
+}
+
+UNIVERSAL PUBLIC EVIDENCE PACKAGE:
 ${JSON.stringify(profileIntelligence)}
-
-Task:
-
-- Understand the user's TruthLoop journey.
-- Identify repeated blockers.
-- Identify supporting evidence.
-- Identify contradictions.
-- Identify missing evidence.
-- Keep source links.
-- Return JSON only.
-
-IMPORTANT:
-
-Do not return raw evidence.
-Do not return profile dumps.
-Do not return conversation dumps.
-
-Return only compressed investigation intelligence.
-
-Maximum response size: 3000 characters.
-
-IMPORTANT EVIDENCE RULES
-
-Only analyze public behavioral evidence.
-
-Ignore:
-
-- Website colors
-- Button styles
-- UI design
-- Fonts
-- Layout observations
-- Visual aesthetics
-- Technology stack guesses
-- Generic website descriptions
-- Marketing copy summaries
-
-Do NOT describe how a website looks.
-
-Focus only on:
-
-- Public actions
-- Public statements
-- Published content
-- Behavioral patterns
-- Repeated themes
-- Contradictions
-- Consistency signals
-- Credibility signals
-- Public achievements
-- Public activity history
-- Cross-platform evidence
-
-Return evidence, not design observations.
-If a finding cannot be linked to a public source,
-do not include it.
-Every important finding must be supported by
-at least one public evidence source.
-
-IDENTITY ANCHOR RULE
-
-The extracted identity package is the primary investigation anchor.
-
-Do not rely on the submitted profile URL.
-
-Only use evidence that can be connected to the discovered identity.
-
-Ignore weak identity matches,
-unverified profiles,
-and unsupported assumptions.
-
-Evidence must be evaluated across all identity-linked public profiles.
-
-Do not overweight a single platform.
-
-Build conclusions from cross-platform evidence connected to the same identity.
-
-TRACKABILITY RULE
-
-Every finding must be linked to at least one trackable public source.
-
-Do not generate findings without evidence.
-
-If evidence is weak, incomplete, or missing:
-
-- Continue searching available public sources.
-- Cross-check across platforms.
-- Attempt to find supporting or contradictory evidence.
-
-Do not stop at the first result.
-
-Only finalize the response when the required evidence structure has been completed.
-
-If the required structure cannot be completed,
-explicitly mark the missing sections instead of inventing information.
-
-Every source must remain trackable and auditable.
-COMPLETENESS RULE
-
-Do not return partial investigation packages.
-
-If the required structure is incomplete:
-
-- Search again.
-- Re-evaluate evidence.
-- Look for additional public sources.
-- Continue identity-based discovery until sufficient evidence is collected.
-
-Prioritize completion of the evidence structure over speed.
-
-Never fill missing sections with assumptions.
-A missing finding is acceptable.
-An invented finding is unacceptable.
 `;
 
     const response =
-    await fetch(
-        "https://api.cerebras.ai/v1/chat/completions",
-        {
-            method: "POST",
-            headers: {
-                Authorization:
-                    `Bearer ${process.env.CEREBRAS_API_KEY}`,
-                "Content-Type":
-                    "application/json"
-            },
-            body: JSON.stringify({
-                model:
-                    "qwen-3-235b-a22b-thinking-2507",
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                temperature: 0.2,
-                max_completion_tokens: 4000
-            })
-        }
-    );
+        await fetch(
+            "https://api.cerebras.ai/v1/chat/completions",
+            {
+                method: "POST",
+                headers: {
+                    Authorization:
+                        `Bearer ${process.env.CEREBRAS_API_KEY}`,
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    model:
+                        "qwen-3-235b-a22b-thinking-2507",
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.1,
+                    max_completion_tokens: 3000
+                })
+            }
+        );
 
     const data =
-    await response.json();
-
-    console.log(
-        "CEREBRAS_RESPONSE",
-        JSON.stringify(data, null, 2)
-    );
+        await response.json();
 
     const content =
         data?.choices?.[0]?.message?.content || "{}";
@@ -1301,7 +1227,8 @@ An invented finding is unacceptable.
     } catch {
 
         intelligencePackage = {
-            rawResponse: content
+            error:
+                "Invalid JSON returned by Cerebras"
         };
 
     }
@@ -1312,14 +1239,7 @@ An invented finding is unacceptable.
 
         source: "cerebras",
 
-        intelligencePackage,
-
-        sources:
-            normalizedEvidence?.sources || [],
-
-        truthLoopPackage,
-
-        normalizedEvidence
+        intelligencePackage
 
     };
 
