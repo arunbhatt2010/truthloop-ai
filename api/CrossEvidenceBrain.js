@@ -137,21 +137,18 @@ const normalizedEvidence =
         result.mergedEvidence
     );
        console.log("STEP_3_NORMALIZER_DONE");
-       const profileIntelligence =
+       const profileIntelligenceResult =
     await ProfileIntelligenceAPI({
-
-        truthLoopPackage,
-
         normalizedEvidence
-
     });
+
+const universalPackage =
+    profileIntelligenceResult?.universalPackage || {};
+
 const cerebrasPackage =
     await CerebrasEvidenceIntelligence({
-
-        truthLoopPackage,
-
-        profileIntelligence
-
+        profileIntelligence:
+            universalPackage
     });
        console.log(
     "CEREBRAS_PACKAGE",
@@ -192,6 +189,23 @@ const confidencePackage =
                 findingsPackage.findings
         }
     );
+       const universalPackageText =
+    JSON.stringify(
+        universalPackage || {}
+    );
+
+if (
+    !universalPackage ||
+    !Object.keys(universalPackage).length ||
+    universalPackageText.length > 3000
+) {
+
+    result.errors.push(
+        "Universal Public Evidence Package is missing or exceeds 3000 characters."
+    );
+
+    return result;
+}
 
 const crossEvidencePackage =
     await CrossEvidencePackageBuilder({
