@@ -121,11 +121,29 @@ const discoveryPackage =
             }
 
         }
+console.log(
+    "BEFORE_MERGE_EVIDENCE"
+);
+       console.log(
+    "EVIDENCE_PACKAGES_COUNT",
+    result.evidencePackages.length
+);
 
+console.log(
+    "EVIDENCE_PACKAGES_SAMPLE",
+    JSON.stringify(
+        result.evidencePackages[0],
+        null,
+        2
+    )
+);
         result.mergedEvidence =
             mergeEvidencePackages(
                 result.evidencePackages
             );
+       console.log(
+    "AFTER_MERGE_EVIDENCE"
+);
 console.log("STEP_1_MERGE_DONE");
         result.confidenceScore =
             calculateEvidenceScore(
