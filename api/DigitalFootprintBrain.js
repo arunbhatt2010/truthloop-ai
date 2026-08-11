@@ -240,21 +240,16 @@ try {
     // --------------------------------------------------
 
     return {
-
     success: true,
-
-    packageType:
-        "DigitalFootprintPackage",
-
+    packageType: "DigitalFootprintPackage",
     profileLink,
-
     platform,
-
     loop7EvidencePackage,
 
-    generatedAt:
-        new Date().toISOString()
+    universalPackage:
+        crossEvidence?.universalPackage || null,
 
+    generatedAt: new Date().toISOString()
 };
         }
     
