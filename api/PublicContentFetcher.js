@@ -322,6 +322,22 @@ evidenceCount: 0,
 
 socialLinks:
     extractSocialLinks(html)
+           console.log(
+    "EXTRACTED_SOCIAL_LINKS",
+    socialLinks
+);
+
+result.sources.push({
+    url: source.url,
+    platform: source.platform,
+    hostname: source.hostname,
+    status: response.status,
+    contentType:
+        response.headers.get("content-type"),
+    pageTitle:
+        extractTitle(html),
+    socialLinks
+});
 
         });
 
