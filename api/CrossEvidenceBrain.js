@@ -1181,62 +1181,95 @@ UNIVERSAL PUBLIC EVIDENCE PACKAGE:
 ${JSON.stringify(profileIntelligence)}
 `;
 
-    const response =
-        await fetch(
-            "https://api.cerebras.ai/v1/chat/completions",
-            {
-                method: "POST",
-                headers: {
-                    Authorization:
-                        `Bearer ${process.env.CEREBRAS_API_KEY}`,
-                    "Content-Type":
-                        "application/json"
-                },
-                body: JSON.stringify({
-                    model:
-                        "qwen-3-235b-a22b-thinking-2507",
-                    messages: [
-                        {
-                            role: "user",
-                            content: prompt
-                        }
-                    ],
-                    temperature: 0.1,
-                    max_completion_tokens: 3000
-                })
-            }
-        );
+   console.log("CEREBRAS_BEFORE");
+console.log(
+    "UNIVERSAL_PACKAGE_SIZE",
+    JSON.stringify(profileIntelligence).length
+);
 
-    const data =
-        await response.json();
+const response =
+    await fetch(
+        "https://api.cerebras.ai/v1/chat/completions",
+        {
+            method: "POST",
+            headers: {
+                Authorization:
+                    `Bearer ${process.env.CEREBRAS_API_KEY}`,
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify({
+                model:
+                    "qwen-3-235b-a22b-thinking-2507",
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                temperature: 0.1,
+                max_completion_tokens: 3000
+            })
+        }
+    );
 
-    const content =
-        data?.choices?.[0]?.message?.content || "{}";
-
-    let intelligencePackage = {};
-
-    try {
-
-        intelligencePackage =
-            JSON.parse(content);
-
-    } catch {
-
-        intelligencePackage = {
-            error:
-                "Invalid JSON returned by Cerebras"
-        };
-
+console.log(
+    "CEREBRAS_TRIGGER",
+    {
+        status: response.status,
+        ok: response.ok
     }
+);
 
-    return {
+const data =
+    await response.json();
 
-        success: true,
+console.log(
+    "CEREBRAS_AFTER",
+    {
+        hasChoices:
+            !!data?.choices,
+        choicesLength:
+            data?.choices?.length || 0
+    }
+);
 
-        source: "cerebras",
+const content =
+    data?.choices?.[0]?.message?.content || "{}";
 
-        intelligencePackage
+let intelligencePackage = {};
 
+try {
+
+    intelligencePackage =
+        JSON.parse(content);
+
+    console.log(
+        "CEREBRAS_JSON_PARSED"
+    );
+
+} catch (error) {
+
+    console.log(
+        "CEREBRAS_JSON_PARSE_ERROR",
+        error?.message
+    );
+
+    intelligencePackage = {
+        error:
+            "Invalid JSON returned by Cerebras"
     };
+
+}
+
+return {
+
+    success: true,
+
+    source: "cerebras",
+
+    intelligencePackage
+
+};
 
 }
