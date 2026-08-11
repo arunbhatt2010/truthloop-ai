@@ -971,50 +971,100 @@ async function ProfileIntelligenceAPI({
     normalizedEvidence = {}
 }) {
 
-    const prompt = `
-You are an Identity & Evidence Intelligence Engine.
+const prompt = `
+You are TruthLoop's Profile Intelligence Engine.
 
-Analyze the provided public evidence.
+Your ONLY job is to convert public evidence into a compact, factual intelligence package for downstream evidence analysis.
 
-Tasks:
+INPUT:
+Public evidence may contain raw HTML, CSS, JavaScript, navigation, images, metadata, links, social profiles, article text, author information, and repeated content.
 
-1. Detect person, company, brand, creator, organization, or unknown.
+EXTRACT ONLY USEFUL PUBLIC SIGNALS:
 
-2. Extract:
-
-- name
-- title
-- company
+1. IDENTITY
+- person name
+- company / organization / brand
+- title / role
 - website
 - location
-- platforms
+- public platforms
 
-3. Discover:
-
+2. PUBLIC POSITIONING
+- what the person/brand appears to do
+- primary niche
+- expertise areas
 - recurring topics
-- expertise signals
-- audience signals
-- business signals
+- audience served
 
-4. Remove:
+3. BUSINESS / CREATOR SIGNALS
+- products or services explicitly mentioned
+- business positioning
+- creator / founder / professional signals
+- public calls-to-action
+- meaningful external profile links
 
-- html
-- css
-- javascript
-- layout data
+4. EVIDENCE SIGNALS
+- repeated themes
+- stated goals
+- public claims
+- notable behavioral or professional signals explicitly present in the evidence
+
+FILTER OUT COMPLETELY:
+- HTML
+- CSS
+- JavaScript
+- page layout
+- styling
 - navigation
+- menus
+- footer boilerplate
+- cookie/privacy boilerplate
+- tracking parameters
+- image URLs
+- technical metadata
 - duplicate text
+- generic website filler
 
-5. Create one compressed evidence package.
+RULES:
+- Use ONLY information explicitly supported by the evidence.
+- Never guess identity, role, company, location, expertise, or intent.
+- If a field is unknown, return null or [].
+- Preserve useful social/profile URLs when they are explicitly present.
+- Prefer concise facts over explanations.
+- Do not reproduce raw evidence.
+- Do not perform psychological diagnosis or deep behavioral interpretation.
+- Do not generate advice.
+- Do not explain your reasoning.
+- Output must be a compact universal intelligence package.
+- Maximum output: 3000 characters.
+- Return valid JSON only.
 
-Maximum 3000 characters.
+OUTPUT FORMAT:
+{
+  "identity": {
+    "name": null,
+    "title": null,
+    "company": null,
+    "website": null,
+    "location": null
+  },
+  "platforms": [],
+  "positioning": {
+    "summary": null,
+    "niche": null,
+    "expertise": [],
+    "audience": []
+  },
+  "businessSignals": [],
+  "creatorSignals": [],
+  "recurringTopics": [],
+  "evidenceSignals": [],
+  "sourceLinks": []
+}
 
-Return JSON only.
-
-Evidence:
+PUBLIC EVIDENCE:
 ${JSON.stringify(normalizedEvidence)}
 `;
-
     const response =
         await fetch(
             "https://api.cerebras.ai/v1/chat/completions",
