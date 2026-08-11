@@ -34,7 +34,8 @@ import {
 
 export async function loadCrossEvidenceBrain({
 
-    profileLinks = []
+    profileLinks = [],
+   truthLoopPackage = {}
 
 } = {}) {
 
@@ -130,7 +131,14 @@ const normalizedEvidence =
     await EvidenceNormalizer(
         result.mergedEvidence
     );
+const cerebrasPackage =
+    await CerebrasEvidenceIntelligence({
 
+        truthLoopPackage,
+
+        normalizedEvidence
+
+    });
 console.log(
     "NORMALIZED_EVIDENCE",
     JSON.stringify(
@@ -644,6 +652,41 @@ async function EvidenceNormalizer(
     return normalized;
 
 }
+// ====================================
+// Cerebras Evidence Intelligence
+// ====================================
+
+async function CerebrasEvidenceIntelligence({
+
+    truthLoopPackage = {},
+
+    normalizedEvidence = {}
+
+}) {
+
+    return {
+
+        success: true,
+
+        evidenceStrategy: {
+
+            userContext:
+                truthLoopPackage,
+
+            prioritizedSources:
+                normalizedEvidence.sources || [],
+
+            filteredSources:
+                normalizedEvidence.sources || [],
+
+            reasoning:
+                "Context-aware evidence collection enabled"
+
+        }
+
+    };
+
+}
 
 // ====================================
 // Cross Evidence Analyzer
@@ -903,3 +946,24 @@ async function CrossEvidencePackageBuilder({
     };
 
            }
+async function CerebrasEvidenceIntelligence({
+
+    truthLoopPackage,
+
+    normalizedEvidence
+
+}) {
+
+    return {
+
+        success: true,
+
+        source: "cerebras",
+
+        truthLoopPackage,
+
+        normalizedEvidence
+
+    };
+
+}
