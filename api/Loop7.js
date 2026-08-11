@@ -1,3 +1,5 @@
+import CrossEvidenceBrain
+    from "./CrossEvidenceBrain.js";
 function buildLoop7Instruction({
   profileLink,
   publicEvidencePackage
