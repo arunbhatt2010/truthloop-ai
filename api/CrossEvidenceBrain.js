@@ -177,7 +177,8 @@ const crossEvidencePackage =
         footprintPackage:
             discoveryPackage,
         findingsPackage,
-        confidencePackage
+        confidencePackage,
+       cerebrasPackage
     });
 
 result.crossEvidencePackage =
@@ -923,7 +924,8 @@ async function CrossEvidencePackageBuilder({
 
     findingsPackage,
 
-    confidencePackage
+    confidencePackage,
+   cerebrasPackage
 
 }) {
 
@@ -941,7 +943,9 @@ async function CrossEvidencePackageBuilder({
             findingsPackage,
 
         confidence:
-            confidencePackage
+            confidencePackage,
+       cerebras:
+        cerebrasPackage
 
     };
 
@@ -954,11 +958,86 @@ async function CerebrasEvidenceIntelligence({
 
 }) {
 
+    const prompt = `
+TruthLoop Context:
+${JSON.stringify(truthLoopPackage)}
+
+Public Evidence:
+${JSON.stringify(normalizedEvidence)}
+
+Task:
+
+- Understand the user's TruthLoop journey.
+- Identify repeated blockers.
+- Identify supporting evidence.
+- Identify contradictions.
+- Identify missing evidence.
+- Keep source links.
+- Return JSON only.
+`;
+
+    const response =
+    await fetch(
+        "https://api.cerebras.ai/v1/chat/completions",
+        {
+            method: "POST",
+            headers: {
+                Authorization:
+                    `Bearer ${process.env.CEREBRAS_API_KEY}`,
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify({
+                model:
+                    "qwen-3-235b-a22b-thinking-2507",
+                messages: [
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ],
+                temperature: 0.2,
+                max_completion_tokens: 4000
+            })
+        }
+    );
+
+    const data =
+    await response.json();
+
+    console.log(
+        "CEREBRAS_RESPONSE",
+        JSON.stringify(data, null, 2)
+    );
+
+    const content =
+        data?.choices?.[0]?.message?.content || "{}";
+
+    let intelligencePackage = {};
+
+    try {
+
+        intelligencePackage =
+            JSON.parse(content);
+
+    } catch {
+
+        intelligencePackage = {
+            rawResponse: content
+        };
+
+    }
+
     return {
 
         success: true,
 
         source: "cerebras",
+
+        intelligencePackage,
+
+        sources:
+            normalizedEvidence?.sources || [],
 
         truthLoopPackage,
 
