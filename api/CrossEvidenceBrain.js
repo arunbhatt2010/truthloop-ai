@@ -214,7 +214,7 @@ const crossEvidencePackage =
             discoveryPackage,
         findingsPackage,
         confidencePackage,
-       cerebrasPackage
+       universalPackage
     });
 
 result.crossEvidencePackage =
@@ -955,7 +955,8 @@ async function CrossEvidencePackageBuilder({
     findingsPackage,
 
     confidencePackage,
-   cerebrasPackage
+
+    universalPackage
 
 }) {
 
@@ -966,7 +967,7 @@ async function CrossEvidencePackageBuilder({
         identity:
             identityPackage,
 
-        footprints:
+        footprint:
             footprintPackage,
 
         findings:
@@ -974,12 +975,12 @@ async function CrossEvidencePackageBuilder({
 
         confidence:
             confidencePackage,
-       cerebras:
-        cerebrasPackage
+
+        universalPackage
 
     };
 
-           }
+}
 async function ProfileIntelligenceAPI({
     normalizedEvidence = {}
 }) {
