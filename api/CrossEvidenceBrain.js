@@ -279,12 +279,18 @@ console.log(
             await loadPublicContentFetcher({
                 url
             });
-
+console.log(
+    "URL_PACKAGE",
+    JSON.stringify(urlPackage, null, 2)
+);
         const rawPackage =
             await acquirePublicContent(
                 urlPackage
             );
-
+console.log(
+    "RAW_PACKAGE",
+    JSON.stringify(rawPackage, null, 2)
+);
         const validatedPackage =
             validatePublicContent(
                 rawPackage
