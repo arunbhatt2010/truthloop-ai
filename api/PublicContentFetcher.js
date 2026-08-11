@@ -313,7 +313,60 @@ console.log(
         links: extractedLinks
     }
 );
+function extractVisibleText(html = "") {
 
+    if (!html) {
+        return "";
+    }
+
+    return html
+
+        // scripts hatao
+        .replace(
+            /<script[\s\S]*?<\/script>/gi,
+            " "
+        )
+
+        // styles hatao
+        .replace(
+            /<style[\s\S]*?<\/style>/gi,
+            " "
+        )
+
+        // comments hatao
+        .replace(
+            /<!--[\s\S]*?-->/g,
+            " "
+        )
+
+        // tags hatao
+        .replace(
+            /<[^>]+>/g,
+            " "
+        )
+
+        // entities clean
+        .replace(
+            /&nbsp;/gi,
+            " "
+        )
+        .replace(
+            /&amp;/gi,
+            "&"
+        )
+
+        // whitespace clean
+        .replace(
+            /\s+/g,
+            " "
+        )
+
+        .trim()
+
+        // prompt explosion se bachao
+        .slice(0, 10000);
+
+        }
 result.sources.push({
 
     url: source.url,
@@ -329,7 +382,7 @@ result.sources.push({
             "content-type"
         ),
 
-   // rawContent: html,
+    visibleText,
 
     pageTitle:
         extractTitle(html),
@@ -338,6 +391,8 @@ result.sources.push({
         extractedLinks
 
 });
+
+
     } catch(error) {
 
   console.error(
