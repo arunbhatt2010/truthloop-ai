@@ -32,10 +32,11 @@ import {
 export async function loadDigitalFootprintBrain({
 
     profileLink = "",
+    profileLinks = [],
     currentLoop = 7,
     truthLoopPackage = {}
 
-} = {}) {
+} = {})
 
     console.log("===== DIGITAL FOOTPRINT BRAIN v2 =====");
 
