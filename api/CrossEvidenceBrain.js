@@ -305,6 +305,25 @@ console.log(
                 rawPackage,
                 extractedPackage
             );
+       console.log(
+  "RAW_PACKAGE",
+  {
+    success: rawPackage?.success,
+    htmlLength: rawPackage?.html?.length,
+    textLength: rawPackage?.text?.length
+  }
+);
+
+console.log(
+  "EXTRACTED_PACKAGE",
+  {
+    success: extractedPackage?.success,
+    visibleTextLength:
+      extractedPackage?.visibleText?.length,
+    links:
+      extractedPackage?.links?.length
+  }
+);
 
         console.log(
             "CROSS_EVIDENCE_FINAL_PACKAGE",
