@@ -746,6 +746,17 @@ export default async function handler(req, res) {
       truthLoopPackage
         ? JSON.stringify(truthLoopPackage, null, 2)
         : "Not Available";
+      console.log("CROSS_EVIDENCE_TEST_START");
+
+const crossEvidence =
+    await CrossEvidenceBrain({
+        profileLinks: [profileLink]
+    });
+
+console.log(
+    "CROSS_EVIDENCE_RESULT",
+    JSON.stringify(crossEvidence, null, 2)
+);
 
     const finalPrompt = `
 TRUTHLOOP PACKAGE
