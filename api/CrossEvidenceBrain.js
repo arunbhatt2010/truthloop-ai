@@ -135,12 +135,20 @@ const normalizedEvidence =
     await EvidenceNormalizer(
         result.mergedEvidence
     );
+       const profileIntelligence =
+    await ProfileIntelligenceAPI({
+
+        truthLoopPackage,
+
+        normalizedEvidence
+
+    });
 const cerebrasPackage =
     await CerebrasEvidenceIntelligence({
 
         truthLoopPackage,
 
-        normalizedEvidence
+        profileIntelligence
 
     });
        console.log(
@@ -956,6 +964,119 @@ async function CrossEvidencePackageBuilder({
     };
 
            }
+async function ProfileIntelligenceAPI({
+    truthLoopPackage = {},
+    normalizedEvidence = {}
+}) {
+
+    const prompt = `
+You are an Identity & Evidence Intelligence Engine.
+
+Analyze the provided public evidence.
+
+Tasks:
+
+1. Detect person, company, brand, creator, organization, or unknown.
+
+2. Extract:
+
+- name
+- title
+- company
+- website
+- location
+- platforms
+
+3. Discover:
+
+- recurring topics
+- expertise signals
+- audience signals
+- business signals
+
+4. Remove:
+
+- html
+- css
+- javascript
+- layout data
+- navigation
+- duplicate text
+
+5. Create one compressed evidence package.
+
+Maximum 3000 characters.
+
+Return JSON only.
+
+Evidence:
+${JSON.stringify(normalizedEvidence)}
+`;
+
+    const response =
+        await fetch(
+            "https://api.cerebras.ai/v1/chat/completions",
+            {
+                method: "POST",
+                headers: {
+                    Authorization:
+                        `Bearer ${process.env.CEREBRAS_API_KEY}`,
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    model:
+                        "qwen-3-235b-a22b-thinking-2507",
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.2,
+                    max_completion_tokens: 3000
+                })
+            }
+        );
+
+    const data =
+        await response.json();
+
+    const content =
+        data?.choices?.[0]?.message?.content || "{}";
+
+    let intelligencePackage = {};
+
+    try {
+
+        intelligencePackage =
+            JSON.parse(content);
+
+    } catch {
+
+        intelligencePackage = {
+            rawResponse: content
+        };
+
+    }
+
+    return {
+
+        success: true,
+
+        source: "cerebras",
+
+        intelligencePackage,
+
+        normalizedEvidence,
+
+        truthLoopPackage
+
+    };
+
+           }
+
+
 async function CerebrasEvidenceIntelligence({
 
     truthLoopPackage,
@@ -969,7 +1090,7 @@ TruthLoop Context:
 ${JSON.stringify(truthLoopPackage)}
 
 Public Evidence:
-${JSON.stringify(normalizedEvidence)}
+${JSON.stringify(profileIntelligence)}
 
 Task:
 
