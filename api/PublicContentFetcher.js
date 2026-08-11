@@ -365,8 +365,12 @@ function extractVisibleText(html = "") {
 
         // prompt explosion se bachao
         .slice(0, 10000);
+}
+       const visibleText =
+    extractVisibleText(html);
+const visibleText =
+    extractVisibleText(html);
 
-        }
 result.sources.push({
 
     url: source.url,
