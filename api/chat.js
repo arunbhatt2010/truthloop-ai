@@ -1862,7 +1862,7 @@ if (loopLevel === 7) {
 
 }
     const maxTokens =
-  loopLevel === 7 ? 900 : 120;
+  loopLevel === 7 ? 1800 : 120;
 
     /*
      * LOOP 7 PROVIDER SEPARATION
