@@ -69,6 +69,10 @@ export async function loadDigitalFootprintBrain({
     // PROFILE VALIDATION
     // --------------------------------------------------
 
+    console.log("DFB_PROFILE_LINK_DEBUG", {
+  profileLink,
+  profileLinks
+});
     if (
         typeof profileLink !== "string" ||
         !profileLink.trim()
