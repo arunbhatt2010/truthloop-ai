@@ -19,9 +19,11 @@ AVAILABLE EVIDENCE
 
 1. TruthLoop Package
    (conversation journey)
+2. Universal Evidence Package
+   (cross-platform evidence)
 
-2. Public Evidence Package
-   (digital footprint evidence)
+3. Loop7 Evidence Package
+   (investigation-ready evidence)
 
 Use both.
 
@@ -243,9 +245,27 @@ ${profileLink || "Not Available"}
 
 Public Evidence:
 
+UNIVERSAL PACKAGE
+
 ${
-  publicEvidencePackage
-    ? JSON.stringify(publicEvidencePackage, null, 2)
+  publicEvidencePackage?.universalPackage
+    ? JSON.stringify(
+        publicEvidencePackage.universalPackage,
+        null,
+        2
+      )
+    : "Not Available"
+}
+
+LOOP7 EVIDENCE PACKAGE
+
+${
+  publicEvidencePackage?.loop7EvidencePackage
+    ? JSON.stringify(
+        publicEvidencePackage.loop7EvidencePackage,
+        null,
+        2
+      )
     : "Not Available"
 }
 
