@@ -622,7 +622,7 @@ console.log(
 
     }
 
-}
+
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
