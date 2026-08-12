@@ -247,13 +247,11 @@ Public Evidence:
 
 UNIVERSAL PACKAGE
 
+UNIVERSAL PACKAGE
+
 ${
   publicEvidencePackage?.universalPackage
-    ? JSON.stringify(
-        publicEvidencePackage.universalPackage,
-        null,
-        2
-      )
+    ? "[UNIVERSAL PACKAGE AVAILABLE]"
     : "Not Available"
 }
 
@@ -261,11 +259,7 @@ LOOP7 EVIDENCE PACKAGE
 
 ${
   publicEvidencePackage?.loop7EvidencePackage
-    ? JSON.stringify(
-        publicEvidencePackage.loop7EvidencePackage,
-        null,
-        2
-      )
+    ? "[LOOP7 EVIDENCE PACKAGE AVAILABLE]"
     : "Not Available"
 }
 
@@ -763,9 +757,9 @@ export default async function handler(req, res) {
       });
 
     const truthLoopEvidence =
-      truthLoopPackage
-        ? JSON.stringify(truthLoopPackage, null, 2)
-        : "Not Available";
+  truthLoopPackage
+    ? "[TRUTHLOOP PACKAGE AVAILABLE]"
+    : "Not Available";
       
 
     const finalPrompt = `
