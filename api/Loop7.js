@@ -832,19 +832,21 @@ ${loop7Instruction}
       await response.json();
 
     const report =
-      data?.choices?.[0]?.message?.content || "";
+  completion.choices[0].message.content;
 
-    console.log(
-      "LOOP7_REPORT_CHARS:",
-      report.length
-    );
+console.log(
+  "LOOP7_REPORT_CHARS:",
+  report.length
+);
 
-    console.log("===== LOOP7 API END =====");
-
-    return res.status(200).json({
-      success: true,
-      report
-    });
+console.log(
+  "LOOP7_RAW_REPORT",
+  finalReport.slice(0, 3000)
+);
+return res.status(200).json({
+  success: true,
+  report
+});
 
   } catch (error) {
 
