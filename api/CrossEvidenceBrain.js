@@ -179,6 +179,7 @@ console.log(
     "UNIVERSAL_PACKAGE_FROM_PROFILE_INTELLIGENCE",
     JSON.stringify(universalPackage).length
 );
+       console.log("BEFORE_CEREBRAS_CALL");
 const cerebrasPackage =
     await CerebrasEvidenceIntelligence({
         profileIntelligence:
