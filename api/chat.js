@@ -493,6 +493,7 @@ User feels close to an important realization but not there yet.
 `;
           }
     let publicEvidencePackage = null;
+
 /* ==========================================
    TRUTHLOOP PACKAGE
    Complete Loop 1–6 Investigation Context
@@ -507,6 +508,7 @@ const truthLoopPackage = {
     paid49,
     paid199
 };
+
 if (
     loopLevel === 7 &&
     (
@@ -514,97 +516,113 @@ if (
         identityPackage
     )
 ) {
-  try {
 
-    publicEvidencePackage =
-await loadDigitalFootprintBrain({
+    try {
 
-    profileLink,
+        publicEvidencePackage =
+            await loadDigitalFootprintBrain({
 
-    profileLinks: profileLink
-        ? [profileLink]
-        : [],
+                profileLink,
 
-    truthLoopPackage,
+                profileLinks:
+                    profileLink
+                        ? [profileLink]
+                        : [],
 
-    identityPackage,
+                truthLoopPackage,
 
-    currentLoop: 7
+                identityPackage,
 
-});
-    
-    /* =========================
-   PLATFORM CARD
-========================= */
+                currentLoop: 7
 
-if (
-    publicEvidencePackage?.type === "platformCard"
-) {
+            });
 
-    return res.status(200).json({
+        /* =========================
+           DFB DEBUG
+        ========================= */
 
-        platformCard: true,
-
-        platform:
-            publicEvidencePackage.platform,
-
-        reason:
-            publicEvidencePackage.reason,
-
-        oauth:
-            publicEvidencePackage.oauth,
-
-        options:
-            publicEvidencePackage.options
-
-    });
-
-}
-console.log(
-    "PUBLIC_EVIDENCE_PACKAGE",
-    JSON.stringify(publicEvidencePackage, null, 2)
-);
-    console.log(
-  "PUBLIC_EVIDENCE_EXISTS",
-  publicEvidencePackage?.success ? "YES" : "NO"
+        console.log(
+    "DIGITAL_FOOTPRINT_PACKAGE_LOADED"
 );
 
 console.log(
-  "PUBLIC_EVIDENCE_SUCCESS",
-  publicEvidencePackage?.success
+    "DIGITAL_FOOTPRINT_PACKAGE_SIZE",
+    JSON.stringify(
+        publicEvidencePackage || {}
+    ).length
 );
 
 console.log(
-  "PUBLIC_EVIDENCE_STAGE",
-  publicEvidencePackage?.stage
+    "UNIVERSAL_PACKAGE_SIZE",
+    JSON.stringify(
+        publicEvidencePackage?.universalPackage || {}
+    ).length
 );
 
 console.log(
-  "PUBLIC_EVIDENCE_REASON",
-  publicEvidencePackage?.reason
+    "LOOP7_EVIDENCE_PACKAGE_SIZE",
+    JSON.stringify(
+        publicEvidencePackage?.loop7EvidencePackage || {}
+    ).length
 );
-if (publicEvidencePackage) {
-   /* console.log(
-        "PUBLIC_EVIDENCE_KEYS",
-        Object.keys(publicEvidencePackage)
-    );*/
-}
-  } catch (e) {
 
-  console.error(
-    "PROFILE_SYSTEM_BRAIN_ERROR",
-    {
-      message: e?.message,
-      stack: e?.stack,
-      name: e?.name
+console.log(
+    "DIGITAL_FOOTPRINT_SUCCESS",
+    publicEvidencePackage?.success
+);
+
+console.log(
+    "DIGITAL_FOOTPRINT_KEYS",
+    Object.keys(
+        publicEvidencePackage || {}
+    )
+);
+
+        /* =========================
+           PLATFORM CARD
+        ========================= */
+
+        if (
+            publicEvidencePackage?.type ===
+            "platformCard"
+        ) {
+
+            return res.status(200).json({
+
+                platformCard: true,
+
+                platform:
+                    publicEvidencePackage.platform,
+
+                reason:
+                    publicEvidencePackage.reason,
+
+                oauth:
+                    publicEvidencePackage.oauth,
+
+                options:
+                    publicEvidencePackage.options
+
+            });
+
+        }
+
+    } catch (e) {
+
+        console.error(
+            "DIGITAL_FOOTPRINT_BRAIN_ERROR",
+            {
+                message: e?.message,
+                stack: e?.stack,
+                name: e?.name
+            }
+        );
+
+        publicEvidencePackage = null;
+
     }
-  );
 
-  publicEvidencePackage = null;
-
-      }
-
-          }
+}
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
