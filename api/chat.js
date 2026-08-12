@@ -519,11 +519,13 @@ if (
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
 
-    truthLoopPackage,
+    profileLink,
 
     profileLinks: profileLink
-    ? [profileLink]
-    : [],
+        ? [profileLink]
+        : [],
+
+    truthLoopPackage,
 
     identityPackage,
 
