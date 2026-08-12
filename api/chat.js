@@ -607,22 +607,17 @@ console.log(
 
         }
 
-    } catch (e) {
+} catch (e) {
 
-        console.error(
-            "DIGITAL_FOOTPRINT_BRAIN_ERROR",
-            {
-                message: e?.message,
-                stack: e?.stack,
-                name: e?.name
-            }
-        );
-      }
-        publicEvidencePackage = null;
+    console.log(
+  "LOOPLEVEL_DEBUG",
+  loopLevel
+);
 
-    }
+    publicEvidencePackage = null;
+  }
 
-
+          }
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
