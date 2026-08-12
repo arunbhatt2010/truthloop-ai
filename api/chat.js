@@ -617,7 +617,7 @@ console.log(
                 name: e?.name
             }
         );
-
+      }
         publicEvidencePackage = null;
 
     }
