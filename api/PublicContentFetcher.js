@@ -779,7 +779,15 @@ Structured Public Content Package
 */
 
 export function extractPublicContent(cleanPackage) {
-
+console.log(
+    "EXTRACT_INPUT",
+    {
+        cleanSuccess:
+            cleanPackage?.success,
+        contentLength:
+            cleanPackage?.cleanContent?.length || 0
+    }
+);
     const result = {
 
         success: false,
@@ -873,6 +881,18 @@ result.timeline = extractTimeline(html);
 
 result.activity = extractActivity(html);
 
+   console.log(
+    "EXTRACT_PUBLIC_CONTENT",
+    {
+        title: result.title,
+        visibleTextLength:
+            result.visibleText?.length || 0,
+        headings:
+            result.headings?.length || 0,
+        posts:
+            result.posts?.length || 0
+    }
+);
     result.success = true;
 
     return result;
