@@ -1166,8 +1166,7 @@ const response =
                     "application/json"
             },
             body: JSON.stringify({
-                model:
-                    "qwen-3-235b-a22b-thinking-2507",
+                model: "gpt-oss-120b",
                 messages: [
                     {
                         role: "user",
@@ -1323,8 +1322,7 @@ const response =
                     "application/json"
             },
             body: JSON.stringify({
-                model:
-                    "qwen-3-235b-a22b-thinking-2507",
+                model: "gpt-oss-120b",
                 messages: [
                     {
                         role: "user",
