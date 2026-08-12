@@ -776,63 +776,65 @@ ${loop7Instruction}
 `;
 
     console.log(
-      "LOOP7_PROMPT_CHARS:",
-      finalPrompt.length
-    );
+  "LOOP7_PROMPT_CHARS:",
+  finalPrompt.length
+);
 
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
+const response = await fetch(
+  "https://api.groq.com/openai/v1/chat/completions",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization":
+        "Bearer " + process.env.GROQ_API_KEY
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "user",
+          content: finalPrompt
+        }
+      ],
+      temperature: 0.3,
+      max_tokens: 1800
+    })
+  }
+);
 
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization":
-            "Bearer " + process.env.GROQ_API_KEY
-        },
+console.log(
+  "LOOP7_GROQ_STATUS:",
+  response.status
+);
 
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
+if (!response.ok) {
 
-          messages: [
-            {
-              role: "user",
-              content: finalPrompt
-            }
-          ],
+  const errorText =
+    await response.text();
 
-          temperature: 0.3,
-          max_tokens: 1800
-        })
-      }
-    );
+  console.error(
+    "LOOP7_GROQ_ERROR:",
+    errorText
+  );
 
-    console.log(
-      "LOOP7_GROQ_STATUS:",
-      response.status
-    );
+  return res.status(500).json({
+    success: false,
+    error: "Loop 7 AI service failed"
+  });
+}
 
-    if (!response.ok) {
+const data =
+  await response.json();
 
-      const errorText =
-        await response.text();
+console.log(
+  "LOOP7_RESPONSE_KEYS:",
+  Object.keys(data || {})
+);
 
-      console.error(
-        "LOOP7_GROQ_ERROR:",
-        errorText
-      );
-
-      return res.status(500).json({
-        success: false,
-        error: "Loop 7 AI service failed"
-      });
-    }
-
-    const data =
-      await response.json();
-
-    const report =
-  completion.choices[0].message.content;
+const report =
+  data?.choices?.[0]?.message?.content ||
+  "Loop 7 report unavailable.";
 
 console.log(
   "LOOP7_REPORT_CHARS:",
@@ -840,9 +842,14 @@ console.log(
 );
 
 console.log(
-  "LOOP7_RAW_REPORT",
-  finalReport.slice(0, 3000)
+  "LOOP7_RAW_REPORT:",
+  report.slice(0, 3000)
 );
+
+console.log(
+  "===== LOOP7 API END ====="
+);
+
 return res.status(200).json({
   success: true,
   report
