@@ -600,6 +600,11 @@ if (publicEvidencePackage) {
   }
 
           }
+    const profileLinks = Array.isArray(profileLink)
+  ? profileLink
+  : profileLink?.trim()
+    ? [profileLink.trim()]
+    : [];
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
