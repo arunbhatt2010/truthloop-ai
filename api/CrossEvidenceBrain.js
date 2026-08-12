@@ -175,12 +175,19 @@ const normalizedEvidence =
 
 const universalPackage =
     profileIntelligenceResult?.universalPackage || {};
-
+console.log(
+    "UNIVERSAL_PACKAGE_FROM_PROFILE_INTELLIGENCE",
+    JSON.stringify(universalPackage).length
+);
 const cerebrasPackage =
     await CerebrasEvidenceIntelligence({
         profileIntelligence:
             universalPackage
     });
+       console.log(
+    "SENDING_TO_CEREBRAS",
+    JSON.stringify(universalPackage).length
+);
        console.log(
     "CEREBRAS_PACKAGE",
     JSON.stringify(
@@ -188,6 +195,10 @@ const cerebrasPackage =
         null,
         2
     )
+);
+       console.log(
+    "CEREBRAS_PACKAGE_SIZE",
+    JSON.stringify(cerebrasPackage || {}).length
 );
 console.log(
     "NORMALIZED_EVIDENCE",
@@ -224,7 +235,10 @@ const confidencePackage =
     JSON.stringify(
         universalPackage || {}
     );
-
+console.log(
+    "FINAL_UNIVERSAL_PACKAGE_SIZE",
+    universalPackageText.length
+);
 if (
     !universalPackage ||
     !Object.keys(universalPackage).length ||
