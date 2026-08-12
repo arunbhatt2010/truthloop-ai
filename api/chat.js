@@ -628,9 +628,8 @@ console.log(
 if (loopLevel === 7) {
 
 loop7Instruction = `
-`;
-}
-/* LOOP 7 MODE
+
+ LOOP 7 MODE
 
 You are the final TruthLoop Investigation Brain.
 
@@ -1363,8 +1362,9 @@ Example:
 ⏩ Commit to one primary content direction for the next 30 days before introducing new themes.
 
 Evidence:
-Weak Patterns + Hidden Pattern */
-
+Weak Patterns + Hidden Pattern 
+`;
+  }
 
     /* =========================
        🧠 MODE ROUTER
