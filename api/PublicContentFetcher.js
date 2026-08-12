@@ -384,6 +384,7 @@ result.sources.push({
         response.headers.get(
             "content-type"
         ),
+   rawContent: html,
 
     visibleText,
 
