@@ -2090,11 +2090,8 @@ word.toLowerCase()
 );
 
 if(contentLeakDetected){
-
-reply =
-"Interesting. You moved from understanding the problem to creating an answer.\n\nWhat feels unfinished if the answer never gets created?";
-
-}    
+   console.log("CONTENT LEAK DETECTED");
+  }
 let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
