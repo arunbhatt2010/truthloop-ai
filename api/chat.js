@@ -1969,62 +1969,100 @@ async function callProvider(
     let data = null;
 if (loopLevel === 7) {
 
-   console.log(
-      "LOOP7_PROVIDER",
-      "GEMINI"
-   );
-
-      }
-
-    const response = await fetch(
-      aiEndpoint,
+  data =
+    await callProvider(
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      process.env.GEMINI_API_KEY,
+      "gemini-2.5-flash",
       {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            "Bearer " + aiApiKey
-        },
-
-        body: JSON.stringify({
-
-          model: aiModel,
-
-          messages: [
-  {
-    role: "system",
-    content: systemPrompt
-  },
-  ...(loopLevel === 7
-      ? messages.slice(-8)
-      : messages.slice(-2))
-],
-
-temperature: 0.7,
-max_tokens: maxTokens
-        })
+        model: "gemini-2.5-flash",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...messages.slice(-8)
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens
       }
     );
 
-    if (!response.ok) {
+  if (!data) {
 
-    console.log("AI_PROVIDER", isLoop7 ? "CEREBRAS" : "GROQ");
-    console.log("AI_STATUS", response.status);
-    console.log("AI_STATUS_TEXT", response.statusText);
-    console.log("AI_ERROR_BODY", await response.text());
-
-    return res.status(500).json({
-        reply: "AI service busy. Please try again."
-    });
-          }
-
-    /* =========================
-       📤 RESPONSE
-    ========================= */
+    console.log(
+      "LOOP7_PROVIDER",
+      "CEREBRAS"
+    );
 
     data =
-  await response.json();
+      await callProvider(
+        "https://api.cerebras.ai/v1/chat/completions",
+        process.env.CEREBRAS_API_KEY,
+        "gpt-oss-120b",
+        {
+          model: "gpt-oss-120b",
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            ...messages.slice(-8)
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens
+        }
+      );
+  }
+
+  if (!data) {
+
+    console.log(
+      "LOOP7_PROVIDER",
+      "GROQ"
+    );
+
+    data =
+      await callProvider(
+        "https://api.groq.com/openai/v1/chat/completions",
+        process.env.GROQ_API_KEY,
+        "llama-3.3-70b-versatile",
+        {
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            ...messages.slice(-8)
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens
+        }
+      );
+  }
+
+} else {
+
+  data =
+    await callProvider(
+      "https://api.groq.com/openai/v1/chat/completions",
+      process.env.GROQ_API_KEY,
+      "llama-3.3-70b-versatile",
+      {
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...messages.slice(-2)
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens
+      }
+    );
+}
 
 console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
