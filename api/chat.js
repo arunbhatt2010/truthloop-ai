@@ -1930,6 +1930,51 @@ console.log(
         reply: "Loop 7 AI service is not configured."
       });
     }
+async function callProvider(
+  endpoint,
+  apiKey,
+  model,
+  body
+) {
+
+  const response = await fetch(
+    endpoint,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + apiKey
+      },
+
+      body: JSON.stringify(body)
+    }
+  );
+
+  if (!response.ok) {
+
+    console.log(
+      "PROVIDER_FAILED",
+      model,
+      response.status
+    );
+
+    return null;
+  }
+
+  return await response.json();
+
+  }
+    let data = null;
+if (loopLevel === 7) {
+
+   console.log(
+      "LOOP7_PROVIDER",
+      "GEMINI"
+   );
+
+      }
 
     const response = await fetch(
       aiEndpoint,
@@ -1978,8 +2023,8 @@ max_tokens: maxTokens
        📤 RESPONSE
     ========================= */
 
-    const data =
-      await response.json();
+    data =
+  await response.json();
 
 console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
