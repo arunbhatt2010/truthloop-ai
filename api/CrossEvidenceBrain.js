@@ -1648,25 +1648,39 @@ console.log(
 );
 
 const content =
-    data?.choices?.[0]?.message?.content || "";
+   data?.choices?.[0]?.message?.content || "";
 
 console.log(
-    "CEREBRAS_CONTENT",
-    content
+   "CEREBRAS_CONTENT",
+   content
 );
 
 let intelligencePackage = {};
 
-try {
+if (!content || !content.trim()) {
 
-    intelligencePackage =
-        JSON.parse(content);
+   console.log(
+      "CEREBRAS_EMPTY_RESPONSE"
+   );
 
-    console.log(
-        "CEREBRAS_JSON_PARSED"
-    );
+   intelligencePackage = {
+      error: "Empty Cerebras response"
+   };
 
-} catch (error) {
+} else {
+
+   try {
+
+      intelligencePackage =
+         JSON.parse(content);
+
+      console.log(
+         "CEREBRAS_JSON_PARSED"
+      );
+
+   } catch (error) {
+      }
+}
    console.log(
     "CEREBRAS_FATAL_ERROR",
     error?.message
