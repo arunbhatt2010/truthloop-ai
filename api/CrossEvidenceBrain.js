@@ -393,6 +393,18 @@ console.log(
                 extractedPackage
             );
        console.log(
+  "FINAL_PACKAGE_KEYS",
+  Object.keys(finalPackage || {})
+);
+       console.log(
+  "FIRST_SOURCE",
+  JSON.stringify(
+    finalPackage?.sources?.[0],
+    null,
+    2
+  )
+);
+       console.log(
   "FINAL_PACKAGE_FULL",
   JSON.stringify(finalPackage, null, 2)
 );
