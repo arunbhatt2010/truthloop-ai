@@ -639,7 +639,24 @@ function buildEvidenceLedger(mergedEvidence = {}) {
     const ledger = [];
 
     for (const source of mergedEvidence.sources || []) {
+       console.log(
+  "SOURCE_KEYS",
+  Object.keys(source || {})
+);
+console.log(
+    "VISIBLE_TEXT_TYPE",
+    typeof source.visibleText
+  );
 
+  console.log(
+    "VISIBLE_TEXT_LENGTH",
+    source.visibleText?.length
+  );
+
+  console.log(
+    "VISIBLE_TEXT_SAMPLE",
+    source.visibleText?.slice(0, 300)
+  );
         const sourceUrl =
             source.sourceUrl ||
             source.canonicalUrl ||
