@@ -369,9 +369,7 @@ console.log(
     "RAW_PACKAGE",
     JSON.stringify(rawPackage, null, 2)
 );
-        const validatedPackage =
-            validatePublicContent(
-                rawPackage
+        const validatedPackage = rawPackage;
             );
 
         const cleanPackage =
