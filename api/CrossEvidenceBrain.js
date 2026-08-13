@@ -353,7 +353,7 @@ console.log(
     "URL_PACKAGE",
     JSON.stringify(urlPackage, null, 2)
 );
-        const rawPackage =
+        const rawPackage = urlPackage;
             await acquirePublicContent(
                 urlPackage
             );
