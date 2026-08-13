@@ -875,11 +875,17 @@ ${profileLinks?.length
 : "Not Available"}
 
 Public Evidence:
-
+console.log(
+  "LOOP7_PUBLIC_EVIDENCE_SIZE",
+  JSON.stringify(publicEvidencePackage || {}).length
+);
 ${publicEvidencePackage
 ? JSON.stringify(publicEvidencePackage, null, 2)
 : "Not Available"}
-
+console.log(
+  "LOOP7_PROMPT_SIZE",
+  investigationPrompt.length
+);
 Rules:
 
 • Evidence may come from multiple sources
