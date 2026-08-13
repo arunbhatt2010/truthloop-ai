@@ -370,7 +370,7 @@ console.log(
     JSON.stringify(rawPackage, null, 2)
 );
         const validatedPackage = rawPackage;
-            );
+            
 
         const cleanPackage =
             cleanPublicContent(
