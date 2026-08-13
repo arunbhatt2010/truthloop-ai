@@ -1679,8 +1679,6 @@ if (!content || !content.trim()) {
       );
 
    } catch (error) {
-      }
-}
    console.log(
     "CEREBRAS_FATAL_ERROR",
     error?.message
