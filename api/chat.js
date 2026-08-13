@@ -1919,7 +1919,10 @@ if (loopLevel === 7) {
     const aiModel = isLoop7
       ? "gpt-oss-120b"
       : "llama-3.3-70b-versatile";
-
+console.log(
+  "GEMINI_KEY_EXISTS",
+  !!process.env.GEMINI_API_KEY
+);
     if (isLoop7 && !process.env.CEREBRAS_API_KEY) {
       console.error("CEREBRAS_CONFIG_ERROR: CEREBRAS_API_KEY is missing");
 
