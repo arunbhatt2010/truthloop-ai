@@ -52,10 +52,9 @@ function extractSocialLinks(html = "") {
     )];
 }
 
-export async function loadPublicContentFetcher({
+export async function acquirePublicContent({
     profileLinks = []
 } = {}) {
-
     const sources = [];
 
     for (const url of profileLinks) {
