@@ -377,10 +377,20 @@ console.log(
                 validatedPackage
             );
 
-        const extractedPackage =
-            extractPublicContent(
-                cleanPackage
-            );
+        const extractedPackage = {
+  success: true,
+  visibleText:
+    rawPackage?.sources?.[0]?.visibleText || "",
+
+  socialLinks:
+    rawPackage?.sources?.[0]?.socialLinks || [],
+
+  title:
+    rawPackage?.sources?.[0]?.title || "",
+
+  description:
+    rawPackage?.sources?.[0]?.description || ""
+};
 console.log(
   "EXTRACTED_PACKAGE_FULL",
   JSON.stringify(extractedPackage, null, 2)
