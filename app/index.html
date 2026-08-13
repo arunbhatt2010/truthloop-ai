@@ -2899,15 +2899,28 @@ investigationSource = profileLink;
             currentCategory
         })
 }).then(r=>r.json());
+  alert("API RESPONSE RECEIVED");
+console.log("LOOP7_DATA", data);
     messages.push({
     role: "assistant",
     content: data.reply
 });
+  alert("REPLY EXISTS: " + !!data.reply);
+alert("REPLY LENGTH: " + (data.reply?.length || 0));
 
-if (data.reply.includes("📋")) {
+if (data.reply.includes("1️⃣")) {
+
+  alert("REPORT DETECTED");
+
+  latestTruthLoopReport = data.reply;
   
   latestTruthLoopReport = data.reply;
-    outputBox.innerHTML = renderLoop7Report(data.reply);
+  alert("ABOUT TO RENDER");
+    outputBox.innerHTML =
+"<pre style='color:white'>" +
+data.reply +
+"</pre>";
+  alert("RENDER COMPLETE");
   nextBtn.style.display = "none";
   
 } else {
