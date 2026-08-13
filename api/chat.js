@@ -1788,19 +1788,22 @@ STYLE:
 - Loops 1-6:
   80-140 words normally.
 
-- Loop 7:
-  Ignore the 80-140 word limit.
-  Return the complete investigation report following the Loop 7 structure.
-  Prioritize completeness over brevity.
+Loop 7:
 
-OUTPUT FORMATTING (STRICT)
+DO NOT create a separate highlight section.
 
-Highlight is MANDATORY.
+The report itself must begin with:
 
-Every response MUST contain EXACTLY ONE highlight block.
+📌 Investigation Summary
 
-The highlight MUST wrap EXACTLY ONE complete sentence.
+If highlighting is required,
+embed the highlighted sentence inside
+Investigation Summary.
 
+Never output:
+
+[[highlight]]
+[[end]]
 Use ONLY this syntax:
 
 [[highlight]]
@@ -2147,6 +2150,12 @@ hiddenAssumption = "";
         ""
       )
       .trim();
+    if (loopLevel === 7) {
+  reply = reply
+    .replace(/\[\[highlight\]\]/gi, "")
+    .replace(/\[\[end\]\]/gi, "")
+    .trim();
+        }
 /* =========================
    LOOP RESPONSE GUARD
 ========================= */
