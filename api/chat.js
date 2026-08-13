@@ -1954,15 +1954,22 @@ async function callProvider(
 
   if (!response.ok) {
 
-    console.log(
-      "PROVIDER_FAILED",
-      model,
-      response.status
-    );
+  const errorBody =
+    await response.text();
 
-    return null;
-  }
+  console.log(
+    "PROVIDER_FAILED",
+    model,
+    response.status
+  );
 
+  console.log(
+    "PROVIDER_ERROR_BODY",
+    errorBody
+  );
+
+  return null;
+}
   return await response.json();
 
   }
@@ -1988,12 +1995,12 @@ if (loopLevel === 7) {
       }
     );
 
-  if (!data) {
+ // if (!data) {
 
-    console.log(
+   /*console.log(
       "LOOP7_PROVIDER",
       "CEREBRAS"
-    );
+    );*/
 
     data =
       await callProvider(
