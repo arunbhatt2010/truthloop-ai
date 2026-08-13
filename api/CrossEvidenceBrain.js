@@ -354,6 +354,14 @@ console.log(
     JSON.stringify(urlPackage, null, 2)
 );
         const rawPackage = urlPackage;
+       console.log(
+    "RAW_SOURCE_0",
+    JSON.stringify(
+        rawPackage?.sources?.[0],
+        null,
+        2
+    )
+);
             await acquirePublicContent(
                 urlPackage
             );
