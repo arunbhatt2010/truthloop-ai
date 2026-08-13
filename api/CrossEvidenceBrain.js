@@ -383,12 +383,19 @@ console.log(
             extractPublicContent(
                 cleanPackage
             );
-
+console.log(
+  "EXTRACTED_PACKAGE_FULL",
+  JSON.stringify(extractedPackage, null, 2)
+);
         const finalPackage =
             buildPublicContentPackage(
                 rawPackage,
                 extractedPackage
             );
+       console.log(
+  "FINAL_PACKAGE_FULL",
+  JSON.stringify(finalPackage, null, 2)
+);
        console.log(
   "RAW_PACKAGE",
   {
