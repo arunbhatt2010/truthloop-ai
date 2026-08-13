@@ -108,3 +108,29 @@ export async function acquirePublicContent({
         sources
     };
 }
+export async function loadPublicContentFetcher(options = {}) {
+    return acquirePublicContent(options);
+}
+
+export function validatePublicContent(content) {
+    return !!content;
+}
+
+export function cleanPublicContent(content = "") {
+    return String(content || "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+export function extractPublicContent(html = "") {
+    return {
+        visibleText: cleanPublicContent(html)
+    };
+}
+
+export function buildPublicContentPackage(data = {}) {
+    return {
+        success: true,
+        ...data
+    };
+}
