@@ -547,13 +547,11 @@ if (
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
     profileLink,
-    profileLinks: profileLink
-        ? [profileLink]
-        : [],
+    profileLinks: profileLink ? [profileLink] : [],
     truthLoopPackage,
-    identityPackage,
     currentLoop: 7
 });
+
     const identityPackage =
 publicEvidencePackage?.identityPackage || null;
 
