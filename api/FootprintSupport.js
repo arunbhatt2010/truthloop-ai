@@ -97,11 +97,10 @@ export async function loadFootprintSupport({
     sourceCandidates,
 
     discoveredProfiles:
-        sourceCandidates.map(url => ({
-            url,
-            platform:
-                detectPlatform(url)
-        })),
+    sourceCandidates.map(url => ({
+        url,
+        platform: "unknown"
+    })),
 
     discoveredLinks:
         sourceCandidates,
