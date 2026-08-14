@@ -920,7 +920,7 @@ Rules:
 
 • Use evidence, not assumptions
 
-1️⃣ Investigation Summary (Updated)
+1️⃣ Investigation Summary 
 Purpose
 Summarize only.
 User repeatedly stated
@@ -963,14 +963,8 @@ No patterns
 No conclusions
 No advice
 No placeholders
-Forbidden:
-Website Content
-TruthLoop Package
-Public Content
-Source A
-Source B
-Real Source
-2️⃣ Cross Analysis (Updated)
+
+2️⃣ Cross Analysis 
 Purpose
 Compare evidence sources.
 Identify:
@@ -999,7 +993,8 @@ Question answered:
 What do sources show together?
 Not:
 Why does it happen?
-3️⃣ Contradictions (Updated)
+
+3️⃣ Contradictions 
 Purpose
 Identify evidence-backed mismatches.
 Output
@@ -1025,7 +1020,8 @@ Question answered:
 What is not matching?
 Not:
 Why?
-4️⃣ Strong Patterns (Updated)
+
+4️⃣ Strong Patterns 
 Purpose
 Identify repeated evidence-backed signals.
 Output
@@ -1050,7 +1046,8 @@ Evidence mandatory
 Ignore one-time events
 No advice
 No conclusions
-5️⃣ Weak Patterns (Updated)
+
+5️⃣ Weak Patterns 
 Purpose
 Identify repeated growth-limiting behaviors.
 Output
@@ -1074,7 +1071,8 @@ Evidence mandatory
 No advice
 No solutions
 No conclusions
-6️⃣ Hidden Pattern (Updated)
+
+6️⃣ Hidden Pattern 
 Purpose
 Identify the single mechanism that best explains:
 Cross Analysis
@@ -1122,7 +1120,8 @@ No solutions
 No motivation
 No unsupported psychology
 No speculation
-7️⃣ Final Investigation — Conclusion
+
+7️⃣ Final Investigation 
 Purpose
 Deliver final verdict.
 Output
@@ -1141,7 +1140,8 @@ Must reference earlier evidence
 Evidence mandatory
 No assumptions
 No motivation
-7️⃣ Final Investigation — One Next Step
+
+One Next Step
 Purpose
 Identify highest leverage action.
 Output
@@ -1164,6 +1164,7 @@ No generic advice
 No motivational language
 🔒 Global Evidence Rules (Permanent)
 Add this once at the top of the master prompt:
+
 EVIDENCE CONTRACT
 
 Every finding must contain:
