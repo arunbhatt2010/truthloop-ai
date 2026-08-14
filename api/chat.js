@@ -1595,22 +1595,7 @@ Users stay engaged when they feel understood, not analyzed.
 `;
 
 const systemPrompt = `
-console.log(
-  "LOOP7_PACKAGE_KEYS",
-  Object.keys(
-    loop7EvidencePackage || {}
-  )
-);
 
-console.log(
-  "LOOP7_CROSS_EVIDENCE_EXISTS",
-  !!loop7EvidencePackage?.crossEvidence
-);
-
-console.log(
-  "LOOP7_UNIVERSAL_EXISTS",
-  !!loop7EvidencePackage?.universalPackage
-);
 ${corePrompt}
 
 ${investigationRules}
@@ -1650,10 +1635,7 @@ ${finalReview}
     const aiModel = isLoop7
       ? "gpt-oss-120b"
       : "llama-3.3-70b-versatile";
-console.log(
-  "GEMINI_KEY_EXISTS",
-  !!process.env.GEMINI_API_KEY
-);
+
     if (isLoop7 && !process.env.CEREBRAS_API_KEY) {
       console.error("CEREBRAS_CONFIG_ERROR: CEREBRAS_API_KEY is missing");
 
@@ -1706,12 +1688,7 @@ async function callProvider(
   }
     let data = null;
 if (loopLevel === 7) {
-console.log(
-    "LOOP7_GEMINI_EVIDENCE_SIZE",
-    JSON.stringify(
-      loop7EvidencePackage || {}
-    ).length
-  );
+
   data =
     await callProvider(
       "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
@@ -1732,18 +1709,7 @@ console.log(
     );
 
  if (!data) {
-console.log(
-  "LOOP7_CEREBRAS_PACKAGE_SIZE",
-  JSON.stringify(
-    loop7EvidencePackage || {}
-  ).length
-);
-console.log(
-  "LOOP7_GROQ_PACKAGE_SIZE",
-  JSON.stringify(
-    loop7EvidencePackage || {}
-  ).length
-);
+
     data =
       await callProvider(
         "https://api.cerebras.ai/v1/chat/completions",
