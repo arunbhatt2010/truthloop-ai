@@ -591,7 +591,7 @@ console.log(
 ========================================== */
 
 const profileLinks =
-    profileLink,
+    profileLink
         ? [profileLink]
         : [];
 
