@@ -630,7 +630,10 @@ function extractSignals(
 function discoverSocialLinks(
     publicContentPackage = {}
 ) {
-
+console.log(
+  "SOCIAL_DISCOVERY_KEYS",
+  Object.keys(publicContentPackage || {})
+);
     /*
      * Primary source:
      * fetchPublicEvidence() extracts platform URLs directly from the
@@ -640,20 +643,47 @@ function discoverSocialLinks(
      * also inspect any surviving links/sourceLinks fields so this remains
      * compatible with older PublicContentFetcher package shapes.
      */
-    const candidateUrls = [
-        ...(Array.isArray(publicContentPackage?.discoveredSocialLinks)
-            ? publicContentPackage.discoveredSocialLinks
-            : []),
+    const candidateUrls = [];
 
-        ...(Array.isArray(publicContentPackage?.links)
-            ? publicContentPackage.links
-            : []),
+for (const [key, value] of Object.entries(publicContentPackage || {})) {
 
-        ...(Array.isArray(publicContentPackage?.sourceLinks)
-            ? publicContentPackage.sourceLinks
-            : [])
-    ];
+  if (!Array.isArray(value)) {
+    continue;
+  }
 
+  for (const item of value) {
+
+    if (
+      typeof item === "string" &&
+      /^https?:\/\//i.test(item)
+    ) {
+      candidateUrls.push(item);
+    }
+
+    if (
+      item &&
+      typeof item === "object"
+    ) {
+
+      const possibleUrl =
+        item.url ||
+        item.link ||
+        item.href ||
+        item.sourceUrl;
+
+      if (
+        typeof possibleUrl === "string" &&
+        /^https?:\/\//i.test(possibleUrl)
+      ) {
+        candidateUrls.push(possibleUrl);
+      }
+    }
+  }
+}
+   console.log(
+  "SOCIAL_DISCOVERY_CANDIDATES",
+  candidateUrls
+);
     const discovered = [];
 
     for (const rawUrl of candidateUrls) {
