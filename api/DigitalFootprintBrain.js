@@ -183,7 +183,7 @@ export async function loadDigitalFootprintBrain({
 
     console.log(
         "EVIDENCE_SOURCE_LINKS",
-        evidenceSourceLinks
+        sourceLinks
     );
 
     const discoveredProfiles =
@@ -304,7 +304,7 @@ export async function loadDigitalFootprintBrain({
     packageType: "DigitalFootprintPackage",
     profileLink: primaryProfileLink,
     profileLinks: requestedProfileLinks,
-    evidenceSourceLinks,
+    sourceLinks,
     platform,
     loop7EvidencePackage,
 
