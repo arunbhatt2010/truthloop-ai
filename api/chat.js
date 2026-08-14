@@ -591,7 +591,11 @@ console.log(
 ========================================== */
 
 const loop7EvidencePackage = {
-    profileLink: profileLinks,
+    profileLinks: Array.isArray(profileLink)
+        ? profileLink
+        : profileLink?.trim()
+        ? [profileLink.trim()]
+        : [],
     identityPackage,
     footprintPackage,
     publicEvidence: testEvidencePackage
@@ -641,11 +645,7 @@ if (publicEvidencePackage) {
   }
 
           }
-    const profileLinks = Array.isArray(profileLink)
-    ? profileLink
-    : profileLink?.trim()
-    ? [profileLink.trim()]
-    : [];
+    
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
