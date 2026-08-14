@@ -1188,22 +1188,27 @@ async function crawlDiscoveredProfiles(
 ) {
 
     const profiles = [];
+    const seen = new Set();
 
-    const sourceLinks = [];
-
-    for (const url of socialLinks.slice(0, 20)) {
+    for (const rawUrl of socialLinks.slice(0, 20)) {
 
         try {
 
-            const normalizedUrl =
-                normalizePublicUrl(url);
+            const url =
+                normalizePublicUrl(rawUrl);
 
-            if (!normalizedUrl) {
+            if (!url) {
                 continue;
             }
 
+            if (seen.has(url)) {
+                continue;
+            }
+
+            seen.add(url);
+
             const platform =
-                detectPlatform(normalizedUrl);
+                detectPlatform(url);
 
             if (
                 platform === "unknown"
@@ -1211,27 +1216,44 @@ async function crawlDiscoveredProfiles(
                 continue;
             }
 
+            let username = null;
+
+            try {
+
+                const parsed =
+                    new URL(url);
+
+                const pathParts =
+                    parsed.pathname
+                        .split("/")
+                        .filter(Boolean);
+
+                username =
+                    pathParts[0] || null;
+
+            } catch {}
+
             profiles.push({
 
-                url:
-                    normalizedUrl,
+                url,
 
                 platform,
 
-                sourceLink:
-                    normalizedUrl
+                username,
+
+                hostname:
+                    (() => {
+                        try {
+                            return new URL(url).hostname;
+                        } catch {
+                            return null;
+                        }
+                    })(),
+
+                discoveredAt:
+                    new Date().toISOString()
 
             });
-
-            if (
-                !sourceLinks.includes(
-                    normalizedUrl
-                )
-            ) {
-                sourceLinks.push(
-                    normalizedUrl
-                );
-            }
 
         } catch {
 
@@ -1240,11 +1262,6 @@ async function crawlDiscoveredProfiles(
         }
 
     }
-
-    console.log(
-        "DISCOVERED_PROFILES",
-        profiles.length
-    );
 
     return {
 
@@ -1255,7 +1272,12 @@ async function crawlDiscoveredProfiles(
         count:
             profiles.length,
 
-        sourceLinks
+        platforms:
+            [...new Set(
+                profiles.map(
+                    item => item.platform
+                )
+            )]
 
     };
 
