@@ -167,7 +167,7 @@ export async function loadDigitalFootprintBrain({
             publicContentPackage
         );
 
-    const evidenceSourceLinks =
+    const sourceLinks =
         normalizeProfileLinks(
             "",
             [
@@ -204,7 +204,7 @@ export async function loadDigitalFootprintBrain({
             await loadCrossEvidenceBrain({
 
                 profileLinks:
-                    evidenceSourceLinks.slice(0, 20)
+                    sourceLinks.slice(0,20)
 
             });
 
