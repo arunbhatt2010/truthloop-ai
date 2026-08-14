@@ -619,8 +619,7 @@ const loop7EvidencePackage = {
   sourceLinks:
     publicEvidencePackage?.sourceLinks || [],
 
-  profileLinks:
-    profileLinks || []
+  profileLinks: []
 
 };
 
