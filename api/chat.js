@@ -599,7 +599,9 @@ console.log(
 const loop7EvidencePackage = {
 
   publicEvidence:
-    publicEvidencePackage || null,
+    universalPackage ||
+    publicEvidencePackage ||
+    null,
 
   loop7Evidence:
     publicEvidencePackage?.loop7EvidencePackage || null,
@@ -630,6 +632,10 @@ console.log(
     console.log(
   "PUBLIC_EVIDENCE_EXISTS",
   publicEvidencePackage?.success ? "YES" : "NO"
+);
+    console.log(
+  "UNIVERSAL_PACKAGE_EXISTS",
+  !!universalPackage
 );
 
 console.log(
