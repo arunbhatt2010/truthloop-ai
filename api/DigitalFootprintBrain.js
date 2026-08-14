@@ -630,60 +630,70 @@ function extractSignals(
 function discoverSocialLinks(
     publicContentPackage = {}
 ) {
-console.log(
-  "SOCIAL_DISCOVERY_KEYS",
-  Object.keys(publicContentPackage || {})
-);
-    /*
-     * Primary source:
-     * fetchPublicEvidence() extracts platform URLs directly from the
-     * fetched HTML before the compact package is built.
-     *
-     * Fallback source:
-     * also inspect any surviving links/sourceLinks fields so this remains
-     * compatible with older PublicContentFetcher package shapes.
-     */
+
+    console.log(
+        "SOCIAL_DISCOVERY_KEYS",
+        Object.keys(publicContentPackage || {})
+    );
+
     const candidateUrls = [];
 
-for (const [key, value] of Object.entries(publicContentPackage || {})) {
+    const collectUrls = (value) => {
 
-  if (!Array.isArray(value)) {
-    continue;
-  }
+        if (!value) {
+            return;
+        }
 
-  for (const item of value) {
+        if (typeof value === "string") {
 
-    if (
-      typeof item === "string" &&
-      /^https?:\/\//i.test(item)
-    ) {
-      candidateUrls.push(item);
-    }
+            if (/^https?:\/\//i.test(value)) {
+                candidateUrls.push(value);
+            }
 
-    if (
-      item &&
-      typeof item === "object"
-    ) {
+            return;
+        }
 
-      const possibleUrl =
-        item.url ||
-        item.link ||
-        item.href ||
-        item.sourceUrl;
+        if (Array.isArray(value)) {
 
-      if (
-        typeof possibleUrl === "string" &&
-        /^https?:\/\//i.test(possibleUrl)
-      ) {
-        candidateUrls.push(possibleUrl);
-      }
-    }
-  }
-}
-   console.log(
-  "SOCIAL_DISCOVERY_CANDIDATES",
-  candidateUrls
-);
+            for (const item of value) {
+                collectUrls(item);
+            }
+
+            return;
+        }
+
+        if (typeof value === "object") {
+
+            const directUrl =
+                value.url ||
+                value.link ||
+                value.href ||
+                value.sourceUrl ||
+                value.profileUrl ||
+                value.website;
+
+            if (
+                typeof directUrl === "string" &&
+                /^https?:\/\//i.test(directUrl)
+            ) {
+                candidateUrls.push(directUrl);
+            }
+
+            for (const nestedValue of Object.values(value)) {
+                collectUrls(nestedValue);
+            }
+
+        }
+
+    };
+
+    collectUrls(publicContentPackage);
+
+    console.log(
+        "SOCIAL_DISCOVERY_CANDIDATES",
+        candidateUrls
+    );
+
     const discovered = [];
 
     for (const rawUrl of candidateUrls) {
@@ -711,7 +721,12 @@ for (const [key, value] of Object.entries(publicContentPackage || {})) {
             ].includes(platform)
         ) {
 
-            if (isLikelyPublicProfileUrl(url, platform)) {
+            if (
+                isLikelyPublicProfileUrl(
+                    url,
+                    platform
+                )
+            ) {
                 discovered.push(url);
             }
 
@@ -719,12 +734,18 @@ for (const [key, value] of Object.entries(publicContentPackage || {})) {
 
     }
 
-    return [
+    const uniqueLinks = [
         ...new Set(discovered)
     ];
 
-}
+    console.log(
+        "DISCOVERED_SOCIAL_LINKS",
+        uniqueLinks
+    );
 
+    return uniqueLinks;
+
+               }
 /*
  * Extract public platform URLs from the original fetched package.
  *
