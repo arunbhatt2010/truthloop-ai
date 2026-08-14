@@ -590,14 +590,8 @@ console.log(
    LOOP 7 EVIDENCE PACKAGE
 ========================================== */
 
-const profileLinks =
-    profileLink
-        ? [profileLink]
-        : [];
-
 const loop7EvidencePackage = {
-    profileLink,
-    profileLinks,
+    profileLink: profileLinks,
     identityPackage,
     footprintPackage,
     publicEvidence: testEvidencePackage
@@ -648,8 +642,8 @@ if (publicEvidencePackage) {
 
           }
     const profileLinks = Array.isArray(profileLink)
-  ? profileLink
-  : profileLink?.trim()
+    ? profileLink
+    : profileLink?.trim()
     ? [profileLink.trim()]
     : [];
     let loop7Instruction = "";
