@@ -546,19 +546,13 @@ if (
 
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
-
     profileLink,
-
     profileLinks: profileLink
         ? [profileLink]
         : [],
-
     truthLoopPackage,
-
     identityPackage,
-
     currentLoop: 7
-
 });
     
     /* =========================
@@ -597,32 +591,17 @@ console.log(
 ========================================== */
 
 const loop7EvidencePackage = {
+    profileLink,
+    profileLinks,
 
-  publicEvidence:
-    universalPackage ||
-    publicEvidencePackage ||
-    null,
+    identityPackage,
+    footprintPackage,
 
-  loop7Evidence:
-    publicEvidencePackage?.loop7EvidencePackage || null,
+    publicEvidence: testEvidencePackage,
 
-  crossEvidence:
-    publicEvidencePackage?.crossEvidence || null,
+    crossEvidence: crossEvidencePackage,
 
-  universalPackage:
-    publicEvidencePackage?.universalPackage || null,
-
-  evidenceSummary:
-    publicEvidencePackage?.evidenceSummary || null,
-
-  signals:
-    publicEvidencePackage?.signals || null,
-
-  sourceLinks:
-    publicEvidencePackage?.sourceLinks || [],
-
-  profileLinks: []
-
+    universalPackage
 };
 
 console.log(
