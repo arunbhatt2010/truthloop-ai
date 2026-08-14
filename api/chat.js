@@ -1988,7 +1988,7 @@ if (loopLevel === 7) {
             role: "system",
             content: systemPrompt
           },
-          ...messages.slice(-8)
+          ...messages.slice(-30)
         ],
         temperature: 0.7,
         max_tokens: maxTokens
