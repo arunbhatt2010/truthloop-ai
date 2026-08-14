@@ -554,7 +554,14 @@ await loadDigitalFootprintBrain({
     identityPackage,
     currentLoop: 7
 });
-    
+    const identityPackage =
+publicEvidencePackage?.identityPackage || null;
+
+const footprintPackage =
+publicEvidencePackage?.footprintPackage || null;
+
+const universalPackage =
+publicEvidencePackage?.universalPackage || null;
     /* =========================
    PLATFORM CARD
 ========================= */
@@ -590,13 +597,12 @@ console.log(
    LOOP 7 EVIDENCE PACKAGE
 ========================================== */
 
-const loop7EvidencePackage = {
-    profileLinks: Array.isArray(profileLink)
-        ? profileLink
-        : profileLink?.trim()
-        ? [profileLink.trim()]
-        : [],
-    
+
+    const loop7EvidencePackage = {
+    profileLinks,
+    identityPackage,
+    footprintPackage,
+    universalPackage
 };
 
 console.log(
