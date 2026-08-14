@@ -1189,12 +1189,21 @@ async function crawlDiscoveredProfiles(
 
     const profiles = [];
 
-    for (const url of socialLinks.slice(0, 10)) {
+    const sourceLinks = [];
+
+    for (const url of socialLinks.slice(0, 20)) {
 
         try {
 
+            const normalizedUrl =
+                normalizePublicUrl(url);
+
+            if (!normalizedUrl) {
+                continue;
+            }
+
             const platform =
-                detectPlatform(url);
+                detectPlatform(normalizedUrl);
 
             if (
                 platform === "unknown"
@@ -1204,11 +1213,25 @@ async function crawlDiscoveredProfiles(
 
             profiles.push({
 
-                url,
+                url:
+                    normalizedUrl,
 
-                platform
+                platform,
+
+                sourceLink:
+                    normalizedUrl
 
             });
+
+            if (
+                !sourceLinks.includes(
+                    normalizedUrl
+                )
+            ) {
+                sourceLinks.push(
+                    normalizedUrl
+                );
+            }
 
         } catch {
 
@@ -1218,13 +1241,21 @@ async function crawlDiscoveredProfiles(
 
     }
 
+    console.log(
+        "DISCOVERED_PROFILES",
+        profiles.length
+    );
+
     return {
 
         success: true,
 
         profiles,
 
-        count: profiles.length
+        count:
+            profiles.length,
+
+        sourceLinks
 
     };
 
@@ -1256,7 +1287,11 @@ function buildIdentitySignals({
 
         discoveredProfiles:
             discoveredProfiles
-                ?.count || 0
+                ?.count || 0,
+
+        sourceLinks:
+            discoveredProfiles
+                ?.sourceLinks || []
 
     };
 
