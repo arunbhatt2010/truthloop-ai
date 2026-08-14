@@ -1143,17 +1143,28 @@ async function CrossEvidenceAnalyzer(
 
         for (const source of sources) {
 
-            for (const link of source?.links || []) {
+    const allLinks = [
 
-                if (
-                    typeof link === "string" &&
-                    /^https?:\/\//i.test(link)
-                ) {
-                    discoveredLinks.add(link);
-                }
-            }
+        ...(source?.links || []),
+
+        ...(source?.socialLinks || []),
+
+        ...(source?.sourceLinks || [])
+
+    ];
+
+    for (const link of allLinks) {
+
+        if (
+            typeof link === "string" &&
+            /^https?:\/\//i.test(link)
+        ) {
+            discoveredLinks.add(link);
         }
 
+    }
+
+        }
         if (sources.length > 1) {
             findings.push({
                 type: "multi-source",
@@ -1200,13 +1211,26 @@ async function CrossEvidenceAnalyzer(
         }
 
         return {
-            success: true,
-            findings,
-            sourceCount: sources.length,
-            linkCount: discoveredLinks.size,
-            evidenceCount: ledger.length,
-            sourceLinks
-        };
+
+    success: true,
+
+    findings,
+
+    sourceCount:
+        sources.length,
+
+    linkCount:
+        discoveredLinks.size,
+
+    evidenceCount:
+        ledger.length,
+
+    sourceLinks,
+
+    discoveredLinks:
+        Array.from(discoveredLinks)
+
+};
 
     } catch (error) {
 
