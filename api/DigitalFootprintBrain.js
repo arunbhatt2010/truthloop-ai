@@ -278,7 +278,7 @@ export async function loadDigitalFootprintBrain({
 
         profileLinks: requestedProfileLinks,
 
-        evidenceSourceLinks,
+        sourceLinks,
 
         platform,
 
@@ -1414,7 +1414,7 @@ function buildLoop7EvidencePackage({
 
     profileLink,
     profileLinks,
-    evidenceSourceLinks,
+    sourceLinks,
     platform,
 
     evidenceSummary,
@@ -1443,7 +1443,7 @@ function buildLoop7EvidencePackage({
 
         profileLinks,
 
-        evidenceSourceLinks,
+        sourceLinks,
 
         platform,
 
@@ -1459,6 +1459,8 @@ function buildLoop7EvidencePackage({
         evidenceGaps
 
     };
+
+}
 
         }
 
