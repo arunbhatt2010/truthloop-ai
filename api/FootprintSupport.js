@@ -82,27 +82,38 @@ export async function loadFootprintSupport({
     const sourceCandidates = [...new Set(normalizedLinks)];
 
     return {
-        success: true,
-        stage: "Footprint Support",
-        discoveryReady: true,
+    success: true,
+    stage: "Footprint Support",
+    discoveryReady: true,
 
-        currentLoop,
+    currentLoop,
 
-        profileLink: primaryLink,
-        profileLinks: normalizedLinks,
+    profileLink: primaryLink,
+    profileLinks: normalizedLinks,
 
-        hostname,
-        platform,
+    hostname,
+    platform,
 
+    sourceCandidates,
+
+    discoveredProfiles:
+        sourceCandidates.map(url => ({
+            url,
+            platform:
+                detectPlatform(url)
+        })),
+
+    discoveredLinks:
         sourceCandidates,
 
-        discoveredProfiles: [],
-        discoveredLinks: [],
-
-        discoveryStats: {
-            primarySource: primaryLink,
-            totalInputLinks: normalizedLinks.length,
-            totalCandidates: sourceCandidates.length
-        }
-    };
+    discoveryStats: {
+        primarySource: primaryLink,
+        totalInputLinks:
+            normalizedLinks.length,
+        totalCandidates:
+            sourceCandidates.length,
+        discoveredProfiles:
+            sourceCandidates.length
+    }
+};
 }
