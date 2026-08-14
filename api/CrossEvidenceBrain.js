@@ -741,7 +741,10 @@ Rules:
 Output:
 Identity Package*/
 async function IdentityExtractionBrain({
-  profileLinks = []
+
+    profileLinks = [],
+    sourceLinks = []
+
 }) {
 
   const identity = {
@@ -749,20 +752,19 @@ async function IdentityExtractionBrain({
     success: false,
 
     name: null,
-
     company: null,
-
     website: null,
-
     title: null,
 
     keywords: [],
-identities: [],
-    sourceLinks: profileLinks
-     
-     
+    identities: [],
 
-  };
+    sourceLinks: [
+        ...profileLinks,
+        ...sourceLinks
+    ]
+
+};
 
   try {
 
