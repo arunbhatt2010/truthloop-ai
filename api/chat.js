@@ -592,6 +592,42 @@ console.log(
     "PUBLIC_EVIDENCE_PACKAGE",
     JSON.stringify(publicEvidencePackage, null, 2)
 );
+    /* ==========================================
+   LOOP 7 EVIDENCE PACKAGE
+========================================== */
+
+const loop7EvidencePackage = {
+
+  publicEvidence:
+    publicEvidencePackage || null,
+
+  loop7Evidence:
+    publicEvidencePackage?.loop7EvidencePackage || null,
+
+  crossEvidence:
+    publicEvidencePackage?.crossEvidence || null,
+
+  universalPackage:
+    publicEvidencePackage?.universalPackage || null,
+
+  evidenceSummary:
+    publicEvidencePackage?.evidenceSummary || null,
+
+  signals:
+    publicEvidencePackage?.signals || null,
+
+  sourceLinks:
+    publicEvidencePackage?.sourceLinks || [],
+
+  profileLinks:
+    profileLinks || []
+
+};
+
+console.log(
+  "LOOP7_EVIDENCE_PACKAGE",
+  JSON.stringify(loop7EvidencePackage, null, 2)
+);
     console.log(
   "PUBLIC_EVIDENCE_EXISTS",
   publicEvidencePackage?.success ? "YES" : "NO"
@@ -640,6 +676,7 @@ if (loopLevel === 7) {
 loop7Instruction = `
 LOOP 7 MODE
 
+END PUBLIC EVIDENCE PACKAGE
 You are TruthLoop's Final Investigation Brain.
 
 Loop 1 to Loop 6 are complete.
@@ -671,6 +708,13 @@ Only use evidence available inside:
 Never guess.
 
 Never invent evidence.
+PUBLIC EVIDENCE PACKAGE
+
+${JSON.stringify(
+  loop7EvidencePackage,
+  null,
+  2
+)}
 
 Never invent URLs.
 
@@ -1329,6 +1373,7 @@ ${investigationState.confidence}
 ========================= */
 
 const corePrompt = `
+
 You are TruthLoop AI.
 
 ROLE:
@@ -1555,6 +1600,22 @@ Users stay engaged when they feel understood, not analyzed.
 `;
 
 const systemPrompt = `
+console.log(
+  "LOOP7_PACKAGE_KEYS",
+  Object.keys(
+    loop7EvidencePackage || {}
+  )
+);
+
+console.log(
+  "LOOP7_CROSS_EVIDENCE_EXISTS",
+  !!loop7EvidencePackage?.crossEvidence
+);
+
+console.log(
+  "LOOP7_UNIVERSAL_EXISTS",
+  !!loop7EvidencePackage?.universalPackage
+);
 ${corePrompt}
 
 ${investigationRules}
@@ -1650,7 +1711,12 @@ async function callProvider(
   }
     let data = null;
 if (loopLevel === 7) {
-
+console.log(
+    "LOOP7_GEMINI_EVIDENCE_SIZE",
+    JSON.stringify(
+      loop7EvidencePackage || {}
+    ).length
+  );
   data =
     await callProvider(
       "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
@@ -1671,12 +1737,18 @@ if (loopLevel === 7) {
     );
 
  if (!data) {
-
-   /*console.log(
-      "LOOP7_PROVIDER",
-      "CEREBRAS"
-    );*/
-
+console.log(
+  "LOOP7_CEREBRAS_PACKAGE_SIZE",
+  JSON.stringify(
+    loop7EvidencePackage || {}
+  ).length
+);
+console.log(
+  "LOOP7_GROQ_PACKAGE_SIZE",
+  JSON.stringify(
+    loop7EvidencePackage || {}
+  ).length
+);
     data =
       await callProvider(
         "https://api.cerebras.ai/v1/chat/completions",
