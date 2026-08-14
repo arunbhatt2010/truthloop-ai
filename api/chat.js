@@ -597,7 +597,7 @@ const loop7EvidencePackage = {
         ? [profileLink.trim()]
         : [],
     identityPackage,
-    footprintPackage,
+    //footprintPackage,
     publicEvidence: testEvidencePackage
 };
 
