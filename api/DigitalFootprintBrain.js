@@ -1294,6 +1294,16 @@ function buildIdentitySignals({
 
 }) {
 
+    const profiles =
+        discoveredProfiles?.profiles || [];
+
+    const platforms =
+        [...new Set(
+            profiles.map(
+                item => item.platform
+            )
+        )];
+
     return {
 
         primaryPlatform:
@@ -1308,12 +1318,27 @@ function buildIdentitySignals({
                 ?.length || 0,
 
         discoveredProfiles:
-            discoveredProfiles
-                ?.count || 0,
+            profiles.length,
 
-        sourceLinks:
-            discoveredProfiles
-                ?.sourceLinks || []
+        discoveredPlatforms:
+            platforms,
+
+        crossPlatformPresence:
+            platforms.length > 1,
+
+        usernames:
+            profiles
+                .map(
+                    item => item.username
+                )
+                .filter(Boolean),
+
+        profileLinks:
+            profiles
+                .map(
+                    item => item.url
+                )
+                .filter(Boolean)
 
     };
 
@@ -1443,15 +1468,19 @@ function buildCrossPlatformSignals({
 
 }) {
 
+    const profiles =
+        discoveredProfiles?.profiles || [];
+
     const platforms =
-        discoveredProfiles?.profiles
-            ?.map(item => item.platform) || [];
+        profiles
+            .map(item => item.platform)
+            .filter(Boolean);
 
     const uniquePlatforms =
         [...new Set([
             platform,
             ...platforms
-        ])];
+        ].filter(Boolean))];
 
     return {
 
@@ -1462,11 +1491,24 @@ function buildCrossPlatformSignals({
             uniquePlatforms,
 
         multiPlatformPresence:
-            uniquePlatforms.length > 1
+            uniquePlatforms.length > 1,
+
+        discoveredProfiles:
+            profiles.length,
+
+        profileLinks:
+            profiles
+                .map(item => item.url)
+                .filter(Boolean),
+
+        usernames:
+            profiles
+                .map(item => item.username)
+                .filter(Boolean)
 
     };
 
-        }
+       }
 function buildLoop7EvidencePackage({
 
     profileLink,
