@@ -651,11 +651,14 @@ Generate one final investigation report.
 AVAILABLE EVIDENCE
 ━━━━━━━━━━━━━━━━━━━━
 
-1. TruthLoop Package
-   (conversation journey)
+1. TruthLoop Conversation Evidence
+(loop 1-6 user statements)
 
-2. Public Evidence Package
-   (digital footprint evidence)
+2. Public Evidence Sources
+(posts, profiles, websites, articles)
+
+3. Cross Evidence Sources
+(shared signals found across sources)
 
 Use both.
 
@@ -677,9 +680,17 @@ REPORT STRUCTURE
 1️⃣ Investigation Summary
 
 Purpose:
-What the user says
-vs
-What the evidence says.
+Frame the investigation.
+
+Summarize:
+
+• Repeated user signals
+• Repeated public signals
+• Investigation entry point
+
+Do not explain.
+Do not analyze.
+Do not conclude.
 
 Bullets:
 3 Maximum
@@ -776,10 +787,14 @@ Evidence:
 1. https://...
 2. https://...
 3. https://...
-If real URLs are unavailable,
-omit the evidence line entirely.
+If no traceable evidence exists:
 
-Never show placeholder names.
+Evidence:
+Not Available
+
+Never invent URLs.
+Never invent evidence.
+Never replace missing evidence with generic labels.
 ━━━━━━━━━━━━━━━━━━━━
 EVIDENCE RULE
 ━━━━━━━━━━━━━━━━━━━━
@@ -1140,6 +1155,10 @@ Must reference earlier evidence
 Evidence mandatory
 No assumptions
 No motivation
+Every conclusion must reference
+at least one previous finding.
+
+No new findings allowed.
 
 One Next Step
 Purpose
