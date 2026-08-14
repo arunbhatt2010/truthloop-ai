@@ -766,8 +766,11 @@ identities: [],
 
   try {
 
-    if (!profileLinks.length) {
-      return identity;
+    if (
+    !profileLinks.length &&
+    !sourceLinks.length
+) {
+    return identity;
     }
      for (const link of profileLinks) {
 
