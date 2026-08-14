@@ -590,18 +590,17 @@ console.log(
    LOOP 7 EVIDENCE PACKAGE
 ========================================== */
 
+const profileLinks =
+    profileLink,
+        ? [profileLink]
+        : [];
+
 const loop7EvidencePackage = {
     profileLink,
     profileLinks,
-
     identityPackage,
     footprintPackage,
-
-    publicEvidence: testEvidencePackage,
-
-    crossEvidence: crossEvidencePackage,
-
-    universalPackage
+    publicEvidence: testEvidencePackage
 };
 
 console.log(
