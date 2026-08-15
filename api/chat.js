@@ -1,10 +1,12 @@
 import { runMasterBrain }
 from "./masterBrain.js";
 import { loadDigitalFootprintBrain } from "./DigitalFootprintBrain.js";
-export default async function handler(req, res) {
 import {
     loadCrossEvidenceBrain
 } from "./CrossEvidenceBrain.js";
+
+export default async function handler(req, res) {
+
   /* =========================
      🌐 HEADERS
   ========================= */
