@@ -1640,54 +1640,84 @@ if (loopLevel === 7) {
 
   messages = messages.filter(m => {
     if (m.role !== "assistant") return true;
-
     return !m.content.includes("?");
   });
 
 }
-    const maxTokens =
+
+const maxTokens =
   loopLevel === 7 ? 900 : 220;
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            "Bearer " + process.env.GROQ_API_KEY
-        },
-
-        body: JSON.stringify({
-
-          model:"llama-3.3-70b-versatile",
-
-          messages: [
+const response = await fetch(
+  "https://api.groq.com/openai/v1/chat/completions",
   {
-    role: "system",
-    content: systemPrompt
-  },
-  ...(loopLevel === 7
-      ? messages.slice(-8)
-      : messages.slice(-2))
-],
+    method: "POST",
 
-temperature: 0.7,
-max_tokens: maxTokens
-        })
-      }
-    );
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer " + process.env.GROQ_API_KEY
+    },
 
-    if (!response.ok) {
+    body: JSON.stringify({
 
-    console.log("GROQ_STATUS", response.status);
-    console.log("GROQ_STATUS_TEXT", response.statusText);
-    console.log("GROQ_ERROR_BODY", await response.text());
+      model: "llama-3.3-70b-versatile",
 
-    return res.status(500).json({
-        reply: "AI service busy. Please try again."
-    });
+      messages:
+
+      loopLevel === 7
+
+      ? [
+
+          {
+            role: "system",
+            content: systemPrompt
+          },
+
+          {
+            role: "user",
+            content: `
+Generate the complete Loop 7 Investigation Report.
+
+Return exactly:
+
+[[highlight]]
+One concise core pattern.
+[[end]]
+
+## Pattern
+Detailed pattern analysis.
+
+## Evidence
+Evidence collected from investigation.
+
+## Blind Spot
+What the user is not noticing.
+
+## Investigation Summary
+Final conclusion.
+`
           }
+
+        ]
+
+      : [
+
+          {
+            role: "system",
+            content: systemPrompt
+          },
+
+          ...messages.slice(-2)
+
+        ],
+
+      temperature: 0.7,
+      max_tokens: maxTokens
+
+    })
+  }
+);
 
     /* =========================
        📤 RESPONSE
