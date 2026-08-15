@@ -5,6 +5,8 @@
    - Pass the combined verified source list to CrossEvidenceBrain.
    - Keep source URLs visible in the returned Loop 7 package.
 ============================================================ */
+import { loadFootprintSupport }
+from "./FootprintSupport.js";
 
 import {
     loadPublicContentFetcher,
@@ -112,7 +114,16 @@ export async function loadDigitalFootprintBrain({
         };
 
     }
+const footprintPackage =
+await loadFootprintSupport({
+    profileLinks: requestedProfileLinks,
+    currentLoop
+});
 
+console.log(
+    "FOOTPRINT_PACKAGE",
+    footprintPackage
+);
     // --------------------------------------------------
     // STEP 3
     // PLATFORM DETECTION
