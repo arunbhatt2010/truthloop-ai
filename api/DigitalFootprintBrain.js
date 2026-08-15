@@ -413,71 +413,72 @@ function detectPlatform(profileLink = "") {
                 .toLowerCase();
 
         if (hostname.includes("linkedin.com")) return "linkedin";
-if (hostname.includes("facebook.com")) return "facebook";
-if (hostname.includes("instagram.com")) return "instagram";
+        if (hostname.includes("facebook.com")) return "facebook";
+        if (hostname.includes("instagram.com")) return "instagram";
 
-if (
-    hostname.includes("x.com") ||
-    hostname.includes("twitter.com")
-) return "x";
+        if (
+            hostname.includes("x.com") ||
+            hostname.includes("twitter.com")
+        ) return "x";
 
-if (hostname.includes("github.com")) return "github";
+        if (hostname.includes("github.com")) return "github";
 
-if (
-    hostname.includes("youtube.com") ||
-    hostname.includes("youtu.be")
-) return "youtube";
+        if (
+            hostname.includes("youtube.com") ||
+            hostname.includes("youtu.be")
+        ) return "youtube";
 
-if (hostname.includes("medium.com")) return "medium";
+        if (hostname.includes("medium.com")) return "medium";
 
-if (hostname.includes("substack.com")) return "substack";
+        if (hostname.includes("substack.com")) return "substack";
 
-if (hostname.includes("reddit.com")) return "reddit";
+        if (hostname.includes("reddit.com")) return "reddit";
 
-if (hostname.includes("indiehackers.com"))
-    return "indiehackers";
+        if (hostname.includes("indiehackers.com"))
+            return "indiehackers";
 
-if (hostname.includes("producthunt.com"))
-    return "producthunt";
+        if (hostname.includes("producthunt.com"))
+            return "producthunt";
 
-if (hostname.includes("crunchbase.com"))
-    return "crunchbase";
+        if (hostname.includes("crunchbase.com"))
+            return "crunchbase";
 
-if (hostname.includes("behance.net"))
-    return "behance";
+        if (hostname.includes("behance.net"))
+            return "behance";
 
-if (hostname.includes("dribbble.com"))
-    return "dribbble";
+        if (hostname.includes("dribbble.com"))
+            return "dribbble";
 
-if (hostname.includes("threads.net"))
-    return "threads";
+        if (hostname.includes("threads.net"))
+            return "threads";
 
-if (hostname.includes("tiktok.com"))
-    return "tiktok";
+        if (hostname.includes("tiktok.com"))
+            return "tiktok";
 
-if (hostname.includes("pinterest.com"))
-    return "pinterest";
+        if (hostname.includes("pinterest.com"))
+            return "pinterest";
 
-if (hostname.includes("quora.com"))
-    return "quora";
+        if (hostname.includes("quora.com"))
+            return "quora";
 
-if (hostname.includes("dev.to"))
-    return "devto";
+        if (hostname.includes("dev.to"))
+            return "devto";
 
-if (hostname.includes("hashnode.com"))
-    return "hashnode";
+        if (hostname.includes("hashnode.com"))
+            return "hashnode";
 
-if (hostname.includes("gitlab.com"))
-    return "gitlab";
+        if (hostname.includes("gitlab.com"))
+            return "gitlab";
 
-return "website";
-      catch {
+        return "website";
 
-    return "unknown";
+    } catch (error) {
+
+        return "unknown";
 
     }
 
-        }
+}
 async function fetchPublicEvidence(profileLink) {
 
     try {
