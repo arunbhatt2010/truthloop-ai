@@ -2170,17 +2170,15 @@ try {
 const contentLeakWords = [
 
 "template",
-"framework",
+
 "storytelling template",
 "blog outline",
-"linkedin post",
+
 "social media post",
 "marketing copy",
 "email draft",
 "content calendar",
-"step 1",
-"step 2",
-"step 3"
+
 
 ];
 
@@ -2200,7 +2198,10 @@ let avoidanceStyle = "";
 let hiddenAssumption = "";
 
 try{
-
+console.log(
+  "PROFILE_AI_RESPONSE",
+  JSON.stringify(profileData, null, 2)
+);
 const rawProfile =
   profileData?.choices?.[0]?.message?.content || "{}";
 
