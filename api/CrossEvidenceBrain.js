@@ -1474,7 +1474,14 @@ async function CrossEvidencePackageBuilder({
     universalPackage
 
 }) {
-
+console.log(
+    "CONTENT_DISCOVERY_PACKAGE",
+    JSON.stringify(
+        footprintPackage?.contentDiscovery,
+        null,
+        2
+    )
+);
     return {
 
         success: true,
@@ -1484,7 +1491,15 @@ async function CrossEvidencePackageBuilder({
 
         footprint:
             footprintPackage,
-
+contentDiscovery:
+    footprintPackage?.contentDiscovery || {
+        articles: [],
+        posts: [],
+        videos: [],
+        profiles: [],
+        repositories: [],
+        traceability: []
+    },
         findings:
             findingsPackage,
 
