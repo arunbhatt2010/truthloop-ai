@@ -682,8 +682,20 @@ console.log(
   )
 );
     const ledger = [];
+for (const source of mergedEvidence.sources || []) {
 
-    for (const source of mergedEvidence.sources || []) {
+  const visibleText = String(
+    source?.visibleText || ""
+  );
+
+  if (!visibleText.trim()) {
+    continue;
+  }
+
+  console.log(
+    "PROCESSING_SOURCE",
+    visibleText.length
+  );
        console.log(
   "SOURCE_KEYS",
   Object.keys(source || {})
@@ -1115,11 +1127,12 @@ async function EvidenceNormalizer(
     source?.description ||
     null,
 
-  visibleText:
-    source?.visibleText ||
-    source?.text ||
-    source?.content ||
-    "",
+  visibleText: String(
+  source?.visibleText ||
+  source?.text ||
+  source?.content ||
+  ""
+).trim(),
 
   socialLinks:
     Array.isArray(source?.socialLinks)
