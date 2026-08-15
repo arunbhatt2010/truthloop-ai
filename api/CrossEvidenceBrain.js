@@ -650,17 +650,7 @@ console.log(
 // ====================================
 // Evidence Input Builder
 // ====================================
-console.log(
-  "LEDGER_CALL_CHECK",
-  {
-    sources:
-      finalPackage?.sources?.length,
 
-    visibleText:
-      finalPackage?.sources?.[0]
-        ?.visibleText?.length
-  }
-);
 function buildEvidenceLedger(mergedEvidence = {}) {
    console.log(
     "LEDGER_CALL_CHECK",
