@@ -1889,15 +1889,7 @@ ${finalReview}
     ========================= */
 
 
-if (loopLevel === 7) {
 
-  messages = messages.filter(m => {
-    if (m.role !== "assistant") return true;
-
-    return !m.content.includes("?");
-  });
-
-}
     const maxTokens =
   loopLevel === 7 ? 4000 : 120;
 
@@ -2224,7 +2216,35 @@ try {
   console.log("PROFILE RAW:", rawProfile);
 
   const profile = JSON.parse(rawProfile);
+console.log(
+  "PARSED_PROFILE",
+  JSON.stringify(profile, null, 2)
+);
 
+console.log(
+  "PROFILE_KEYS",
+  Object.keys(profile || {})
+);
+
+console.log(
+  "PRIMARY_LOOP",
+  profile.primaryLoop
+);
+
+console.log(
+  "EMOTIONAL_DRIVER",
+  profile.emotionalDriver
+);
+
+console.log(
+  "AVOIDANCE_STYLE",
+  profile.avoidanceStyle
+);
+
+console.log(
+  "HIDDEN_ASSUMPTION",
+  profile.hiddenAssumption
+);
   primaryLoop =
     profile.primaryLoop || "";
 
