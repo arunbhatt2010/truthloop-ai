@@ -613,6 +613,11 @@ function mergeEvidencePackages(packages) {
                     ? pkg.traceability.slice(0, 30)
                     : []
         });
+       console.log(
+  "MERGE_SOURCE_ADDED",
+  merged.sources.length,
+  merged.sources[merged.sources.length - 1]?.sourceUrl
+);
 
         pushUnique("profiles", pkg.profiles);
         pushUnique("posts", pkg.posts);
@@ -622,7 +627,19 @@ function mergeEvidencePackages(packages) {
         pushUnique("publicSignals", pkg.publicSignals);
         pushUnique("traceability", pkg.traceability);
     }
+console.log(
+  "MERGE_FINAL_SOURCE_COUNT",
+  merged.sources?.length
+);
 
+console.log(
+  "MERGE_FINAL_FIRST_SOURCE",
+  JSON.stringify(
+    merged.sources?.[0],
+    null,
+    2
+  )
+);
     return merged;
 }
 
@@ -630,7 +647,19 @@ function mergeEvidencePackages(packages) {
 // Evidence Input Builder
 // ====================================
 function buildEvidenceLedger(mergedEvidence = {}) {
+console.log(
+  "LEDGER_INPUT_SOURCE_COUNT",
+  mergedEvidence?.sources?.length
+);
 
+console.log(
+  "LEDGER_INPUT_FIRST_SOURCE",
+  JSON.stringify(
+    mergedEvidence?.sources?.[0],
+    null,
+    2
+  )
+);
     const ledger = [];
 
     for (const source of mergedEvidence.sources || []) {
@@ -656,7 +685,20 @@ console.log(
             source.sourceUrl ||
             source.canonicalUrl ||
             null;
+console.log(
+  "LEDGER_SOURCE_URL",
+  sourceUrl
+);
 
+console.log(
+  "LEDGER_VISIBLE_TEXT_LENGTH",
+  source.visibleText?.length
+);
+
+console.log(
+  "LEDGER_LINKS_COUNT",
+  source.links?.length
+);
         const sourceId =
             sourceUrl ||
             source.sourceHost ||
