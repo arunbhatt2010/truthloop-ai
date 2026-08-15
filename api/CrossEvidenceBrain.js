@@ -84,6 +84,14 @@ console.log(
         profileLinks
     });
        console.log(
+  "IDENTITY_INPUT",
+  JSON.stringify(
+    urlPackage,
+    null,
+    2
+  )
+);
+       console.log(
   "IDENTITY_PACKAGE",
   JSON.stringify(
     identityPackage,
