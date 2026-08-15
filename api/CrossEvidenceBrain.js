@@ -38,7 +38,10 @@ export async function loadCrossEvidenceBrain({
    truthLoopPackage = {}
 
 } = {}) {
-
+console.log(
+  "PROFILE_LINKS_IN_CROSS_EVIDENCE",
+  profileLinks
+);
     const result = {
 
         success: false,
