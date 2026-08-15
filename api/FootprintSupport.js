@@ -81,38 +81,180 @@ export async function loadFootprintSupport({
 
     const sourceCandidates = [...new Set(normalizedLinks)];
 
+    const contentDiscovery = {
+        articles: [],
+        posts: [],
+        videos: [],
+        profiles: [],
+        repositories: [],
+        traceability: []
+    };
+
+    for (const url of sourceCandidates) {
+
+        const lower = String(url).toLowerCase();
+
+        if (
+            lower.includes("/blog/") ||
+            lower.includes("/article/") ||
+            lower.includes("/articles/") ||
+            lower.includes("/post/")
+        ) {
+            contentDiscovery.articles.push(url);
+        }
+
+        else if (
+            lower.includes("/posts/") ||
+            lower.includes("/activity/") ||
+            lower.includes("/status/")
+        ) {
+            contentDiscovery.posts.push(url);
+        }
+
+        else if (
+            lower.includes("youtube.com/watch") ||
+            lower.includes("/video/") ||
+            lower.includes("/videos/")
+        ) {
+            contentDiscovery.videos.push(url);
+        }
+
+        else if (
+            lower.includes("linkedin.com/") ||
+            lower.includes("x.com/") ||
+            lower.includes("twitter.com/") ||
+            lower.includes("facebook.com/") ||
+            lower.includes("instagram.com/")
+        ) {
+            contentDiscovery.profiles.push(url);
+        }
+
+        else if (
+            lower.includes("github.com/")
+        ) {
+            contentDiscovery.repositories.push(url);
+        }
+
+        contentDiscovery.traceability.push({
+            sourceUrl: primaryLink,
+            discoveredUrl: url
+        });
+    }
+
     return {
-    success: true,
-    stage: "Footprint Support",
-    discoveryReady: true,
+        success: true,
+        stage: "Footprint Support",
+        discoveryReady: true,
 
-    currentLoop,
+        currentLoop,
 
-    profileLink: primaryLink,
-    profileLinks: normalizedLinks,
+        profileLink: primaryLink,
+        profileLinks: normalizedLinks,
 
-    hostname,
-    platform,
+        hostname,
+        platform,
 
-    sourceCandidates,
-
-    discoveredProfiles:
-    sourceCandidates.map(url => ({
-        url,
-        platform: "unknown"
-    })),
-
-    discoveredLinks:
         sourceCandidates,
 
-    discoveryStats: {
-        primarySource: primaryLink,
-        totalInputLinks:
-            normalizedLinks.length,
-        totalCandidates:
-            sourceCandidates.length,
+        contentDiscovery,
+
         discoveredProfiles:
-            sourceCandidates.length
-    }
-};
+            sourceCandidates.map(url => ({
+                url,
+                platform: "unknown"
+            })),
+
+        discoveredLinks:
+            sourceCandidates,
+
+        discoveryStats: {
+            primarySource: primaryLink,
+            totalInputLinks:
+                normalizedLinks.length,
+            totalCandidates:
+                sourceCandidates.length,
+            discoveredProfiles:
+                sourceCandidates.length
+        }
+    };
+
 }
+
+async function discoverContentUrls({
+    sourceUrl,
+    html,
+    visibleText,
+    links = []
+}) {
+
+    const discovered = {
+        articles: [],
+        posts: [],
+        videos: [],
+        profiles: [],
+        repositories: [],
+        traceability: []
+    };
+
+    for (const url of links) {
+
+        const lower = url.toLowerCase();
+
+        // Article / Blog
+        if (
+            lower.includes("/blog/") ||
+            lower.includes("/article/") ||
+            lower.includes("/articles/") ||
+            lower.includes("/post/")
+        ) {
+            discovered.articles.push(url);
+        }
+
+        // Social Posts
+        else if (
+            lower.includes("/posts/") ||
+            lower.includes("/status/") ||
+            lower.includes("/activity/") ||
+            lower.includes("/updates/")
+        ) {
+            discovered.posts.push(url);
+        }
+
+        // Videos
+        else if (
+            lower.includes("youtube.com/watch") ||
+            lower.includes("/video/") ||
+            lower.includes("/videos/")
+        ) {
+            discovered.videos.push(url);
+        }
+
+        // Profiles
+        else if (
+            lower.includes("linkedin.com/in/") ||
+            lower.includes("x.com/") ||
+            lower.includes("twitter.com/") ||
+            lower.includes("instagram.com/") ||
+            lower.includes("facebook.com/")
+        ) {
+            discovered.profiles.push(url);
+        }
+
+        // Repositories
+        else if (
+            lower.includes("github.com/")
+        ) {
+            discovered.repositories.push(url);
+        }
+
+        discovered.traceability.push({
+            sourceUrl,
+            discoveredUrl: url
+        });
+    }
+
+    return {
+        success: true,
+        ...discovered
+    };
+       }
