@@ -1978,17 +1978,17 @@ if (loopLevel === 7) {
 
   data =
     await callProvider(
-      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      "https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent",
       process.env.GEMINI_API_KEY,
       "gemini-2.5-flash",
       {
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         messages: [
           {
             role: "system",
             content: systemPrompt
           },
-          ...messages.slice(-8)
+          ...messages.slice(-30)
         ],
         temperature: 0.7,
         max_tokens: maxTokens
