@@ -1130,6 +1130,17 @@ async function EvidenceNormalizer(
         buildEvidenceLedger({
             sources: normalized.sources
         });
+   console.log(
+  "NORMALIZED_SOURCE_COUNT",
+  normalized.sources.length
+);
+
+normalized.sources.forEach((s, i) => {
+  console.log(
+    `NORMALIZED_SOURCE_${i}`,
+    JSON.stringify(s, null, 2)
+  );
+});
 
     console.log(
         "NORMALIZER_DONE",
