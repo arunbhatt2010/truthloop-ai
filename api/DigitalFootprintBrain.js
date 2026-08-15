@@ -471,6 +471,9 @@ if (hostname.includes("gitlab.com"))
     return "gitlab";
 
 return "website";
+      catch {
+
+    return "unknown";
 
     }
 
