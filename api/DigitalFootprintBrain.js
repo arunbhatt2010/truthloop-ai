@@ -212,13 +212,12 @@ console.log(
     try {
 
         crossEvidence =
-            await loadCrossEvidenceBrain({
+await loadCrossEvidenceBrain({
+    profileLinks:
+        sourceLinks.slice(0,20),
 
-                profileLinks:
-                    sourceLinks.slice(0,20)
-
-            });
-
+    footprintPackage
+});
     } catch (error) {
 
         console.log(
