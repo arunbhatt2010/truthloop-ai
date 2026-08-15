@@ -650,7 +650,34 @@ console.log(
 // ====================================
 // Evidence Input Builder
 // ====================================
+console.log(
+  "LEDGER_CALL_CHECK",
+  {
+    sources:
+      finalPackage?.sources?.length,
+
+    visibleText:
+      finalPackage?.sources?.[0]
+        ?.visibleText?.length
+  }
+);
 function buildEvidenceLedger(mergedEvidence = {}) {
+   console.log(
+    "LEDGER_CALL_CHECK",
+    {
+      sourceCount:
+        mergedEvidence?.sources?.length,
+
+      firstVisibleText:
+        mergedEvidence?.sources?.[0]
+          ?.visibleText?.length
+    }
+  );
+
+  console.log(
+    "LEDGER_INPUT_SOURCE_COUNT",
+    mergedEvidence?.sources?.length
+  );
 console.log(
   "LEDGER_INPUT_SOURCE_COUNT",
   mergedEvidence?.sources?.length
