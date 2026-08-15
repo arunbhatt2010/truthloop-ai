@@ -1576,7 +1576,23 @@ async function ProfileIntelligenceAPI({
         evidenceLedger:
             normalizedEvidence?.evidenceLedger || []
     };
+console.log(
+  "PROFILE_INTELLIGENCE_INPUT",
+  JSON.stringify(
+    normalizedEvidence,
+    null,
+    2
+  )
+);
+   console.log(
+  "PROFILE_INTELLIGENCE_SOURCES_COUNT",
+  normalizedEvidence?.sources?.length || 0
+);
 
+console.log(
+  "PROFILE_INTELLIGENCE_LEDGER_COUNT",
+  normalizedEvidence?.evidenceLedger?.length || 0
+);
     const prompt = `
 You are TruthLoop's Universal Public Evidence Package Generator.
 
@@ -1661,7 +1677,14 @@ ${JSON.stringify(evidenceInput)}
 `;
 
   console.log("CEREBRAS_BEFORE");
-
+console.log(
+  "EVIDENCE_INPUT",
+  JSON.stringify(
+    evidenceInput,
+    null,
+    2
+  )
+);
 const response =
     await fetch(
         "https://api.cerebras.ai/v1/chat/completions",
