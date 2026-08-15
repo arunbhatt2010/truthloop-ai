@@ -979,7 +979,14 @@ async function FootprintDiscoveryBrain(
         "DISCOVERY_PACKAGE",
         result
     );
-
+console.log(
+  "DISCOVERED_PROFILES",
+  JSON.stringify(
+    result.discoveredProfiles,
+    null,
+    2
+  )
+);
     return result;
 
 }
