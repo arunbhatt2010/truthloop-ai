@@ -1888,7 +1888,15 @@ ${finalReview}
        🤖 AI CALL
     ========================= */
 
+if (loopLevel === 7) {
 
+  messages = messages.filter(m => {
+    if (m.role !== "assistant") return true;
+
+    return !m.content.includes("?");
+  });
+
+}
 
     const maxTokens =
   loopLevel === 7 ? 4000 : 120;
