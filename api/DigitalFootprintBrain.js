@@ -412,46 +412,65 @@ function detectPlatform(profileLink = "") {
                 .replace(/^www\./, "")
                 .toLowerCase();
 
-        if (hostname.includes("linkedin.com")) {
-            return "linkedin";
-        }
+        if (hostname.includes("linkedin.com")) return "linkedin";
+if (hostname.includes("facebook.com")) return "facebook";
+if (hostname.includes("instagram.com")) return "instagram";
 
-        if (hostname.includes("facebook.com")) {
-            return "facebook";
-        }
+if (
+    hostname.includes("x.com") ||
+    hostname.includes("twitter.com")
+) return "x";
 
-        if (hostname.includes("instagram.com")) {
-            return "instagram";
-        }
+if (hostname.includes("github.com")) return "github";
 
-        if (
-            hostname.includes("x.com") ||
-            hostname.includes("twitter.com")
-        ) {
-            return "x";
-        }
+if (
+    hostname.includes("youtube.com") ||
+    hostname.includes("youtu.be")
+) return "youtube";
 
-        if (hostname.includes("github.com")) {
-            return "github";
-        }
+if (hostname.includes("medium.com")) return "medium";
 
-        if (hostname.includes("youtube.com")) {
-            return "youtube";
-        }
+if (hostname.includes("substack.com")) return "substack";
 
-        if (hostname.includes("medium.com")) {
-            return "medium";
-        }
+if (hostname.includes("reddit.com")) return "reddit";
 
-        if (hostname.includes("substack.com")) {
-            return "substack";
-        }
+if (hostname.includes("indiehackers.com"))
+    return "indiehackers";
 
-        return "website";
+if (hostname.includes("producthunt.com"))
+    return "producthunt";
 
-    } catch {
+if (hostname.includes("crunchbase.com"))
+    return "crunchbase";
 
-        return "unknown";
+if (hostname.includes("behance.net"))
+    return "behance";
+
+if (hostname.includes("dribbble.com"))
+    return "dribbble";
+
+if (hostname.includes("threads.net"))
+    return "threads";
+
+if (hostname.includes("tiktok.com"))
+    return "tiktok";
+
+if (hostname.includes("pinterest.com"))
+    return "pinterest";
+
+if (hostname.includes("quora.com"))
+    return "quora";
+
+if (hostname.includes("dev.to"))
+    return "devto";
+
+if (hostname.includes("hashnode.com"))
+    return "hashnode";
+
+if (hostname.includes("gitlab.com"))
+    return "gitlab";
+
+return "website";
 
     }
 
@@ -721,14 +740,27 @@ function discoverSocialLinks(
 
         if (
             [
-                "linkedin",
-                "facebook",
-                "instagram",
-                "x",
-                "github",
-                "youtube",
-                "medium",
-                "substack"
+                 "linkedin",
+ "facebook",
+ "instagram",
+ "x",
+ "github",
+ "youtube",
+ "medium",
+ "substack",
+ "reddit",
+ "indiehackers",
+ "producthunt",
+ "crunchbase",
+ "behance",
+ "dribbble",
+ "threads",
+ "tiktok",
+ "pinterest",
+ "quora",
+ "devto",
+ "hashnode",
+ "gitlab"
             ].includes(platform)
         ) {
 
@@ -831,14 +863,27 @@ function extractSocialLinksFromFetchedPackage(
 
         if (
             [
-                "linkedin",
-                "facebook",
-                "instagram",
-                "x",
-                "github",
-                "youtube",
-                "medium",
-                "substack"
+                 "linkedin",
+ "facebook",
+ "instagram",
+ "x",
+ "github",
+ "youtube",
+ "medium",
+ "substack",
+ "reddit",
+ "indiehackers",
+ "producthunt",
+ "crunchbase",
+ "behance",
+ "dribbble",
+ "threads",
+ "tiktok",
+ "pinterest",
+ "quora",
+ "devto",
+ "hashnode",
+ "gitlab"
             ].includes(platform)
             &&
             isLikelyPublicProfileUrl(
