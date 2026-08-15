@@ -920,6 +920,10 @@ identity.identities.push({
   type: "platform",
   value: platform
 });
+     identity.identities.push({
+  type: "profile",
+  value: link
+});
 
   } catch (error) {
 
