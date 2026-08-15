@@ -25,7 +25,7 @@ No Fetching
 No Ranking
 ============================================================
 */
-
+import { loadCrossEvidenceBrain } from "./CrossEvidenceBrain.js";
 import { runMasterBrain }
 from "./masterBrain.js";
 import { loadDigitalFootprintBrain } from "./DigitalFootprintBrain.js";
@@ -564,7 +564,17 @@ await loadDigitalFootprintBrain({
     /* =========================
    PLATFORM CARD
 ========================= */
+const crossEvidencePackage =
+    await loadCrossEvidenceBrain({
+        identityPackage,
+        discoveryPackage: publicEvidencePackage
+    });
 
+console.log(
+    "CROSS_EVIDENCE_PACKAGE",
+    JSON.stringify(crossEvidencePackage, null, 2)
+);
+    
 if (
     publicEvidencePackage?.type === "platformCard"
 ) {
