@@ -566,8 +566,10 @@ await loadDigitalFootprintBrain({
 ========================= */
 const crossEvidencePackage =
     await loadCrossEvidenceBrain({
-        identityPackage,
-        discoveryPackage: publicEvidencePackage
+        profileLinks: profileLink
+            ? [profileLink]
+            : [],
+        truthLoopPackage
     });
 
 console.log(
