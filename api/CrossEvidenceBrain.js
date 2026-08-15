@@ -1025,52 +1025,97 @@ async function EvidenceNormalizer(
             seen.add(key);
 
             normalized.sources.push({
-                sourceUrl,
-                sourcePlatform:
-                    source?.sourcePlatform || "unknown",
-                sourceHost:
-                    source?.sourceHost || null,
-                title:
-                    source?.title || null,
-                description:
-                    source?.description || null,
-                canonicalUrl:
-                    source?.canonicalUrl || null,
-                status:
-                    source?.status || null,
-                contentType:
-                    source?.contentType || null,
-                language:
-                    source?.language || null,
-                headings:
-                    Array.isArray(source?.headings)
-                        ? source.headings.slice(0, 20)
-                        : [],
-                posts:
-                    Array.isArray(source?.posts)
-                        ? source.posts.slice(0, 20)
-                        : [],
-                comments:
-                    Array.isArray(source?.comments)
-                        ? source.comments.slice(0, 20)
-                        : [],
-                articles:
-                    Array.isArray(source?.articles)
-                        ? source.articles.slice(0, 20)
-                        : [],
-                links:
-                    Array.isArray(source?.links)
-                        ? source.links.slice(0, 50)
-                        : [],
-                publicSignals:
-                    Array.isArray(source?.publicSignals)
-                        ? source.publicSignals.slice(0, 30)
-                        : [],
-                traceability:
-                    Array.isArray(source?.traceability)
-                        ? source.traceability.slice(0, 30)
-                        : []
-            });
+
+  sourceUrl,
+
+  sourcePlatform:
+    source?.sourcePlatform ||
+    source?.platform ||
+    "unknown",
+
+  sourceHost:
+    source?.sourceHost ||
+    null,
+
+  title:
+    source?.title ||
+    null,
+
+  description:
+    source?.description ||
+    null,
+
+  visibleText:
+    source?.visibleText ||
+    source?.text ||
+    source?.content ||
+    "",
+
+  socialLinks:
+    Array.isArray(source?.socialLinks)
+      ? source.socialLinks
+      : [],
+
+  contentLength:
+    source?.contentLength ||
+    (
+      source?.visibleText
+      ? source.visibleText.length
+      : 0
+    ),
+
+  canonicalUrl:
+    source?.canonicalUrl ||
+    null,
+
+  status:
+    source?.status ||
+    null,
+
+  contentType:
+    source?.contentType ||
+    null,
+
+  language:
+    source?.language ||
+    null,
+
+  headings:
+    Array.isArray(source?.headings)
+      ? source.headings.slice(0,20)
+      : [],
+
+  posts:
+    Array.isArray(source?.posts)
+      ? source.posts.slice(0,20)
+      : [],
+
+  comments:
+    Array.isArray(source?.comments)
+      ? source.comments.slice(0,20)
+      : [],
+
+  articles:
+    Array.isArray(source?.articles)
+      ? source.articles.slice(0,20)
+      : [],
+
+  links:
+    Array.isArray(source?.links)
+      ? source.links.slice(0,50)
+      : [],
+
+  publicSignals:
+    Array.isArray(source?.publicSignals)
+      ? source.publicSignals.slice(0,30)
+      : [],
+
+  traceability:
+    Array.isArray(source?.traceability)
+      ? source.traceability.slice(0,30)
+      : []
+
+});
 
             if (
                 sourceUrl &&
