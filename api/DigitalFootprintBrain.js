@@ -315,7 +315,8 @@ console.log(
     packageType: "DigitalFootprintPackage",
     profileLink: primaryProfileLink,
     profileLinks: requestedProfileLinks,
-    sourceLinks,
+    footprintPackage,
+   sourceLinks,
     platform,
     loop7EvidencePackage,
 
