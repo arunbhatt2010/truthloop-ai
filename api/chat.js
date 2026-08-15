@@ -519,31 +519,36 @@ if (
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
 
-    truthLoopPackage,
-
     profileLink,
+
+    profileLinks: profileLink
+        ? [profileLink]
+        : [],
+
+    truthLoopPackage,
 
     identityPackage,
 
     currentLoop: 7
 
 });
-    alert(
-    "Reached DFB\n" +
-    "loopLevel = " + loopLevel +
-    "\nprofileLink = " + profileLink +
-    "\nidentity = " + !!identityPackage
-);
-    alert(
-    "DFB returned\n" +
-    "success = " + publicEvidencePackage?.success +
-    "\nstage = " + publicEvidencePackage?.stage +
-    "\nreason = " + publicEvidencePackage?.reason
-);
+    
     /* =========================
    PLATFORM CARD
 ========================= */
+const crossEvidencePackage =
+    await loadCrossEvidenceBrain({
+        profileLinks: profileLink
+            ? [profileLink]
+            : [],
+        truthLoopPackage
+    });
 
+console.log(
+    "CROSS_EVIDENCE_PACKAGE",
+    JSON.stringify(crossEvidencePackage, null, 2)
+);
+    
 if (
     publicEvidencePackage?.type === "platformCard"
 ) {
@@ -572,15 +577,29 @@ console.log(
     JSON.stringify(publicEvidencePackage, null, 2)
 );
     console.log(
-    "PUBLIC_EVIDENCE_EXISTS",
-    publicEvidencePackage ? "YES" : "NO"
+  "PUBLIC_EVIDENCE_EXISTS",
+  publicEvidencePackage?.success ? "YES" : "NO"
 );
 
+console.log(
+  "PUBLIC_EVIDENCE_SUCCESS",
+  publicEvidencePackage?.success
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_STAGE",
+  publicEvidencePackage?.stage
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_REASON",
+  publicEvidencePackage?.reason
+);
 if (publicEvidencePackage) {
-    console.log(
+   /* console.log(
         "PUBLIC_EVIDENCE_KEYS",
         Object.keys(publicEvidencePackage)
-    );
+    );*/
 }
   } catch (e) {
 
@@ -593,6 +612,11 @@ if (publicEvidencePackage) {
   }
 
           }
+    const profileLinks = Array.isArray(profileLink)
+  ? profileLink
+  : profileLink?.trim()
+    ? [profileLink.trim()]
+    : [];
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
