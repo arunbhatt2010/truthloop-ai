@@ -2197,46 +2197,73 @@ let emotionalDriver = "";
 let avoidanceStyle = "";
 let hiddenAssumption = "";
 
-try{
-console.log(
-  "PROFILE_AI_RESPONSE",
-  JSON.stringify(profileData, null, 2)
-);
-const rawProfile =
-  profileData?.choices?.[0]?.message?.content || "{}";
+try {
 
-console.log("PROFILE RAW:", rawProfile);
+  console.log(
+    "PROFILE_AI_RESPONSE",
+    JSON.stringify(profileData, null, 2)
+  );
 
-const profile = JSON.parse(rawProfile);
+  console.log(
+    "PROFILE_DATA_KEYS",
+    profileData ? Object.keys(profileData) : null
+  );
 
-primaryLoop =
-profile.primaryLoop || "";
+  console.log(
+    "PROFILE_MESSAGE_CONTENT",
+    profileData?.choices?.[0]?.message?.content
+  );
 
-emotionalDriver =
-profile.emotionalDriver &&
-profile.emotionalDriver !== "unknown"
-? profile.emotionalDriver
-: "";
+  const rawProfile =
+    profileData?.choices?.[0]?.message?.content ||
+    profileData?.content ||
+    profileData?.text ||
+    profileData?.response ||
+    "{}";
 
-avoidanceStyle =
-profile.avoidanceStyle &&
-profile.avoidanceStyle !== "unknown"
-? profile.avoidanceStyle
-: "";
+  console.log("PROFILE RAW:", rawProfile);
 
-hiddenAssumption =
-profile.hiddenAssumption &&
-profile.hiddenAssumption !== "unknown"
-? profile.hiddenAssumption
-: "";
-}catch(e){
+  const profile = JSON.parse(rawProfile);
 
-primaryLoop = "";
-emotionalDriver = "";
-avoidanceStyle = "";
-hiddenAssumption = "";
+  primaryLoop =
+    profile.primaryLoop || "";
 
-  }
+  emotionalDriver =
+    profile.emotionalDriver &&
+    profile.emotionalDriver !== "unknown"
+      ? profile.emotionalDriver
+      : "";
+
+  avoidanceStyle =
+    profile.avoidanceStyle &&
+    profile.avoidanceStyle !== "unknown"
+      ? profile.avoidanceStyle
+      : "";
+
+  hiddenAssumption =
+    profile.hiddenAssumption &&
+    profile.hiddenAssumption !== "unknown"
+      ? profile.hiddenAssumption
+      : "";
+
+} catch (e) {
+
+  console.error(
+    "PROFILE_PARSE_ERROR",
+    e
+  );
+
+  console.log(
+    "PROFILE_DATA_AT_FAILURE",
+    JSON.stringify(profileData, null, 2)
+  );
+
+  primaryLoop = "";
+  emotionalDriver = "";
+  avoidanceStyle = "";
+  hiddenAssumption = "";
+
+}
     /* =========================
        ✂️ CLEANER
     ========================= */
