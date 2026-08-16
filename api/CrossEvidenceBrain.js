@@ -692,6 +692,13 @@ console.log(
         if (source.title) {
             addEvidence("title", source.title, 0);
         }
+       if (source.visibleText) {
+    addEvidence(
+        "visibleText",
+        source.visibleText.slice(0, 5000),
+        0
+    );
+       }
 
         (source.headings || [])
             .slice(0, 15)
