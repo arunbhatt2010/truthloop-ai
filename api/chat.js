@@ -907,14 +907,12 @@ Interpret only patterns that appear consistently across multiple verified public
 
 If verified public evidence is unavailable, omit this section completely.
 Conversation Evidence
-
-${JSON.stringify(investigationPackage, null, 2)}
-
 Verified Universal Evidence Package
 
 ${crossEvidencePackage
-    ? "AVAILABLE"
-    : "NOT AVAILABLE"}
+ ? JSON.stringify(crossEvidencePackage, null, 2)
+ : "NOT AVAILABLE"}
+
 🔍 CROSS EVIDENCE
 
 Purpose
