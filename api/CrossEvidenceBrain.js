@@ -631,6 +631,9 @@ function mergeEvidencePackages(packages) {
 // ====================================
 function buildEvidenceLedger(mergedEvidence = {}) {
    console.log(
+  "LEDGER_ENTER"
+);
+   console.log(
     "LEDGER_FUNCTION_ENTERED",
     !!sources,
     Array.isArray(sources),
