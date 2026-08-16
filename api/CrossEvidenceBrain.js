@@ -539,117 +539,131 @@ function mergeEvidencePackages(packages) {
 
     if (!pkg?.success) continue;
 
-    const source =
-        Array.isArray(pkg.sources) &&
-        pkg.sources.length > 0
-            ? pkg.sources[0]
-            : pkg;
+    const sources =
+        Array.isArray(pkg.sources) && pkg.sources.length
+            ? pkg.sources
+            : [pkg];
 
-    merged.sources.push({
+    for (const source of sources) {
 
-        sourceUrl:
-            source.sourceUrl ||
-            pkg.sourceUrl ||
-            pkg.url ||
-            null,
+        merged.sources.push({
 
-        sourcePlatform:
-            source.platform ||
-            pkg.sourcePlatform ||
-            "unknown",
+            sourceUrl:
+                source.sourceUrl ||
+                pkg.sourceUrl ||
+                pkg.url ||
+                null,
 
-        sourceHost:
-            pkg.sourceHost ||
-            null,
+            sourcePlatform:
+                source.platform ||
+                source.sourcePlatform ||
+                pkg.sourcePlatform ||
+                "unknown",
 
-        title:
-            source.title ||
-            pkg.title ||
-            null,
+            sourceHost:
+                source.sourceHost ||
+                pkg.sourceHost ||
+                (() => {
+                    try {
+                        return source.sourceUrl
+                            ? new URL(source.sourceUrl).hostname
+                            : null;
+                    } catch {
+                        return null;
+                    }
+                })(),
 
-        description:
-            source.description ||
-            pkg.description ||
-            null,
+            title:
+                source.title ||
+                pkg.title ||
+                null,
 
-        visibleText:
-            source.visibleText ||
-            "",
+            description:
+                source.description ||
+                pkg.description ||
+                null,
 
-        socialLinks:
-            Array.isArray(source.socialLinks)
-                ? source.socialLinks.slice(0, 50)
-                : [],
+            visibleText:
+                source.visibleText ||
+                "",
 
-        contentLength:
-            source.contentLength ||
-            0,
+            socialLinks:
+                Array.isArray(source.socialLinks)
+                    ? source.socialLinks.slice(0, 50)
+                    : [],
 
-        canonicalUrl:
-            source.canonicalUrl ||
-            pkg.canonicalUrl ||
-            null,
+            contentLength:
+                source.contentLength ||
+                source.visibleText?.length ||
+                0,
 
-        status:
-            source.status ||
-            pkg.status ||
-            null,
+            canonicalUrl:
+                source.canonicalUrl ||
+                pkg.canonicalUrl ||
+                null,
 
-        contentType:
-            source.contentType ||
-            pkg.contentType ||
-            null,
+            status:
+                source.status ||
+                pkg.status ||
+                null,
 
-        language:
-            source.language ||
-            pkg.language ||
-            null,
+            contentType:
+                source.contentType ||
+                pkg.contentType ||
+                null,
 
-        headings:
-            Array.isArray(source.headings)
-                ? source.headings.slice(0, 20)
-                : [],
+            language:
+                source.language ||
+                pkg.language ||
+                null,
 
-        posts:
-            Array.isArray(source.posts)
-                ? source.posts.slice(0, 20)
-                : [],
+            headings:
+                Array.isArray(source.headings)
+                    ? source.headings.slice(0, 20)
+                    : [],
 
-        comments:
-            Array.isArray(source.comments)
-                ? source.comments.slice(0, 20)
-                : [],
+            posts:
+                Array.isArray(source.posts)
+                    ? source.posts.slice(0, 20)
+                    : [],
 
-        articles:
-            Array.isArray(source.articles)
-                ? source.articles.slice(0, 20)
-                : [],
+            comments:
+                Array.isArray(source.comments)
+                    ? source.comments.slice(0, 20)
+                    : [],
 
-        links:
-            Array.isArray(source.links)
-                ? source.links.slice(0, 50)
-                : [],
+            articles:
+                Array.isArray(source.articles)
+                    ? source.articles.slice(0, 20)
+                    : [],
 
-        publicSignals:
-            Array.isArray(source.publicSignals)
-                ? source.publicSignals.slice(0, 30)
-                : [],
+            links:
+                Array.isArray(source.links)
+                    ? source.links.slice(0, 50)
+                    : [],
 
-        traceability:
-            Array.isArray(source.traceability)
-                ? source.traceability.slice(0, 30)
-                : []
-    });
-        pushUnique("profiles", pkg.profiles);
-        pushUnique("posts", pkg.posts);
-        pushUnique("comments", pkg.comments);
-        pushUnique("articles", pkg.articles);
-        pushUnique("links", pkg.links);
-        pushUnique("publicSignals", pkg.publicSignals);
-        pushUnique("traceability", pkg.traceability);
+            publicSignals:
+                Array.isArray(source.publicSignals)
+                    ? source.publicSignals.slice(0, 30)
+                    : [],
+
+            traceability:
+                Array.isArray(source.traceability)
+                    ? source.traceability.slice(0, 30)
+                    : []
+        });
     }
 
-    return merged;
+    pushUnique("profiles", pkg.profiles);
+    pushUnique("posts", pkg.posts);
+    pushUnique("comments", pkg.comments);
+    pushUnique("articles", pkg.articles);
+    pushUnique("links", pkg.links);
+    pushUnique("publicSignals", pkg.publicSignals);
+    pushUnique("traceability", pkg.traceability);
+}
+
+return merged;
 }
 
 // ====================================
