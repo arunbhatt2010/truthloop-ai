@@ -765,12 +765,13 @@ console.log(
     "FINAL_LEDGER_SAMPLE",
     ledger.slice(0, 3)
 );
-    return ledger.slice(0, 80);
-}
-console.log(
+   console.log(
   "LEDGER_DONE",
   ledger.length
 );
+    return ledger.slice(0, 80);
+}
+
 // ====================================
 // Identity Extraction Brain
 // ====================================
