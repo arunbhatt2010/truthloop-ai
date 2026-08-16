@@ -1995,6 +1995,17 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 }
+      console.log(
+"FINAL_RESPONSE",
+JSON.stringify({
+analysis,
+question,
+reply,
+platformCard,
+loopCompleted:
+loopLevel === 6 ? 6 : undefined
+}, null, 2)
+);
 console.log("FINAL RETURN REACHED");
 return res.status(200).json({
 analysis,
