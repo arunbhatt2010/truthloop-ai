@@ -908,7 +908,15 @@ Interpret only patterns that appear consistently across multiple verified public
 If verified public evidence is unavailable, omit this section completely.
 Conversation Evidence
 Verified Universal Evidence Package
+Verified Universal Evidence Package
 
+${publicEvidencePackage?.universalPackage
+ ? JSON.stringify(
+     publicEvidencePackage.universalPackage,
+     null,
+     2
+   )
+ : "NOT AVAILABLE"}
 
 🔍 CROSS EVIDENCE
 
