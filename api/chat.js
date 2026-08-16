@@ -906,7 +906,15 @@ Keep every observation concise.
 Interpret only patterns that appear consistently across multiple verified public signals, not isolated observations.
 
 If verified public evidence is unavailable, omit this section completely.
+Conversation Evidence
 
+${JSON.stringify(investigationPackage, null, 2)}
+
+Verified Universal Evidence Package
+
+${crossEvidencePackage
+ ? JSON.stringify(crossEvidencePackage, null, 2)
+ : "Not available"}
 🔍 CROSS EVIDENCE
 
 Purpose
