@@ -1788,6 +1788,15 @@ try {
 
       }
     let reply =
+        console.log(
+"RAW_REPLY_LENGTH",
+data?.choices?.[0]?.message?.content?.length || 0
+);
+
+console.log(
+"RAW_REPLY",
+data?.choices?.[0]?.message?.content
+);
     data?.choices?.[0]?.message?.content || "";
 
 console.log("===== RAW AI REPLY =====");
