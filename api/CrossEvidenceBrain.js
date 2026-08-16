@@ -403,6 +403,7 @@ console.log(
                 rawPackage,
                 extractedPackage
             );
+       const publicContentPackage = finalPackage;
        console.log(
   "FINAL_PACKAGE_KEYS",
   Object.keys(finalPackage || {})
