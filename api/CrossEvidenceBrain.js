@@ -506,20 +506,20 @@ console.log(
 
     } catch (error) {
 
-        console.error(
-            "COLLECT_SOURCE_EVIDENCE_ERROR",
-            error
-        );
+    console.error(
+        "COLLECT_SOURCE_EVIDENCE_ERROR",
+        {
+            message: error?.message,
+            stack: error?.stack,
+            name: error?.name
+        }
+    );
 
-        return {
-
-            success: false,
-
-            reason: error.message
-
-        };
-
-    }
+    return {
+        success: false,
+        reason: error?.message
+    };
+}
 
 }
 function mergeEvidencePackages(packages) {
