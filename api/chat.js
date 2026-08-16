@@ -1614,7 +1614,7 @@ if (loopLevel === 7) {
 
 }
     const maxTokens =
-  loopLevel === 7 ? 900 : 220;
+  loopLevel === 7 ? 1800 : 220;
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -1628,7 +1628,7 @@ if (loopLevel === 7) {
 
         body: JSON.stringify({
 
-          model:"llama-3.3-70b-versatile",
+          model:"openai/gpt-oss-120b",
 
           messages: [
   {
@@ -1636,7 +1636,7 @@ if (loopLevel === 7) {
     content: systemPrompt
   },
   ...(loopLevel === 7
-      ? messages.slice(-8)
+      ? messages.slice(-16)
       : messages.slice(-2))
 ],
 
@@ -1680,7 +1680,7 @@ Authorization:
 "Bearer " + process.env.GROQ_API_KEY
 },
 body:JSON.stringify({
-model:"llama-3.1-8b-instant",
+model:"qwen/qwen3-27b",
 messages:[
 {
 role:"system",
