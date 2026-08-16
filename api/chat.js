@@ -913,8 +913,8 @@ ${JSON.stringify(investigationPackage, null, 2)}
 Verified Universal Evidence Package
 
 ${crossEvidencePackage
- ? JSON.stringify(crossEvidencePackage, null, 2)
- : "Not available"}
+    ? "AVAILABLE"
+    : "NOT AVAILABLE"}
 🔍 CROSS EVIDENCE
 
 Purpose
