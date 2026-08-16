@@ -1667,7 +1667,7 @@ console.log(
     content: systemPrompt
   },
   ...(loopLevel === 7
-      ? messages.slice(-16)
+      ? messages.slice(-9)
       : messages.slice(-2))
 ],
 
