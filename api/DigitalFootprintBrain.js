@@ -319,8 +319,8 @@ await loadCrossEvidenceBrain({
     platform,
     loop7EvidencePackage,
 
-   // universalPackage:
-        //crossEvidence?.universalPackage || null,
+   universalPackage:
+        crossEvidence?.universalPackage || null,
 
     generatedAt: new Date().toISOString()
 };
