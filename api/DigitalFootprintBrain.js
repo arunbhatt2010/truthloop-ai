@@ -509,7 +509,25 @@ async function fetchPublicEvidence(profileLink) {
             extractPublicContent(
                 cleanPackage
             );
+console.log(
+   "RAW_PACKAGE",
+   JSON.stringify(rawPackage,null,2)
+);
 
+console.log(
+   "VALIDATED_PACKAGE",
+   JSON.stringify(validatedPackage,null,2)
+);
+
+console.log(
+   "CLEAN_PACKAGE",
+   JSON.stringify(cleanPackage,null,2)
+);
+
+console.log(
+   "EXTRACTED_PACKAGE",
+   JSON.stringify(extractedPackage,null,2)
+);
         /*
          * IMPORTANT:
          * buildPublicContentPackage() intentionally keeps the final
