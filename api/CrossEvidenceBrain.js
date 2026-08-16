@@ -408,6 +408,20 @@ console.log(
   Object.keys(finalPackage || {})
 );
        console.log(
+    "VISIBLE_TEXT_LENGTH",
+    publicContentPackage?.visibleText?.length || 0
+);
+
+console.log(
+    "SOCIAL_LINK_COUNT",
+    publicContentPackage?.socialLinks?.length || 0
+);
+
+console.log(
+    "PUBLIC_CONTENT_PREVIEW",
+    publicContentPackage?.visibleText?.slice(0,500)
+);
+       console.log(
   "FIRST_SOURCE",
   JSON.stringify(
     finalPackage?.sources?.[0],
