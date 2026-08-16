@@ -658,6 +658,10 @@ console.log(
 );
     for (const source of mergedEvidence.sources || []) {
        console.log(
+  "LEDGER_LOOP_START",
+  source.sourceUrl
+);
+       console.log(
   "SOURCE_KEYS",
   Object.keys(source || {})
 );
@@ -691,7 +695,12 @@ console.log(
                 value === null ||
                 value === undefined ||
                 String(value).trim() === ""
-            ) {
+            )
+            console.log(
+  "LEDGER_LOOP_END",
+  source.sourceUrl
+);
+            {
                 return;
             }
 
@@ -758,7 +767,10 @@ console.log(
 );
     return ledger.slice(0, 80);
 }
-
+console.log(
+  "LEDGER_DONE",
+  ledger.length
+);
 // ====================================
 // Identity Extraction Brain
 // ====================================
