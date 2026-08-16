@@ -537,83 +537,109 @@ function mergeEvidencePackages(packages) {
 
     for (const pkg of packages || []) {
 
-        if (!pkg?.success) continue;
+    if (!pkg?.success) continue;
 
-        merged.sources.push({
+    const source =
+        Array.isArray(pkg.sources) &&
+        pkg.sources.length > 0
+            ? pkg.sources[0]
+            : pkg;
 
-            sourceUrl:
-                pkg.sourceUrl ||
-                pkg.url ||
-                null,
+    merged.sources.push({
 
-            sourcePlatform:
-                pkg.sourcePlatform ||
-                "unknown",
+        sourceUrl:
+            source.sourceUrl ||
+            pkg.sourceUrl ||
+            pkg.url ||
+            null,
 
-            sourceHost:
-                pkg.sourceHost ||
-                null,
+        sourcePlatform:
+            source.platform ||
+            pkg.sourcePlatform ||
+            "unknown",
 
-            title:
-                pkg.title ||
-                null,
+        sourceHost:
+            pkg.sourceHost ||
+            null,
 
-            description:
-                pkg.description ||
-                null,
+        title:
+            source.title ||
+            pkg.title ||
+            null,
 
-            canonicalUrl:
-                pkg.canonicalUrl ||
-                null,
+        description:
+            source.description ||
+            pkg.description ||
+            null,
 
-            status:
-                pkg.status ||
-                null,
+        visibleText:
+            source.visibleText ||
+            "",
 
-            contentType:
-                pkg.contentType ||
-                null,
+        socialLinks:
+            Array.isArray(source.socialLinks)
+                ? source.socialLinks.slice(0, 50)
+                : [],
 
-            language:
-                pkg.language ||
-                null,
+        contentLength:
+            source.contentLength ||
+            0,
 
-            headings:
-                Array.isArray(pkg.headings)
-                    ? pkg.headings.slice(0, 20)
-                    : [],
+        canonicalUrl:
+            source.canonicalUrl ||
+            pkg.canonicalUrl ||
+            null,
 
-            posts:
-                Array.isArray(pkg.posts)
-                    ? pkg.posts.slice(0, 20)
-                    : [],
+        status:
+            source.status ||
+            pkg.status ||
+            null,
 
-            comments:
-                Array.isArray(pkg.comments)
-                    ? pkg.comments.slice(0, 20)
-                    : [],
+        contentType:
+            source.contentType ||
+            pkg.contentType ||
+            null,
 
-            articles:
-                Array.isArray(pkg.articles)
-                    ? pkg.articles.slice(0, 20)
-                    : [],
+        language:
+            source.language ||
+            pkg.language ||
+            null,
 
-            links:
-                Array.isArray(pkg.links)
-                    ? pkg.links.slice(0, 50)
-                    : [],
+        headings:
+            Array.isArray(source.headings)
+                ? source.headings.slice(0, 20)
+                : [],
 
-            publicSignals:
-                Array.isArray(pkg.publicSignals)
-                    ? pkg.publicSignals.slice(0, 30)
-                    : [],
+        posts:
+            Array.isArray(source.posts)
+                ? source.posts.slice(0, 20)
+                : [],
 
-            traceability:
-                Array.isArray(pkg.traceability)
-                    ? pkg.traceability.slice(0, 30)
-                    : []
-        });
+        comments:
+            Array.isArray(source.comments)
+                ? source.comments.slice(0, 20)
+                : [],
 
+        articles:
+            Array.isArray(source.articles)
+                ? source.articles.slice(0, 20)
+                : [],
+
+        links:
+            Array.isArray(source.links)
+                ? source.links.slice(0, 50)
+                : [],
+
+        publicSignals:
+            Array.isArray(source.publicSignals)
+                ? source.publicSignals.slice(0, 30)
+                : [],
+
+        traceability:
+            Array.isArray(source.traceability)
+                ? source.traceability.slice(0, 30)
+                : []
+    });
         pushUnique("profiles", pkg.profiles);
         pushUnique("posts", pkg.posts);
         pushUnique("comments", pkg.comments);
