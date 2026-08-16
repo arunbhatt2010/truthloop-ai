@@ -169,7 +169,7 @@ export function extractPublicContent(
     };
 }
 
-function buildPublicContentPackage(
+export function buildPublicContentPackage(
     rawPackage = {},
     extractedPackage = {}
 ) {
