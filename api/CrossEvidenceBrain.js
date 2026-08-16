@@ -691,35 +691,29 @@ console.log(
 
         const addEvidence = (type, value, index) => {
 
-            if (
-                value === null ||
-                value === undefined ||
-                String(value).trim() === ""
-            )
-            console.log(
-  "LEDGER_LOOP_END",
-  source.sourceUrl
-);
-            {
-                return;
-            }
+  if (
+    value === null ||
+    value === undefined ||
+    String(value).trim() === ""
+  ) {
+    return;
+  }
 
-            const evidence =
-                String(value)
-                    .replace(/\s+/g, " ")
-                    .trim();
+  const evidence = String(value)
+    .replace(/\s+/g, " ")
+    .trim();
 
-            if (!evidence) return;
+  if (!evidence) return;
 
-            ledger.push({
-                id: `${sourceId}#${type}-${index + 1}`,
-                sourceUrl,
-                sourcePlatform:
-                    source.sourcePlatform || "unknown",
-                sourceType: type,
-                evidence: evidence.slice(0, 700)
-            });
-        };
+  ledger.push({
+    id: `${sourceId}#${type}-${index + 1}`,
+    sourceUrl,
+    sourcePlatform:
+      source.sourcePlatform || "unknown",
+    sourceType: type,
+    evidence: evidence.slice(0, 700)
+  });
+};
 
         if (source.title) {
             addEvidence("title", source.title, 0);
@@ -755,6 +749,11 @@ console.log(
                 (item, index) =>
                     addEvidence("article", item, index)
             );
+       console.log(
+    "LEDGER_LOOP_END",
+    source.sourceUrl,
+    ledger.length
+  );
     }
 console.log(
     "FINAL_LEDGER_COUNT",
