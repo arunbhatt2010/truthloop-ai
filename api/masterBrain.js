@@ -1658,18 +1658,7 @@ const loop7 = isFinalLoop
 ========================= */
 
 export function runMasterBrain(text) {
-if (
-   memory?.currentLoop >= 7 &&
-   memory?.loop7BridgeRendered
-) {
 
-   return {
-      currentLoop: 7,
-      render: "loop7-bridge",
-      skipQuestionGeneration: true
-   };
-
-}
   const environment =
     detectEnvironment(text);
 const selectedBrain =
