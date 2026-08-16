@@ -668,9 +668,7 @@ Use:
 
 • Verified Universal Evidence Package (optional)
 
-${publicEvidencePackage
-? JSON.stringify(publicEvidencePackage, null, 2)
-: "Not available"}
+
 
 Current profile link:
 ${profileLink}
