@@ -1616,6 +1616,20 @@ if (loopLevel === 7) {
     const maxTokens =
   loopLevel === 7 ? 1800 : 220;
       console.log(
+  "PUBLIC_EVIDENCE_CHARS",
+  JSON.stringify(publicEvidence || {}).length
+);
+
+console.log(
+  "EVIDENCE_PACKAGE_CHARS",
+  JSON.stringify(evidencePackage || {}).length
+);
+
+console.log(
+  "COMPRESSED_CONTEXT_CHARS",
+  JSON.stringify(compressedContext || {}).length
+);
+      console.log(
   "SYSTEM_PROMPT_CHARS",
   systemPrompt?.length || 0
 );
