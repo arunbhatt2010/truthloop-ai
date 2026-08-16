@@ -142,6 +142,14 @@ console.log(
                 result.evidencePackages
             );
        console.log(
+    "ALL_EVIDENCE_PACKAGES",
+    JSON.stringify(
+        result.evidencePackages,
+        null,
+        2
+    )
+);
+       console.log(
     "AFTER_MERGE_EVIDENCE"
 );
 console.log("STEP_1_MERGE_DONE");
@@ -536,7 +544,10 @@ function mergeEvidencePackages(packages) {
     };
 
     for (const pkg of packages || []) {
-
+console.log(
+    "MERGE_PKG",
+    JSON.stringify(pkg, null, 2)
+);
     if (!pkg?.success) continue;
 
     const sources =
@@ -545,7 +556,10 @@ function mergeEvidencePackages(packages) {
             : [pkg];
 
     for (const source of sources) {
-
+console.log(
+    "MERGE_SOURCE",
+    JSON.stringify(source, null, 2)
+);
         merged.sources.push({
 
             sourceUrl:
