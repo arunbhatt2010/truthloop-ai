@@ -128,9 +128,49 @@ export function extractPublicContent(html = "") {
     };
 }
 
-export function buildPublicContentPackage(data = {}) {
+function buildPublicContentPackage(
+    rawPackage = {},
+    extractedPackage = {}
+) {
+    const source =
+        rawPackage?.sources?.[0] || {};
+
     return {
         success: true,
-        ...data
+
+        title:
+            extractedPackage?.title ||
+            source?.title ||
+            "",
+
+        description:
+            extractedPackage?.description ||
+            source?.description ||
+            "",
+
+        visibleText:
+            extractedPackage?.visibleText ||
+            source?.visibleText ||
+            "",
+
+        socialLinks:
+            extractedPackage?.socialLinks ||
+            source?.socialLinks ||
+            [],
+
+        links:
+            source?.links || [],
+
+        headings:
+            source?.headings || [],
+
+        posts:
+            source?.posts || [],
+
+        articles:
+            source?.articles || [],
+
+        sources:
+            rawPackage?.sources || []
     };
-}
+        }
