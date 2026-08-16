@@ -1995,18 +1995,13 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 }
-      console.log(
-"FINAL_RESPONSE",
-JSON.stringify({
-analysis,
-question,
-reply,
-platformCard,
-loopCompleted:
-loopLevel === 6 ? 6 : undefined
-}, null, 2)
-);
+      console.log("ANALYSIS_TYPE", typeof analysis);
+console.log("QUESTION_TYPE", typeof question);
+console.log("REPLY_TYPE", typeof reply);
+console.log("PLATFORMCARD_TYPE", typeof platformCard);
+
 console.log("FINAL RETURN REACHED");
+
 return res.status(200).json({
 analysis,
 question,
