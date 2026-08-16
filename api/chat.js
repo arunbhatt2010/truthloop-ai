@@ -519,31 +519,36 @@ if (
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
 
-    truthLoopPackage,
-
     profileLink,
+
+    profileLinks: profileLink
+        ? [profileLink]
+        : [],
+
+    truthLoopPackage,
 
     identityPackage,
 
     currentLoop: 7
 
 });
-    alert(
-    "Reached DFB\n" +
-    "loopLevel = " + loopLevel +
-    "\nprofileLink = " + profileLink +
-    "\nidentity = " + !!identityPackage
-);
-    alert(
-    "DFB returned\n" +
-    "success = " + publicEvidencePackage?.success +
-    "\nstage = " + publicEvidencePackage?.stage +
-    "\nreason = " + publicEvidencePackage?.reason
-);
+    
     /* =========================
    PLATFORM CARD
 ========================= */
+const crossEvidencePackage =
+    await loadCrossEvidenceBrain({
+        profileLinks: profileLink
+            ? [profileLink]
+            : [],
+        truthLoopPackage
+    });
 
+console.log(
+    "CROSS_EVIDENCE_PACKAGE",
+    JSON.stringify(crossEvidencePackage, null, 2)
+);
+    
 if (
     publicEvidencePackage?.type === "platformCard"
 ) {
@@ -572,15 +577,29 @@ console.log(
     JSON.stringify(publicEvidencePackage, null, 2)
 );
     console.log(
-    "PUBLIC_EVIDENCE_EXISTS",
-    publicEvidencePackage ? "YES" : "NO"
+  "PUBLIC_EVIDENCE_EXISTS",
+  publicEvidencePackage?.success ? "YES" : "NO"
 );
 
+console.log(
+  "PUBLIC_EVIDENCE_SUCCESS",
+  publicEvidencePackage?.success
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_STAGE",
+  publicEvidencePackage?.stage
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_REASON",
+  publicEvidencePackage?.reason
+);
 if (publicEvidencePackage) {
-    console.log(
+   /* console.log(
         "PUBLIC_EVIDENCE_KEYS",
         Object.keys(publicEvidencePackage)
-    );
+    );*/
 }
   } catch (e) {
 
@@ -593,6 +612,11 @@ if (publicEvidencePackage) {
   }
 
           }
+    const profileLinks = Array.isArray(profileLink)
+  ? profileLink
+  : profileLink?.trim()
+    ? [profileLink.trim()]
+    : [];
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
@@ -1607,66 +1631,181 @@ ${finalReview}
     /******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
+const maxTokens =
+  loopLevel === 7 ? 4000 : 220;
 
+    /*
+     * LOOP 7 PROVIDER SEPARATION
+     * Loops 1-6 stay on Groq.
+     * Loop 7 uses Cerebras only.
+     */
+    const isLoop7 = loopLevel === 7;
+
+    const aiEndpoint = isLoop7
+      ? "https://api.cerebras.ai/v1/chat/completions"
+      : "https://api.groq.com/openai/v1/chat/completions";
+
+    const aiApiKey = isLoop7
+      ? process.env.CEREBRAS_API_KEY
+      : process.env.GROQ_API_KEY;
+
+    const aiModel = isLoop7
+      ? "gpt-oss-120b"
+      : "llama-3.3-70b-versatile";
+console.log(
+  "GEMINI_KEY_EXISTS",
+  !!process.env.GEMINI_API_KEY
+);
+    if (isLoop7 && !process.env.CEREBRAS_API_KEY) {
+      console.error("CEREBRAS_CONFIG_ERROR: CEREBRAS_API_KEY is missing");
+
+      return res.status(500).json({
+        reply: "Loop 7 AI service is not configured."
+      });
+    }
+async function callProvider(
+  endpoint,
+  apiKey,
+  model,
+  body
+) {
+
+  const response = await fetch(
+    endpoint,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + apiKey
+      },
+
+      body: JSON.stringify(body)
+    }
+  );
+
+  if (!response.ok) {
+
+  const errorBody =
+    await response.text();
+
+  console.log(
+    "PROVIDER_FAILED",
+    model,
+    response.status
+  );
+
+  console.log(
+    "PROVIDER_ERROR_BODY",
+    errorBody
+  );
+
+  return null;
+}
+  return await response.json();
+
+  }
+    let data = null;
 if (loopLevel === 7) {
 
-  messages = messages.filter(m => {
-    if (m.role !== "assistant") return true;
-
-    return !m.content.includes("?");
-  });
-
-}
-    const maxTokens =
-  loopLevel === 7 ? 900 : 220;
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
+  data =
+    await callProvider(
+      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      process.env.GEMINI_API_KEY,
+      "gemini-2.5-flash",
       {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            "Bearer " + process.env.GROQ_API_KEY
-        },
-
-        body: JSON.stringify({
-
-          model:"llama-3.3-70b-versatile",
-
-          messages: [
-  {
-    role: "system",
-    content: systemPrompt
-  },
-  ...(loopLevel === 7
-      ? messages.slice(-8)
-      : messages.slice(-2))
-],
-
-temperature: 0.7,
-max_tokens: maxTokens
-        })
+        model: "gemini-2.5-flash",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...messages.slice(-30)
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens
       }
     );
 
-    if (!response.ok) {
+ if (!data) {
 
-    console.log("GROQ_STATUS", response.status);
-    console.log("GROQ_STATUS_TEXT", response.statusText);
-    console.log("GROQ_ERROR_BODY", await response.text());
+   /*console.log(
+      "LOOP7_PROVIDER",
+      "CEREBRAS"
+    );*/
 
-    return res.status(500).json({
-        reply: "AI service busy. Please try again."
-    });
-          }
+    data =
+      await callProvider(
+        "https://api.cerebras.ai/v1/chat/completions",
+        process.env.CEREBRAS_API_KEY,
+        "gpt-oss-120b",
+        {
+          model: "gpt-oss-120b",
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            ...messages.slice(-8)
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens
+        }
+      );
+  }
 
-    /* =========================
-       📤 RESPONSE
-    ========================= */
+  if (!data) {
 
-    const data =
-      await response.json();
+    console.log(
+      "LOOP7_PROVIDER",
+      "GROQ"
+    );
+
+    data =
+      await callProvider(
+        "https://api.groq.com/openai/v1/chat/completions",
+        process.env.GROQ_API_KEY,
+        "llama-3.3-70b-versatile",
+        {
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            ...messages.slice(-8)
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens
+        }
+      );
+  }
+
+} else {
+
+  data =
+    await callProvider(
+      "https://api.groq.com/openai/v1/chat/completions",
+      process.env.GROQ_API_KEY,
+      "llama-3.3-70b-versatile",
+      {
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...messages.slice(-2)
+        ],
+        temperature: 0.7,
+        max_tokens: maxTokens
+      }
+    );
+}
+
+
+    
     console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
 console.log("===== END RAW AI RESPONSE =====");
