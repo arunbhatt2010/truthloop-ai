@@ -631,17 +631,31 @@ function mergeEvidencePackages(packages) {
 // ====================================
 function buildEvidenceLedger(mergedEvidence = {}) {
    console.log(
+    "LEDGER_MERGED_EVIDENCE",
+    JSON.stringify(mergedEvidence, null, 2)
+);
+   console.log(
   "LEDGER_ENTER"
 );
    console.log(
-    "LEDGER_FUNCTION_ENTERED",
-    !!sources,
-    Array.isArray(sources),
-    sources?.length
+    "LEDGER_OBJECT",
+    JSON.stringify(mergedEvidence, null, 2)
+);
+
+console.log(
+    "LEDGER_SOURCE_COUNT",
+    mergedEvidence?.sources?.length
+);
+   console.log(
+  "LEDGER_FUNCTION_ENTERED",
+  mergedEvidence?.sources?.length
 );
 
     const ledger = [];
-
+console.log(
+    "LEDGER_SOURCES_COUNT",
+    mergedEvidence?.sources?.length
+);
     for (const source of mergedEvidence.sources || []) {
        console.log(
   "SOURCE_KEYS",
@@ -1154,6 +1168,13 @@ async function EvidenceNormalizer(
     }
 console.log(
   "BEFORE_LEDGER_BUILD"
+);
+   console.log(
+    "LEDGER_INPUT",
+    JSON.stringify({
+        sourceCount: normalized.sources?.length,
+        firstSource: normalized.sources?.[0]
+    }, null, 2)
 );
     normalized.evidenceLedger =
         buildEvidenceLedger({
