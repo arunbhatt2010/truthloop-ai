@@ -1644,49 +1644,41 @@ ${finalReview}
     /* =========================
        🤖 AI CALL
     ========================= */
-    /******************************
- const isLoop7 = loopLevel === 7;
 
-/* ==========================
-   PROVIDER ROUTING
-========================== */
+ 
+const isLoop7 = loopLevel === 7;
 
-const apiUrl = isLoop7
-  ? "https://api.cerebras.ai/v1/chat/completions"
-  : "https://api.groq.com/openai/v1/chat/completions";
+const response = await fetch(
+  isLoop7
+    ? "https://api.cerebras.ai/v1/chat/completions"
+    : "https://api.groq.com/openai/v1/chat/completions",
+  {
+    method: "POST",
 
-const apiKey = isLoop7
-  ? process.env.CEREBRAS_API_KEY
-  : process.env.GROQ_API_KEY;
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${
+        isLoop7
+          ? process.env.CEREBRAS_API_KEY
+          : process.env.GROQ_API_KEY
+      }`
+    },
 
-const model = isLoop7
-  ? "qwen-3-235b-a22b-instruct-2507"
-  : "openai/gpt-oss-120b";
+    body: JSON.stringify({
+      model: isLoop7
+        ? "qwen-3-235b-a22b-instruct-2507"
+        : "openai/gpt-oss-120b",
 
-/* ==========================
-   MESSAGE BUILD
-========================== */
-
-const requestMessages = isLoop7
-
-  ? [
-      {
-        role: "system",
-        content: systemPrompt
-      },
-
-      {
-        role: "user",
-        content: `
+      messages: isLoop7
+        ? [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            {
+              role: "user",
+              content: `
 Generate the complete Loop 7 Investigation Report.
-
-Use all investigation evidence.
-
-Return exactly in this format:
-
-[[highlight]]
-One concise core pattern.
-[[end]]
 
 ## Pattern
 Detailed pattern analysis.
@@ -1700,71 +1692,23 @@ What the user is not noticing.
 ## Investigation Summary
 Final conclusion.
 `
-      }
-    ]
+            }
+          ]
+        : [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            ...messages.slice(-2)
+          ],
 
-  : [
-      {
-        role: "system",
-        content: systemPrompt
-      },
-
-      ...messages.slice(-2)
-    ];
-
-/* ==========================
-   TOKEN LIMITS
-========================== */
-
-const maxTokens = isLoop7 ? 1800 : 220;
-
-/* ==========================
-   API CALL
-========================== */
-
-console.log(
-  "AI_PROVIDER",
-  isLoop7 ? "CEREBRAS" : "GROQ"
+      temperature: 0.7,
+      max_tokens: isLoop7 ? 1800 : 220
+    })
+  }
 );
 
-console.log("AI_MODEL", model);
 
-const response = await fetch(apiUrl, {
-  method: "POST",
-
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${apiKey}`
-  },
-
-  body: JSON.stringify({
-    model,
-    messages: requestMessages,
-    temperature: 0.7,
-    max_tokens: maxTokens
-  })
-});
-
-
-
-if (data?.error) {
-  console.error(
-    "AI_ERROR",
-    JSON.stringify(data.error, null, 2)
-  );
-}
-
-let reply =
-  data?.choices?.[0]?.message?.content ||
-  data?.choices?.[0]?.text ||
-  "";
-
-console.log(
-  "RAW_REPLY_LENGTH",
-  reply?.length || 0
-);
-
-console.log("RAW_REPLY", reply);
     /* =========================
        📤 RESPONSE
     ========================= */
