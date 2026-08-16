@@ -1737,6 +1737,10 @@ Final conclusion.
 
     const data =
       await response.json();
+      console.log(
+ "FULL_AI_RESPONSE",
+ JSON.stringify(data, null, 2)
+);
     console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
 console.log("===== END RAW AI RESPONSE =====");
