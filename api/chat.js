@@ -1,6 +1,10 @@
 import { runMasterBrain }
 from "./masterBrain.js";
 import { loadDigitalFootprintBrain } from "./DigitalFootprintBrain.js";
+import {
+    loadCrossEvidenceBrain
+} from "./CrossEvidenceBrain.js";
+
 export default async function handler(req, res) {
 
   /* =========================
@@ -519,19 +523,36 @@ if (
     publicEvidencePackage =
 await loadDigitalFootprintBrain({
 
-    truthLoopPackage,
-
     profileLink,
+
+    profileLinks: profileLink
+        ? [profileLink]
+        : [],
+
+    truthLoopPackage,
 
     identityPackage,
 
     currentLoop: 7
 
 });
+    
     /* =========================
    PLATFORM CARD
 ========================= */
+const crossEvidencePackage =
+    await loadCrossEvidenceBrain({
+        profileLinks: profileLink
+            ? [profileLink]
+            : [],
+        truthLoopPackage
+    });
 
+console.log(
+    "CROSS_EVIDENCE_PACKAGE",
+    JSON.stringify(crossEvidencePackage, null, 2)
+);
+    
 if (
     publicEvidencePackage?.type === "platformCard"
 ) {
@@ -559,6 +580,31 @@ console.log(
     "PUBLIC_EVIDENCE_PACKAGE",
     JSON.stringify(publicEvidencePackage, null, 2)
 );
+    console.log(
+  "PUBLIC_EVIDENCE_EXISTS",
+  publicEvidencePackage?.success ? "YES" : "NO"
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_SUCCESS",
+  publicEvidencePackage?.success
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_STAGE",
+  publicEvidencePackage?.stage
+);
+
+console.log(
+  "PUBLIC_EVIDENCE_REASON",
+  publicEvidencePackage?.reason
+);
+if (publicEvidencePackage) {
+   /* console.log(
+        "PUBLIC_EVIDENCE_KEYS",
+        Object.keys(publicEvidencePackage)
+    );*/
+}
   } catch (e) {
 
     console.error(
@@ -570,9 +616,15 @@ console.log(
   }
 
           }
+    const profileLinks = Array.isArray(profileLink)
+  ? profileLink
+  : profileLink?.trim()
+    ? [profileLink.trim()]
+    : [];
     let loop7Instruction = "";
 
 if (loopLevel === 7) {
+
 
 loop7Instruction = `
 
