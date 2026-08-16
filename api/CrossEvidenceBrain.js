@@ -1149,11 +1149,17 @@ async function EvidenceNormalizer(
             }
         }
     }
-
+console.log(
+  "BEFORE_LEDGER_BUILD"
+);
     normalized.evidenceLedger =
         buildEvidenceLedger({
             sources: normalized.sources
         });
+   console.log(
+  "AFTER_LEDGER_BUILD",
+  normalized.evidenceLedger?.length
+);
    console.log(
   "NORMALIZED_SOURCE_COUNT",
   normalized.sources.length
