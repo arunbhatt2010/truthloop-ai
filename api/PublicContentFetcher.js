@@ -112,19 +112,60 @@ export async function loadPublicContentFetcher(options = {}) {
     return acquirePublicContent(options);
 }
 
-export function validatePublicContent(content) {
-    return !!content;
+export function validatePublicContent(content = {}) {
+
+    if (
+        !content ||
+        typeof content !== "object"
+    ) {
+        return {
+            success: false,
+            sources: []
+        };
+    }
+
+    return content;
+}
+export function cleanPublicContent(content = {}) {
+
+    if (
+        !content ||
+        typeof content !== "object"
+    ) {
+        return {
+            success: false,
+            sources: []
+        };
+    }
+
+    return content;
 }
 
-export function cleanPublicContent(content = "") {
-    return String(content || "")
-        .replace(/\s+/g, " ")
-        .trim();
-}
+export function extractPublicContent(
+    content = {}
+) {
 
-export function extractPublicContent(html = "") {
+    const source =
+        content?.sources?.[0] || {};
+
     return {
-        visibleText: cleanPublicContent(html)
+
+        title:
+            source.title || "",
+
+        description:
+            source.description || "",
+
+        visibleText:
+            source.visibleText || "",
+
+        socialLinks:
+            Array.isArray(source.socialLinks)
+                ? source.socialLinks
+                : [],
+
+        contentLength:
+            source.contentLength || 0
     };
 }
 
@@ -135,7 +176,7 @@ function buildPublicContentPackage(
     const source =
         rawPackage?.sources?.[0] || {};
 
-    return {
+        return {
         success: true,
 
         title:
@@ -173,4 +214,4 @@ function buildPublicContentPackage(
         sources:
             rawPackage?.sources || []
     };
-        }
+}
