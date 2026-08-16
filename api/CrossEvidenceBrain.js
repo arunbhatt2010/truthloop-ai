@@ -1608,7 +1608,15 @@ async function ProfileIntelligenceAPI({
         evidenceLedger:
             normalizedEvidence?.evidenceLedger || []
     };
+console.log(
+   "PROMPT_LENGTH",
+   prompt?.length || 0
+);
 
+console.log(
+   "PROMPT_PREVIEW",
+   prompt?.slice(0,1000)
+);
     const prompt = `
 You are TruthLoop's Universal Public Evidence Package Generator.
 
