@@ -630,6 +630,12 @@ function mergeEvidencePackages(packages) {
 // Evidence Input Builder
 // ====================================
 function buildEvidenceLedger(mergedEvidence = {}) {
+   console.log(
+    "LEDGER_FUNCTION_ENTERED",
+    !!sources,
+    Array.isArray(sources),
+    sources?.length
+);
 
     const ledger = [];
 
@@ -699,7 +705,10 @@ console.log(
         0
     );
        }
-
+console.log(
+    "LEDGER_BEFORE_ADD",
+    ledger.length
+);
         (source.headings || [])
             .slice(0, 15)
             .forEach(
@@ -721,7 +730,15 @@ console.log(
                     addEvidence("article", item, index)
             );
     }
+console.log(
+    "FINAL_LEDGER_COUNT",
+    ledger.length
+);
 
+console.log(
+    "FINAL_LEDGER_SAMPLE",
+    ledger.slice(0, 3)
+);
     return ledger.slice(0, 80);
 }
 
