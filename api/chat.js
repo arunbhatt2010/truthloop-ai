@@ -1745,12 +1745,7 @@ const response = await fetch(apiUrl, {
   })
 });
 
-const data = await response.json();
 
-console.log(
-  "FULL_AI_RESPONSE",
-  JSON.stringify(data, null, 2)
-);
 
 if (data?.error) {
   console.error(
