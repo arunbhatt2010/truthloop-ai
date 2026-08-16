@@ -1955,7 +1955,10 @@ clearInterval(interval);
 let finalHtml = text;
 
 const match = text.match(/([^.!?]*\?)/g);
-
+const match =
+  loopLevel >= 6
+    ? null
+    : text.match(/\[\[(.*?)\]\]/g);
 if(match && match.length){
 
 const lastQuestion = match[match.length-1];
@@ -2003,10 +2006,12 @@ ${lastQuestion}
 
 div.innerHTML = finalHtml;
 
-if (loopLevel === 6) {
-
-    div.innerHTML += renderLoop7EntryBridge();
-
+if (
+  loopLevel === 6 &&
+  !document.getElementById("loop7Bridge")
+) {
+  div.innerHTML += renderLoop7EntryBridge();
+}
     reflectionInput.style.display = "none";
 
     nextBtn.innerText = window.loop7Started
