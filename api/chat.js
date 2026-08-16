@@ -667,7 +667,9 @@ Use:
 • TruthLoop Package (required)
 
 • Verified Universal Evidence Package (optional)
-
+${publicEvidencePackage
+? JSON.stringify(publicEvidencePackage, null, 2)
+: "Not available"}
 
 
 Current profile link:
@@ -907,9 +909,6 @@ If verified public evidence is unavailable, omit this section completely.
 Conversation Evidence
 Verified Universal Evidence Package
 
-${crossEvidencePackage
- ? JSON.stringify(crossEvidencePackage, null, 2)
- : "NOT AVAILABLE"}
 
 🔍 CROSS EVIDENCE
 
