@@ -1660,51 +1660,165 @@ console.log(
    prompt?.slice(0,1000)
 );
     const prompt = `
-You are TruthLoop's Universal Public Evidence Package Generator.
+You are TruthLoop's Universal Public Evidence & Discovery Intelligence Engine.
 
 INPUT:
-Normalized public evidence.
+Normalized public evidence collected from websites, profiles, articles, posts, social platforms, repositories, videos, and discovered public sources.
 
-YOUR ONLY TASK:
-Compress the evidence into ONE factual Universal Public Evidence Package for Loop 7.
+PRIMARY OBJECTIVE:
 
-EXTRACT ONLY:
-- verified identity
-- name
-- title / role
-- company / brand
-- website
-- location
-- public platforms
-- positioning
-- niche
-- expertise signals
-- audience signals
-- business / creator signals
-- recurring topics
-- repeated behavioral signals
-- evidence-backed contradictions
-- important public evidence
-- source URLs
+Build ONE Universal Public Evidence Package that helps TruthLoop identify:
 
-RULES:
-- Use only information explicitly supported by the evidence.
-- Never guess or infer unsupported identity.
-- Never invent behavior, claims, or facts.
+- who this entity is
+- where this entity exists online
+- what this entity repeatedly talks about
+- what public signals repeatedly appear
+- what additional platforms should be investigated
+
+DISCOVERY RULES:
+
+1. Extract every verified identity signal.
+
+2. Detect:
+- personal names
+- founder names
+- creator names
+- company names
+- brand names
+- product names
+- website names
+- usernames
+- handles
+- aliases
+- repeated identity references
+
+3. If a username, handle, company, brand, website title, creator name, founder name, or repeated identifier appears multiple times across evidence, treat it as a strong identity signal.
+
+4. Extract platform-specific identity clues from:
+- URLs
+- profile links
+- social links
+- visible text
+- titles
+- descriptions
+- author references
+- bylines
+- usernames
+- handles
+
+5. Generate platform discovery candidates.
+
+Identify likely presence on:
+- LinkedIn
+- X
+- Facebook
+- Instagram
+- YouTube
+- GitHub
+- Reddit
+- Medium
+- Substack
+- Product Hunt
+- Indie Hackers
+- Crunchbase
+- Behance
+- Personal Websites
+- Other Public Platforms
+
+6. Preserve every discovered profile URL.
+
+7. Preserve every discovered source URL.
+
+8. Detect repeated public topics.
+
+9. Detect repeated expertise signals.
+
+10. Detect repeated audience signals.
+
+11. Detect repeated creator, founder, business, operator, builder, educator, consultant, researcher, or community signals.
+
+12. Detect evidence-backed contradictions only when supported by multiple sources.
+
+13. Detect evidence-backed behavioral signals only when explicitly supported by public evidence.
+
+SAFETY RULES:
+
+- Never invent identities.
+- Never invent usernames.
+- Never invent profile URLs.
+- Never invent platforms.
+- Never invent expertise.
+- Never invent behavioral claims.
 - Never diagnose psychology.
-- Never give advice or analysis.
-- Remove HTML, CSS, JavaScript, layout, navigation, styling,
-  technical metadata, boilerplate, duplicates, and raw content dumps.
-- Preserve useful source URLs.
-- Keep unsupported fields null or [].
-- Prefer repeated or strongly supported evidence.
-- Do not reproduce raw evidence.
-- Do not explain your reasoning.
+- Never give advice.
+- Never generate analysis.
+- Never output unsupported facts.
 
-OUTPUT:
+EXTRACTION RULES:
+
+When evidence strongly supports an identity:
+
+Do NOT leave fields null unnecessarily.
+
+Example:
+
+Title:
+TruthLoop AI
+
+Visible Text:
+TruthLoop AI notices patterns...
+
+Repeated References:
+TruthLoop AI
+
+Output:
+
+{
+  "company": "TruthLoop AI"
+}
+
+because the evidence explicitly supports it.
+
+OUTPUT REQUIREMENTS:
+
 Return ONLY valid JSON.
+
 Return ONE Universal Public Evidence Package.
-Maximum total output: 3000 characters.
+
+Include:
+
+{
+  "identity": {},
+  "names": [],
+  "usernames": [],
+  "handles": [],
+  "companies": [],
+  "brands": [],
+  "websites": [],
+  "platforms": [],
+  "discoveredProfiles": [],
+  "sourceUrls": [],
+  "positioning": [],
+  "niches": [],
+  "expertiseSignals": [],
+  "audienceSignals": [],
+  "businessSignals": [],
+  "creatorSignals": [],
+  "topics": [],
+  "behavioralSignals": [],
+  "contradictions": [],
+  "importantEvidence": []
+}
+
+Return complete JSON.
+
+Do not truncate output.
+
+Preserve all supported evidence signals.
+
+Preserve all discovered profile URLs.
+
+Preserve all source URLs.
 
 FORMAT:
 {
