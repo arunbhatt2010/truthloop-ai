@@ -1650,7 +1650,7 @@ const aiApiKey =
 const aiModel =
   isLoop7
     ? "gpt-oss-120b"
-    : "qwen/qwen3-32b";
+    : "qwen/qwen3.6-27b";
 
 async function callProvider(
   endpoint,
@@ -1726,7 +1726,7 @@ data = await callProvider(
       },
 
       body: JSON.stringify({
-        model: "qwen/qwen3-32b",
+        model: "qwen/qwen3.6-27b",
 
         messages: [
           {
