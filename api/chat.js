@@ -1693,7 +1693,7 @@ Authorization:
 "Bearer " + process.env.GROQ_API_KEY
 },
 body:JSON.stringify({
-model:"qwen/qwen3-27b",
+model: "openai/gpt-oss-120b",
 messages:[
 {
 role:"system",
