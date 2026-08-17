@@ -490,7 +490,7 @@ console.log(
                 sourcePlatform:
                     sourcePlatform:
 finalPackage?.sources?.[0]?.platform ||
-"unknown"
+"unknown",
                 sourceHost:
                     (() => {
                         try {
