@@ -1621,27 +1621,7 @@ ${finalReview}
         body: JSON.stringify({
 
           model:"openai/gpt-oss-120b",
-console.log(
-  "MODEL",
-  data?.model
-);
 
-console.log(
-  "CONTENT_LENGTH",
-  data?.choices?.[0]?.message?.content?.length
-);
-
-console.log(
-  "REASONING_LENGTH",
-  data?.choices?.[0]?.message?.reasoning?.length
-);
-
-console.log(
-  "MESSAGE_KEYS",
-  Object.keys(
-    data?.choices?.[0]?.message || {}
-  )
-);
           messages: [
   {
     role: "system",
@@ -1675,6 +1655,27 @@ max_tokens: 1000
 
     const data =
       await response.json();
+      console.log(
+  "MODEL",
+  data?.model
+);
+
+console.log(
+  "CONTENT_LENGTH",
+  data?.choices?.[0]?.message?.content?.length
+);
+
+console.log(
+  "REASONING_LENGTH",
+  data?.choices?.[0]?.message?.reasoning?.length
+);
+
+console.log(
+  "MESSAGE_KEYS",
+  Object.keys(
+    data?.choices?.[0]?.message || {}
+  )
+);
 console.log("CHATJS_MARKER_V17");
     console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
