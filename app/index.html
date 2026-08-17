@@ -2879,7 +2879,8 @@ messages.push({
 role:"assistant",    
 content:data.reply    
 });    
-/*saveJourney();    
+/*saveJourney();
+alert("SAVE CALLED");
 function saveJourney() {
 
 
@@ -2904,11 +2905,11 @@ getBtn.disabled = false;
 /* NEXT */    
     
 nextBtn.onclick=async()=>{
-/*alert(
+alert(
     "NEXT BTN\n" +
     "loopLevel = " + loopLevel +
     "\nloop7Started = " + window.loop7Started
-); */
+); 
 if (isLoading) return;
 if (loopLevel === 6) {
   if (!window.loop7Started) {
@@ -2920,10 +2921,10 @@ if (loopLevel === 6) {
     const profileLink =
         document.getElementById("loop7ProfileLink")?.value.trim() || "";
 investigationSource = profileLink;
-  /*alert(
+  alert(
     "BEFORE PUSH\n\n" +
     JSON.stringify(messages, null, 2)
-);*/
+);
     messages.push({
         role: "user",
         content: profileLink || "Continue to Loop 7"
