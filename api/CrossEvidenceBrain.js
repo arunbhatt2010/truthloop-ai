@@ -331,7 +331,7 @@ function calculateEvidenceScore(
 async function collectSourceEvidence(url) {
 
     try {
-       const identityPackage =
+       /*const identityPackage =
   await IdentityExtractionBrain({
     sourceUrl: url
   });
@@ -339,7 +339,7 @@ async function collectSourceEvidence(url) {
 console.log(
   "IDENTITY_PACKAGE",
   identityPackage
-);
+);*/
 /*const footprintPackage =
   await FootprintDiscoveryBrain(
     identityPackage
@@ -488,9 +488,9 @@ console.log(
                 ...finalPackage,
                 sourceUrl: url,
                 sourcePlatform:
-                    identityPackage?.identities?.find(
-                        item => item?.type === "platform"
-                    )?.value || "unknown",
+                    sourcePlatform:
+finalPackage?.sources?.[0]?.platform ||
+"unknown"
                 sourceHost:
                     (() => {
                         try {
