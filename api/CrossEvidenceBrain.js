@@ -89,10 +89,11 @@ console.log(
   )
 );
 
-const discoveryPackage =
+/*const discoveryPackage =
     await FootprintDiscoveryBrain(
         identityPackage
-    );
+    );*/
+       const discoveryPackage = {};
 
         for (const url of profileLinks) {
 
