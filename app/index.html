@@ -2112,38 +2112,54 @@ ${action}
 `;
 
   }
-async function startLoop7Investigation(
-    profileLink
-) {
+async function startLoop7Investigation(profileLink) {
+    try {
 
-    const response = await fetch(
-        "/api/foundation/profile-system",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type":
-                "application/json"
-            },
-            body: JSON.stringify({
-                profileLink
-            })
-        
-    );
+        const response = await fetch(
+            "/api/foundation/profile-system",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    profileLink
+                })
+            }
+        );
 
-    const data = await response.json();
+        if (!response.ok) {
+            throw new Error(
+                `Profile System Error: ${response.status}`
+            );
+        }
 
-    window.publicEvidencePackage =
-        data.publicEvidencePackage;
+        const data = await response.json();
 
-    window.universalPackage =
-        data.universalPackage;
+        window.publicEvidencePackage =
+            data?.publicEvidencePackage || null;
 
-  }
-  console.log(
-  "UNIVERSAL_READY",
-  window.publicEvidencePackage,
-  window.universalPackage
-);
+        window.universalPackage =
+            data?.universalPackage || null;
+
+        console.log(
+            "UNIVERSAL_READY",
+            window.publicEvidencePackage,
+            window.universalPackage
+        );
+
+        return data;
+
+    } catch (error) {
+
+        console.error(
+            "LOOP7_PROFILE_SYSTEM_ERROR",
+            error
+        );
+
+        return null;
+    }
+}
 document.addEventListener("click",(e)=>{
 
     if(e.target.id==="downloadReportBtn"){
