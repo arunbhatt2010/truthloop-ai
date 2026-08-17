@@ -344,10 +344,10 @@ function calculateEvidenceScore(
 async function collectSourceEvidence(url) {
 
     try {
-console.log(
-  "DEFAULT_IDENTITY_PACKAGE",
-  identityPackage
-);
+//console.log(
+ // "DEFAULT_IDENTITY_PACKAGE",
+ // identityPackage
+//);
        
 const footprintPackage = {
     success: false,
