@@ -403,6 +403,24 @@ console.log(
   "EXTRACTED_PACKAGE_FULL",
   JSON.stringify(extractedPackage, null, 2)
 );
+       console.log(
+  "RAW_VISIBLE_TEXT_LENGTH",
+  rawPackage?.sources?.[0]?.visibleText?.length
+);
+
+console.log(
+  "RAW_TITLE",
+  rawPackage?.sources?.[0]?.title
+);
+
+console.log(
+  "RAW_DESCRIPTION",
+  rawPackage?.sources?.[0]?.description
+);
+       console.log(
+  "EXTRACTED_VISIBLE_TEXT_LENGTH",
+  extractedPackage?.visibleText?.length
+);
         const finalPackage =
             buildPublicContentPackage(
                 rawPackage,
