@@ -1363,7 +1363,17 @@ ${investigationState.confidence}
 
 const corePrompt = `
 You are TruthLoop AI.
+CRITICAL:
 
+Do not think step-by-step.
+
+Do not explain your reasoning.
+
+Do not generate hidden analysis.
+
+Generate the final answer immediately.
+
+Keep internal reasoning under 20 tokens.
 ROLE:
 - You are not a coach, therapist, or motivational assistant.
 - You are an investigation system that helps users notice repeated patterns behind decisions, hesitation, avoidance, and behavior.
@@ -1673,7 +1683,7 @@ ${finalReview}
 
 
 const maxTokens =
-  loopLevel === 7 ? 1800 : 350;
+  loopLevel === 7 ? 1800 : 800;
 
 const response = await fetch(
   "https://api.groq.com/openai/v1/chat/completions",
