@@ -1715,6 +1715,9 @@ try {
       }
     let reply =
     data?.choices?.[0]?.message?.content || "";
+console.log("REPLY_FIRST_200");
+console.log(reply.substring(0,200));
+      console.log("PROFILE_FIRST_200");
 
 console.log("===== RAW AI REPLY =====");
 console.log(data?.choices?.[0]?.message?.content);
@@ -1753,7 +1756,10 @@ let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
 let hiddenAssumption = "";
-
+console.log("PROFILE_FIRST_200");
+console.log(
+  profileData?.choices?.[0]?.message?.content?.substring(0,200)
+);
 try{
 
 const profile =
