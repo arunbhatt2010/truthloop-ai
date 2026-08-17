@@ -2112,7 +2112,33 @@ ${action}
 `;
 
   }
+async function startLoop7Investigation(
+    profileLink
+) {
 
+    const response = await fetch(
+        "/api/foundation/profile-system",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+                profileLink
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    window.publicEvidencePackage =
+        data.publicEvidencePackage;
+
+    window.universalPackage =
+        data.universalPackage;
+
+  }
 document.addEventListener("click",(e)=>{
 
     if(e.target.id==="downloadReportBtn"){
