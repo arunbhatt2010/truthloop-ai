@@ -1635,7 +1635,7 @@ ${finalReview}
  LOOP 7 RESPONSE SANITIZER
 ******************************/
 const maxTokens =
-  loopLevel === 7 ? 4000 : 220;
+  loopLevel === 7 ? 2000 : 220;
 
     /*
      * LOOP 7 PROVIDER SEPARATION
@@ -1644,15 +1644,15 @@ const maxTokens =
      */
     const isLoop7 = loopLevel === 7;
 
-    const aiEndpoint = isLoop7
+   // const aiEndpoint = isLoop7
       ? "https://api.cerebras.ai/v1/chat/completions"
       : "https://api.groq.com/openai/v1/chat/completions";
 
-    const aiApiKey = isLoop7
+   // const aiApiKey = isLoop7
       ? process.env.CEREBRAS_API_KEY
       : process.env.GROQ_API_KEY;
 
-    const aiModel = isLoop7
+   // const aiModel = isLoop7
       ? "gpt-oss-120b"
       : "llama-3.3-70b-versatile";
 console.log(
@@ -1710,85 +1710,35 @@ async function callProvider(
 
   }
     let data = null;
+
 if (loopLevel === 7) {
 
-  data =
-    await callProvider(
-      "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-      process.env.GEMINI_API_KEY,
-      "gemini-2.5-flash",
-      {
-        model: "gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          ...messages.slice(-30)
-        ],
-        temperature: 0.7,
-        max_tokens: maxTokens
-      }
-    );
-
- if (!data) {
-
-   /*console.log(
-      "LOOP7_PROVIDER",
-      "CEREBRAS"
-    );*/
-
-    data =
-      await callProvider(
-        "https://api.cerebras.ai/v1/chat/completions",
-        process.env.CEREBRAS_API_KEY,
-        "gpt-oss-120b",
+  data = await callProvider(
+    "https://api.cerebras.ai/v1/chat/completions",
+    process.env.CEREBRAS_API_KEY,
+    "gpt-oss-120b",
+    {
+      model: "gpt-oss-120b",
+      messages: [
         {
-          model: "gpt-oss-120b",
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
-            ...messages.slice(-8)
-          ],
-          temperature: 0.7,
-          max_tokens: maxTokens
-        }
-      );
-  }
+          role: "system",
+          content: systemPrompt
+        },
+        ...messages.slice(-8)
+      ],
+      temperature: 0.7,
+      max_tokens: maxTokens
+    }
+  );
 
   if (!data) {
 
     console.log(
       "LOOP7_PROVIDER",
-      "GROQ"
+      "GROQ_FALLBACK"
     );
 
-    data =
-      await callProvider(
-        "https://api.groq.com/openai/v1/chat/completions",
-        process.env.GROQ_API_KEY,
-        "openai/gpt-oss-120b",
-        {
-          model:"openai/gpt-oss-120b",
-          messages: [
-            {
-              role: "system",
-              content: systemPrompt
-            },
-            ...messages.slice(-8)
-          ],
-          temperature: 0.7,
-          max_tokens: maxTokens
-        }
-      );
-  }
-
-} else {
-
-  data =
-    await callProvider(
+    data = await callProvider(
       "https://api.groq.com/openai/v1/chat/completions",
       process.env.GROQ_API_KEY,
       "openai/gpt-oss-120b",
@@ -1799,16 +1749,35 @@ if (loopLevel === 7) {
             role: "system",
             content: systemPrompt
           },
-          ...messages.slice(-2)
+          ...messages.slice(-8)
         ],
         temperature: 0.7,
         max_tokens: maxTokens
       }
     );
+  }
+
+} else {
+
+  data = await callProvider(
+    "https://api.groq.com/openai/v1/chat/completions",
+    process.env.GROQ_API_KEY,
+    "openai/gpt-oss-120b",
+    {
+      model: "openai/gpt-oss-120b",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt
+        },
+        ...messages.slice(-2)
+      ],
+      temperature: 0.7,
+      max_tokens: maxTokens
+    }
+  );
+
 }
-
-
-    
     console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
 console.log("===== END RAW AI RESPONSE =====");
