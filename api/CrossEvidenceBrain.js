@@ -76,18 +76,18 @@ console.log(
 
             return result;
         }
-       const identityPackage =
+     /*  const identityPackage =
     await IdentityExtractionBrain({
         profileLinks
-    });
-       console.log(
+    });*/
+       /*console.log(
   "IDENTITY_PACKAGE",
   JSON.stringify(
     identityPackage,
     null,
     2
   )
-);
+);*/
 
 /*const discoveryPackage =
     await FootprintDiscoveryBrain(
@@ -179,7 +179,7 @@ const normalizedEvidence =
        console.log("STEP_3_NORMALIZER_DONE");
        const universalPackage = {
     identity: identityPackage || {},
-    footprint: discoveryPackage || {},
+  //  footprint: discoveryPackage || {},
     sourceLinks: normalizedEvidence?.sourceLinks || [],
     normalizedEvidence,
     rawEvidence: result.mergedEvidence || {}
@@ -260,8 +260,8 @@ if (
 const crossEvidencePackage =
     await CrossEvidencePackageBuilder({
         identityPackage,
-        footprintPackage:
-            discoveryPackage,
+      //  footprintPackage:
+            //discoveryPackage,
         findingsPackage,
         confidencePackage,
        universalPackage
@@ -340,7 +340,7 @@ console.log(
   "IDENTITY_PACKAGE",
   identityPackage
 );
-const footprintPackage =
+/*const footprintPackage =
   await FootprintDiscoveryBrain(
     identityPackage
 );
@@ -348,7 +348,7 @@ const footprintPackage =
 console.log(
   "FOOTPRINT_PACKAGE",
   footprintPackage
-);
+);*/
         const urlPackage =
 await loadPublicContentFetcher({
     profileLinks: [url]
