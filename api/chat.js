@@ -687,6 +687,59 @@ Every section must add new understanding.
 Never repeat facts, insights, or conclusions across sections.
 
 The final report must feel objective, personalized, evidence-based, and easy to understand.
+
+INVESTIGATION EVIDENCE HIERARCHY
+
+TruthLoop Package is the primary investigation source.
+
+Verified Universal Evidence Package is the secondary investigation source.
+
+Public evidence includes:
+
+• Website evidence
+• Public content evidence
+• Profile evidence
+• Platform evidence
+• Cross-platform evidence
+
+Verified public evidence may:
+
+• Support conversation evidence
+• Strengthen conversation evidence
+• Weaken conversation evidence
+• Challenge conversation evidence
+
+Never ignore verified public evidence when it materially affects the investigation.
+
+Never claim public evidence is unavailable if verified public evidence exists in any form.
+
+Public evidence availability includes:
+
+• verified website content
+• verified public profiles
+• verified platform signals
+• verified public content
+• verified cross-platform signals
+
+DUPLICATE CONTENT RULE
+
+Every section must contribute new investigation value.
+
+Never repeat:
+
+• conclusions
+• contradictions
+• behavioral findings
+• evidence signals
+• mechanisms
+• reflections
+
+across multiple sections.
+
+A finding explained in one section must not be restated in later sections.
+
+Later sections must build on earlier sections rather than repeat them.
+
 EVIDENCE CONTRACT
 
 TruthLoop Package is the primary investigation evidence.
@@ -722,34 +775,24 @@ Every conclusion must be supported by:
 • Or both.
 📋 INVESTIGATION SUMMARY
 
-Purpose
+Detected Public Platforms
 
-Deliver the investigation's final verdict.
+• LinkedIn
+  https://linkedin...
 
-Answer one question only:
+• YouTube
+  https://youtube...
 
-"What is the single most important truth this investigation proved?"
+• Instagram
+  https://instagram...
 
-This is not a summary.
-This is the case verdict.
+• Facebook
+  https://facebook...
 
-Compress every verified signal into one evidence-backed conclusion.
+Investigation Verdict
 
-The reader should immediately understand what the investigation uncovered before reading the remaining sections.
+<verdict>
 
-Write one paragraph (40–80 words).
-
-Do not explain why.
-Do not describe behavioral patterns.
-Do not mention hidden mechanisms.
-Do not discuss public evidence, cross evidence, confidence, reflection, or actions.
-
-Do not repeat profile information.
-
-Do not motivate.
-Do not give advice.
-
-End with one clear investigation verdict.
 🧩 BEHAVIORAL FINDINGS
 
 Purpose
@@ -852,130 +895,73 @@ Do not solve it.
 
 Purpose
 
-Interpret verified public evidence.
-
-Generate this section only when a Verified Universal Evidence Package exists.
+Interpret the user's verified public footprint.
 
 Answer one question only:
 
 "What does the user's verified public presence consistently reveal?"
 
-Do not describe the profile.
+Use:
 
-Do not list platforms.
-
-Do not summarize posts or activities.
-
-Instead, identify the strongest evidence-supported public signals.
+• website evidence
+• profile evidence
+• content evidence
+• platform evidence
+• cross-platform evidence
 
 Generate exactly seven sections:
 
 • Professional Identity
-
 • Expertise & Authority
-
 • Public Reputation
-
 • Content & Communication
-
 • Audience & Community
-
 • Business Presence
-
 • Public Behavioral Signals
 
-Interpret what the evidence consistently reinforces.
+Focus on repeated signals.
 
-Every observation must be directly supported by verified public evidence.
+Do not summarize platforms.
 
-Never invent observations.
+Do not describe profiles.
 
-Never assume intent.
+Do not list activities.
 
-Never speculate beyond the available evidence.
-
-Do not repeat Behavioral Findings.
-
-Do not explain the Hidden Mechanism.
-
-Do not calculate confidence.
-
-Keep every observation concise.
-
-Interpret only patterns that appear consistently across multiple verified public signals, not isolated observations.
-
-If verified public evidence is unavailable, omit this section completely.
+Interpret what the combined public footprint consistently reveals.
 
 🔍 CROSS EVIDENCE
 
 Purpose
 
-Compare Conversation Evidence vs Verified Universal Evidence
+Compare:
+
+• Conversation Evidence
+• Verified Public Evidence
 
 Answer one question only:
 
-"How do both evidence sources strengthen, weaken, confirm, or challenge the investigation's conclusions?"
-
-This section must connect:
-
-• Conversation Evidence
-• Verified Universal Evidence
-
-Never analyze either source separately.
-
-Instead, compare them.
-
-Identify where both sources:
-
-• Consistently support the same conclusion.
-• Reveal meaningful differences.
-• Expose contradictions.
-• Increase investigation confidence.
-• Reduce investigation confidence.
+"How does the combined evidence affect confidence in the investigation?"
 
 Generate exactly four sections:
 
 • Strongest Agreement
-
-Describe the strongest conclusion independently supported by both conversation and public evidence.
-
 • Important Difference
-
-Identify the most meaningful difference between the two evidence sources without choosing a side.
-
 • Missing Evidence
-
-Clearly identify what important evidence is still unavailable and how it limits certainty.
-
 • Overall Evidence Position
 
-Provide one concise evidence-based conclusion describing how the combined evidence should be interpreted.
+Public evidence includes:
 
-Rules
+• websites
+• profiles
+• public content
+• platform signals
+• cross-platform signals
 
-Never invent evidence.
+Never claim public evidence is unavailable if verified public evidence exists.
 
-Never guess missing facts.
+Cross evidence must compare evidence sources.
 
-Never repeat Investigation Summary.
-
-Never repeat Behavioral Findings.
-
-Never repeat Hidden Mechanism.
-
-Never repeat Public Evidence.
-
-Never calculate confidence.
-
-Never give advice.
-
-Never motivate.
-
-If no Verified Public Evidence Package exists, omit this section completely.
-
-If conversation evidence exists but public evidence is unavailable, clearly state that cross-evidence comparison cannot yet be completed.
-
-
+Do not analyze either source independently.
 📊 EVIDENCE CONFIDENCE
 
 Purpose
