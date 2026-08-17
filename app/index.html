@@ -2904,7 +2904,7 @@ nextBtn.onclick = async () => {
         nextBtn.innerText =
             "Get Your Final Report →";
 
-        return;
+        // return;
     }
 
     const profileLink =
@@ -2938,28 +2938,7 @@ nextBtn.onclick = async () => {
         })
     }).then(r => r.json());
 
-    // existing Loop 7 report code yahin se continue
-  
-/* console.log("PROFILE UPDATE:", {
-  primaryLoop: data.primaryLoop,
-  emotionalDriver: data.emotionalDriver,
-  avoidanceStyle: data.avoidanceStyle,
-  hiddenAssumption: data.hiddenAssumption
-});
 
-document.getElementById("patternProfile").style.display = "block";
-
-document.getElementById("profilePrimary").innerText =
-"Primary Loop: " + (data.primaryLoop || "—");
-
-document.getElementById("profileTrigger").innerText =
-"Emotional Driver: " + (data.emotionalDriver || "—");
-
-document.getElementById("profileAvoidance").innerText =
-"Avoidance Style: " + (data.avoidanceStyle || "—");
-
-document.getElementById("profileBelief").innerText =
-"Underlying Belief: " + (data.hiddenAssumption || "—");*/
     messages.push({
     role: "assistant",
     content: data.reply
