@@ -1716,6 +1716,17 @@ try {
 
     profileData =
       await profileResponse.json();
+      console.log(
+  "===== PROFILE RAW RESPONSE ====="
+);
+
+console.log(
+  JSON.stringify(profileData, null, 2)
+);
+
+console.log(
+  "===== END PROFILE RAW RESPONSE ====="
+);
 
   }
 
