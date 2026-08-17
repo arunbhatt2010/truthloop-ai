@@ -1631,183 +1631,118 @@ ${finalReview}
     /* =========================
        🤖 AI CALL
     ========================= */
-    /******************************
- LOOP 7 RESPONSE SANITIZER
-******************************/
 const maxTokens =
-  loopLevel === 7 ? 2000 : 220;
+  loopLevel === 7 ? 900 : 220;
 
-    /*
-     * LOOP 7 PROVIDER SEPARATION
-     * Loops 1-6 stay on Groq.
-     * Loop 7 uses Cerebras only.
-     */
-    const isLoop7 = loopLevel === 7;
+const isLoop7 =
+  loopLevel === 7;
 
-   // const aiEndpoint = isLoop7
-      ? "https://api.cerebras.ai/v1/chat/completions"
-      : "https://api.groq.com/openai/v1/chat/completions";
+const aiEndpoint =
+  isLoop7
+    ? "https://api.cerebras.ai/v1/chat/completions"
+    : "https://api.groq.com/openai/v1/chat/completions";
 
-   // const aiApiKey = isLoop7
-      ? process.env.CEREBRAS_API_KEY
-      : process.env.GROQ_API_KEY;
+const aiApiKey =
+  isLoop7
+    ? process.env.CEREBRAS_API_KEY
+    : process.env.GROQ_API_KEY;
 
-   // const aiModel = isLoop7
-      ? "gpt-oss-120b"
-      : "llama-3.3-70b-versatile";
-console.log(
-  "GEMINI_KEY_EXISTS",
-  !!process.env.GEMINI_API_KEY
-);
-    if (isLoop7 && !process.env.CEREBRAS_API_KEY) {
-      console.error("CEREBRAS_CONFIG_ERROR: CEREBRAS_API_KEY is missing");
+const aiModel =
+  isLoop7
+    ? "gpt-oss-120b"
+    : "openai/gpt-oss-120b";
 
-      return res.status(500).json({
-        reply: "Loop 7 AI service is not configured."
-      });
-    }
 async function callProvider(
   endpoint,
   apiKey,
-  model,
   body
 ) {
 
-  const response = await fetch(
-    endpoint,
-    {
+  const response =
+    await fetch(endpoint, {
       method: "POST",
 
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type":
+          "application/json",
         Authorization:
           "Bearer " + apiKey
       },
 
       body: JSON.stringify(body)
-    }
-  );
+    });
 
   if (!response.ok) {
 
-  const errorBody =
-    await response.text();
-
-  console.log(
-    "PROVIDER_FAILED",
-    model,
-    response.status
-  );
-
-  console.log(
-    "PROVIDER_ERROR_BODY",
-    errorBody
-  );
-
-  return null;
-}
-  return await response.json();
-
-  }
-    let data = null;
-
-if (loopLevel === 7) {
-
-  data = await callProvider(
-    "https://api.cerebras.ai/v1/chat/completions",
-    process.env.CEREBRAS_API_KEY,
-    "gpt-oss-120b",
-    {
-      model: "gpt-oss-120b",
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        ...messages.slice(-8)
-      ],
-      temperature: 0.7,
-      max_tokens: maxTokens
-    }
-  );
-
-  if (!data) {
-
     console.log(
-      "LOOP7_PROVIDER",
-      "GROQ_FALLBACK"
+      "PROVIDER_FAILED",
+      response.status
     );
 
-    data = await callProvider(
-      "https://api.groq.com/openai/v1/chat/completions",
-      process.env.GROQ_API_KEY,
-      "openai/gpt-oss-120b",
+    console.log(
+      await response.text()
+    );
+
+    return null;
+  }
+
+  return await response.json();
+}
+      let data = null;
+
+data = await callProvider(
+  aiEndpoint,
+  aiApiKey,
+  {
+    model: aiModel,
+
+    messages: [
       {
-        model: "openai/gpt-oss-120b",
+        role: "system",
+        content: systemPrompt
+      },
+
+      ...(isLoop7
+        ? messages.slice(-8)
+        : messages.slice(-2))
+    ],
+
+    temperature: 0.7,
+    max_tokens: maxTokens
+  }
+);
+      const profileResponse =
+  await fetch(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json",
+        Authorization:
+          "Bearer " +
+          process.env.GROQ_API_KEY
+      },
+
+      body: JSON.stringify({
+        model:
+          "openai/gpt-oss-120b",
+
         messages: [
           {
             role: "system",
-            content: systemPrompt
+            content: profilePrompt
           },
-          ...messages.slice(-8)
+
+          ...messages.slice(-3)
         ],
-        temperature: 0.7,
-        max_tokens: maxTokens
-      }
-    );
-  }
 
-} else {
-
-  data = await callProvider(
-    "https://api.groq.com/openai/v1/chat/completions",
-    process.env.GROQ_API_KEY,
-    "openai/gpt-oss-120b",
-    {
-      model: "openai/gpt-oss-120b",
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        ...messages.slice(-2)
-      ],
-      temperature: 0.7,
-      max_tokens: maxTokens
+        temperature: 0.3,
+        max_tokens: 120
+      })
     }
   );
-
-}
-    console.log("===== RAW AI RESPONSE =====");
-console.log(JSON.stringify(data, null, 2));
-console.log("===== END RAW AI RESPONSE =====");
-
-console.log("===== RAW AI REPLY =====");
-console.log(data?.choices?.[0]?.message?.content);
-console.log("===== END RAW AI REPLY =====");
-const profileResponse = await fetch(
-"https://api.groq.com/openai/v1/chat/completions",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:
-"Bearer " + process.env.GROQ_API_KEY
-},
-body:JSON.stringify({
-model:"openai/gpt-oss-120b",
-messages:[
-{
-role:"system",
-content:profilePrompt
-},
-...messages.slice(-3)
-],
-temperature:0.3,
-max_tokens:120
-})
-}
-);
 
 let profileData = {};
 
@@ -1827,9 +1762,12 @@ try {
     e
   );
 
-      }
-    let reply =
-    data?.choices?.[0]?.message?.content || "";
+}
+
+let reply =
+  data?.choices?.[0]?.message?.content || "";
+
+
 
 console.log("===== RAW AI REPLY =====");
 console.log(data?.choices?.[0]?.message?.content);
