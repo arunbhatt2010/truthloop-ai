@@ -80,6 +80,12 @@ console.log(
     await IdentityExtractionBrain({
         profileLinks
     });
+       if (
+  identityPackage?.identities?.length > 0
+) {
+  result.identityPackage =
+    identityPackage;
+       }
        console.log(
   "IDENTITY_PACKAGE",
   JSON.stringify(
