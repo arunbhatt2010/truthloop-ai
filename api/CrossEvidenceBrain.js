@@ -331,24 +331,18 @@ function calculateEvidenceScore(
 async function collectSourceEvidence(url) {
 
     try {
-       /*const identityPackage =
-  await IdentityExtractionBrain({
-    sourceUrl: url
-  });
-
-console.log(
-  "IDENTITY_PACKAGE",
-  identityPackage
-);*/
-/*const footprintPackage =
-  await FootprintDiscoveryBrain(
+  const identityPackage = {
+    success: false,
+    identities: []
+};
+       console.log(
+    "IDENTITY_PACKAGE",
     identityPackage
 );
-
-console.log(
-  "FOOTPRINT_PACKAGE",
-  footprintPackage
-);*/
+const footprintPackage = {
+    success: false,
+    discoveredProfiles: []
+};
         const urlPackage =
 await loadPublicContentFetcher({
     profileLinks: [url]
@@ -485,22 +479,20 @@ console.log(
                 finalPackage.success,
 
             package: {
-                ...finalPackage,
-                sourceUrl: url,
-                sourcePlatform:
-                    sourcePlatform:
-finalPackage?.sources?.[0]?.platform ||
-"unknown",
-                sourceHost:
-                    (() => {
-                        try {
-                            return new URL(url).hostname;
-                        } catch {
-                            return null;
-                        }
-                    })()
-            },
-
+    ...finalPackage,
+    sourceUrl: url,
+    sourcePlatform:
+        finalPackage?.sources?.[0]?.platform ||
+        "unknown",
+    sourceHost:
+        (() => {
+            try {
+                return new URL(url).hostname;
+            } catch {
+                return null;
+            }
+        })()
+},
             reason:
                 finalPackage.reason || null
 
