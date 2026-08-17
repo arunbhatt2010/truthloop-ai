@@ -621,7 +621,17 @@ if (publicEvidencePackage) {
     ? [profileLink.trim()]
     : [];
     let loop7Instruction = "";
-
+console.log(
+  "LOOP7_EVIDENCE_DEBUG",
+  JSON.stringify(
+    {
+      publicEvidencePackage,
+      profileLink
+    },
+    null,
+    2
+  )
+);
 if (loopLevel === 7) {
 
 loop7Instruction = `
@@ -666,7 +676,11 @@ Use:
 • TruthLoop Package (required)
 
 • Verified Universal Evidence Package (optional)
+DEBUG_PUBLIC_EVIDENCE_START
 
+${JSON.stringify(publicEvidencePackage, null, 2)}
+
+DEBUG_PUBLIC_EVIDENCE_END
 ${publicEvidencePackage
 ? JSON.stringify(publicEvidencePackage, null, 2)
 : "Not available"}
