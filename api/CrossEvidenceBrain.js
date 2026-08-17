@@ -77,16 +77,23 @@ console.log(
             return result;
         }
   const identityPackage =
-    await IdentityExtractionBrain({
-        profileLinks
-    });
-       if (
-  identityPackage?.identities?.length > 0
+  await IdentityExtractionBrain({
+    profileLinks
+  });
+
+if (
+  identityPackage?.identities?.length > 0 &&
+  identityPackage.identities.some(
+    x =>
+      x.type !== "platform" ||
+      x.value !== "unknown"
+  )
 ) {
   result.identityPackage =
     identityPackage;
-       }
-       console.log(
+}
+
+console.log(
   "IDENTITY_PACKAGE",
   JSON.stringify(
     identityPackage,
@@ -337,14 +344,11 @@ function calculateEvidenceScore(
 async function collectSourceEvidence(url) {
 
     try {
-  const identityPackage = {
-    success: false,
-    identities: []
-};
-       console.log(
-    "IDENTITY_PACKAGE",
-    identityPackage
+console.log(
+  "DEFAULT_IDENTITY_PACKAGE",
+  identityPackage
 );
+       
 const footprintPackage = {
     success: false,
     discoveredProfiles: []
@@ -978,7 +982,7 @@ identity.identities.push({
 
    }
      console.log(
-  "IDENTITY_PACKAGE",
+  "EXTRACTED_IDENTITY_PACKAGE",
   JSON.stringify(
     identity,
     null,
