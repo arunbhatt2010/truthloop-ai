@@ -1118,6 +1118,10 @@ Before returning the final report, verify:
 After the first identity reference (if used), address the reader only as "you" and "your". Never repeat the user's name or refer to the reader as "the user."
 
 Return only the final corrected report.
+Never output reasoning.
+Never output chain of thought.
+Never output <think> tags.
+Return only the final user-facing response.
 `;
 }
     /* =========================
@@ -1613,6 +1617,10 @@ Return only the TruthLoop response.
 
 MOST IMPORTANT:
 Users stay engaged when they feel understood, not analyzed.
+Never output reasoning.
+Never output chain of thought.
+Never output <think> tags.
+Return only the final user-facing response.
 `;
 
 const systemPrompt = `
@@ -1766,7 +1774,17 @@ try {
 let reply =
   data?.choices?.[0]?.message?.content || "";
 
+if (reply.startsWith("<think>")) {
 
+  const splitIndex = reply.indexOf("</think>");
+
+  if (splitIndex !== -1) {
+    reply = reply.slice(splitIndex + 8).trim();
+  } else {
+    reply = "";
+  }
+
+        }
 
 console.log("===== RAW AI REPLY =====");
 console.log(data?.choices?.[0]?.message?.content);
