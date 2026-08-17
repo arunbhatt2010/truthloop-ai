@@ -1689,10 +1689,6 @@ const response = await fetch(
     body: JSON.stringify({
       model: "openai/gpt-oss-20b",
 
-      reasoning: {
-        effort: "low"
-      },
-
       messages: [
         {
           role: "system",
@@ -1704,24 +1700,10 @@ const response = await fetch(
       ],
 
       temperature: 0.7,
-      max_tokens: 220
+      max_tokens: maxTokens
     })
   }
 );
-
-if (!response.ok) {
-
-  console.log("GROQ_STATUS", response.status);
-  console.log("GROQ_STATUS_TEXT", response.statusText);
-  console.log(
-    "GROQ_ERROR_BODY",
-    await response.text()
-  );
-
-  return res.status(500).json({
-    reply: "AI service busy. Please try again."
-  });
-}
     /* =========================
        📤 RESPONSE
     ========================= */
