@@ -1045,63 +1045,146 @@ Rules:
 Output:
 Discovery Package*/
 async function FootprintDiscoveryBrain(
-    identityPackage
+    identityPackage = {}
 ) {
 
-    const result = {
-        success: false,
-        discoveredProfiles: []
-    };
+    const discoveredProfiles = [];
 
+    // 1. Direct source links
     for (
-        const identity of
-        identityPackage.identities
+        const link of
+        (identityPackage.sourceLinks || [])
     ) {
 
         if (
-    identity.type === "profile"
-) {
+            typeof link === "string" &&
+            link.startsWith("http")
+        ) {
 
-    result.discoveredProfiles.push(
-        identity.value
-    );
+            discoveredProfiles.push(link);
 
-}
-
-// Fallback for website-only identities
-
-else if (
-    identity.type === "hostname" &&
-    identity.value
-) {
-
-    const sourceLink =
-        identityPackage.sourceLinks?.[0];
-
-    if (sourceLink) {
-
-        result.discoveredProfiles.push(
-            sourceLink
-        );
+        }
 
     }
 
-                      }
+    // 2. Publicly discovered profiles
+    for (
+        const profile of
+        (identityPackage.profiles || [])
+    ) {
+
+        const url =
+            profile?.url ||
+            profile?.value;
+
+        if (
+            typeof url === "string" &&
+            url.startsWith("http")
+        ) {
+
+            discoveredProfiles.push(url);
+
+        }
 
     }
 
-    result.success =
-        result.discoveredProfiles.length > 0;
+    // 3. Legacy identity support
+    for (
+        const identity of
+        (identityPackage.identities || [])
+    ) {
+
+        if (
+            identity?.type === "profile" &&
+            identity?.value
+        ) {
+
+            discoveredProfiles.push(
+                identity.value
+            );
+
+        }
+
+    }
+
+    // 4. Remove duplicates
+    const uniqueProfiles =
+        [...new Set(discoveredProfiles)];
+
+    // 5. Platform detection
+    const normalizedProfiles =
+        uniqueProfiles.map(url => {
+
+            let platform = "website";
+
+            if (
+                url.includes("linkedin.com")
+            ) {
+                platform = "linkedin";
+            }
+
+            else if (
+                url.includes("instagram.com")
+            ) {
+                platform = "instagram";
+            }
+
+            else if (
+                url.includes("facebook.com")
+            ) {
+                platform = "facebook";
+            }
+
+            else if (
+                url.includes("youtube.com") ||
+                url.includes("youtu.be")
+            ) {
+                platform = "youtube";
+            }
+
+            else if (
+                url.includes("x.com") ||
+                url.includes("twitter.com")
+            ) {
+                platform = "x";
+            }
+
+            else if (
+                url.includes("github.com")
+            ) {
+                platform = "github";
+            }
+
+            return {
+                url,
+                platform
+            };
+
+        });
+
+    const result = {
+        success:
+            normalizedProfiles.length > 0,
+
+        discoveredProfiles:
+            normalizedProfiles,
+
+        profileCount:
+            normalizedProfiles.length
+    };
 
     console.log(
         "DISCOVERY_PACKAGE",
-        result
+        JSON.stringify(
+            result,
+            null,
+            2
+        )
     );
 
     return result;
 
 }
-
 // ====================================
 // Evidence Normalizer
 // ====================================
