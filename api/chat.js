@@ -1604,17 +1604,9 @@ ${finalReview}
  LOOP 7 RESPONSE SANITIZER
 ******************************/
 
-if (loopLevel === 7) {
 
-  messages = messages.filter(m => {
-    if (m.role !== "assistant") return true;
-
-    return !m.content.includes("?");
-  });
-
-}
     const maxTokens =
-  loopLevel === 7 ? 1800 : 1000;
+  loopLevel === 7 ? 1800 : 400;
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -1628,7 +1620,7 @@ if (loopLevel === 7) {
 
         body: JSON.stringify({
 
-          model:"openai/gpt-oss-120b",
+          model:"qwen/qwen3-27b",
 
           messages: [
   {
@@ -1637,11 +1629,11 @@ if (loopLevel === 7) {
   },
   ...(loopLevel === 7
       ? messages.slice(-16)
-      : messages.slice(-2))
+      : messages.slice(-6))
 ],
 
 temperature: 0.7,
-max_tokens: maxTokens
+max_tokens: 1000
         })
       }
     );
