@@ -76,24 +76,24 @@ console.log(
 
             return result;
         }
-     /*  const identityPackage =
+  const identityPackage =
     await IdentityExtractionBrain({
         profileLinks
-    });*/
-       /*console.log(
+    });
+       console.log(
   "IDENTITY_PACKAGE",
   JSON.stringify(
     identityPackage,
     null,
     2
   )
-);*/
+);
 
-/*const discoveryPackage =
+const discoveryPackage =
     await FootprintDiscoveryBrain(
         identityPackage
-    );*/
-       const discoveryPackage = {};
+    );
+       
 
         for (const url of profileLinks) {
 
