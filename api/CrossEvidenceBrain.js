@@ -1031,14 +1031,34 @@ async function FootprintDiscoveryBrain(
     ) {
 
         if (
-            identity.type === "profile"
-        ) {
+    identity.type === "profile"
+) {
 
-            result.discoveredProfiles.push(
-                identity.value
-            );
+    result.discoveredProfiles.push(
+        identity.value
+    );
 
-        }
+}
+
+// Fallback for website-only identities
+
+else if (
+    identity.type === "hostname" &&
+    identity.value
+) {
+
+    const sourceLink =
+        identityPackage.sourceLinks?.[0];
+
+    if (sourceLink) {
+
+        result.discoveredProfiles.push(
+            sourceLink
+        );
+
+    }
+
+                      }
 
     }
 
