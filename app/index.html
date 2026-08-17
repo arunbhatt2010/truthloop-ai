@@ -2903,32 +2903,27 @@ getBtn.disabled = false;
     
 /* NEXT */    
     
-nextBtn.onclick = async () => {
-
-    if (isLoading) return;
-
-    if (loopLevel === 6 && !window.loop7Started) {
-
-        const profileLink =
-            document.getElementById("loop7ProfileLink")
-            ?.value.trim() || "";
-
-        window.loop7Started = true;
-
-        await startLoop7Investigation(profileLink);
-
-        nextBtn.innerText =
-            "Get Your Final Report →";
-      return;
-  
-    }
+nextBtn.onclick=async()=>{
+/*alert(
+    "NEXT BTN\n" +
+    "loopLevel = " + loopLevel +
+    "\nloop7Started = " + window.loop7Started
+); */
+if (isLoading) return;
+if (loopLevel === 6) {
+  if (!window.loop7Started) {
+    window.loop7Started = true;
+    nextBtn.innerText = "Get Your Final Report →";
+    return;
+  }
 
     const profileLink =
-        document.getElementById("loop7ProfileLink")
-        ?.value.trim() || "";
-
-    investigationSource = profileLink;
-
+        document.getElementById("loop7ProfileLink")?.value.trim() || "";
+investigationSource = profileLink;
+  /*alert(
+    "BEFORE PUSH\n\n" +
+    JSON.stringify(messages, null, 2)
+);*/
     messages.push({
         role: "user",
         content: profileLink || "Continue to Loop 7"
@@ -2936,23 +2931,22 @@ nextBtn.onclick = async () => {
 
     loopLevel = 7;
 
-    document.getElementById("loopIndicator").innerText =
-        "Loop 7 of 7";
+    document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
 
-    const data = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
+    const data = await fetch(API_URL,{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
         },
-        body: JSON.stringify({
+        body:JSON.stringify({
             messages,
             loopLevel,
             profileLink,
-            paid49: payment49,
-            paid199: payment199,
+            paid49:payment49,
+            paid199:payment199,
             currentCategory
         })
-    }).then(r => r.json());
+    }).then(r=>r.json());
 
 
     messages.push({
