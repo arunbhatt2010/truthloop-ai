@@ -1769,9 +1769,9 @@ if (loopLevel === 7) {
       await callProvider(
         "https://api.groq.com/openai/v1/chat/completions",
         process.env.GROQ_API_KEY,
-        "llama-3.3-70b-versatile",
+        "openai/gpt-oss-120b",
         {
-          model: "llama-3.3-70b-versatile",
+          model:"openai/gpt-oss-120b",
           messages: [
             {
               role: "system",
@@ -1791,9 +1791,9 @@ if (loopLevel === 7) {
     await callProvider(
       "https://api.groq.com/openai/v1/chat/completions",
       process.env.GROQ_API_KEY,
-      "llama-3.3-70b-versatile",
+      "openai/gpt-oss-120b",
       {
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-120b",
         messages: [
           {
             role: "system",
@@ -1826,7 +1826,7 @@ Authorization:
 "Bearer " + process.env.GROQ_API_KEY
 },
 body:JSON.stringify({
-model:"llama-3.1-8b-instant",
+model:"openai/gpt-oss-120b",
 messages:[
 {
 role:"system",
