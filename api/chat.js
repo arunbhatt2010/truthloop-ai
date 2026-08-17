@@ -1806,7 +1806,7 @@ const contentLeakWords = [
 
 ];
 
-const contentLeakDetected =
+const contentLeakDetected = false;
 contentLeakWords.some(word =>
 reply.toLowerCase().includes(
 word.toLowerCase()
@@ -1826,6 +1826,10 @@ let hiddenAssumption = "";
 
 try{
 
+    console.log(
+    "PROFILE_RAW",
+    profileData?.choices?.[0]?.message?.content
+  );
 const profile =
 JSON.parse(
 profileData?.choices?.[0]?.message?.content || "{}"
@@ -1852,7 +1856,10 @@ profile.hiddenAssumption !== "unknown"
 ? profile.hiddenAssumption
 : "";
 }catch(e){
-
+console.log(
+    "PROFILE_PARSE_ERROR",
+    e.message
+  );
 primaryLoop = "";
 emotionalDriver = "";
 avoidanceStyle = "";
