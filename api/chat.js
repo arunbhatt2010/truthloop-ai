@@ -1665,183 +1665,134 @@ ${outputRules}
 ${finalReview}
 `;
 
+ 
+/* =========================
+   🤖 MAIN CHAT
+   SambaNova 70B
+========================= */
 
-    /* =========================
-       🤖 AI CALL
-    ========================= */
-    /******************************
+/******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
 
 if (loopLevel === 7) {
 
   messages = messages.filter(m => {
-    if (m.role !== "assistant") return true;
+
+    if (m.role !== "assistant") {
+      return true;
+    }
 
     return !m.content.includes("?");
+
   });
 
 }
-    const response = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+
+const maxTokens =
+  loopLevel === 7 ? 900 : 220;
+
+/* =========================
+   MAIN CHAT REQUEST
+========================= */
+
+const response = await fetch(
+  "https://api.sambanova.ai/v1/chat/completions",
   {
     method: "POST",
+
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer " + process.env.SAMBANOVA_API_KEY
     },
+
     body: JSON.stringify({
-      contents: [
+
+      model:
+        "Meta-Llama-3.3-70B-Instruct",
+
+      messages: [
+
         {
-          parts: [
-            {
-              text: `SYSTEM:\n${systemPrompt}\n\nUSER:\n${
-                messages?.[messages.length - 1]?.content || ""
-              }`
-            }
-          ]
-        }
-      ]
+          role: "system",
+          content: systemPrompt
+        },
+
+        ...(loopLevel === 7
+          ? messages.slice(-8)
+          : messages.slice(-2))
+
+      ],
+
+      temperature: 0.7,
+
+      max_tokens: maxTokens
+
     })
+
   }
 );
 
-const data = await response.json();
-console.log(
-  "MAIN_RESPONSE",
-  JSON.stringify(data, null, 2)
-);
-let reply =
-  data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+/* =========================
+   ERROR HANDLING
+========================= */
 
-    /* =========================
-       📤 RESPONSE
-    ========================= */
-
-    let profileData = {
-  candidates: [
-    {
-      content: {
-        parts: [
-          {
-            text: JSON.stringify({
-              primaryLoop: "",
-              emotionalDriver: "",
-              avoidanceStyle: "",
-              hiddenAssumption: ""
-            })
-          }
-        ]
-      }
-    }
-  ]
-};
-
-try {
-console.log(
-  "PROFILE_PROMPT",
-  `
-Return ONLY valid JSON
-
-{
-  "primaryLoop":"",
-  "emotionalDriver":"",
-  "avoidanceStyle":"",
-  "hiddenAssumption":""
-}
-
-${profilePrompt}
-
-Assistant Reply:
-${reply}
-`
-);
-  console.log("AI_REPLY", reply);
-  console.log("PROFILE_REPLY_SOURCE", reply);
-console.log("PROFILE_PROMPT", profilePrompt);
-  const profileResponse = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `
-${profilePrompt}
-
-Recent Conversation:
-
-${messages
-  .slice(-3)
-  .map(m => `${m.role}: ${m.content}`)
-  .join("\n")}
-
-assistant: ${reply}
-
-Return ONLY valid JSON:
-
-{
-  "primaryLoop":"",
-  "emotionalDriver":"",
-  "avoidanceStyle":"",
-  "hiddenAssumption":""
-}
-`
-              }
-            ]
-          }
-        ],
-
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 120
-        }
-      })
-    }
-  );
-
-  if (profileResponse.ok) {
-    profileData =
-      await profileResponse.json();
-  }
-
-} catch (e) {
-
-  console.error(
-    "PROFILE_ENGINE_ERROR",
-    e
-  );
-
-}
-let profile = {
-  primaryLoop: "Unknown",
-  emotionalDriver: "Unknown",
-  avoidanceStyle: "Unknown",
-  hiddenAssumption: "Unknown"
-};
-
-try {
-
-  const raw =
-    profileData?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-
-  profile = JSON.parse(raw);
-
-} catch (e) {
+if (!response.ok) {
 
   console.log(
-    "PROFILE_PARSE_ERROR",
-    e
+    "SAMBANOVA_STATUS",
+    response.status
   );
+
+  console.log(
+    "SAMBANOVA_STATUS_TEXT",
+    response.statusText
+  );
+
+  console.log(
+    "SAMBANOVA_ERROR_BODY",
+    await response.text()
+  );
+
+  return res.status(500).json({
+    reply:
+      "AI service busy. Please try again."
+  });
 
 }
 
+/* =========================
+   MAIN CHAT RESPONSE
+========================= */
+
+const data =
+  await response.json();
+
+console.log(
+  "===== RAW AI RESPONSE ====="
+);
+
+console.log(
+  JSON.stringify(data, null, 2)
+);
+
+console.log(
+  "===== END RAW AI RESPONSE ====="
+);
+
+let reply =
+  data?.choices?.[0]?.message?.content || "";
+
+console.log(
+  "===== RAW AI REPLY ====="
+);
+
+console.log(reply);
+
+console.log(
+  "===== END RAW AI REPLY ====="
+);
 const contentLeakWords = [
 
 "template",
