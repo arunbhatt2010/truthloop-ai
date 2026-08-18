@@ -1884,20 +1884,7 @@ try {
 
   }
     
-  if (profileResponse.ok) {
-    profileData =
-      await profileResponse.json();
-  }
-
-} catch (e) {
-
-  console.error(
-    "PROFILE_ENGINE_ERROR",
-    e
-  );
-
-}
-
+  
 
 const contentLeakWords = [
 
