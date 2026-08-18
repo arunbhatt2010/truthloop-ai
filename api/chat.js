@@ -1857,8 +1857,11 @@ let hiddenAssumption = "";
 try{
 
 const rawProfile =
-  profileData?.choices?.[0]?.message?.content || "{}";
-
+  profileData?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+console.log(
+  "PROFILE RAW",
+  JSON.stringify(profileData, null, 2)
+);
 console.log("PROFILE RAW:", rawProfile);
 
 const profile = JSON.parse(rawProfile);
