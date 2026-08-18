@@ -1896,45 +1896,6 @@ reply = reply
   .trim();
 
 
-/* ========================================
-   🚫 CONTENT LEAK GUARD
-======================================== */
-
-const contentLeakWords = [
-
-  "template",
-  "framework",
-  "storytelling template",
-  "blog outline",
-  "linkedin post",
-  "social media post",
-  "marketing copy",
-  "email draft",
-  "content calendar",
-  "step 1",
-  "step 2",
-  "step 3"
-
-];
-
-const contentLeakDetected =
-  contentLeakWords.some(
-    word =>
-      reply
-        .toLowerCase()
-        .includes(
-          word.toLowerCase()
-        )
-  );
-
-if (contentLeakDetected) {
-
-  reply =
-`Interesting. You moved from understanding the problem to creating an answer.
-
-What feels unfinished if the answer never gets created?`;
-
-}
 
 
 /* ========================================
