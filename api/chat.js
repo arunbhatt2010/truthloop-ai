@@ -1547,17 +1547,6 @@ Internal State:
 Generate only the final user-facing response.
 `;
 
-const systemPrompt = `
-${corePrompt}
-
-${investigationRules}
-
-${loopRules}
-
-${outputRules}
-
-${finalReview}
-`;
 
 
     /* =========================
