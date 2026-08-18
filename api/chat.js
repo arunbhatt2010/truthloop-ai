@@ -1734,7 +1734,25 @@ let reply =
 };
 
 try {
+console.log(
+  "PROFILE_PROMPT",
+  `
+Return ONLY valid JSON
 
+{
+  "primaryLoop":"",
+  "emotionalDriver":"",
+  "avoidanceStyle":"",
+  "hiddenAssumption":""
+}
+
+${profilePrompt}
+
+Assistant Reply:
+${reply}
+`
+);
+  console.log("AI_REPLY", reply);
   const profileResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
