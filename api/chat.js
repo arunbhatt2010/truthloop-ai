@@ -1549,13 +1549,9 @@ Generate only the final user-facing response.
 
 
 
-    /* =========================
-       🤖 AI CALL
-    ========================= */
-    /******************************
- LOOP 7 RESPONSE SANITIZER
-******************************/
-
+/* ========================================
+   🤖 TRUTHLOOP AI RESPONSE ENGINE
+======================================== */
 
 const maxTokens =
   loopLevel === 7 ? 1800 : 220;
@@ -1580,6 +1576,7 @@ const response = await fetch(
           role: "system",
           content: systemPrompt
         },
+
         ...(loopLevel === 7
           ? messages.slice(-16)
           : messages.slice(-6))
@@ -1590,13 +1587,18 @@ const response = await fetch(
     })
   }
 );
-    /* =========================
-       📤 RESPONSE
-    ========================= */
 
-    const data =
-      await response.json();
-      console.log(
+const data =
+  await response.json();
+
+
+/* ========================================
+   📊 AI DEBUG
+======================================== */
+
+console.log("CHATJS_MARKER_V18");
+
+console.log(
   "MODEL",
   data?.model
 );
@@ -1607,154 +1609,230 @@ console.log(
 );
 
 console.log(
-  "REASONING_LENGTH",
-  data?.choices?.[0]?.message?.reasoning?.length
-);
-
-console.log(
   "MESSAGE_KEYS",
   Object.keys(
     data?.choices?.[0]?.message || {}
   )
 );
-console.log("CHATJS_MARKER_V17");
-    console.log("===== RAW AI RESPONSE =====");
-console.log(JSON.stringify(data, null, 2));
-console.log("===== END RAW AI RESPONSE =====");
 
-console.log("===== RAW AI REPLY =====");
-console.log(data?.choices?.[0]?.message?.content);
-console.log("===== END RAW AI REPLY =====");
-const profileResponse = await fetch(
-  "https://api.cerebras.ai/v1/chat/completions",
-  {
-    method: "POST",
-
-    headers: {
-      "Content-Type": "application/json",
-      Authorization:
-        `Bearer ${process.env.CEREBRAS_API_KEY}`
-    },
-
-    body: JSON.stringify({
-      model: "gpt-oss-120b",
-
-      messages: [
-        {
-          role: "system",
-          content: profilePrompt
-        },
-        ...messages.slice(-3)
-      ],
-
-      temperature: 0.1,
-      max_completion_tokens: 300
-    })
-  }
-);
-  "===== PROFILE RAW RESPONSE ====="
+console.log(
+  "===== RAW AI RESPONSE ====="
 );
 
 console.log(
-  JSON.stringify(profileData, null, 2)
+  JSON.stringify(data, null, 2)
 );
 
 console.log(
-  "===== END PROFILE RAW RESPONSE ====="
+  "===== END RAW AI RESPONSE ====="
 );
 
-  }
+console.log(
+  "===== RAW AI REPLY ====="
+);
 
-} catch (e) {
+console.log(
+  data?.choices?.[0]?.message?.content
+);
+
+console.log(
+  "===== END RAW AI REPLY ====="
+);
+
+
+/* ========================================
+   🧠 PROFILE ENGINE
+======================================== */
+
+let profileData = {};
+
+try {
+
+  const profileResponse = await fetch(
+    "https://api.cerebras.ai/v1/chat/completions",
+    {
+      method: "POST",
+
+      headers: {
+        Authorization:
+          `Bearer ${process.env.CEREBRAS_API_KEY}`,
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+        model: "gpt-oss-120b",
+
+        messages: [
+          {
+            role: "system",
+            content: profilePrompt
+          },
+
+          ...messages.slice(-3)
+        ],
+
+        temperature: 0.1,
+        max_completion_tokens: 300
+      })
+    }
+  );
+
+  profileData =
+    await profileResponse.json();
+
+  console.log(
+    "PROFILE_MODEL",
+    profileData?.model
+  );
+
+  console.log(
+    "===== PROFILE RAW RESPONSE ====="
+  );
+
+  console.log(
+    JSON.stringify(
+      profileData,
+      null,
+      2
+    )
+  );
+
+  console.log(
+    "===== END PROFILE RAW RESPONSE ====="
+  );
+
+}
+catch (e) {
 
   console.error(
     "PROFILE_ENGINE_ERROR",
     e
   );
 
-      }
-    let reply =
-    data?.choices?.[0]?.message?.content || "";
-console.log("REPLY_FIRST_200");
-console.log(reply.substring(0,200));
-      console.log("PROFILE_FIRST_200");
+}
 
-console.log("===== RAW AI REPLY =====");
-console.log(data?.choices?.[0]?.message?.content);
-console.log("===== END RAW AI REPLY =====");
+
+/* ========================================
+   💬 REPLY EXTRACTION
+======================================== */
+
+let reply =
+  data?.choices?.[0]?.message?.content || "";
+
+console.log(
+  "REPLY_FIRST_200"
+);
+
+console.log(
+  reply.substring(0, 200)
+);
+
+
+/* ========================================
+   🚨 CONTENT LEAK GUARD
+======================================== */
+
 const contentLeakWords = [
 
-"template",
-"framework",
-"storytelling template",
-"blog outline",
-"linkedin post",
-"social media post",
-"marketing copy",
-"email draft",
-"content calendar",
-"step 1",
-"step 2",
-"step 3"
+  "template",
+  "framework",
+  "storytelling template",
+  "blog outline",
+  "linkedin post",
+  "social media post",
+  "marketing copy",
+  "email draft",
+  "content calendar",
+  "step 1",
+  "step 2",
+  "step 3"
 
 ];
 
 const contentLeakDetected =
-contentLeakWords.some(word =>
-reply.toLowerCase().includes(
-word.toLowerCase()
-)
-);
+  contentLeakWords.some(
+    word =>
+      reply
+        .toLowerCase()
+        .includes(
+          word.toLowerCase()
+        )
+  );
 
-if(contentLeakDetected){
+if (contentLeakDetected) {
 
-reply =
-"Interesting. You moved from understanding the problem to creating an answer.\n\nWhat feels unfinished if the answer never gets created?";
+  reply =
+`Interesting. You moved from understanding the problem to creating an answer.
 
-}    
+What feels unfinished if the answer never gets created?`;
+
+}
+
+
+/* ========================================
+   🧩 PROFILE PARSER
+======================================== */
+
 let primaryLoop = "";
 let emotionalDriver = "";
 let avoidanceStyle = "";
 let hiddenAssumption = "";
-console.log("PROFILE_FIRST_200");
-console.log(
-  profileData?.choices?.[0]?.message?.content?.substring(0,200)
-);
-try{
 
-const profile =
-JSON.parse(
-profileData?.choices?.[0]?.message?.content || "{}"
-);
+try {
 
-primaryLoop =
-profile.primaryLoop || "";
+  console.log(
+    "PROFILE_FIRST_200"
+  );
 
-emotionalDriver =
-profile.emotionalDriver &&
-profile.emotionalDriver !== "unknown"
-? profile.emotionalDriver
-: "";
+  console.log(
+    profileData?.choices?.[0]
+      ?.message?.content
+      ?.substring(0, 200)
+  );
 
-avoidanceStyle =
-profile.avoidanceStyle &&
-profile.avoidanceStyle !== "unknown"
-? profile.avoidanceStyle
-: "";
+  const profile =
+    JSON.parse(
+      profileData?.choices?.[0]
+        ?.message?.content || "{}"
+    );
 
-hiddenAssumption =
-profile.hiddenAssumption &&
-profile.hiddenAssumption !== "unknown"
-? profile.hiddenAssumption
-: "";
-}catch(e){
+  primaryLoop =
+    profile.primaryLoop || "";
 
-primaryLoop = "";
-emotionalDriver = "";
-avoidanceStyle = "";
-hiddenAssumption = "";
+  emotionalDriver =
+    profile.emotionalDriver &&
+    profile.emotionalDriver !== "unknown"
+      ? profile.emotionalDriver
+      : "";
 
-  }
+  avoidanceStyle =
+    profile.avoidanceStyle &&
+    profile.avoidanceStyle !== "unknown"
+      ? profile.avoidanceStyle
+      : "";
+
+  hiddenAssumption =
+    profile.hiddenAssumption &&
+    profile.hiddenAssumption !== "unknown"
+      ? profile.hiddenAssumption
+      : "";
+
+}
+catch (e) {
+
+  console.error(
+    "PROFILE_PARSE_ERROR",
+    e
+  );
+
+  primaryLoop = "";
+  emotionalDriver = "";
+  avoidanceStyle = "";
+  hiddenAssumption = "";
+
+}
+
     /* =========================
        ✂️ CLEANER
     ========================= */
