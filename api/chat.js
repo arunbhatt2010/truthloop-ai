@@ -1585,17 +1585,6 @@ const data = await response.json();
 
 
 
-const reply =
-  data?.candidates?.[0]
-    ?.content?.parts?.[0]?.text || "";
-
-console.log(
-  "REPLY_FIRST_200"
-);
-
-console.log(
-  reply.substring(0, 200)
-);
 
 /* ========================================
    📊 AI DEBUG
