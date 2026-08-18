@@ -1764,31 +1764,34 @@ try {
   );
 
   console.log(
-    profileData?.choices?.[0]
-      ?.message?.content
-      ?.substring(0, 200)
-  );
+  profileData?.candidates?.[0]
+    ?.content?.parts?.[0]
+    ?.text?.substring(0, 200)
+);
+  const rawProfile =
+  profileData?.candidates?.[0]?.content?.parts?.[0]?.text ||
+  profileData?.choices?.[0]?.message?.content ||
+  "{}";
 
-  const profile =
-    JSON.parse(
-      profileData?.choices?.[0]
-        ?.message?.content || "{}"
-    );
+const cleanProfile =
+  rawProfile
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
 
-  primaryLoop =
-    profile.primaryLoop || "";
+const profile =
+  JSON.parse(cleanProfile);
 
-  emotionalDriver =
-    profile.emotionalDriver &&
-    profile.emotionalDriver !== "unknown"
-      ? profile.emotionalDriver
-      : "";
+primaryLoop =
+  profile.primaryLoop || "";
 
-  avoidanceStyle =
-    profile.avoidanceStyle &&
-    profile.avoidanceStyle !== "unknown"
-      ? profile.avoidanceStyle
-      : "";
+emotionalDriver =
+  profile.emotionalDriver &&
+  profile.emotionalDriver !== "unknown"
+    ? profile.emotionalDriver
+    : "";
+
+  
 
   hiddenAssumption =
     profile.hiddenAssumption &&
