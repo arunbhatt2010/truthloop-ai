@@ -1553,43 +1553,32 @@ Generate only the final user-facing response.
    🤖 TRUTHLOOP AI RESPONSE ENGINE
 ======================================== */
 
-const maxTokens =
-  loopLevel === 7 ? 1800 : 220;
-
 const response = await fetch(
-  "https://api.cerebras.ai/v1/chat/completions",
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
   {
     method: "POST",
 
     headers: {
-      Authorization:
-        `Bearer ${process.env.CEREBRAS_API_KEY}`,
-      "Content-Type":
-        "application/json"
+      "Content-Type": "application/json"
     },
 
     body: JSON.stringify({
-      model: "llama-3.3-70b",
-
-      messages: [
+      contents: [
         {
-          role: "system",
-          content: systemPrompt
-        },
-
-        ...(loopLevel === 7
-          ? messages.slice(-16)
-          : messages.slice(-6))
-      ],
-
-      temperature: 0.5,
-      max_completion_tokens: maxTokens
+          parts: [
+            {
+              text: `SYSTEM:\n${systemPrompt}\n\nUSER:\n${
+                messages?.[messages.length - 1]?.content || ""
+              }`
+            }
+          ]
+        }
+      ]
     })
   }
 );
 
-const data =
-  await response.json();
+const data = await response.json();
 
 
 /* ========================================
@@ -1644,47 +1633,35 @@ console.log(
    🧠 PROFILE ENGINE
 ======================================== */
 
-let profileData = {};
-
 try {
 
   const profileResponse = await fetch(
-    "https://api.cerebras.ai/v1/chat/completions",
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
       method: "POST",
 
       headers: {
-        Authorization:
-          `Bearer ${process.env.CEREBRAS_API_KEY}`,
-        "Content-Type":
-          "application/json"
+        "Content-Type": "application/json"
       },
 
       body: JSON.stringify({
-        model: "llama-3.3-70b",
-
-        messages: [
+        contents: [
           {
-            role: "system",
-            content: profilePrompt
-          },
-
-          ...messages.slice(-3)
-        ],
-
-        temperature: 0.1,
-        max_completion_tokens: 300
+            parts: [
+              {
+                text: `SYSTEM:\n${profilePrompt}\n\nUSER:\n${
+                  messages?.[messages.length - 1]?.content || ""
+                }`
+              }
+            ]
+          }
+        ]
       })
     }
   );
 
   profileData =
     await profileResponse.json();
-
-  console.log(
-    "PROFILE_MODEL",
-    profileData?.model
-  );
 
   console.log(
     "===== PROFILE RAW RESPONSE ====="
