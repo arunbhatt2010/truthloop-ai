@@ -674,6 +674,79 @@ function scanPatternSignals(text) {
     });
 
   }
+   /* Idea Overload */
+
+if (
+  input.includes("many ideas") ||
+  input.includes("too many ideas") ||
+  input.includes("lots of ideas")
+) {
+
+  patterns.push({
+    pattern: "Idea Overload",
+    confidence: 0.90
+  });
+
+}
+
+/* Action Paralysis */
+
+if (
+  input.includes("can't start") ||
+  input.includes("cannot start") ||
+  input.includes("never start")
+) {
+
+  patterns.push({
+    pattern: "Action Paralysis",
+    confidence: 0.95
+  });
+
+}
+
+/* Procrastination */
+
+if (
+  input.includes("procrastinate") ||
+  input.includes("later") ||
+  input.includes("put off")
+) {
+
+  patterns.push({
+    pattern: "Procrastination Loop",
+    confidence: 0.90
+  });
+
+}
+
+/* Overthinking */
+
+if (
+  input.includes("overthink") ||
+  input.includes("thinking too much")
+) {
+
+  patterns.push({
+    pattern: "Analysis Paralysis",
+    confidence: 0.90
+  });
+
+}
+
+/* Incompletion Pattern */
+
+if (
+  input.includes("never finish") ||
+  input.includes("don't finish") ||
+  input.includes("quit")
+) {
+
+  patterns.push({
+    pattern: "Execution Breakdown",
+    confidence: 0.90
+  });
+
+}
 
   return patterns;
 
