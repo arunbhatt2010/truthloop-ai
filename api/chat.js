@@ -1682,119 +1682,90 @@ if (loopLevel === 7) {
   });
 
 }
-    const maxTokens =
-  loopLevel === 7 ? 900 : 220;
     const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            "Bearer " + process.env.GROQ_API_KEY
-        },
-
-        body: JSON.stringify({
-
-          model:"llama-3.3-70b-versatile",
-
-          messages: [
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
   {
-    role: "system",
-    content: systemPrompt
-  },
-  ...(loopLevel === 7
-      ? messages.slice(-8)
-      : messages.slice(-2))
-],
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [
+            {
+              text: `SYSTEM:\n${systemPrompt}\n\nUSER:\n${
+                messages?.[messages.length - 1]?.content || ""
+              }`
+            }
+          ]
+        }
+      ]
+    })
+  }
+);
 
-temperature: 0.7,
-max_tokens: maxTokens
-        })
-      }
-    );
+const data = await response.json();
 
-    if (!response.ok) {
-
-    console.log("GROQ_STATUS", response.status);
-    console.log("GROQ_STATUS_TEXT", response.statusText);
-    console.log("GROQ_ERROR_BODY", await response.text());
-
-    return res.status(500).json({
-        reply: "AI service busy. Please try again."
-    });
-          }
+let reply =
+  data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     /* =========================
        📤 RESPONSE
     ========================= */
 
-    const data =
-      await response.json();
+    const profileResponse = await fetch(
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [
+            {
+              text: `
+Return ONLY valid JSON.
 
-console.log("===== RAW AI RESPONSE =====");
-console.log(JSON.stringify(data, null, 2));
-console.log("===== END RAW AI RESPONSE =====");
+{
+  "primaryLoop":"",
+  "emotionalDriver":"",
+  "avoidanceStyle":"",
+  "hiddenAssumption":""
+}
 
-let reply =
-      data?.choices?.[0]?.message?.content || "";
+${profilePrompt}
 
-console.log("===== RAW AI REPLY =====");
-console.log(reply);
-console.log("===== END RAW AI REPLY =====");
+Assistant Reply:
+${reply}
+`
+            }
+          ]
+        }
+      ]
+    })
+  }
+);
 
-let profileData = {
-  choices: [
-    {
-      message: {
-        content: JSON.stringify({
-          primaryLoop: "",
-          emotionalDriver: "",
-          avoidanceStyle: "",
-          hiddenAssumption: ""
-        })
-      }
-    }
-  ]
+const profileData = await profileResponse.json();
+
+let profile = {
+  primaryLoop: "Unknown",
+  emotionalDriver: "Unknown",
+  avoidanceStyle: "Unknown",
+  hiddenAssumption: "Unknown"
 };
 
 try {
+  const raw =
+    profileData?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
 
-  const profileResponse = await fetch(
-    "https://api.groq.com/openai/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          "Bearer " + process.env.GROQ_API_KEY
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
-        messages: [
-          {
-            role: "system",
-            content: profilePrompt
-          },
-
-          ...messages.slice(-3),
-
-          {
-            role: "assistant",
-            content: reply
-          }
-
-        ],
-        temperature: 0.3,
-        max_tokens: 120,
-        response_format: {
-  type: "json_object"
-        }
-      })
-    }
-  );
-
+  profile = JSON.parse(raw);
+} catch (e) {
+  console.log("PROFILE_PARSE_ERROR", e);
+}
   if (profileResponse.ok) {
     profileData =
       await profileResponse.json();
