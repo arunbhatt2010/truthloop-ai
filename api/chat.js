@@ -1783,6 +1783,105 @@ console.log(
 
 let reply =
   data?.choices?.[0]?.message?.content || "";
+    let profileData = {
+  choices: [
+    {
+      message: {
+        content: JSON.stringify({
+          primaryLoop: "unknown",
+          emotionalDriver: "unknown",
+          avoidanceStyle: "unknown",
+          hiddenAssumption: "unknown"
+        })
+      }
+    }
+  ]
+};
+
+try {
+
+  const profileResponse = await fetch(
+    "https://api.sambanova.ai/v1/chat/completions",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + process.env.SAMBANOVA_API_KEY
+      },
+
+      body: JSON.stringify({
+
+        model:
+          "Meta-Llama-3.1-8B-Instruct",
+
+        messages: [
+
+          {
+            role: "system",
+            content: profilePrompt
+          },
+
+          ...messages.slice(-3),
+
+          {
+            role: "assistant",
+            content: reply
+          }
+
+        ],
+
+        temperature: 0.3,
+
+        max_tokens: 120,
+
+        response_format: {
+          type: "json_object"
+        }
+
+      })
+
+    }
+  );
+
+  if (!profileResponse.ok) {
+
+    console.log(
+      "PROFILE_STATUS",
+      profileResponse.status
+    );
+
+    console.log(
+      "PROFILE_STATUS_TEXT",
+      profileResponse.statusText
+    );
+
+    console.log(
+      "PROFILE_ERROR_BODY",
+      await profileResponse.text()
+    );
+
+  } else {
+
+    profileData =
+      await profileResponse.json();
+
+    console.log(
+      "PROFILE RAW",
+      JSON.stringify(profileData, null, 2)
+    );
+
+  }
+
+} catch (e) {
+
+  console.error(
+    "PROFILE_ENGINE_ERROR",
+    e
+  );
+
+          }
 
 console.log(
   "===== RAW AI REPLY ====="
