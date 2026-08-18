@@ -1553,160 +1553,59 @@ Generate only the final user-facing response.
    🤖 TRUTHLOOP AI RESPONSE ENGINE
 ======================================== */
 
-const response = await fetch(
+const profileResponse = await fetch(
   `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
   {
     method: "POST",
+
     headers: {
       "Content-Type": "application/json"
     },
+
     body: JSON.stringify({
       contents: [
         {
           parts: [
             {
-              text: `SYSTEM:\n${systemPrompt}\n\nUSER:\n${
+              text: `SYSTEM:\n${profilePrompt}\n\nUSER:\n${
                 messages?.[messages.length - 1]?.content || ""
               }`
             }
           ]
         }
-      ],
-      generationConfig: {
-        temperature: 0.5,
-        maxOutputTokens:
-          loopLevel === 7 ? 2500 : 220
-      }
+      ]
     })
   }
 );
 
-const data = await response.json();
-
-
-
-
-/* ========================================
-   📊 AI DEBUG
-======================================== */
-
-console.log("CHATJS_MARKER_V19");
+profileData =
+  await profileResponse.json();
 
 console.log(
-  "MODEL",
-  data?.modelVersion
+  "===== PROFILE RAW RESPONSE ====="
 );
 
 console.log(
-  "CONTENT_LENGTH",
-  data?.candidates?.[0]?.content?.parts?.[0]?.text?.length
-);
-
-console.log(
-  "CANDIDATE_KEYS",
-  Object.keys(
-    data?.candidates?.[0] || {}
+  JSON.stringify(
+    profileData,
+    null,
+    2
   )
 );
 
 console.log(
-  "===== RAW AI RESPONSE ====="
+  "===== END PROFILE RAW RESPONSE ====="
 );
 
 console.log(
-  JSON.stringify(data, null, 2)
+  "PROFILE_FIRST_200"
 );
 
 console.log(
-  "===== END RAW AI RESPONSE ====="
+  profileData?.candidates?.[0]
+    ?.content?.parts?.[0]?.text
+    ?.substring(0, 200)
 );
-
-console.log(
-  "===== RAW AI REPLY ====="
-);
-
-console.log(
-  data?.candidates?.[0]?.content?.parts?.[0]?.text
-);
-
-console.log(
-  "===== END RAW AI REPLY ====="
-);
-/* ========================================
-   🧠 PROFILE ENGINE
-======================================== */
-let profileData = {};
-
-try {
-
-  const profileResponse = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `SYSTEM:\n${profilePrompt}\n\nUSER:\n${
-                  messages?.[messages.length - 1]?.content || ""
-                }`
-              }
-            ]
-          }
-        ],
-
-        generationConfig: {
-          temperature: 0.5,
-          maxOutputTokens: 200
-        }
-      })
-    }
-  );
-
-  profileData =
-    await profileResponse.json();
-
-  console.log(
-    "===== PROFILE RAW RESPONSE ====="
-  );
-
-  console.log(
-    JSON.stringify(
-      profileData,
-      null,
-      2
-    )
-  );
-
-  console.log(
-    "===== END PROFILE RAW RESPONSE ====="
-  );
-
-  console.log(
-    "PROFILE_FIRST_200"
-  );
-
-  console.log(
-    profileData?.candidates?.[0]
-      ?.content?.parts?.[0]?.text
-      ?.substring(0, 200)
-  );
-
-}
-catch (e) {
-
-  console.error(
-    "PROFILE_ENGINE_ERROR",
-    e
-  );
-
-}
 
   
 /* ========================================
