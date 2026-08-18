@@ -2106,3 +2106,60 @@ console.log(
 console.log(
   "FINAL_RETURN_REACHED"
 );
+
+    return res.status(200).json({
+
+  analysis,
+  question,
+  reply,
+
+  primaryLoop,
+  emotionalDriver,
+  avoidanceStyle,
+  hiddenAssumption,
+
+  loop7EntryBridge:
+    loopLevel === 6
+      ? {
+          enabled: true,
+          recommended: true,
+          allowSkip: true,
+          supportedSources: [
+            "LinkedIn",
+            "GitHub",
+            "Portfolio",
+            "Website",
+            "X",
+            "Facebook",
+            "Reddit",
+            "YouTube",
+            "Medium",
+            "Substack"
+          ]
+        }
+      : null,
+
+  loopCompleted:
+    loopLevel === 6
+      ? 6
+      : undefined,
+
+  paywall: false
+
+});
+
+} catch (error) {
+
+  return res.status(500).json({
+
+    reply: "SERVER CRASH",
+
+    error: error.message,
+
+    stack: error.stack
+
+  });
+
+}
+
+        }
