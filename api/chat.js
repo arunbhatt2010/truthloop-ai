@@ -1575,7 +1575,7 @@ const response = await fetch(
       generationConfig: {
         temperature: 0.5,
         maxOutputTokens:
-          loopLevel === 7 ? 1800 : 220
+          loopLevel === 7 ? 2500 : 800
       }
     })
   }
@@ -1590,22 +1590,22 @@ const data = await response.json();
    📊 AI DEBUG
 ======================================== */
 
-console.log("CHATJS_MARKER_V18");
+console.log("CHATJS_MARKER_V19");
 
 console.log(
   "MODEL",
-  data?.model
+  data?.modelVersion
 );
 
 console.log(
   "CONTENT_LENGTH",
-  data?.choices?.[0]?.message?.content?.length
+  data?.candidates?.[0]?.content?.parts?.[0]?.text?.length
 );
 
 console.log(
-  "MESSAGE_KEYS",
+  "CANDIDATE_KEYS",
   Object.keys(
-    data?.choices?.[0]?.message || {}
+    data?.candidates?.[0] || {}
   )
 );
 
@@ -1626,14 +1626,12 @@ console.log(
 );
 
 console.log(
-  data?.choices?.[0]?.message?.content
+  data?.candidates?.[0]?.content?.parts?.[0]?.text
 );
 
 console.log(
   "===== END RAW AI REPLY ====="
 );
-
-
 /* ========================================
    🧠 PROFILE ENGINE
 ======================================== */
@@ -1664,8 +1662,8 @@ try {
         ],
 
         generationConfig: {
-          temperature: 0.1,
-          maxOutputTokens: 300
+          temperature: 0,
+          maxOutputTokens: 150
         }
       })
     }
