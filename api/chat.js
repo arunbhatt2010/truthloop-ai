@@ -1706,7 +1706,10 @@ if (loopLevel === 7) {
 );
 
 const data = await response.json();
-
+console.log(
+  "MAIN_RESPONSE",
+  JSON.stringify(data, null, 2)
+);
 let reply =
   data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
