@@ -1756,6 +1756,8 @@ ${reply}
 `
 );
   console.log("AI_REPLY", reply);
+  console.log("PROFILE_REPLY_SOURCE", reply);
+console.log("PROFILE_PROMPT", profilePrompt);
   const profileResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
