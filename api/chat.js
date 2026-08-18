@@ -1695,8 +1695,9 @@ catch (e) {
 ======================================== */
 
 let reply =
-  data?.choices?.[0]?.message?.content || "";
-
+data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+data?.choices?.[0]?.message?.content ||
+"";
 console.log(
   "REPLY_FIRST_200"
 );
