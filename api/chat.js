@@ -1714,20 +1714,54 @@ let reply =
        📤 RESPONSE
     ========================= */
 
-    const profileResponse = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: `
-Return ONLY valid JSON.
+    let profileData = {
+  candidates: [
+    {
+      content: {
+        parts: [
+          {
+            text: JSON.stringify({
+              primaryLoop: "",
+              emotionalDriver: "",
+              avoidanceStyle: "",
+              hiddenAssumption: ""
+            })
+          }
+        ]
+      }
+    }
+  ]
+};
+
+try {
+
+  const profileResponse = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: `
+${profilePrompt}
+
+Recent Conversation:
+
+${messages
+  .slice(-3)
+  .map(m => `${m.role}: ${m.content}`)
+  .join("\n")}
+
+assistant: ${reply}
+
+Return ONLY valid JSON:
 
 {
   "primaryLoop":"",
@@ -1735,37 +1769,20 @@ Return ONLY valid JSON.
   "avoidanceStyle":"",
   "hiddenAssumption":""
 }
-
-${profilePrompt}
-
-Assistant Reply:
-${reply}
 `
-            }
-          ]
+              }
+            ]
+          }
+        ],
+
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 120
         }
-      ]
-    })
-  }
-);
+      })
+    }
+  );
 
-const profileData = await profileResponse.json();
-
-let profile = {
-  primaryLoop: "Unknown",
-  emotionalDriver: "Unknown",
-  avoidanceStyle: "Unknown",
-  hiddenAssumption: "Unknown"
-};
-
-try {
-  const raw =
-    profileData?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-
-  profile = JSON.parse(raw);
-} catch (e) {
-  console.log("PROFILE_PARSE_ERROR", e);
-}
   if (profileResponse.ok) {
     profileData =
       await profileResponse.json();
@@ -1779,7 +1796,28 @@ try {
   );
 
 }
+let profile = {
+  primaryLoop: "Unknown",
+  emotionalDriver: "Unknown",
+  avoidanceStyle: "Unknown",
+  hiddenAssumption: "Unknown"
+};
 
+try {
+
+  const raw =
+    profileData?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+
+  profile = JSON.parse(raw);
+
+} catch (e) {
+
+  console.log(
+    "PROFILE_PARSE_ERROR",
+    e
+  );
+
+}
 
 const contentLeakWords = [
 
