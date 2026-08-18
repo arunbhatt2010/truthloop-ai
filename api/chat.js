@@ -1558,21 +1558,22 @@ Generate only the final user-facing response.
 
 
 const maxTokens =
-  loopLevel === 7 ? 1800 : 150;
+  loopLevel === 7 ? 1800 : 220;
 
 const response = await fetch(
-  "https://api.groq.com/openai/v1/chat/completions",
+  "https://api.cerebras.ai/v1/chat/completions",
   {
     method: "POST",
 
     headers: {
-      "Content-Type": "application/json",
       Authorization:
-        "Bearer " + process.env.GROQ_API_KEY
+        `Bearer ${process.env.CEREBRAS_API_KEY}`,
+      "Content-Type":
+        "application/json"
     },
 
     body: JSON.stringify({
-      model: "qwen/qwen3.6-27b",
+      model: "gpt-oss-120b",
 
       messages: [
         {
@@ -1585,7 +1586,7 @@ const response = await fetch(
       ],
 
       temperature: 0.5,
-      max_tokens: maxTokens
+      max_completion_tokens: maxTokens
     })
   }
 );
