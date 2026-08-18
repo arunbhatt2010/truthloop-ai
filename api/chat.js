@@ -1683,7 +1683,73 @@ if (loopLevel === 7) {
   });
 
 }
+const detectedPattern =
+  masterBrainResult?.executiveDecision?.primaryPattern ||
+  "Unknown";
 
+const patternConfidence =
+  masterBrainResult?.mergedSignals?.primaryPattern?.confidence ||
+  0;
+
+const evidenceContext = `
+TRUTHLOOP VALIDATED EVIDENCE
+
+Primary Pattern:
+${detectedPattern}
+
+Confidence:
+${patternConfidence}
+
+This pattern has already been detected by TruthLoop.
+
+Treat it as evidence, not a hypothesis.
+
+Do not generate multiple explanations.
+
+Do not investigate whether the pattern exists.
+
+Build your response around this pattern.
+
+User Input:
+${userMessage}
+`;
+    const evidenceContext = `
+TRUTHLOOP VALIDATED EVIDENCE
+
+Primary Pattern:
+${detectedPattern}
+
+Confidence:
+${patternConfidence}
+
+The pattern has already been detected.
+
+Treat it as established evidence.
+
+Do not investigate alternatives.
+
+Do not ask what the pattern is.
+
+Do not generate multiple explanations.
+
+Build one conclusion from:
+1. Detected Pattern
+2. User Input
+
+Output structure:
+
+Observation:
+(one paragraph)
+
+Hidden Mechanism:
+(one paragraph)
+
+Question:
+(one question only)
+
+User Input:
+${userMessage}
+`;
 const maxTokens =
   loopLevel === 7 ? 900 : 220;
 
@@ -1703,15 +1769,20 @@ const response = await fetch(
       model: "qwen/qwen3.6-27b",
 
       messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
+  {
+    role: "system",
+    content: systemPrompt
+  },
 
-        ...(loopLevel === 7
-          ? messages.slice(-8)
-          : messages.slice(-2))
-      ],
+  {
+    role: "system",
+    content: evidenceContext
+  },
+
+  ...(loopLevel === 7
+      ? messages.slice(-8)
+      : messages.slice(-2))
+],
 
       temperature: 0.7,
 
