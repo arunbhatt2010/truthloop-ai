@@ -1709,9 +1709,7 @@ const response = await fetch(
 
     body: JSON.stringify({
 
-      model:
-        "Meta-Llama-3.3-70B-Instruct",
-
+      model: "DeepSeek-V3.1",
       messages: [
 
         {
@@ -1813,8 +1811,7 @@ try {
 
       body: JSON.stringify({
 
-        model:
-          "Meta-Llama-3.1-8B-Instruct",
+        model: "DeepSeek-V3.1",
 
         messages: [
 
