@@ -1553,7 +1553,7 @@ Generate only the final user-facing response.
    🤖 TRUTHLOOP AI RESPONSE ENGINE
 ======================================== */
 
-const profileResponse = await fetch(
+const response = await fetch(
   `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
   {
     method: "POST",
@@ -1567,7 +1567,7 @@ const profileResponse = await fetch(
         {
           parts: [
             {
-              text: `SYSTEM:\n${profilePrompt}\n\nUSER:\n${
+              text: `SYSTEM:\n${systemPrompt}\n\nUSER:\n${
                 messages?.[messages.length - 1]?.content || ""
               }`
             }
@@ -1578,35 +1578,78 @@ const profileResponse = await fetch(
   }
 );
 
-profileData =
-  await profileResponse.json();
+const data = await response.json();
 
-console.log(
-  "===== PROFILE RAW RESPONSE ====="
-);
+console.log("===== RAW AI RESPONSE =====");
+console.log(JSON.stringify(data, null, 2));
+console.log("===== END RAW AI RESPONSE =====");
+      let profileData = {};
 
-console.log(
-  JSON.stringify(
-    profileData,
-    null,
-    2
-  )
-);
+try {
 
-console.log(
-  "===== END PROFILE RAW RESPONSE ====="
-);
+  const profileResponse = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    {
+      method: "POST",
 
-console.log(
-  "PROFILE_FIRST_200"
-);
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-console.log(
-  profileData?.candidates?.[0]
-    ?.content?.parts?.[0]?.text
-    ?.substring(0, 200)
-);
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: `SYSTEM:\n${profilePrompt}\n\nUSER:\n${
+                  messages?.[messages.length - 1]?.content || ""
+                }`
+              }
+            ]
+          }
+        ]
+      })
+    }
+  );
 
+  profileData =
+    await profileResponse.json();
+
+  console.log(
+    "===== PROFILE RAW RESPONSE ====="
+  );
+
+  console.log(
+    JSON.stringify(
+      profileData,
+      null,
+      2
+    )
+  );
+
+  console.log(
+    "===== END PROFILE RAW RESPONSE ====="
+  );
+
+  console.log(
+    "PROFILE_FIRST_200"
+  );
+
+  console.log(
+    profileData?.candidates?.[0]
+      ?.content?.parts?.[0]?.text
+      ?.substring(0, 200)
+  );
+
+}
+catch (e) {
+
+  console.error(
+    "PROFILE_ENGINE_ERROR",
+    e
+  );
+
+      }
   
 /* ========================================
    💬 REPLY EXTRACTION
