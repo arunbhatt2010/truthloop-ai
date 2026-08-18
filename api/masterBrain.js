@@ -1668,7 +1668,15 @@ const selectedBrain =
 
   const organizationPatterns =
     scanOrganizationPatterns(text);
-
+console.log("MASTER_TEXT", text);
+console.log(
+  "PATTERN_SIGNALS",
+  JSON.stringify(
+    scanPatternSignals(text),
+    null,
+    2
+  )
+);
   const patternSignals =
     scanPatternSignals(text);
 
