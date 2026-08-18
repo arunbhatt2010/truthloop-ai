@@ -1626,38 +1626,32 @@ console.log("===== RAW AI REPLY =====");
 console.log(data?.choices?.[0]?.message?.content);
 console.log("===== END RAW AI REPLY =====");
 const profileResponse = await fetch(
-"https://api.groq.com/openai/v1/chat/completions",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:
-"Bearer " + process.env.GROQ_API_KEY
-},
-body:JSON.stringify({
-model: "qwen/qwen3.6-27b",
-messages:[
-{
-role:"system",
-content:profilePrompt
-},
-...messages.slice(-3)
-],
-temperature:0.3,
-max_tokens:120
-})
-}
+  "https://api.cerebras.ai/v1/chat/completions",
+  {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        `Bearer ${process.env.CEREBRAS_API_KEY}`
+    },
+
+    body: JSON.stringify({
+      model: "gpt-oss-120b",
+
+      messages: [
+        {
+          role: "system",
+          content: profilePrompt
+        },
+        ...messages.slice(-3)
+      ],
+
+      temperature: 0.1,
+      max_completion_tokens: 300
+    })
+  }
 );
-
-let profileData = {};
-
-try {
-
-  if (profileResponse.ok) {
-
-    profileData =
-      await profileResponse.json();
-      console.log(
   "===== PROFILE RAW RESPONSE ====="
 );
 
