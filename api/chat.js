@@ -1833,191 +1833,315 @@ catch (e) {
 
 }
 
-    /* =========================
-       ✂️ CLEANER
-    ========================= */
+/* ========================================
+   🧠 REASONING SANITIZER
+======================================== */
 
-    reply = reply
-      .replace(/As an AI/gi, "")
-      .replace(/you should/gi, "")
-      .replace(/Think again\./gi, "")
-      .replace(
-        /^\s*["']|["']\s*$/g,
-        ""
-      )
-      .trim();
-/* =========================
-   LOOP RESPONSE GUARD
-========================= */
-
-if (loopLevel >= 6) {
-
-  // Loop 6 & 7 par koi follow-up question allowed nahi
-  reply = reply.replace(/\s*[^.!?\n]*\?\s*$/s, "");
-
-}
-    /* =========================
-       🔧 REMOVE WEAK PHRASES
-    ========================= */
-
-    const weakPhrases = [
-      "maybe",
-      "perhaps",
-      "it seems",
-      "it looks like",
-      "possibly",
-      "could be",
-      "might be",
-      "deep inside"
-    ];
-
-    weakPhrases.forEach(phrase => {
-
-      const regex =
-        new RegExp(phrase, "gi");
-
-      reply =
-        reply.replace(regex, "");
-    });
-    reply = reply.replace(
-/\[\[\s*highlight\s*\]\]/gi,
-"[[highlight]]"
+reply = reply.replace(
+  /<think>[\s\S]*?<\/think>/gi,
+  ""
 );
 
 reply = reply.replace(
-/\[\[\s*end\s*\]\]/gi,
-"[[end]]"
+  /Here's a thinking process:[\s\S]*/gi,
+  ""
 );
-    reply = reply
-      .replace(/\n{3,}/g, "\n\n")
-      .replace(/\s{2,}/g, " ")
-      .trim();
 
-    /* =========================
-       🔧 FALLBACK
-    ========================= */
+reply = reply.replace(
+  /Thinking process:[\s\S]*/gi,
+  ""
+);
 
-    if (!reply || reply.length < 20) {
+reply = reply.replace(
+  /Draft:[\s\S]*/gi,
+  ""
+);
 
-      reply =
+reply = reply.replace(
+  /Verification:[\s\S]*/gi,
+  ""
+);
+
+reply = reply.replace(
+  /Internal State:[\s\S]*/gi,
+  ""
+);
+
+reply = reply.replace(
+  /Analyze User Input:[\s\S]*/gi,
+  ""
+);
+
+
+/* ========================================
+   ✂️ CLEANER
+======================================== */
+
+reply = reply
+
+  .replace(/As an AI/gi, "")
+  .replace(/As TruthLoop AI/gi, "")
+  .replace(/you should/gi, "")
+  .replace(/Think again\./gi, "")
+  .replace(/I recommend/gi, "")
+  .replace(/My advice/gi, "")
+  .replace(/Here's what you can do/gi, "")
+  .replace(/step\s*\d+/gi, "")
+
+  .replace(
+    /^\s*["']|["']\s*$/g,
+    ""
+  )
+
+  .trim();
+
+
+/* ========================================
+   🚫 CONTENT LEAK GUARD
+======================================== */
+
+const contentLeakWords = [
+
+  "template",
+  "framework",
+  "storytelling template",
+  "blog outline",
+  "linkedin post",
+  "social media post",
+  "marketing copy",
+  "email draft",
+  "content calendar",
+  "step 1",
+  "step 2",
+  "step 3"
+
+];
+
+const contentLeakDetected =
+  contentLeakWords.some(
+    word =>
+      reply
+        .toLowerCase()
+        .includes(
+          word.toLowerCase()
+        )
+  );
+
+if (contentLeakDetected) {
+
+  reply =
+`Interesting. You moved from understanding the problem to creating an answer.
+
+What feels unfinished if the answer never gets created?`;
+
+}
+
+
+/* ========================================
+   🚫 WEAK PHRASE REMOVER
+======================================== */
+
+const weakPhrases = [
+
+  "maybe",
+  "perhaps",
+  "it seems",
+  "it looks like",
+  "possibly",
+  "could be",
+  "might be",
+  "deep inside"
+
+];
+
+weakPhrases.forEach(phrase => {
+
+  const regex =
+    new RegExp(
+      phrase,
+      "gi"
+    );
+
+  reply =
+    reply.replace(
+      regex,
+      ""
+    );
+
+});
+
+
+/* ========================================
+   🎨 HIGHLIGHT NORMALIZER
+======================================== */
+
+reply = reply.replace(
+  /\[\[\s*highlight\s*\]\]/gi,
+  "[[highlight]]"
+);
+
+reply = reply.replace(
+  /\[\[\s*end\s*\]\]/gi,
+  "[[end]]"
+);
+
+
+/* ========================================
+   ❓ LOOP QUESTION GUARD
+======================================== */
+
+if (loopLevel >= 6) {
+
+  reply = reply.replace(
+    /[^.!?\n]*\?/g,
+    ""
+  );
+
+}
+
+
+/* ========================================
+   🧹 FINAL FORMAT CLEANUP
+======================================== */
+
+reply = reply
+
+  .replace(/\n{3,}/g, "\n\n")
+  .replace(/\s{2,}/g, " ")
+
+  .trim();
+
+
+/* ========================================
+   🛡️ LAST CHANCE REASONING BLOCKER
+======================================== */
+
+if (
+
+  reply.includes("<think>") ||
+
+  reply.includes("Thinking process") ||
+
+  reply.includes("Here's a thinking process") ||
+
+  reply.includes("Draft:") ||
+
+  reply.includes("Verification:") ||
+
+  reply.includes("Internal State") ||
+
+  reply.includes("Analyze User Input")
+
+) {
+
+  reply = "";
+
+}
+
+
+/* ========================================
+   🔧 FALLBACK
+======================================== */
+
+if (
+  !reply ||
+  reply.length < 20
+) {
+
+  if (loopLevel >= 6) {
+
+    reply =
+`You're circling the real issue.
+
+The pattern remains active even after it becomes visible.`;
+
+  } else {
+
+    reply =
 `You're circling the real issue.
 
 What keeps repeating even after you've already noticed it?`;
-    }
-if (loopLevel === 5 && !paid49) {
 
-return res.status(200).json({
-reply,
-paywall: true
-});
+  }
 
 }
-    /* =========================
-       ❓ FINAL QUESTION
-    ========================= */
 
-  if (
-  loopLevel !== 7 &&
-  !reply.trim().endsWith("?")
+
+/* ========================================
+   💰 LOOP 5 PAYWALL
+======================================== */
+
+if (
+  loopLevel === 5 &&
+  !paid49
 ) {
 
-      /*
-const questions = [
+  return res.status(200).json({
 
-"What are you emotionally protecting?",
+    reply,
 
-"What becomes uncomfortable the moment this gets real?",
+    paywall: true
 
-"What are you still trying to control before acting?",
+  });
 
-"What changes if you stop optimizing and start exposing the work?",
+}
 
-"Where does the hesitation appear every time?"
 
-];
+/* ========================================
+   ❓ FINAL QUESTION HANDLER
+======================================== */
 
-const q =
-questions[
-Math.floor(
-Math.random() * questions.length
-)
-];
-
-reply += "\n\n" + q;
-*/
-    }
-
-    /* =========================
-       ✅ FINAL
-    ========================= */
-
-    let analysis = reply;
+let analysis = reply;
 let question = "";
 
-if(loopLevel !== 7){
+if (loopLevel !== 7) {
 
-const lines = reply.split("\n");
+  const lines =
+    reply.split("\n");
 
-const lastLine = lines[lines.length - 1].trim();
+  const lastLine =
+    lines[
+      lines.length - 1
+    ]?.trim();
 
-if(lastLine.endsWith("?")){
+  if (
+    lastLine &&
+    lastLine.endsWith("?")
+  ) {
 
-question = lastLine;
+    question =
+      lastLine;
 
-analysis = lines.slice(0,-1).join("\n").trim();
-
-}
-
-}
-console.log("FINAL RETURN REACHED");
-return res.status(200).json({
-analysis,
-question,
-reply,
-
-primaryLoop,
-emotionalDriver,
-avoidanceStyle,
-hiddenAssumption,
-loop7EntryBridge:
-loopLevel === 6
-? {
-enabled: true,
-recommended: true,
-allowSkip: true,
-supportedSources: [
-"LinkedIn",
-"GitHub",
-"Portfolio",
-"Website",
-"X",
-"Facebook",
-"Reddit",
-"YouTube",
-"Medium",
-"Substack"
-]
-}
-: null,
-
-loopCompleted:
-loopLevel === 6 ? 6 : undefined,
-paywall:false
-});
+    analysis =
+      lines
+        .slice(0, -1)
+        .join("\n")
+        .trim();
 
   }
 
-  catch (error) {
+}
 
- return res.status(500).json({
 
-  reply:"SERVER CRASH",
+/* ========================================
+   📊 FINAL DEBUG
+======================================== */
 
-  error:error.message,
+console.log(
+  "FINAL_REPLY_LENGTH",
+  reply.length
+);
 
-  stack:error.stack
+console.log(
+  "FINAL_ANALYSIS_LENGTH",
+  analysis.length
+);
 
- });
+console.log(
+  "FINAL_QUESTION",
+  question
+);
 
-  }
-        }
+console.log(
+  "FINAL_RETURN_REACHED"
+);
