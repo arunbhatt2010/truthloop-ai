@@ -1575,7 +1575,7 @@ const response = await fetch(
       generationConfig: {
         temperature: 0.5,
         maxOutputTokens:
-          loopLevel === 7 ? 2500 : 800
+          loopLevel === 7 ? 2500 : 220
       }
     })
   }
@@ -1662,8 +1662,8 @@ try {
         ],
 
         generationConfig: {
-          temperature: 0,
-          maxOutputTokens: 150
+          temperature: 0.5,
+          maxOutputTokens: 200
         }
       })
     }
