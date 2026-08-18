@@ -1557,11 +1557,9 @@ const response = await fetch(
   `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
   {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json"
     },
-
     body: JSON.stringify({
       contents: [
         {
@@ -1573,13 +1571,31 @@ const response = await fetch(
             }
           ]
         }
-      ]
+      ],
+      generationConfig: {
+        temperature: 0.5,
+        maxOutputTokens:
+          loopLevel === 7 ? 1800 : 220
+      }
     })
   }
 );
 
 const data = await response.json();
 
+
+
+const reply =
+  data?.candidates?.[0]
+    ?.content?.parts?.[0]?.text || "";
+
+console.log(
+  "REPLY_FIRST_200"
+);
+
+console.log(
+  reply.substring(0, 200)
+);
 
 /* ========================================
    📊 AI DEBUG
@@ -1633,6 +1649,7 @@ console.log(
    🧠 PROFILE ENGINE
 ======================================== */
 let profileData = {};
+
 try {
 
   const profileResponse = await fetch(
@@ -1655,7 +1672,12 @@ try {
               }
             ]
           }
-        ]
+        ],
+
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 300
+        }
       })
     }
   );
@@ -1679,6 +1701,16 @@ try {
     "===== END PROFILE RAW RESPONSE ====="
   );
 
+  console.log(
+    "PROFILE_FIRST_200"
+  );
+
+  console.log(
+    profileData?.candidates?.[0]
+      ?.content?.parts?.[0]?.text
+      ?.substring(0, 200)
+  );
+
 }
 catch (e) {
 
@@ -1689,7 +1721,7 @@ catch (e) {
 
 }
 
-
+  
 /* ========================================
    💬 REPLY EXTRACTION
 ======================================== */
