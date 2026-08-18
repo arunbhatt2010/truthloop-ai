@@ -1569,7 +1569,7 @@ const response = await fetch(
     },
 
     body: JSON.stringify({
-      model: "gpt-oss-120b",
+      model: "llama-3.3-70b",
 
       messages: [
         {
@@ -1661,7 +1661,7 @@ try {
       },
 
       body: JSON.stringify({
-        model: "gpt-oss-120b",
+        model: "llama-3.3-70b",
 
         messages: [
           {
