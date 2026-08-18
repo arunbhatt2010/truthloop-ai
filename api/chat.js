@@ -1713,7 +1713,7 @@ Build your response around this pattern.
 User Input:
 ${userMessage}
 `;
-    const evidenceContext = `
+    const evidenceContext2 = `
 TRUTHLOOP VALIDATED EVIDENCE
 
 Primary Pattern:
