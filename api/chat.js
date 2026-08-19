@@ -1705,43 +1705,7 @@ User Input:
 ${userMessage}
 `;
 
-    const evidenceContext = `
-TRUTHLOOP VALIDATED EVIDENCE
-
-Primary Pattern:
-${detectedPattern}
-
-Confidence:
-${patternConfidence}
-
-The pattern has already been detected.
-
-Treat it as established evidence.
-
-Do not investigate alternatives.
-
-Do not ask what the pattern is.
-
-Do not generate multiple explanations.
-
-Build one conclusion from:
-1. Detected Pattern
-2. User Input
-
-Output structure:
-
-Observation:
-(one paragraph)
-
-Hidden Mechanism:
-(one paragraph)
-
-Question:
-(one question only)
-
-User Input:
-${userMessage}
-`;
+    
 const maxTokens =
   loopLevel === 7 ? 900 : 220;
 
