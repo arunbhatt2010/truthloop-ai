@@ -1805,88 +1805,69 @@ try {
     }
   );
 
-  if (profileResponse.ok) {
+if (profileResponse.ok) {
 
-    const result =
-      await profileResponse.json();
-console.log(
-  "PROFILE_RESPONSE_RAW",
-  JSON.stringify(profileData, null, 2)
-);
+  const result =
+    await profileResponse.json();
 
-console.log(
-  "PROFILE_CONTENT",
-  profileData?.choices?.[0]?.message?.content
-);
+  console.log(
+    "PROFILE_RESPONSE_RAW",
+    JSON.stringify(result, null, 2)
+  );
 
-console.log(
-  "PROFILE_DATA_BEFORE_PARSE",
-  JSON.stringify(profileData, null, 2)
-);
-    const rawProfile =
-      result?.choices?.[0]?.message?.content || "";
+  const rawProfile =
+    result?.choices?.[0]?.message?.content || "";
 
-    let parsedProfile = null;
+  console.log(
+    "PROFILE_CONTENT",
+    rawProfile
+  );
 
-    try {
+  let parsedProfile = null;
 
-      parsedProfile =
-        JSON.parse(rawProfile);
+  try {
 
-    } catch (e) {
+    parsedProfile =
+      JSON.parse(rawProfile);
 
-      const jsonMatch =
-        rawProfile.match(/\{[\s\S]*\}/);
+  } catch (e) {
 
-      if (jsonMatch) {
+    const jsonMatch =
+      rawProfile.match(/\{[\s\S]*\}/);
 
-        try {
-          parsedProfile =
-            JSON.parse(jsonMatch[0]);
-        } catch (e2) {
-          parsedProfile = null;
-        }
+    if (jsonMatch) {
+
+      try {
+
+        parsedProfile =
+          JSON.parse(jsonMatch[0]);
+
+      } catch (e2) {
+
+        parsedProfile = null;
 
       }
-
-    }
-
-    if (parsedProfile) {
-
-      profileData = {
-        choices: [
-          {
-            message: {
-              content:
-                JSON.stringify(parsedProfile)
-            }
-          }
-        ]
-      };
 
     }
 
   }
 
-} catch (e) {
+  if (parsedProfile) {
 
-  profileData = {
-    choices: [
-      {
-        message: {
-          content: JSON.stringify({
-            primaryLoop: "unknown",
-            emotionalDriver: "unknown",
-            avoidanceStyle: "unknown",
-            hiddenAssumption: "unknown"
-          })
+    profileData = {
+      choices: [
+        {
+          message: {
+            content:
+              JSON.stringify(parsedProfile)
+          }
         }
-      }
-    ]
-  };
+      ]
+    };
+
+  }
 
 }
-
 const contentLeakWords = [
 
 "template",
