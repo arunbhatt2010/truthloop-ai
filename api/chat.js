@@ -1674,46 +1674,8 @@ ${finalReview}
  LOOP 7 RESPONSE SANITIZER
 ******************************/
 
-if (loopLevel === 7) {
 
-  messages = messages.filter(m => {
-    if (m.role !== "assistant") return true;
-
-    return !m.content.includes("?");
-  });
-
-}
-const detectedPattern =
-  masterBrainResult?.executiveDecision?.primaryPattern ||
-  "Unknown";
-
-const patternConfidence =
-  masterBrainResult?.mergedSignals?.primaryPattern?.confidence ||
-  0;
-
-const evidenceContext = `
-TRUTHLOOP VALIDATED EVIDENCE
-
-Primary Pattern:
-${detectedPattern}
-
-Confidence:
-${patternConfidence}
-
-This pattern has already been detected by TruthLoop.
-
-Treat it as evidence, not a hypothesis.
-
-Do not generate multiple explanations.
-
-Do not investigate whether the pattern exists.
-
-Build your response around this pattern.
-
-User Input:
-${userMessage}
-`;
-    const evidenceContext2 = `
+    const evidenceContext = `
 TRUTHLOOP VALIDATED EVIDENCE
 
 Primary Pattern:
@@ -1763,7 +1725,7 @@ const response = await fetch(
       Authorization:
         "Bearer " + process.env.GROQ_API_KEY
     },
-
+console.log("REACHED_GROQ_CALL");
     body: JSON.stringify({
 
       model: "qwen/qwen3.6-27b",
