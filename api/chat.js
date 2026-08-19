@@ -1770,6 +1770,10 @@ max_tokens:120
 
 const profileData =
 await profileResponse.json();
+    console.log(
+  "PROFILE_MODEL_RAW",
+  JSON.stringify(profileData, null, 2)
+);
     let reply =
       data?.choices?.[0]?.message?.content || "";
 const contentLeakWords = [
