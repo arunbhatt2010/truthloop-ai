@@ -1809,7 +1809,8 @@ console.log(
       ],
 
       temperature: 0.3,
-      max_tokens: 120
+      max_tokens: 120,
+      reasoning_effort: "none"
     })
   }
 );
