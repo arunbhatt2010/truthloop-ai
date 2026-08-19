@@ -1773,6 +1773,8 @@ body: JSON.stringify({
   }
 
 })
+  }
+);
 
 const profileData =
 await profileResponse.json();
