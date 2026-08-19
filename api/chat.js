@@ -1758,18 +1758,11 @@ console.log(reply);
 console.log("===== END RAW AI REPLY =====");
 
 let profileData = {
-  choices: [
-    {
-      message: {
-        content: JSON.stringify({
-          primaryLoop: "decision paralysis",
-          emotionalDriver: "fear of regret",
-          avoidanceStyle: "over research",
-          hiddenAssumption: "perfect choice exists"
-        })
-      }
+  choices: [{
+    message: {
+      content: "PRABHU_TEST"
     }
-  ]
+  }]
 };
 
 try {
