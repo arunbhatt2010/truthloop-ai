@@ -1885,7 +1885,7 @@ try {
 
   hiddenAssumption =
     profile.hiddenAssumption || "unknown";
-  }
+  
 
 } catch (e) {
 
