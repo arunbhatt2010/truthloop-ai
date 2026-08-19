@@ -1885,6 +1885,7 @@ try {
 
   hiddenAssumption =
     profile.hiddenAssumption || "unknown";
+  }
 
 } catch (e) {
 
@@ -1893,7 +1894,17 @@ try {
   avoidanceStyle = "unknown";
   hiddenAssumption = "unknown";
   }
+console.log(
+  "PROFILE_RAW_RESPONSE",
+  profileData?.choices?.[0]?.message?.content
+);
 
+primaryLoop = "PROFILE_PARSE_ERROR";
+emotionalDriver = e.message;
+avoidanceStyle = "PROFILE_PARSE_ERROR";
+hiddenAssumption = "PROFILE_PARSE_ERROR";
+
+  }
     /* =========================
        ✂️ CLEANER
     ========================= */
