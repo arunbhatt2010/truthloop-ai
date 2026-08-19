@@ -1909,33 +1909,24 @@ console.log("PROFILE RAW:", rawProfile);
 const profile = JSON.parse(rawProfile);
 
 primaryLoop =
-profile.primaryLoop || "";
+  profile.primaryLoop || "unknown";
 
 emotionalDriver =
-profile.emotionalDriver &&
-profile.emotionalDriver !== "unknown"
-? profile.emotionalDriver
-: "";
+  profile.emotionalDriver || "unknown";
 
 avoidanceStyle =
-profile.avoidanceStyle &&
-profile.avoidanceStyle !== "unknown"
-? profile.avoidanceStyle
-: "";
+  profile.avoidanceStyle || "unknown";
 
 hiddenAssumption =
-profile.hiddenAssumption &&
-profile.hiddenAssumption !== "unknown"
-? profile.hiddenAssumption
-: "";
+  profile.hiddenAssumption || "unknown";
 }catch(e){
 
-primaryLoop = "";
-emotionalDriver = "";
-avoidanceStyle = "";
-hiddenAssumption = "";
+  primaryLoop = "unknown";
+  emotionalDriver = "unknown";
+  avoidanceStyle = "unknown";
+  hiddenAssumption = "unknown";
 
-  }
+}
     /* =========================
        ✂️ CLEANER
     ========================= */
