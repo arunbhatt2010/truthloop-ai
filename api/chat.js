@@ -1883,7 +1883,10 @@ try{
 
 const rawProfile =
   profileData?.choices?.[0]?.message?.content || "{}";
-
+console.log(
+  "PROFILE_DATA_BEFORE_PARSE",
+  JSON.stringify(profileData, null, 2)
+);
 console.log("PROFILE RAW:", rawProfile);
 
 const profile = JSON.parse(rawProfile);
