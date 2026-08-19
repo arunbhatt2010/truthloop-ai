@@ -1807,29 +1807,55 @@ let emotionalDriver = "";
 let avoidanceStyle = "";
 let hiddenAssumption = "";
 
-try{
+try {
 
-const profile =
-JSON.parse(
-profileData?.choices?.[0]?.message?.content || "{}"
+const rawProfile =
+profileData?.choices?.[0]?.message?.content || "{}";
+
+console.log(
+  "PROFILE_API_RESULT",
+  JSON.stringify(profileData, null, 2)
+);
+
+console.log("PROFILE_RAW", rawProfile);
+
+const jsonMatch =
+rawProfile.match(/\{[\s\S]*\}/);
+
+const profile = jsonMatch
+? JSON.parse(jsonMatch[0])
+: {};
+
+console.log(
+  "PROFILE_PARSED",
+  JSON.stringify(profile, null, 2)
 );
 
 primaryLoop =
-profile.primaryLoop || "";
+profile.primaryLoop || "unknown";
 
 emotionalDriver =
-profile.emotionalDriver || "";
+profile.emotionalDriver || "unknown";
 
 avoidanceStyle =
-profile.avoidanceStyle || "";
-hiddenAssumption =
-profile.hiddenAssumption || "";
-}catch(e){
+profile.avoidanceStyle || "unknown";
 
-primaryLoop = "";
-emotionalDriver = "";
-avoidanceStyle = "";
-hiddenAssumption = "";
+hiddenAssumption =
+profile.hiddenAssumption || "unknown";
+
+} catch (e) {
+
+console.log(
+  "PROFILE_PARSE_ERROR",
+  e.message
+);
+
+primaryLoop = "unknown";
+emotionalDriver = "unknown";
+avoidanceStyle = "unknown";
+hiddenAssumption = "unknown";
+
+    
 
   }
 
