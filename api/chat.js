@@ -1753,20 +1753,26 @@ headers:{
 Authorization:
 "Bearer " + process.env.GROQ_API_KEY
 },
-body:JSON.stringify({
-model: "qwen/qwen3.6-27b",
-messages:[
-{
-role:"system",
-content:profilePrompt
-},
-...messages.slice(-10)
-],
-temperature:0.3,
-max_tokens:120
+body: JSON.stringify({
+  model: "qwen/qwen3.6-27b",
+
+  messages: [
+    {
+      role: "system",
+      content: profilePrompt
+    },
+    ...messages.slice(-10)
+  ],
+
+  temperature: 0,
+
+  max_tokens: 80,
+
+  response_format: {
+    type: "json_object"
+  }
+
 })
-}
-);
 
 const profileData =
 await profileResponse.json();
