@@ -1705,7 +1705,7 @@ if (loopLevel === 7) {
 
         body: JSON.stringify({
 
-          model: "qwen/qwen3.6-27b",
+          model: "llama-3.1-8b-instant",
 
           messages: [
   {
@@ -1719,7 +1719,7 @@ if (loopLevel === 7) {
 
 temperature: 0.7,
 
-max_tokens: maxTokens,
+max_tokens: 600,
 
 reasoning_effort: "none",
 
