@@ -1403,53 +1403,57 @@ Return only a complete and valid profile.
     
 Never return a partial profile.    
 `;    
-let contextInstruction = "";    
-    
-if (contextMissing) {    
-    
-contextInstruction = `    
-    
-CONVERSATION PROFILE MODE    
-    
-Analyze only the available conversation evidence.    
-    
-Build the best current behavioral profile from the evidence that exists.    
-    
-Update the profile after every AI response.    
-    
-Do not wait for perfect evidence.    
-    
-If confidence is low, return your best evidence-based estimate instead of asking another question.    
-    
-Never return an empty profile.    
-    
-Return ONLY valid JSON.    
-;   }   const investigationPrompt =     
-CURRENT INVESTIGATION STATE    
-    
-Topic:    
-${investigationState.topic}    
-    
-Confirmed Facts:    
-${investigationState.confirmedFacts.join(", ")}    
-    
-Goals:    
-${investigationState.statedGoals.join(", ")}    
-    
-Results:    
-${investigationState.results.join(", ")}    
-    
-Contradictions:    
-${investigationState.contradictions.join(", ")}    
-    
-Open Questions:    
-${investigationState.openQuestions.join(", ")}    
-    
-Working Hypothesis:    
-${investigationState.workingHypothesis}    
-    
-Confidence:    
-${investigationState.confidence}    
+let contextInstruction = "";
+
+if (contextMissing) {
+
+contextInstruction = `
+
+CONVERSATION PROFILE MODE
+
+Analyze only the available conversation evidence.
+
+Build the best current behavioral profile from the evidence that exists.
+
+Update the profile after every AI response.
+
+Do not wait for perfect evidence.
+
+If confidence is low, return your best evidence-based estimate instead of asking another question.
+
+Never return an empty profile.
+
+Return ONLY valid JSON.
+
+`;
+}
+
+const investigationPrompt = `
+CURRENT INVESTIGATION STATE
+
+Topic:
+${investigationState.topic}
+
+Confirmed Facts:
+${investigationState.confirmedFacts.join(", ")}
+
+Goals:
+${investigationState.statedGoals.join(", ")}
+
+Results:
+${investigationState.results.join(", ")}
+
+Contradictions:
+${investigationState.contradictions.join(", ")}
+
+Open Questions:
+${investigationState.openQuestions.join(", ")}
+
+Working Hypothesis:
+${investigationState.workingHypothesis}
+
+Confidence:
+${investigationState.confidence}
 `;
     
 /* =========================
