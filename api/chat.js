@@ -1832,16 +1832,26 @@ console.log(
 );
 
 primaryLoop =
-profile.primaryLoop || "unknown";
+profile.primaryLoop || "[EMPTY_PRIMARY_LOOP]";
 
 emotionalDriver =
-profile.emotionalDriver || "unknown";
+profile.emotionalDriver || "[EMPTY_EMOTIONAL_DRIVER]";
 
 avoidanceStyle =
-profile.avoidanceStyle || "unknown";
+profile.avoidanceStyle || "[EMPTY_AVOIDANCE_STYLE]";
 
 hiddenAssumption =
-profile.hiddenAssumption || "unknown";
+profile.hiddenAssumption || "[EMPTY_HIDDEN_ASSUMPTION]";
+
+console.log(
+  "PROFILE_VALUES_AFTER_PARSE",
+  {
+    primaryLoop,
+    emotionalDriver,
+    avoidanceStyle,
+    hiddenAssumption
+  }
+);
 
 } catch (e) {
 
@@ -1850,15 +1860,17 @@ console.log(
   e.message
 );
 
-primaryLoop = "unknown";
-emotionalDriver = "unknown";
-avoidanceStyle = "unknown";
-hiddenAssumption = "unknown";
+console.log(
+  "PROFILE_RAW_RESPONSE",
+  profileData?.choices?.[0]?.message?.content
+);
 
-    
+primaryLoop = "PROFILE_PARSE_ERROR";
+emotionalDriver = e.message;
+avoidanceStyle = "PROFILE_PARSE_ERROR";
+hiddenAssumption = "PROFILE_PARSE_ERROR";
 
-  }
-
+          }
     /* =========================
        ✂️ CLEANER
     ========================= */
