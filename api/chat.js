@@ -1673,7 +1673,15 @@ ${finalReview}
 /******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
+if (loopLevel === 7) {
 
+  messages = messages.filter(m => {
+    if (m.role !== "assistant") return true;
+
+    return !m.content.includes("?");
+  });
+
+      }
 const detectedPattern =
   masterBrainResult?.executiveDecision?.primaryPattern ||
   "Unknown";
