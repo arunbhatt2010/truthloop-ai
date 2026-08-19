@@ -1312,105 +1312,27 @@ Do not mention the category directly unless naturally relevant.
 `;
 }
  const profilePrompt = `
-You are TruthLoop Profile Engine.
+You are a profile extraction engine.
 
-Analyze conversation evidence only.
-
-Return four fields:
-- primaryLoop
-- emotionalDriver
-- avoidanceStyle
-- hiddenAssumption
-RETURN ONLY JSON.
-
-DO NOT THINK.
-
-DO NOT EXPLAIN.
-
-DO NOT USE <think>.
-Rules:
-- Never guess.
-- No unsupported inference.
-- Use "unknown" when evidence is weak.
-- Ignore category labels.
-- Hidden assumption = strongest belief keeping the pattern active.
-- Update only when new evidence appears.
-- Max 5 words per field.
-LOOP 7 PROFILE MODE
-
-LOOP 7 INVESTIGATION MODE
-
-When the current loop is 7:
-
-The current AI response is the final TruthLoop Investigation Report.
-
-Treat it as the highest-confidence investigation evidence.
-
-Do not expect additional conversation evidence.
-
-Do not require user input.
-
-Update the profile card using only the investigation report.
-
-The investigation report contains verified behavioral findings, hidden mechanisms, public evidence, cross evidence, and evidence confidence.
-
-Assume all required evidence already exists inside the investigation.
-
-Never return "unknown" because conversation evidence is missing.
-
-Return "unknown" only if the investigation explicitly states that evidence is unavailable.
-
-If any required profile field is missing, empty, unsupported, or returned as "unknown" without evidence stating "Evidence unavailable",
-
-rewrite the entire profile.
-
-Return only a complete profile.
-Return ONLY JSON:
-
-{
-"primaryLoop":"unknown",
-"emotionalDriver":"unknown",
-"avoidanceStyle":"unknown",
-"hiddenAssumption":"unknown"
-}
-SELF CHECK
-
-Before returning the profile:
-
-Verify that all required fields are present.
-
-If any field is missing,
-empty,
-unsupported,
-or does not follow the required format,
-
-rewrite the entire profile.
-
-Return only a complete and valid profile.
-
-Never return a partial profile.
-`;
- let contextInstruction = "";
-
-if (contextMissing) {
-
-contextInstruction = `
-
-CONVERSATION PROFILE MODE
-
-Analyze only the available conversation evidence.
-
-Build the best current behavioral profile from the evidence that exists.
-
-Update the profile after every AI response.
-
-Do not wait for perfect evidence.
-
-If confidence is low, return your best evidence-based estimate instead of asking another question.
-
-Never return an empty profile.
+Analyze the conversation.
 
 Return ONLY valid JSON.
+
+{
+  "primaryLoop":"",
+  "emotionalDriver":"",
+  "avoidanceStyle":"",
+  "hiddenAssumption":""
+}
+
+Rules:
+- Maximum 5 words per field.
+- No explanations.
+- No markdown.
+- No code block.
+- No <think>.
+- If evidence is insufficient use "unknown".
+- Output valid JSON only.
 `;
 }
     const investigationPrompt = `
@@ -1773,10 +1695,6 @@ body: JSON.stringify({
   temperature: 0,
 
   max_tokens: 80,
-
-  response_format: {
-    type: "json_object"
-  }
 
 })
   }
