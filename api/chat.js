@@ -1816,6 +1816,20 @@ try {
   "PROFILE_RESPONSE_RAW",
   JSON.stringify(profileData, null, 2)
 );
+    console.log(
+  "PROFILE_STATUS",
+  profileResponse.status
+);
+
+console.log(
+  "PROFILE_RESPONSE_RAW",
+  JSON.stringify(profileData, null, 2)
+);
+
+console.log(
+  "PROFILE_CONTENT",
+  profileData?.choices?.[0]?.message?.content
+);
   }
 
 } catch (e) {
