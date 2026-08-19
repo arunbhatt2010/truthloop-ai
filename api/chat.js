@@ -1809,7 +1809,20 @@ try {
 
     const result =
       await profileResponse.json();
+console.log(
+  "PROFILE_RESPONSE_RAW",
+  JSON.stringify(profileData, null, 2)
+);
 
+console.log(
+  "PROFILE_CONTENT",
+  profileData?.choices?.[0]?.message?.content
+);
+
+console.log(
+  "PROFILE_DATA_BEFORE_PARSE",
+  JSON.stringify(profileData, null, 2)
+);
     const rawProfile =
       result?.choices?.[0]?.message?.content || "";
 
