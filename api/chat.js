@@ -1334,7 +1334,7 @@ Rules:
 - If evidence is insufficient use "unknown".
 - Output valid JSON only.
 `;
-//}
+      }
     const investigationPrompt = `
 CURRENT INVESTIGATION STATE
 
