@@ -1786,39 +1786,34 @@ console.log(
   )
 );
   const profileResponse = await fetch(
-    "https://api.groq.com/openai/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization:
-          "Bearer " + process.env.GROQ_API_KEY
-      },
-      body: JSON.stringify({
-        model:
-            "qwen/qwen3.6-27b",
-        messages: [
-          {
-            role: "system",
-            content: profilePrompt
-          },
+  "https://api.groq.com/openai/v1/chat/completions",
+  {
+    method: "POST",
 
-          ...messages.slice(-6),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer " + process.env.GROQ_API_KEY
+    },
 
-          {
-            role: "assistant",
-            content: reply
-          }
+    body: JSON.stringify({
+      model: "qwen/qwen3.6-27b",
 
-        ],
-        temperature: 0.3,
-        max_tokens: 300,
-        response_format: {
-  type: "json_object"
-        }
-      })
-    }
-  );
+      messages: [
+        {
+          role: "system",
+          content: profilePrompt
+        },
+
+        ...messages.slice(-10)
+      ],
+
+      temperature: 0.3,
+      max_tokens: 120
+    })
+  }
+);
+
 
   if (profileResponse.ok) {
     profileData =
