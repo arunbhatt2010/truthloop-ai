@@ -64,7 +64,15 @@ if (DEV_GATE) {
 let masterBrain = {};
 
 try {
+console.log(
+  "MESSAGES_DEBUG",
+  JSON.stringify(messages, null, 2)
+);
 
+console.log(
+  "LAST_USER_MESSAGE",
+  lastUserMessage
+);
   masterBrain =
     runMasterBrain(lastUserMessage);
 
