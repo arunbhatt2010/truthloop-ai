@@ -1797,7 +1797,7 @@ console.log(
     },
 
     body: JSON.stringify({
-      model: "qwen/qwen3.6-27b",
+      model: "llama-3.1-8b-instant",
 
       messages: [
         {
