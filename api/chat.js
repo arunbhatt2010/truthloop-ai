@@ -1781,7 +1781,7 @@ console.log(
         role: "system",
         content: profilePrompt
       },
-      ...messages.slice(-3),
+      ...messages.slice(-6),
       {
         role: "assistant",
         content: reply
@@ -1809,7 +1809,7 @@ console.log(
             content: profilePrompt
           },
 
-          ...messages.slice(-3),
+          ...messages.slice(-6),
 
           {
             role: "assistant",
@@ -1818,7 +1818,7 @@ console.log(
 
         ],
         temperature: 0.3,
-        max_tokens: 120,
+        max_tokens: 300,
         response_format: {
   type: "json_object"
         }
