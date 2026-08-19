@@ -1682,40 +1682,9 @@ if (loopLevel === 7) {
   });
 
       }
-const detectedPattern =
-  masterBrainResult?.executiveDecision?.primaryPattern ||
-  "Unknown";
 
-const patternConfidence =
-  masterBrainResult?.mergedSignals?.primaryPattern?.confidence ||
-  0;
-
-const evidenceContext = `
-TRUTHLOOP VALIDATED EVIDENCE
-
-Primary Pattern:
-${detectedPattern}
-
-Confidence:
-${patternConfidence}
-
-This pattern has already been detected by TruthLoop.
-
-Treat it as evidence, not a hypothesis.
-
-Do not generate multiple explanations.
-
-Do not investigate whether the pattern exists.
-
-Build your response around this pattern.
-
-User Input:
-${userMessage}
-`;
-
-    
 const maxTokens =
-  loopLevel === 7 ? 900 : 220;
+  loopLevel === 7 ? 900 : 500;
     console.log("EVIDENCE_CONTEXT_CREATED");
 console.log("REACHED_GROQ_CALL");
 const response = await fetch(
