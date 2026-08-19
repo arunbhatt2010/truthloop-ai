@@ -1757,13 +1757,15 @@ console.log("===== RAW AI REPLY =====");
 console.log(reply);
 console.log("===== END RAW AI REPLY =====");
 
-let profileData = {
-  choices: [{
-    message: {
-      content: "PRABHU_TEST"
+{
+  "choices": [
+    {
+      "message": {
+        "content": "{\"primaryLoop\":\"TEST_LOOP\",\"emotionalDriver\":\"TEST_DRIVER\",\"avoidanceStyle\":\"TEST_STYLE\",\"hiddenAssumption\":\"TEST_BELIEF\"}"
+      }
     }
-  }]
-};
+  ]
+          }
 
 try {
 console.log(
