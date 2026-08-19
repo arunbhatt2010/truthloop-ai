@@ -1674,6 +1674,36 @@ ${finalReview}
  LOOP 7 RESPONSE SANITIZER
 ******************************/
 
+const detectedPattern =
+  masterBrainResult?.executiveDecision?.primaryPattern ||
+  "Unknown";
+
+const patternConfidence =
+  masterBrainResult?.mergedSignals?.primaryPattern?.confidence ||
+  0;
+
+const evidenceContext = `
+TRUTHLOOP VALIDATED EVIDENCE
+
+Primary Pattern:
+${detectedPattern}
+
+Confidence:
+${patternConfidence}
+
+This pattern has already been detected by TruthLoop.
+
+Treat it as evidence, not a hypothesis.
+
+Do not generate multiple explanations.
+
+Do not investigate whether the pattern exists.
+
+Build your response around this pattern.
+
+User Input:
+${userMessage}
+`;
 
     const evidenceContext = `
 TRUTHLOOP VALIDATED EVIDENCE
