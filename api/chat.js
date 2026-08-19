@@ -1809,7 +1809,8 @@ if (profileResponse.ok) {
 
   const result =
     await profileResponse.json();
-
+console.log("PROFILE PROMPT:");
+console.log(profilePrompt);
   console.log(
     "PROFILE_RESPONSE_RAW",
     JSON.stringify(result, null, 2)
