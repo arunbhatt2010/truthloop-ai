@@ -1727,7 +1727,9 @@ const response = await fetch(
     })
   }
 );
-
+console.log("FETCH_COMPLETED");
+console.log("RESPONSE_OK", response.ok);
+console.log("RESPONSE_STATUS", response.status);
 if (!response.ok) {
 
   console.log("GROQ_STATUS", response.status);
