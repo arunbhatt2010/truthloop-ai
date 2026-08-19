@@ -1716,6 +1716,7 @@ ${userMessage}
     
 const maxTokens =
   loopLevel === 7 ? 900 : 220;
+    console.log("EVIDENCE_CONTEXT_CREATED");
 console.log("REACHED_GROQ_CALL");
 const response = await fetch(
   "https://api.groq.com/openai/v1/chat/completions",
