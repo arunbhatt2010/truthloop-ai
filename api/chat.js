@@ -1767,33 +1767,62 @@ reasoning_format: "hidden"
     const data =
       await response.json();
 const profileResponse = await fetch(
-"https://api.groq.com/openai/v1/chat/completions",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-Authorization:
-"Bearer " + process.env.GROQ_API_KEY
-},
-body: JSON.stringify({
-  model: "qwen/qwen3.6-27b",
+  "https://api.groq.com/openai/v1/chat/completions",
+  {
+    method: "POST",
 
-  messages: [
-    {
-      role: "system",
-      content: profilePrompt
+    headers: {
+      "Content-Type": "application/json",
+      Authorization:
+        "Bearer " + process.env.GROQ_API_KEY
     },
-    ...messages.slice(-10)
-  ],
 
-  temperature: 0,
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",
 
-  max_tokens: 80,
+      messages: [
+        {
+          role: "system",
+          content: `
+You are TruthLoop Profile Engine.
 
-})
+Analyze the conversation evidence.
+
+Return ONLY valid JSON.
+
+{
+  "primaryLoop": "unknown",
+  "emotionalDriver": "unknown",
+  "avoidanceStyle": "unknown",
+  "hiddenAssumption": "unknown"
+}
+
+Rules:
+- Update from evidence in the conversation.
+- Do not guess beyond evidence.
+- Maximum 5 words per field.
+- Always return all four fields.
+- Return JSON only.
+`
+        },
+
+        ...messages.slice(-10),
+
+        {
+          role: "assistant",
+          content: reply
+        }
+      ],
+
+      temperature: 0,
+      max_tokens: 120,
+
+      response_format: {
+        type: "json_object"
+      }
+    })
   }
 );
-
 const profileData =
 await profileResponse.json();
     console.log(
@@ -1839,57 +1868,31 @@ let hiddenAssumption = "";
 
 try {
 
-const rawProfile =
-profileData?.choices?.[0]?.message?.content || "{}";
+  const rawProfile =
+    profileData?.choices?.[0]?.message?.content || "";
 
-console.log(
-  "PROFILE_API_RESULT",
-  JSON.stringify(profileData, null, 2)
-);
+  const profile =
+    JSON.parse(rawProfile || "{}");
 
-console.log("PROFILE_RAW", rawProfile);
+  primaryLoop =
+    profile.primaryLoop || "unknown";
 
-const jsonMatch =
-rawProfile.match(/\{[\s\S]*\}/);
+  emotionalDriver =
+    profile.emotionalDriver || "unknown";
 
-const profile = jsonMatch
-? JSON.parse(jsonMatch[0])
-: {};
+  avoidanceStyle =
+    profile.avoidanceStyle || "unknown";
 
-console.log(
-  "PROFILE_PARSED",
-  JSON.stringify(profile, null, 2)
-);
-
-primaryLoop =
-profile.primaryLoop || "[EMPTY_PRIMARY_LOOP]";
-
-emotionalDriver =
-profile.emotionalDriver || "[EMPTY_EMOTIONAL_DRIVER]";
-
-avoidanceStyle =
-profile.avoidanceStyle || "[EMPTY_AVOIDANCE_STYLE]";
-
-hiddenAssumption =
-profile.hiddenAssumption || "[EMPTY_HIDDEN_ASSUMPTION]";
-
-console.log(
-  "PROFILE_VALUES_AFTER_PARSE",
-  {
-    primaryLoop,
-    emotionalDriver,
-    avoidanceStyle,
-    hiddenAssumption
-  }
-);
+  hiddenAssumption =
+    profile.hiddenAssumption || "unknown";
 
 } catch (e) {
 
-console.log(
-  "PROFILE_PARSE_ERROR",
-  e.message
-);
-
+  primaryLoop = "unknown";
+  emotionalDriver = "unknown";
+  avoidanceStyle = "unknown";
+  hiddenAssumption = "unknown";
+  }
 console.log(
   "PROFILE_RAW_RESPONSE",
   profileData?.choices?.[0]?.message?.content
