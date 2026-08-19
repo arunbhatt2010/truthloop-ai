@@ -1750,22 +1750,20 @@ console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
 console.log("===== END RAW AI RESPONSE =====");
 
-let reply =
-      data?.choices?.[0]?.message?.content || "";
-
-console.log("===== RAW AI REPLY =====");
-console.log(reply);
-console.log("===== END RAW AI REPLY =====");
-
-{
-  "choices": [
+let profileData = {
+  choices: [
     {
-      "message": {
-        "content": "{\"primaryLoop\":\"TEST_LOOP\",\"emotionalDriver\":\"TEST_DRIVER\",\"avoidanceStyle\":\"TEST_STYLE\",\"hiddenAssumption\":\"TEST_BELIEF\"}"
+      message: {
+        content: JSON.stringify({
+          primaryLoop: "",
+          emotionalDriver: "",
+          avoidanceStyle: "",
+          hiddenAssumption: ""
+        })
       }
     }
   ]
-          }
+};
 
 try {
 console.log(
