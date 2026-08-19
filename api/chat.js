@@ -1809,13 +1809,30 @@ if (profileResponse.ok) {
 
   const result =
     await profileResponse.json();
-console.log("PROFILE PROMPT:");
-console.log(profilePrompt);
-  console.log(
-    "PROFILE_RESPONSE_RAW",
-    JSON.stringify(result, null, 2)
-  );
+console.log(
+  "PROFILE_RESPONSE_RAW",
+  JSON.stringify(result, null, 2)
+);
 
+console.log(
+  "PROFILE_PROMPT",
+  profilePrompt
+);
+
+console.log(
+  "PROFILE_MESSAGES",
+  JSON.stringify(
+    [
+      ...messages.slice(-10),
+      {
+        role:"assistant",
+        content: reply
+      }
+    ],
+    null,
+    2
+  )
+);
   const rawProfile =
     result?.choices?.[0]?.message?.content || "";
 
