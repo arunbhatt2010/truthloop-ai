@@ -1745,7 +1745,8 @@ reasoning_format: "hidden"
 
     const data =
       await response.json();
-
+let reply =
+  data?.choices?.[0]?.message?.content || "";
 console.log("===== RAW AI RESPONSE =====");
 console.log(JSON.stringify(data, null, 2));
 console.log("===== END RAW AI RESPONSE =====");
