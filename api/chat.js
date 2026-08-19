@@ -1666,13 +1666,13 @@ ${finalReview}
 `;
 
 
-/* =========================
-   🤖 AI CALL
-========================= */
-
-/******************************
+  /* =========================
+       🤖 AI CALL
+    ========================= */
+    /******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
+
 if (loopLevel === 7) {
 
   messages = messages.filter(m => {
@@ -1681,112 +1681,70 @@ if (loopLevel === 7) {
     return !m.content.includes("?");
   });
 
-      }
+}
+    const maxTokens =
+  loopLevel === 7 ? 900 : 220;
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
 
-const maxTokens =
-  loopLevel === 7 ? 900 : 500;
-    console.log("EVIDENCE_CONTEXT_CREATED");
-console.log("REACHED_GROQ_CALL");
-const response = await fetch(
-  "https://api.groq.com/openai/v1/chat/completions",
-  {
-    method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + process.env.GROQ_API_KEY
+        },
 
-    headers: {
-      "Content-Type": "application/json",
-      Authorization:
-        "Bearer " + process.env.GROQ_API_KEY
-    },
+        body: JSON.stringify({
 
-    body: JSON.stringify({
+          model: "qwen/qwen3.6-27b",
 
-      model: "qwen/qwen3.6-27b",
-
-      messages: [
+          messages: [
   {
     role: "system",
     content: systemPrompt
   },
-
-  {
-    role: "system",
-    content: evidenceContext
-  },
-
   ...(loopLevel === 7
       ? messages.slice(-8)
       : messages.slice(-2))
 ],
 
-      temperature: 0.7,
+temperature: 0.7,
+max_tokens: maxTokens
+        })
+      }
+    );
 
-      max_tokens: maxTokens,
+    if (!response.ok) {
 
-      reasoning_effort: "none"
+    console.log("GROQ_STATUS", response.status);
+    console.log("GROQ_STATUS_TEXT", response.statusText);
+    console.log("GROQ_ERROR_BODY", await response.text());
 
-    })
-  }
-);
-console.log("FETCH_COMPLETED");
-console.log("RESPONSE_OK", response.ok);
-console.log("RESPONSE_STATUS", response.status);
-if (!response.ok) {
+    return res.status(500).json({
+        reply: "AI service busy. Please try again."
+    });
+          }
 
-  console.log("GROQ_STATUS", response.status);
-  console.log("GROQ_STATUS_TEXT", response.statusText);
-  console.log(
-    "GROQ_ERROR_BODY",
-    await response.text()
-  );
+    /* =========================
+       📤 RESPONSE
+    ========================= */
 
-  return res.status(500).json({
-    reply:
-      "AI service busy. Please try again."
-  });
+    const data =
+      await response.json();
 
-}
-
-/* =========================
-   📤 RESPONSE
-========================= */
-
-const data =
-  await response.json();
-
-console.log(
-  "===== RAW AI RESPONSE ====="
-);
-
-console.log(
-  JSON.stringify(data, null, 2)
-);
-
-console.log(
-  "===== END RAW AI RESPONSE ====="
-);
+console.log("===== RAW AI RESPONSE =====");
+console.log(JSON.stringify(data, null, 2));
+console.log("===== END RAW AI RESPONSE =====");
 
 let reply =
-  data?.choices?.[0]?.message?.content || "";
+      data?.choices?.[0]?.message?.content || "";
 
-/* THINK TAG CLEANUP */
-
-reply = reply
-  .replace(
-    /<think>[\s\S]*?<\/think>/gi,
-    ""
-  )
-  .trim();
-
-console.log(
-  "===== RAW AI REPLY ====="
-);
-
+console.log("===== RAW AI REPLY =====");
 console.log(reply);
+console.log("===== END RAW AI REPLY =====");
 
-console.log(
-  "===== END RAW AI REPLY ====="
-);
-    let profileData = {
+let profileData = {
   choices: [
     {
       message: {
@@ -1803,83 +1761,44 @@ console.log(
 
 try {
 
-  const profileResponse =
-    await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json",
-
-          Authorization:
-            "Bearer " +
-            process.env.GROQ_API_KEY
-        },
-
-        body: JSON.stringify({
-
-          model:
+  const profileResponse = await fetch(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + process.env.GROQ_API_KEY
+      },
+      body: JSON.stringify({
+        model:
             "qwen/qwen3.6-27b",
+        messages: [
+          {
+            role: "system",
+            content: profilePrompt
+          },
 
-          messages: [
+          ...messages.slice(-3),
 
-            {
-              role: "system",
-              content: profilePrompt
-            },
-
-            ...messages.slice(-3),
-
-            {
-              role: "assistant",
-              content: reply
-            }
-
-          ],
-
-          temperature: 0.3,
-
-          max_tokens: 120,
-
-          reasoning_effort:
-            "none",
-
-          response_format: {
-            type: "json_object"
+          {
+            role: "assistant",
+            content: reply
           }
 
-        })
-      }
-    );
-
-  console.log(
-    "PROFILE_STATUS",
-    profileResponse.status
+        ],
+        temperature: 0.3,
+        max_tokens: 120,
+        response_format: {
+  type: "json_object"
+        }
+      })
+    }
   );
 
   if (profileResponse.ok) {
-
     profileData =
       await profileResponse.json();
-
-    console.log(
-      "PROFILE_RESPONSE",
-      JSON.stringify(
-        profileData,
-        null,
-        2
-      )
-    );
-
-  } else {
-
-    console.log(
-      "PROFILE_ERROR",
-      await profileResponse.text()
-    );
-
   }
 
 } catch (e) {
@@ -1890,7 +1809,8 @@ try {
   );
 
   }
-    
+      
+        
   
 
 const contentLeakWords = [
