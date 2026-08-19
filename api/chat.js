@@ -1773,7 +1773,24 @@ let profileData = {
 };
 
 try {
-
+console.log(
+  "PROFILE_MESSAGES",
+  JSON.stringify(
+    [
+      {
+        role: "system",
+        content: profilePrompt
+      },
+      ...messages.slice(-3),
+      {
+        role: "assistant",
+        content: reply
+      }
+    ],
+    null,
+    2
+  )
+);
   const profileResponse = await fetch(
     "https://api.groq.com/openai/v1/chat/completions",
     {
