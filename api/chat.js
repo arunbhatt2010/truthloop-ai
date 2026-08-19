@@ -1756,10 +1756,10 @@ let profileData = {
     {
       message: {
         content: JSON.stringify({
-          primaryLoop: "",
-          emotionalDriver: "",
-          avoidanceStyle: "",
-          hiddenAssumption: ""
+          primaryLoop: "unknown",
+          emotionalDriver: "unknown",
+          avoidanceStyle: "unknown",
+          hiddenAssumption: "unknown"
         })
       }
     }
@@ -1767,89 +1767,113 @@ let profileData = {
 };
 
 try {
-console.log(
-  "PROFILE_MESSAGES",
-  JSON.stringify(
-    [
-      {
-        role: "system",
-        content: profilePrompt
-      },
-      ...messages.slice(-6),
-      {
-        role: "assistant",
-        content: reply
-      }
-    ],
-    null,
-    2
-  )
-);
+
   const profileResponse = await fetch(
-  "https://api.groq.com/openai/v1/chat/completions",
-  {
-    method: "POST",
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
 
-    headers: {
-      "Content-Type": "application/json",
-      Authorization:
-        "Bearer " + process.env.GROQ_API_KEY
-    },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + process.env.GROQ_API_KEY
+      },
 
-    body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
 
-      messages: [
-        {
-          role: "system",
-          content: profilePrompt
-        },
+        messages: [
+          {
+            role: "system",
+            content: profilePrompt
+          },
 
-        ...messages.slice(-10)
-      ],
+          ...messages.slice(-10),
 
-      temperature: 0.3,
-      max_tokens: 120,
-      reasoning_effort: "none"
-    })
-  }
-);
+          {
+            role: "assistant",
+            content: reply
+          }
+        ],
 
+        temperature: 0.3,
+        max_tokens: 220,
+
+        response_format: {
+          type: "json_object"
+        }
+      })
+    }
+  );
 
   if (profileResponse.ok) {
-    profileData =
+
+    const result =
       await profileResponse.json();
-    console.log(
-  "PROFILE_RESPONSE_RAW",
-  JSON.stringify(profileData, null, 2)
-);
-    console.log(
-  "PROFILE_STATUS",
-  profileResponse.status
-);
 
-console.log(
-  "PROFILE_RESPONSE_RAW",
-  JSON.stringify(profileData, null, 2)
-);
+    const rawProfile =
+      result?.choices?.[0]?.message?.content || "";
 
-console.log(
-  "PROFILE_CONTENT",
-  profileData?.choices?.[0]?.message?.content
-);
+    let parsedProfile = null;
+
+    try {
+
+      parsedProfile =
+        JSON.parse(rawProfile);
+
+    } catch (e) {
+
+      const jsonMatch =
+        rawProfile.match(/\{[\s\S]*\}/);
+
+      if (jsonMatch) {
+
+        try {
+          parsedProfile =
+            JSON.parse(jsonMatch[0]);
+        } catch (e2) {
+          parsedProfile = null;
+        }
+
+      }
+
+    }
+
+    if (parsedProfile) {
+
+      profileData = {
+        choices: [
+          {
+            message: {
+              content:
+                JSON.stringify(parsedProfile)
+            }
+          }
+        ]
+      };
+
+    }
+
   }
 
 } catch (e) {
 
-  console.error(
-    "PROFILE_ENGINE_ERROR",
-    e
-  );
+  profileData = {
+    choices: [
+      {
+        message: {
+          content: JSON.stringify({
+            primaryLoop: "unknown",
+            emotionalDriver: "unknown",
+            avoidanceStyle: "unknown",
+            hiddenAssumption: "unknown"
+          })
+        }
+      }
+    ]
+  };
 
-  }
-      
-        
-  
+}
 
 const contentLeakWords = [
 
