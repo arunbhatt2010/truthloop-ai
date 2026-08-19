@@ -1321,7 +1321,13 @@ Return four fields:
 - emotionalDriver
 - avoidanceStyle
 - hiddenAssumption
+RETURN ONLY JSON.
 
+DO NOT THINK.
+
+DO NOT EXPLAIN.
+
+DO NOT USE <think>.
 Rules:
 - Never guess.
 - No unsupported inference.
