@@ -1708,7 +1708,7 @@ ${userMessage}
     
 const maxTokens =
   loopLevel === 7 ? 900 : 220;
-
+console.log("REACHED_GROQ_CALL");
 const response = await fetch(
   "https://api.groq.com/openai/v1/chat/completions",
   {
@@ -1719,7 +1719,7 @@ const response = await fetch(
       Authorization:
         "Bearer " + process.env.GROQ_API_KEY
     },
-console.log("REACHED_GROQ_CALL");
+
     body: JSON.stringify({
 
       model: "qwen/qwen3.6-27b",
