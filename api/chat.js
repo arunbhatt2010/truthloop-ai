@@ -1812,6 +1812,10 @@ try {
   if (profileResponse.ok) {
     profileData =
       await profileResponse.json();
+    console.log(
+  "PROFILE_RESPONSE_RAW",
+  JSON.stringify(profileData, null, 2)
+);
   }
 
 } catch (e) {
