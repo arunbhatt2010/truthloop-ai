@@ -1868,6 +1868,25 @@ if (profileResponse.ok) {
   }
 
 }
+  
+} catch (e) {
+
+  profileData = {
+    choices: [
+      {
+        message: {
+          content: JSON.stringify({
+            primaryLoop: "unknown",
+            emotionalDriver: "unknown",
+            avoidanceStyle: "unknown",
+            hiddenAssumption: "unknown"
+          })
+        }
+      }
+    ]
+  };
+
+      }
 const contentLeakWords = [
 
 "template",
