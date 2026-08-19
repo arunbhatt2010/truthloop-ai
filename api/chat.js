@@ -1762,10 +1762,10 @@ let profileData = {
     {
       message: {
         content: JSON.stringify({
-          primaryLoop: "",
-          emotionalDriver: "",
-          avoidanceStyle: "",
-          hiddenAssumption: ""
+          primaryLoop: "decision paralysis",
+          emotionalDriver: "fear of regret",
+          avoidanceStyle: "over research",
+          hiddenAssumption: "perfect choice exists"
         })
       }
     }
