@@ -1705,8 +1705,7 @@ if (loopLevel === 7) {
 
         body: JSON.stringify({
 
-          model: "llama-3.1-8b-instant",
-
+          model: "qwen/qwen3.6-27b",
           messages: [
   {
     role: "system",
@@ -1714,7 +1713,7 @@ if (loopLevel === 7) {
   },
   ...(loopLevel === 7
       ? messages.slice(-8)
-      : messages.slice(-2))
+      : messages.slice(-4))
 ],
 
 temperature: 0.7,
