@@ -1938,36 +1938,43 @@ FORMAT:
 NORMALIZED PUBLIC EVIDENCE:
 ${JSON.stringify(evidenceInput)}
 `;
-
-  console.log("CEREBRAS_BEFORE");
-
-const response =
+console.log("GEMINI_BEFORE");
+  const response =
     await fetch(
-        "https://api.cerebras.ai/v1/chat/completions",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" +
+        process.env.GEMINI_API_KEY,
         {
             method: "POST",
+
             headers: {
-                Authorization:
-                    `Bearer ${process.env.CEREBRAS_API_KEY}`,
                 "Content-Type":
                     "application/json"
             },
+
             body: JSON.stringify({
-                model: "gpt-oss-120b",
-                messages: [
+                contents: [
                     {
                         role: "user",
-                        content: prompt
+                        parts: [
+                            {
+                                text: prompt
+                            }
+                        ]
                     }
                 ],
-                temperature: 0.1,
-                max_completion_tokens: 3000
+
+                generationConfig: {
+                    responseMimeType:
+                        "application/json",
+
+                    maxOutputTokens: 3000
+                }
             })
         }
     );
 
 console.log(
-    "CEREBRAS_TRIGGER",
+    "GEMINI_TRIGGER",
     {
         status: response.status,
         ok: response.ok
@@ -1978,51 +1985,66 @@ const data =
     await response.json();
 
 console.log(
-    "CEREBRAS_RESPONSE_KEYS",
+    "GEMINI_RESPONSE_KEYS",
     Object.keys(data || {})
 );
 
 const content =
-    data?.choices?.[0]?.message?.content || "{}";
-
+    data?.candidates?.[0]
+        ?.content?.parts?.[0]
+        ?.text || "{}";
 console.log(
-    "CEREBRAS_CONTENT_LENGTH",
-    content.length
+    "GEMINI_CONTENT_PREVIEW",
+    content.slice(0,500)
 );
 
 let universalPackage = {};
 
 try {
 
+    let cleanContent =
+        content
+            .replace(/```json/gi, "")
+            .replace(/```/g, "")
+            .trim();
+
     universalPackage =
-        JSON.parse(content);
+        JSON.parse(cleanContent);
 
     console.log(
-        "CEREBRAS_AFTER",
+        "GEMINI_AFTER",
         {
-            success: true
+            success: true,
+            keys: Object.keys(
+                universalPackage || {}
+            )
         }
     );
 
 } catch (error) {
 
     console.error(
-        "CEREBRAS_JSON_PARSE_ERROR",
+        "GEMINI_JSON_PARSE_ERROR",
         error
+    );
+
+    console.error(
+        "GEMINI_RAW_RESPONSE",
+        content
     );
 
     universalPackage = {
         error:
-            "Invalid JSON returned by Cerebras"
+            "Invalid JSON returned by Gemini"
     };
 
-}
+       }
 
 return {
 
     success: response.ok,
 
-    source: "cerebras",
+    source: "gemini",
 
     universalPackage
 
