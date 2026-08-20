@@ -3121,7 +3121,10 @@ window.isRestoredJourney = true;
 loopLevel = restored.loopLevel || 1;
 messages = restored.messages || [];
 currentCategory = restored.currentCategory || "";
-
+alert(
+  "RESTORED_LOOP = " + restored.loopLevel +
+  "\nRESTORED_COUNT = " + (restored.messages?.length || 0)
+);
 document.getElementById("loopIndicator").innerText =
 `Loop ${loopLevel} of 7`;
 
