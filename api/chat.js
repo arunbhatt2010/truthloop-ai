@@ -1817,7 +1817,14 @@ const profileResponse = await fetch(
     })
   }
 );
-
+console.log(
+  "PROFILE_STATUS",
+  profileResponse.status
+);
+    console.log(
+  "PROFILE_RESPONSE_OK",
+  profileResponse.ok
+);
 const profileData =
   await profileResponse.json();
 
