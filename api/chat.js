@@ -1817,11 +1817,12 @@ const profileResponse = await fetch(
       ],
 
       temperature: 0,
-      max_tokens: 200
+max_tokens: 200,
+reasoning_effort: "none",
 
-     // response_format: {
-     //   type: "json_object"
-   //   }
+response_format: {
+  type: "json_object"
+        }
     })
   }
 );
