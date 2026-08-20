@@ -1817,7 +1817,7 @@ const profileResponse = await fetch(
       ],
 
       temperature: 0,
-      max_tokens: 120
+      max_tokens: 200
 
      // response_format: {
      //   type: "json_object"
