@@ -1765,7 +1765,16 @@ reasoning_format: "hidden"
     ========================= */
 
     const data =
-      await response.json();
+  await response.json();
+
+let reply =
+  data?.choices?.[0]?.message?.content || "";
+
+
+/* =========================
+   PROFILE ENGINE
+========================= */
+
 const profileResponse = await fetch(
   "https://api.groq.com/openai/v1/chat/completions",
   {
@@ -1783,27 +1792,7 @@ const profileResponse = await fetch(
       messages: [
         {
           role: "system",
-          content: `
-You are TruthLoop Profile Engine.
-
-Analyze the conversation evidence.
-
-Return ONLY valid JSON.
-
-{
-  "primaryLoop": "unknown",
-  "emotionalDriver": "unknown",
-  "avoidanceStyle": "unknown",
-  "hiddenAssumption": "unknown"
-}
-
-Rules:
-- Update from evidence in the conversation.
-- Do not guess beyond evidence.
-- Maximum 5 words per field.
-- Always return all four fields.
-- Return JSON only.
-`
+          content: profilePrompt
         },
 
         ...messages.slice(-10),
@@ -1823,14 +1812,22 @@ Rules:
     })
   }
 );
+
+const profileData =
+  await profileResponse.json();
+
+console.log(
+  "PROFILE_MODEL_RAW",
+  JSON.stringify(profileData, null, 2)
+);
+
 const profileData =
 await profileResponse.json();
     console.log(
   "PROFILE_MODEL_RAW",
   JSON.stringify(profileData, null, 2)
 );
-    let reply =
-      data?.choices?.[0]?.message?.content || "";
+    
 const contentLeakWords = [
 
 "template",
@@ -1861,18 +1858,27 @@ reply =
 "Interesting. You moved from understanding the problem to creating an answer.\n\nWhat feels unfinished if the answer never gets created?";
 
 }    
-let primaryLoop = "";
-let emotionalDriver = "";
-let avoidanceStyle = "";
-let hiddenAssumption = "";
+/* =========================
+   PROFILE PARSE
+========================= */
+
+let primaryLoop = "unknown";
+let emotionalDriver = "unknown";
+let avoidanceStyle = "unknown";
+let hiddenAssumption = "unknown";
 
 try {
 
   const rawProfile =
-    profileData?.choices?.[0]?.message?.content || "";
+    profileData?.choices?.[0]?.message?.content || "{}";
+
+  console.log(
+    "PROFILE_RAW",
+    rawProfile
+  );
 
   const profile =
-    JSON.parse(rawProfile || "{}");
+    JSON.parse(rawProfile);
 
   primaryLoop =
     profile.primaryLoop || "unknown";
@@ -1885,26 +1891,20 @@ try {
 
   hiddenAssumption =
     profile.hiddenAssumption || "unknown";
-  
 
 } catch (e) {
 
-  primaryLoop = "unknown";
-  emotionalDriver = "unknown";
-  avoidanceStyle = "unknown";
-  hiddenAssumption = "unknown";
-  }
-console.log(
-  "PROFILE_RAW_RESPONSE",
-  profileData?.choices?.[0]?.message?.content
-);
+  console.log(
+    "PROFILE_PARSE_ERROR",
+    e.message
+  );
 
-primaryLoop = "PROFILE_PARSE_ERROR";
-emotionalDriver = e.message;
-avoidanceStyle = "PROFILE_PARSE_ERROR";
-hiddenAssumption = "PROFILE_PARSE_ERROR";
+  console.log(
+    "PROFILE_RAW_RESPONSE",
+    profileData?.choices?.[0]?.message?.content
+  );
 
-  }
+}
     /* =========================
        ✂️ CLEANER
     ========================= */
