@@ -1383,14 +1383,22 @@ If any required profile field is missing, empty, unsupported, or returned as "un
 rewrite the entire profile.    
     
 Return only a complete profile.    
-Return ONLY JSON:    
-    
-{    
-"primaryLoop":"unknown",    
-"emotionalDriver":"unknown",    
-"avoidanceStyle":"unknown",    
-"hiddenAssumption":"unknown"    
-}    
+Return ONLY valid JSON.
+
+Do not explain.
+Do not think.
+Do not use <think>.
+Do not use markdown.
+Do not use code blocks.
+
+Return exactly:
+
+{
+  "primaryLoop":"",
+  "emotionalDriver":"",
+  "avoidanceStyle":"",
+  "hiddenAssumption":""
+    }
 SELF CHECK    
     
 Before returning the profile:    
