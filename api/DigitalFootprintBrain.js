@@ -833,24 +833,25 @@ function extractSocialLinksFromFetchedPackage(
 
     for (const source of sources) {
 
-        if (typeof source?.rawContent === "string") {
+    if (typeof source?.rawContent === "string") {
+        candidateUrls.push(
+            ...extractUrlsFromHtml(
+                source.rawContent
+            )
+        );
+    }
 
-            candidateUrls.push(
-                ...extractUrlsFromHtml(
-                    source.rawContent
-                )
-            );
+    if (Array.isArray(source?.links)) {
+        candidateUrls.push(
+            ...source.links
+        );
+    }
 
-        }
-
-        if (Array.isArray(source?.links)) {
-
-            candidateUrls.push(
-                ...source.links
-            );
-
-        }
-
+    if (Array.isArray(source?.socialLinks)) {
+        candidateUrls.push(
+            ...source.socialLinks
+        );
+    }
     }
 
     if (Array.isArray(extractedPackage?.links)) {
