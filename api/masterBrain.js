@@ -1422,24 +1422,26 @@ return 1;
 ========================= */
 
 function trackInvestigationState(
-
   mergedSignals,
-
   generatedQuestion,
-
-  loopNavigation
-
-) {
+  loopNavigation,
+  restoredLoopLevel = 1
+){
 
   const signalCount =
     mergedSignals?.totalSignals || 0;
 
-  const currentLoop =
+  const detectedLoop =
   determineLoopStage(
     signalCount,
     signalCount >= 6 ? 2 : 0
   );
 
+const currentLoop =
+  Math.max(
+    restoredLoopLevel || 1,
+    detectedLoop || 1
+  );
   let stage =
     "surface-level";
 
@@ -1475,7 +1477,7 @@ function trackInvestigationState(
   stage,
 
   currentLoop,
-
+restoredLoopLevel,
   signalCount,
 
   investigationActive: true,
@@ -1805,13 +1807,10 @@ const conflictResolution =
   );
    const investigationState =
   trackInvestigationState(
-
     mergedSignals,
-
     generatedQuestion,
-
-    loopNavigation
-
+    loopNavigation,
+    restoredLoopLevel
   );
    const loopProgress =
   calculateLoopProgress(
