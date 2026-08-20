@@ -1739,7 +1739,7 @@ export function runMasterBrain({
   loopLevel = 1,
   messages = [],
   currentCategory = null
-})
+}) {
 
   const environment =
     detectEnvironment(text);
