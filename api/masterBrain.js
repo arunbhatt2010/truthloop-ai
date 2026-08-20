@@ -1506,7 +1506,9 @@ function calculateLoopProgress(
 ){
 
   const currentLoop =
-    investigationState.currentLoop || 1;
+  investigationState.currentLoop ||
+  investigationState.restoredLoopLevel ||
+  1;
 
   return {
 
