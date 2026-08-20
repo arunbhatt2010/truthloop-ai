@@ -1730,10 +1730,27 @@ const loop7 = isFinalLoop
    🧠 MASTER BRAIN
 ========================= */
 
-export function runMasterBrain(text) {
+export function runMasterBrain({
+  text,
+  loopLevel = 1,
+  messages = [],
+  currentCategory = null
+})
 
   const environment =
     detectEnvironment(text);
+const restoredLoopLevel =
+Number(loopLevel) || 1;
+
+console.log(
+  "MASTER_LOOP_LEVEL",
+  restoredLoopLevel
+);
+
+console.log(
+  "MASTER_MESSAGES_COUNT",
+  messages.length
+);
 const selectedBrain =
   selectBrain(environment);
   const communityPatterns =
