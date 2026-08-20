@@ -74,7 +74,12 @@ console.log(
   lastUserMessage
 );
   masterBrain =
-    runMasterBrain(lastUserMessage);
+  runMasterBrain({
+    text: lastUserMessage,
+    loopLevel,
+    messages,
+    currentCategory
+  });
 
 } catch (e) {
 
