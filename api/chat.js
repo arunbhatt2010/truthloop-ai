@@ -1799,7 +1799,30 @@ reasoning_format: "hidden"
 
 let reply =
   data?.choices?.[0]?.message?.content || "";
+console.log(
+  "LOOP_LEVEL",
+  loopLevel
+);
 
+console.log(
+  "SYSTEM_PROMPT_LENGTH",
+  systemPrompt.length
+);
+
+console.log(
+  "LOOP7_PROMPT_EXISTS",
+  loop7Instruction.length
+);
+
+console.log(
+  "RESPONSE_LENGTH",
+  reply.length
+);
+
+console.log(
+  "RESPONSE_PREVIEW",
+  reply.slice(0,1000)
+);
 
 /* =========================
    PROFILE ENGINE
