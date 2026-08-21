@@ -406,3 +406,6 @@ console.log(
    return universalEvidencePackage;
    
 }
+export {
+    loadEvidenceCompressionBrain
+};
