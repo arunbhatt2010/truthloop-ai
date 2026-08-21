@@ -648,23 +648,17 @@ Use this format exactly:
 Apply the same formatting to every subsection throughout the report.
 
 Never output ### or any Markdown heading.
-
-Use:
-• TruthLoop Package (required)
-• Verified Universal Evidence Package (optional)
 Use:
 
 • TruthLoop Package (required)
 
 • Verified Universal Evidence Package (optional)
 
-${publicEvidencePackage
-? JSON.stringify(publicEvidencePackage, null, 2)
-: "Not available"}
+Evidence Available:
+${publicEvidencePackage?.success}
 
 Current profile link:
 ${profileLink}
-
 YOUR ROLE
 
 You are an investigation system, not a summarization system.
