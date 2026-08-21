@@ -320,7 +320,9 @@ await loadCrossEvidenceBrain({
     loop7EvidencePackage,
 
    universalPackage:
-        crossEvidence?.universalPackage || null,
+    crossEvidence?.universalPackage ||
+    crossEvidence?.crossEvidencePackage?.universalPackage ||
+    null,
 
     generatedAt: new Date().toISOString()
 };
