@@ -641,12 +641,6 @@ console.log(
   typeof compressedEvidencePackage
 );
 
-console.log(
-  "COMPRESSED_PACKAGE_KEYS",
-  compressedEvidencePackage
-    ? Object.keys(compressedEvidencePackage)
-    : []
-);
 
 console.log(
   "TRUTHLOOP_PACKAGE_TYPE",
