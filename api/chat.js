@@ -1793,8 +1793,8 @@ reasoning_format: "hidden"
     const data =
   await response.json();
     console.log(
-  "LOOP7_FINAL_RESPONSE",
-  JSON.stringify(result, null, 2)
+    "LOOP7_FINAL_RESPONSE",
+    JSON.stringify(data).slice(0,3000)
 );
 
 let reply =
