@@ -612,7 +612,20 @@ if (publicEvidencePackage) {
 
           }
     let loop7Instruction = "";
+console.log(
+"TRUTHLOOP_PACKAGE_SIZE",
+JSON.stringify(truthLoopPackage).length
+);
 
+console.log(
+"PUBLIC_PACKAGE_SIZE",
+JSON.stringify(publicEvidencePackage).length
+);
+
+console.log(
+"LOOP7_PROMPT_SIZE",
+loop7Instruction.length
+);
 if (loopLevel === 7) {
 
 loop7Instruction = `
@@ -648,17 +661,15 @@ Use this format exactly:
 Apply the same formatting to every subsection throughout the report.
 
 Never output ### or any Markdown heading.
-Use:
+INVESTIGATION DATA
 
-• TruthLoop Package (required)
+TruthLoop Package:
 
-• Verified Universal Evidence Package (optional)
+${JSON.stringify(truthLoopPackage, null, 2)}
 
-Evidence Available:
-${publicEvidencePackage?.success}
+Verified Universal Evidence Package:
 
-Current profile link:
-${profileLink}
+${JSON.stringify(publicEvidencePackage, null, 2)}
 YOUR ROLE
 
 You are an investigation system, not a summarization system.
