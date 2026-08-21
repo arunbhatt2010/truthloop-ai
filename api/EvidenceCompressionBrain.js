@@ -279,11 +279,8 @@ async function loadEvidenceCompressionBrain({
   console.log("ECB_INPUT_VALID");
 
   const sources =
-    publicEvidencePackage.sources ||
-    publicEvidencePackage.loop7EvidencePackage?.sources ||
-    publicEvidencePackage.footprintPackage?.sources ||
+    publicEvidencePackage?.universalPackage?.normalizedEvidence?.sources ||
     [];
-
   console.log(
     "ECB_SOURCE_COUNT",
     sources.length
