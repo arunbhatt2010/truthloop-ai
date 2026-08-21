@@ -1993,11 +1993,12 @@ const contentLeakWords = [
 ];
 
 const contentLeakDetected =
-contentLeakWords.some(word =>
-reply.toLowerCase().includes(
-word.toLowerCase()
-)
-);
+  loopLevel !== 7 &&
+  contentLeakWords.some(word =>
+    reply.toLowerCase().includes(
+      word.toLowerCase()
+    )
+  );
 
 if(contentLeakDetected){
 
