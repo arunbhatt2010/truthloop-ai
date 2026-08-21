@@ -1983,7 +1983,10 @@ console.log(
 
 const data =
     await response.json();
-
+console.log(
+  "GEMINI_FULL_RESPONSE",
+  JSON.stringify(data).slice(0,3000)
+);
 console.log(
     "GEMINI_RESPONSE_KEYS",
     Object.keys(data || {})
