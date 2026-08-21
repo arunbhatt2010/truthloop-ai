@@ -870,13 +870,7 @@ function extractSocialLinksFromFetchedPackage(
         );
 
     }
-   if (Array.isArray(source?.socialLinks)) {
-
-    candidateUrls.push(
-        ...source.socialLinks
-    );
-
-   }
+   
    console.log(
     "EXTRACT_CANDIDATES",
     candidateUrls
