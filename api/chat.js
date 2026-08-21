@@ -1,6 +1,8 @@
 import { runMasterBrain }
 from "./masterBrain.js";
 import { loadDigitalFootprintBrain } from "./DigitalFootprintBrain.js";
+import { loadEvidenceCompressionBrain }
+from "./EvidenceCompressionBrain.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -543,6 +545,17 @@ await loadDigitalFootprintBrain({
     currentLoop: 7
 
 });
+    const compressedEvidencePackage =
+await loadEvidenceCompressionBrain({
+
+    truthLoopPackage,
+    publicEvidencePackage
+
+});
+    console.log(
+    "COMPRESSED_PACKAGE",
+    compressedEvidencePackage?.success
+);
     
     /* =========================
    PLATFORM CARD
@@ -669,7 +682,7 @@ ${JSON.stringify(truthLoopPackage, null, 2)}
 
 Verified Universal Evidence Package:
 
-${JSON.stringify(publicEvidencePackage, null, 2)}
+${JSON.stringify(compressedEvidencePackage, null, 2)}
 YOUR ROLE
 
 You are an investigation system, not a summarization system.
