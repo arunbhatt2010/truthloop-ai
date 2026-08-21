@@ -2913,11 +2913,11 @@ document.getElementById("profileAvoidance").innerText =
 document.getElementById("profileBelief").innerText =
 "Underlying Belief: " + (data.hiddenAssumption || "—");*/
     messages.push({
-    role: "assistant",
-    content: data.reply
+  role: "assistant",
+  content: data.reply || JSON.stringify(data)
 });
 
-if(loopLevel === 7)
+if((data.reply || "").includes("📙"))
   
   latestTruthLoopReport = data.reply;
     outputBox.innerHTML = renderLoop7Report(data.reply);
