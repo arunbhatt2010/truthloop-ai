@@ -489,6 +489,10 @@ async function fetchPublicEvidence(profileLink) {
                 profileLinks: [profileLink]
 
             });
+       console.log(
+ "FETCH_PACKAGE",
+ JSON.stringify(fetchPackage,null,2)
+);
 
         const rawPackage =
             await acquirePublicContent(
