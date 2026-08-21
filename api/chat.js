@@ -1739,7 +1739,7 @@ if (loopLevel === 7) {
 
 }
     const maxTokens =
-  loopLevel === 7 ? 900 : 220;
+  loopLevel === 7 ? 2500 : 220;
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
