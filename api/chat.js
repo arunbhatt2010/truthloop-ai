@@ -634,7 +634,27 @@ console.log(
 "PUBLIC_PACKAGE_SIZE",
 JSON.stringify(publicEvidencePackage).length
 );
+console.log("AFTER_PUBLIC_PACKAGE_SIZE");
 
+console.log(
+  "COMPRESSED_PACKAGE_TYPE",
+  typeof compressedEvidencePackage
+);
+
+console.log(
+  "COMPRESSED_PACKAGE_KEYS",
+  compressedEvidencePackage
+    ? Object.keys(compressedEvidencePackage)
+    : []
+);
+
+console.log(
+  "TRUTHLOOP_PACKAGE_TYPE",
+  typeof truthLoopPackage
+);
+
+console.log("BEFORE_LOOP7_INSTRUCTION");
+    
 if (loopLevel === 7) {
 
 loop7Instruction = `
@@ -1196,6 +1216,12 @@ After the first identity reference (if used), address the reader only as "you" a
 Return only the final corrected report.
 `;
 }
+    console.log("AFTER_LOOP7_INSTRUCTION");
+
+console.log(
+  "LOOP7_PROMPT_SIZE",
+  loop7Instruction.length
+);
     /* =========================
        🧠 MODE ROUTER
     ========================= */
