@@ -508,6 +508,7 @@ User feels close to an important realization but not there yet.
 `;
           }
     let publicEvidencePackage = null;
+    let compressedEvidencePackage = null;
 /* ==========================================
    TRUTHLOOP PACKAGE
    Complete Loop 1–6 Investigation Context
@@ -545,7 +546,7 @@ await loadDigitalFootprintBrain({
     currentLoop: 7
 
 });
-    const compressedEvidencePackage =
+     compressedEvidencePackage =
 await loadEvidenceCompressionBrain({
 
     truthLoopPackage,
