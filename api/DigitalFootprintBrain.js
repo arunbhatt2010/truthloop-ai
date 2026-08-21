@@ -494,10 +494,7 @@ async function fetchPublicEvidence(profileLink) {
  JSON.stringify(fetchPackage,null,2)
 );
 
-        const rawPackage =
-            await acquirePublicContent(
-                fetchPackage
-            );
+        const rawPackage = fetchPackage;
 
         const validatedPackage =
             validatePublicContent(
