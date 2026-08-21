@@ -329,4 +329,80 @@ console.log(
 console.log(
     "ECB_EXTRACTION_COMPLETE"
 );
+   const compressedEvidence = {
+
+    sourceUrl:
+        extractedEvidence.sourceUrl,
+
+    platform:
+        extractedEvidence.platform,
+
+    title:
+        extractedEvidence.title,
+
+    description:
+        extractedEvidence.description,
+
+    socialLinks:
+        extractedEvidence.socialLinks,
+
+    evidenceText:
+        extractedEvidence.visibleText
+            .replace(/\s+/g, " ")
+            .trim()
+            .substring(0, 5000)
+
+};
+
+console.log(
+    "ECB_COMPRESSION_STATS",
+    {
+        original:
+            extractedEvidence.visibleText.length,
+
+        compressed:
+            compressedEvidence.evidenceText.length
+    }
+);
+   const universalEvidencePackage = {
+
+    success: true,
+
+    stage: "Evidence Compression Brain",
+
+    sourceUrl:
+        compressedEvidence.sourceUrl,
+
+    platform:
+        compressedEvidence.platform,
+
+    title:
+        compressedEvidence.title,
+
+    description:
+        compressedEvidence.description,
+
+    socialLinks:
+        compressedEvidence.socialLinks,
+
+    evidenceText:
+        compressedEvidence.evidenceText,
+
+    compressionStats: {
+
+        originalLength:
+            extractedEvidence.visibleText.length,
+
+        compressedLength:
+            compressedEvidence.evidenceText.length
+
+    }
+      
+};
+
+console.log(
+    "ECB_PACKAGE_READY"
+);
+   return universalEvidencePackage;
+   
 }
