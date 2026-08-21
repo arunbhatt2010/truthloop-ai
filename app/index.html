@@ -2917,7 +2917,7 @@ document.getElementById("profileBelief").innerText =
   content: data.reply || JSON.stringify(data)
 });
 
-if((data.reply || "").includes("📙"))
+if(data.reply.includes("📙")) {
   
   latestTruthLoopReport = data.reply;
     outputBox.innerHTML = renderLoop7Report(data.reply);
