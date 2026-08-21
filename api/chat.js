@@ -1792,6 +1792,10 @@ reasoning_format: "hidden"
 
     const data =
   await response.json();
+    console.log(
+  "LOOP7_FINAL_RESPONSE",
+  JSON.stringify(result, null, 2)
+);
 
 let reply =
   data?.choices?.[0]?.message?.content || "";
