@@ -641,7 +641,10 @@ console.log(
   "COMPRESSED_PACKAGE_TYPE",
   typeof compressedEvidencePackage
 );
-
+console.log(
+  "COMPRESSED_PACKAGE_SIZE",
+  JSON.stringify(compressedEvidencePackage).length
+);
 
 console.log(
   "TRUTHLOOP_PACKAGE_TYPE",
