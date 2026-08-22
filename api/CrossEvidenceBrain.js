@@ -41,7 +41,7 @@ const MAX_PROFILE_LINKS_TOTAL = 20;
 const MAX_TOPICS_PER_SOURCE = 8;
 const MAX_EVIDENCE_PER_SOURCE = 4;
 const MAX_TEXT_PER_SOURCE = 650;
-const MAX_TOTAL_PACKAGE_CHARS = 4500;
+const MAX_TOTAL_PACKAGE_CHARS = 8000;
 
 const SUPPORTED_PLATFORMS = new Set([
     "linkedin",
@@ -529,7 +529,29 @@ export async function loadCrossEvidenceBrain({
         sources.flatMap(source => source.socialProfiles || []),
         MAX_PROFILE_LINKS_TOTAL
     );
+/* ==========================================
+   PASS 2
+   FETCH DISCOVERED PROFILES
+========================================== */
 
+const profileSources = [];
+
+for (const profileUrl of discoveredProfiles) {
+
+  const collected = await collectSource(profileUrl);
+
+  if (collected?.success && collected?.source) {
+
+    profileSources.push({
+      ...collected.source,
+      discoveredProfile: true
+    });
+  }
+}
+
+/* Merge profile evidence */
+sources.push(...profileSources);
+   
     const allTraceableLinks = uniqueStrings(
         [
             ...sourceLinks,
