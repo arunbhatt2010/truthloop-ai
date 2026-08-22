@@ -726,7 +726,8 @@ OUTPUT FORMAT
 
 Generate EXACTLY these sections
 in the EXACT order below.
-
+Evidence Sources section MUST display actual source URLs whenever available.
+Never replace URLs with platform names.
 ━━━━━━━━━━━━━━━━━━━━━━
 
 📋 Investigation Summary
