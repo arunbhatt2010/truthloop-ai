@@ -1761,6 +1761,11 @@ console.log("PROFILE_AI_START", {
   loopLevel
 });
 
+const profileContext =
+  loopLevel === 7
+    ? JSON.stringify(compressedEvidencePackage || {})
+    : reply;
+
 let profileResponse;
 
 try {
@@ -1782,10 +1787,9 @@ try {
             role: "system",
             content: profilePrompt
           },
-          ...messages.slice(-10),
           {
-            role: "assistant",
-            content: reply
+            role: "user",
+            content: profileContext
           }
         ],
         temperature: 0,
