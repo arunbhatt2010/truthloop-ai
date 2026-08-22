@@ -1,0 +1,613 @@
+/* ============================================================
+   CROSS EVIDENCE BRAIN v20
+   TruthLoop AI
+
+   Mission
+   --------
+   Collect verified public-source evidence and build ONE compact
+   Universal Public Evidence Package for Loop 7.
+
+   Design rules
+   ------------
+   - No Cerebras.
+   - No Gemini.
+   - No LLM calls.
+   - No raw HTML storage.
+   - No raw evidence duplication.
+   - No TruthLoop conversation storage.
+   - No investigation or psychological interpretation.
+   - Preserve source URLs and discovered platform URLs.
+   - Keep the final package compact and traceable.
+
+   Upstream
+   --------
+   DigitalFootprintBrain supplies the verified sourceLinks list.
+   PublicContentFetcher is responsible for fetching each source.
+
+   Downstream
+   ----------
+   EvidenceCompressionBrain / Loop 7 consume:
+   result.universalPackage
+   or result.crossEvidencePackage.universalPackage
+   ============================================================ */
+
+import {
+    loadPublicContentFetcher
+} from "./PublicContentFetcher.js";
+
+const MAX_SOURCES = 20;
+const MAX_SOCIAL_LINKS_PER_SOURCE = 12;
+const MAX_PROFILE_LINKS_TOTAL = 20;
+const MAX_TOPICS_PER_SOURCE = 8;
+const MAX_EVIDENCE_PER_SOURCE = 4;
+const MAX_TEXT_PER_SOURCE = 650;
+const MAX_TOTAL_PACKAGE_CHARS = 4500;
+
+const SUPPORTED_PLATFORMS = new Set([
+    "linkedin",
+    "facebook",
+    "instagram",
+    "x",
+    "github",
+    "youtube",
+    "medium",
+    "substack",
+    "reddit",
+    "indiehackers",
+    "producthunt",
+    "crunchbase",
+    "behance",
+    "dribbble",
+    "threads",
+    "tiktok",
+    "pinterest",
+    "quora",
+    "devto",
+    "hashnode",
+    "gitlab"
+]);
+
+function normalizeUrl(value = "") {
+    if (typeof value !== "string") return "";
+
+    let cleaned = value
+        .trim()
+        .replace(/[),.;]+$/g, "");
+
+    if (/^\/\//.test(cleaned)) {
+        cleaned = `https:${cleaned}`;
+    }
+
+    if (!/^https?:\/\//i.test(cleaned)) return "";
+
+    try {
+        const url = new URL(cleaned);
+        if (!/^https?:$/.test(url.protocol)) return "";
+        return url.toString();
+    } catch {
+        return "";
+    }
+}
+
+function detectPlatform(value = "") {
+    try {
+        const hostname = new URL(value).hostname
+            .replace(/^www\./, "")
+            .toLowerCase();
+
+        if (hostname.includes("linkedin.com")) return "linkedin";
+        if (hostname.includes("facebook.com")) return "facebook";
+        if (hostname.includes("instagram.com")) return "instagram";
+        if (hostname === "x.com" || hostname.includes("twitter.com")) return "x";
+        if (hostname.includes("github.com")) return "github";
+        if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) return "youtube";
+        if (hostname.includes("medium.com")) return "medium";
+        if (hostname.includes("substack.com")) return "substack";
+        if (hostname.includes("reddit.com")) return "reddit";
+        if (hostname.includes("indiehackers.com")) return "indiehackers";
+        if (hostname.includes("producthunt.com")) return "producthunt";
+        if (hostname.includes("crunchbase.com")) return "crunchbase";
+        if (hostname.includes("behance.net")) return "behance";
+        if (hostname.includes("dribbble.com")) return "dribbble";
+        if (hostname.includes("threads.net")) return "threads";
+        if (hostname.includes("tiktok.com")) return "tiktok";
+        if (hostname.includes("pinterest.com")) return "pinterest";
+        if (hostname.includes("quora.com")) return "quora";
+        if (hostname === "dev.to" || hostname.endsWith(".dev.to")) return "devto";
+        if (hostname.includes("hashnode.com")) return "hashnode";
+        if (hostname.includes("gitlab.com")) return "gitlab";
+        return "website";
+    } catch {
+        return "unknown";
+    }
+}
+
+function isLikelyProfileUrl(value = "") {
+    const url = normalizeUrl(value);
+    if (!url) return false;
+
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+        const path = parsed.pathname.toLowerCase();
+
+        // Remove obvious share / utility / asset URLs.
+        if (
+            path.includes("share") ||
+            path.includes("login") ||
+            path.includes("signin") ||
+            path.includes("signup") ||
+            path.includes("accounts") ||
+            path.includes("error") ||
+            path.includes("favicon") ||
+            path.includes("redirect") ||
+            path.includes("share-post")
+        ) {
+            return false;
+        }
+
+        if (!SUPPORTED_PLATFORMS.has(detectPlatform(url))) {
+            return false;
+        }
+
+        return path.split("/").filter(Boolean).length >= 1;
+    } catch {
+        return false;
+    }
+}
+
+function uniqueStrings(values = [], limit = 50) {
+    const seen = new Set();
+    const output = [];
+
+    for (const value of values) {
+        const normalized = normalizeUrl(value);
+        if (!normalized || seen.has(normalized)) continue;
+        seen.add(normalized);
+        output.push(normalized);
+        if (output.length >= limit) break;
+    }
+
+    return output;
+}
+
+function cleanText(value = "", max = MAX_TEXT_PER_SOURCE) {
+    if (typeof value !== "string") return "";
+
+    return value
+        .replace(/\s+/g, " ")
+        .replace(/\u0000/g, "")
+        .trim()
+        .slice(0, max);
+}
+
+function extractTopics(source = {}) {
+    const raw = [
+        source.title,
+        source.description,
+        source.visibleText
+    ].filter(Boolean).join(" ");
+
+    if (!raw) return [];
+
+    const dictionary = [
+        "ai",
+        "artificial intelligence",
+        "systems",
+        "system thinking",
+        "decision making",
+        "psychology",
+        "behavior",
+        "procrastination",
+        "overthinking",
+        "execution",
+        "business",
+        "marketing",
+        "conversion",
+        "education",
+        "learning",
+        "startup",
+        "founder",
+        "creator",
+        "technology",
+        "digital growth",
+        "clients",
+        "content"
+    ];
+
+    const text = raw.toLowerCase();
+    return dictionary.filter(term => text.includes(term)).slice(0, MAX_TOPICS_PER_SOURCE);
+}
+
+function compactSource(source = {}, fallbackUrl = "") {
+    const sourceUrl = normalizeUrl(
+        source.sourceUrl ||
+        source.canonicalUrl ||
+        fallbackUrl
+    );
+
+    const rawSocial = Array.isArray(source.socialLinks)
+        ? source.socialLinks
+        : [];
+
+    const socialProfiles = uniqueStrings(
+        rawSocial.filter(isLikelyProfileUrl),
+        MAX_SOCIAL_LINKS_PER_SOURCE
+    );
+
+    const allLinks = uniqueStrings(
+        [
+            ...(Array.isArray(source.links) ? source.links : []),
+            ...rawSocial
+        ],
+        30
+    );
+
+    const evidence = [];
+
+    const addEvidence = (type, value) => {
+        const cleaned = cleanText(value, 420);
+        if (!cleaned) return;
+        evidence.push({
+            type,
+            sourceUrl: sourceUrl || null,
+            value: cleaned
+        });
+    };
+
+    addEvidence("title", source.title);
+    addEvidence("description", source.description);
+    addEvidence("content", source.visibleText);
+
+    for (const link of socialProfiles.slice(0, 1)) {
+        addEvidence("profile-link", link);
+    }
+
+    return {
+        sourceUrl: sourceUrl || null,
+        sourcePlatform:
+            source.sourcePlatform ||
+            source.platform ||
+            detectPlatform(sourceUrl),
+        sourceHost:
+            source.sourceHost ||
+            (() => {
+                try {
+                    return sourceUrl ? new URL(sourceUrl).hostname : null;
+                } catch {
+                    return null;
+                }
+            })(),
+        status: source.status || null,
+        title: cleanText(source.title, 180) || null,
+        description: cleanText(source.description, 260) || null,
+        contentSnippet: cleanText(source.visibleText, MAX_TEXT_PER_SOURCE) || null,
+        contentLength:
+            Number(source.contentLength) ||
+            (typeof source.visibleText === "string" ? source.visibleText.length : 0),
+        topics: extractTopics(source),
+        socialProfiles,
+        links: allLinks.slice(0, 12),
+        evidence: evidence.slice(0, MAX_EVIDENCE_PER_SOURCE)
+    };
+}
+
+function buildCrossFindings(sources = [], sourceLinks = []) {
+    const findings = [];
+    const platforms = new Set();
+    const profileLinks = [];
+    const topicCounts = new Map();
+
+    for (const source of sources) {
+        const platform = source.sourcePlatform;
+        if (platform && platform !== "unknown") platforms.add(platform);
+
+        for (const profile of source.socialProfiles || []) {
+            profileLinks.push(profile);
+        }
+
+        for (const topic of source.topics || []) {
+            topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1);
+        }
+    }
+
+    if (sources.length > 1) {
+        findings.push({
+            type: "multi-source",
+            sourceCount: sources.length,
+            message: `${sources.length} public evidence sources were collected.`
+        });
+    }
+
+    if (platforms.size > 1) {
+        findings.push({
+            type: "multi-platform",
+            platformCount: platforms.size,
+            platforms: [...platforms]
+        });
+    }
+
+    const repeatedTopics = [...topicCounts.entries()]
+        .filter(([, count]) => count >= 2)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([topic, count]) => ({ topic, count }));
+
+    if (repeatedTopics.length) {
+        findings.push({
+            type: "repeated-topics",
+            topics: repeatedTopics
+        });
+    }
+
+    const validProfileLinks = uniqueStrings(
+        profileLinks,
+        MAX_PROFILE_LINKS_TOTAL
+    );
+
+    if (validProfileLinks.length) {
+        findings.push({
+            type: "discovered-profiles",
+            count: validProfileLinks.length,
+            profileLinks: validProfileLinks
+        });
+    }
+
+    if (sourceLinks.length) {
+        findings.push({
+            type: "source-traceability",
+            sourceLinks: sourceLinks.slice(0, MAX_PROFILE_LINKS_TOTAL)
+        });
+    }
+
+    return {
+        findings,
+        platforms: [...platforms],
+        repeatedTopics,
+        discoveredProfiles: validProfileLinks
+    };
+}
+
+function calculateConfidence({
+    sources = [],
+    sourceLinks = [],
+    discoveredProfiles = [],
+    findings = []
+}) {
+    let score = 0;
+
+    score += Math.min(sources.length * 20, 40);
+    score += Math.min(sourceLinks.length * 5, 20);
+    score += Math.min(discoveredProfiles.length * 5, 20);
+    score += Math.min(findings.length * 4, 20);
+
+    return Math.max(0, Math.min(score, 100));
+}
+
+function trimPackageToBudget(pkg, maxChars = MAX_TOTAL_PACKAGE_CHARS) {
+    let current = JSON.stringify(pkg);
+    if (current.length <= maxChars) return pkg;
+
+    const trimmed = {
+        ...pkg,
+        sources: (pkg.sources || []).map(source => ({
+            sourceUrl: source.sourceUrl,
+            sourcePlatform: source.sourcePlatform,
+            sourceHost: source.sourceHost,
+            title: source.title,
+            description: source.description,
+            contentSnippet: cleanText(source.contentSnippet, 300),
+            contentLength: source.contentLength,
+            topics: (source.topics || []).slice(0, 5),
+            socialProfiles: (source.socialProfiles || []).slice(0, 6),
+            evidence: (source.evidence || []).slice(0, 2)
+        })),
+        findings: (pkg.findings || []).slice(0, 6),
+        evidenceLedger: (pkg.evidenceLedger || []).slice(0, 30)
+    };
+
+    current = JSON.stringify(trimmed);
+    if (current.length <= maxChars) return trimmed;
+
+    // Last-resort deterministic reduction: keep source traceability,
+    // profile links, platforms, findings and a very small snippet.
+    return {
+        success: true,
+        packageType: "UniversalPublicEvidencePackage",
+        sourceLinks: (pkg.sourceLinks || []).slice(0, MAX_PROFILE_LINKS_TOTAL),
+        discoveredProfiles: (pkg.discoveredProfiles || []).slice(0, MAX_PROFILE_LINKS_TOTAL),
+        platforms: (pkg.platforms || []).slice(0, 12),
+        confidence: pkg.confidence || 0,
+        findings: (pkg.findings || []).slice(0, 5),
+        sources: (pkg.sources || []).map(source => ({
+            sourceUrl: source.sourceUrl,
+            sourcePlatform: source.sourcePlatform,
+            title: source.title,
+            socialProfiles: (source.socialProfiles || []).slice(0, 4),
+            contentSnippet: cleanText(source.contentSnippet, 220),
+            topics: (source.topics || []).slice(0, 4)
+        })).slice(0, 12)
+    };
+}
+
+async function collectSource(url) {
+    const normalizedUrl = normalizeUrl(url);
+
+    if (!normalizedUrl) {
+        return {
+            success: false,
+            reason: "Invalid public source URL.",
+            source: null
+        };
+    }
+
+    try {
+        const packageResult = await loadPublicContentFetcher({
+            profileLinks: [normalizedUrl]
+        });
+
+        const source =
+            packageResult?.sources?.[0] ||
+            packageResult?.source ||
+            null;
+
+        if (!source) {
+            return {
+                success: false,
+                reason: "Public Content Fetcher returned no source.",
+                source: null
+            };
+        }
+
+        return {
+            success: true,
+            source: compactSource(source, normalizedUrl)
+        };
+    } catch (error) {
+        return {
+            success: false,
+            reason: error?.message || "Source fetch failed.",
+            source: null
+        };
+    }
+}
+
+export async function loadCrossEvidenceBrain({
+    profileLinks = [],
+    footprintPackage = {},
+    truthLoopPackage = {}
+} = {}) {
+    const requestedLinks = Array.isArray(profileLinks)
+        ? profileLinks
+        : [];
+
+    const sourceLinks = uniqueStrings(requestedLinks, MAX_SOURCES);
+
+    const result = {
+        success: false,
+        packageType: "CrossEvidencePackage",
+        sourcesProcessed: 0,
+        sourcesSucceeded: 0,
+        sourcesFailed: 0,
+        confidenceScore: 0,
+        errors: [],
+        universalPackage: null,
+        crossEvidencePackage: null
+    };
+
+    if (!sourceLinks.length) {
+        result.errors.push("At least one public source URL is required.");
+        return result;
+    }
+
+    // Deliberately ignore truthLoopPackage here. Loop 1–6 conversation
+    // must never enter the public-evidence package.
+    void truthLoopPackage;
+
+    console.log("CROSS_EVIDENCE_PROFILE_LINKS", sourceLinks);
+
+    const sources = [];
+
+    for (const url of sourceLinks) {
+        result.sourcesProcessed++;
+
+        const collected = await collectSource(url);
+
+        if (collected.success && collected.source) {
+            result.sourcesSucceeded++;
+            sources.push(collected.source);
+        } else {
+            result.sourcesFailed++;
+            result.errors.push({
+                url,
+                reason: collected.reason
+            });
+        }
+    }
+
+    const discoveredProfiles = uniqueStrings(
+        sources.flatMap(source => source.socialProfiles || []),
+        MAX_PROFILE_LINKS_TOTAL
+    );
+
+    const allTraceableLinks = uniqueStrings(
+        [
+            ...sourceLinks,
+            ...discoveredProfiles
+        ],
+        MAX_PROFILE_LINKS_TOTAL
+    );
+
+    const cross = buildCrossFindings(
+        sources,
+        allTraceableLinks
+    );
+
+    const evidenceLedger = sources.flatMap(source =>
+        (source.evidence || []).map((item, index) => ({
+            id: `${source.sourceUrl || "source"}#e${index + 1}`,
+            sourceUrl: item.sourceUrl || source.sourceUrl,
+            sourcePlatform: source.sourcePlatform,
+            sourceType: item.type,
+            evidence: item.value
+        }))
+    ).slice(0, 60);
+
+    const confidence = calculateConfidence({
+        sources,
+        sourceLinks: allTraceableLinks,
+        discoveredProfiles,
+        findings: cross.findings
+    });
+
+    const universalPackage = trimPackageToBudget({
+        success: true,
+        packageType: "UniversalPublicEvidencePackage",
+        version: "20.0",
+        sourceLinks: allTraceableLinks,
+        discoveredProfiles,
+        platforms: cross.platforms,
+        confidence,
+        sources,
+        findings: cross.findings,
+        repeatedTopics: cross.repeatedTopics,
+        evidenceLedger
+    });
+
+    const packageTextSize = JSON.stringify(universalPackage).length;
+
+    result.confidenceScore = confidence;
+    result.universalPackage = universalPackage;
+    result.crossEvidencePackage = {
+        success: true,
+        packageType: "CrossEvidencePackage",
+        version: "20.0",
+        sourceLinks: universalPackage.sourceLinks || [],
+        discoveredProfiles: universalPackage.discoveredProfiles || [],
+        platforms: universalPackage.platforms || [],
+        findings: universalPackage.findings || [],
+        confidence: confidence,
+        evidenceLedger: universalPackage.evidenceLedger || [],
+        universalPackage
+    };
+    result.success = result.sourcesSucceeded > 0;
+
+    console.log("CROSS_EVIDENCE_FINAL", {
+        success: result.success,
+        sourcesProcessed: result.sourcesProcessed,
+        sourcesSucceeded: result.sourcesSucceeded,
+        sourcesFailed: result.sourcesFailed,
+        sourceLinks: universalPackage.sourceLinks?.length || 0,
+        discoveredProfiles: universalPackage.discoveredProfiles?.length || 0,
+        platforms: universalPackage.platforms?.length || 0,
+        confidence,
+        universalPackageSize: packageTextSize
+    });
+
+    return result;
+}
+
+// Optional named export retained for simple unit checks.
+export function getCrossEvidencePlatform(url) {
+    return detectPlatform(normalizeUrl(url));
+}
