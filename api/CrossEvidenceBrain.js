@@ -264,32 +264,85 @@ function compactSource(source = {}, fallbackUrl = "") {
     }
 
     return {
-        sourceUrl: sourceUrl || null,
-        sourcePlatform:
-            source.sourcePlatform ||
-            source.platform ||
-            detectPlatform(sourceUrl),
-        sourceHost:
-            source.sourceHost ||
-            (() => {
-                try {
-                    return sourceUrl ? new URL(sourceUrl).hostname : null;
-                } catch {
-                    return null;
-                }
-            })(),
-        status: source.status || null,
-        title: cleanText(source.title, 180) || null,
-        description: cleanText(source.description, 260) || null,
-        contentSnippet: cleanText(source.visibleText, MAX_TEXT_PER_SOURCE) || null,
-        contentLength:
-            Number(source.contentLength) ||
-            (typeof source.visibleText === "string" ? source.visibleText.length : 0),
-        topics: extractTopics(source),
-        socialProfiles,
-        links: allLinks.slice(0, 12),
-        evidence: evidence.slice(0, MAX_EVIDENCE_PER_SOURCE)
-    };
+    sourceUrl: sourceUrl || null,
+
+    sourcePlatform:
+        source.sourcePlatform ||
+        source.platform ||
+        detectPlatform(sourceUrl),
+
+    sourceHost:
+        source.sourceHost ||
+        (() => {
+            try {
+                return sourceUrl
+                    ? new URL(sourceUrl).hostname
+                    : null;
+            } catch {
+                return null;
+            }
+        })(),
+
+    status: source.status || null,
+
+    title:
+        cleanText(source.title, 180) || null,
+
+    description:
+        cleanText(source.description, 260) || null,
+
+    visibleText:
+        cleanText(
+            source.visibleText,
+            3000
+        ) || null,
+
+    contentSnippet:
+        cleanText(
+            source.visibleText,
+            MAX_TEXT_PER_SOURCE
+        ) || null,
+
+    contentLength:
+        Number(source.contentLength) ||
+        (
+            typeof source.visibleText === "string"
+                ? source.visibleText.length
+                : 0
+        ),
+
+    topics: extractTopics(source),
+
+    socialProfiles,
+
+    links: allLinks.slice(0, 12),
+
+    headings:
+        Array.isArray(source.headings)
+            ? source.headings.slice(0, 50)
+            : [],
+
+    articles:
+        Array.isArray(source.articles)
+            ? source.articles.slice(0, 50)
+            : [],
+
+    posts:
+        Array.isArray(source.posts)
+            ? source.posts.slice(0, 50)
+            : [],
+
+    publicEvidence:
+        Array.isArray(source.publicEvidence)
+            ? source.publicEvidence.slice(0, 50)
+            : [],
+
+    evidence:
+        evidence.slice(
+            0,
+            MAX_EVIDENCE_PER_SOURCE
+        )
+};
 }
 
 function buildCrossFindings(sources = [], sourceLinks = []) {
