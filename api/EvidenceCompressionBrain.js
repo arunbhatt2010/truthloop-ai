@@ -1,6 +1,6 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v2
-   Produces Universal Evidence Package only.
+   EVIDENCE COMPRESSION BRAIN v3
+   Preserve evidence. Compress noise.
 ========================================================= */
 
 async function loadEvidenceCompressionBrain({
@@ -18,128 +18,122 @@ async function loadEvidenceCompressionBrain({
   }
 
   const sources =
-  publicEvidencePackage?.universalPackage?.sources ||
-  publicEvidencePackage?.sources ||
-  [];
+    publicEvidencePackage?.universalPackage?.sources ||
+    publicEvidencePackage?.sources ||
+    [];
 
-  console.log("ECB_INPUT_STATS", {
-    sourceCount: sources.length
-  });
+  let rawChars = 0;
 
-  const profileMap = new Map();
-
+  const evidenceSources = [];
   const identitySignals = new Set();
   const expertiseSignals = new Set();
   const businessSignals = new Set();
   const behaviorSignals = new Set();
 
-  let rawChars = 0;
-
   function detectPlatform(url = "") {
+
     const u = url.toLowerCase();
 
-    if (u.includes("linkedin.com")) return "linkedin";
-    if (u.includes("github.com")) return "github";
-    if (u.includes("x.com") || u.includes("twitter.com")) return "x";
-    if (u.includes("youtube.com") || u.includes("youtu.be")) return "youtube";
-    if (u.includes("facebook.com")) return "facebook";
-    if (u.includes("instagram.com")) return "instagram";
-    if (u.includes("reddit.com")) return "reddit";
-    if (u.includes("medium.com")) return "medium";
-    if (u.includes("substack.com")) return "substack";
+    if (u.includes("linkedin")) return "linkedin";
+    if (u.includes("github")) return "github";
+    if (u.includes("youtube")) return "youtube";
+    if (u.includes("instagram")) return "instagram";
+    if (u.includes("facebook")) return "facebook";
+    if (u.includes("x.com")) return "x";
 
     return "website";
+  }
+
+  function compressText(text = "", maxChars = 1200) {
+
+    return text
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, maxChars);
   }
 
   for (const source of sources) {
 
     const visibleText = source?.visibleText || "";
-    rawChars += visibleText.length;
-
+    const title = source?.title || "";
+    const description = source?.description || "";
     const sourceUrl = source?.sourceUrl || source?.url || "";
 
-    if (sourceUrl) {
-      profileMap.set(sourceUrl, {
-        platform: detectPlatform(sourceUrl),
-        url: sourceUrl,
-        confidence: 1.0
-      });
-    }
+    rawChars += visibleText.length;
 
-    for (const link of (source?.socialProfiles || [])) {
-  profileMap.set(link, {
-    platform: detectPlatform(link),
-    url: link,
-    confidence: 0.9
-  });
-       }
+    const compressedContent = compressText(
+      `${title}\n${description}\n${visibleText}`,
+      1200
+    );
 
-    const text = visibleText.toLowerCase();
+    evidenceSources.push({
+      platform: detectPlatform(sourceUrl),
+      url: sourceUrl,
+      title,
+      description,
+      content: compressedContent,
+      socialLinks:
+        source?.socialProfiles ||
+        source?.socialLinks ||
+        []
+    });
+
+    const text = (
+      title +
+      " " +
+      description +
+      " " +
+      visibleText
+    ).toLowerCase();
 
     if (/founder|creator|developer|consultant|coach|educator|researcher/.test(text)) {
-      identitySignals.add("Detected Professional Identity");
+      identitySignals.add("Professional Identity");
     }
 
     if (/ai|software|saas|product|marketing|psychology|leadership/.test(text)) {
-      expertiseSignals.add("Detected Expertise Domain");
+      expertiseSignals.add("Expertise Domain");
     }
 
-    if (/business|customer|client|conversion|growth|revenue/.test(text)) {
+    if (/business|customer|client|growth|revenue/.test(text)) {
       businessSignals.add("Business Growth");
     }
 
-    if (/system|pattern|decision|clarity|execution|action/.test(text)) {
-      behaviorSignals.add("Systems Thinking");
+    if (/pattern|system|decision|clarity|execution|action|behavior/.test(text)) {
+      behaviorSignals.add("Behavior Systems");
     }
   }
 
-  const discoveredProfiles = [...profileMap.values()];
+  const loop7Package = {
+    sourceCount: evidenceSources.length,
 
-  const universalEvidencePackage = {
-    success: true,
-    stage: "Evidence Compression Brain v2",
+    confidenceScore: Number(
+      Math.min(
+        0.95,
+        0.40 + (evidenceSources.length * 0.05)
+      ).toFixed(2)
+    ),
 
     identitySignals: [...identitySignals],
     expertiseSignals: [...expertiseSignals],
     businessSignals: [...businessSignals],
     behaviorSignals: [...behaviorSignals],
 
-    discoveredProfiles,
-
-    confidenceScore: Number(
-      Math.min(
-        0.99,
-        0.40 + (discoveredProfiles.length * 0.05)
-      ).toFixed(2)
-    )
+    evidenceSources
   };
-
-  const loop7Package = {
-    evidenceSources: discoveredProfiles.slice(0, 5),
-    confidenceScore: universalEvidencePackage.confidenceScore,
-    identitySignals: universalEvidencePackage.identitySignals,
-    expertiseSignals: universalEvidencePackage.expertiseSignals,
-    businessSignals: universalEvidencePackage.businessSignals,
-    behaviorSignals: universalEvidencePackage.behaviorSignals
-  };
-
-  console.log("ECB_EXTRACTION_COMPLETE");
 
   console.log("ECB_COMPRESSION_STATS", {
     rawChars,
-    finalPackageChars: JSON.stringify(loop7Package).length
+    finalPackageChars:
+      JSON.stringify(loop7Package).length
   });
-
-  console.log("ECB_PACKAGE_READY");
 
   return {
     success: true,
-    universalEvidencePackage,
     loop7Package,
     compressionStats: {
       rawChars,
-      compressedChars: JSON.stringify(loop7Package).length,
-      tokenReductionTarget: "80-90%"
+      compressedChars:
+        JSON.stringify(loop7Package).length
     }
   };
 }
