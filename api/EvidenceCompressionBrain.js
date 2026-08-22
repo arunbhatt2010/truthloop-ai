@@ -66,13 +66,13 @@ async function loadEvidenceCompressionBrain({
       });
     }
 
-    for (const link of (source?.socialLinks || [])) {
-      profileMap.set(link, {
-        platform: detectPlatform(link),
-        url: link,
-        confidence: 0.9
-      });
-    }
+    for (const link of (source?.socialProfiles || [])) {
+  profileMap.set(link, {
+    platform: detectPlatform(link),
+    url: link,
+    confidence: 0.9
+  });
+       }
 
     const text = visibleText.toLowerCase();
 
