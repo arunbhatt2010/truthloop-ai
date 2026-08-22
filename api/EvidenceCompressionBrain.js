@@ -18,9 +18,9 @@ async function loadEvidenceCompressionBrain({
   }
 
   const sources =
-    publicEvidencePackage?.universalPackage?.normalizedEvidence?.sources ||
-    publicEvidencePackage?.sources ||
-    [];
+  publicEvidencePackage?.universalPackage?.sources ||
+  publicEvidencePackage?.sources ||
+  [];
 
   console.log("ECB_INPUT_STATS", {
     sourceCount: sources.length
