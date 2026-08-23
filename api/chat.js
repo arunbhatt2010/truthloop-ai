@@ -1767,7 +1767,7 @@ console.log(
 /* =========================
    PROFILE ENGINE
 ========================= */
-
+profileData === null
 if (loopLevel !== 7) {
 
 console.log("PROFILE_AI_START", {
@@ -1918,20 +1918,14 @@ let hiddenAssumption = "unknown";
     hiddenAssumption =
       profile.hiddenAssumption || "unknown";
 
-  } catch (e) {
+} catch (e) {
 
-    console.log(
-      "PROFILE_PARSE_ERROR",
-      e.message
-    );
-
-    console.log(
-      "PROFILE_RAW_RESPONSE",
-      profileData?.choices?.[0]?.message?.content
-    );
+  console.log(
+    "PROFILE_RAW_RESPONSE",
+    profileData?.choices?.[0]?.message?.content
+  );
   }
-
-}
+  
     /* =========================
        ✂️ CLEANER
     ========================= */
