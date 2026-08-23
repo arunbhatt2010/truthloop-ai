@@ -554,6 +554,15 @@ await loadEvidenceCompressionBrain({
 
 });
     console.log(
+  "PUBLIC_EVIDENCE_PACKAGE",
+  JSON.stringify(publicEvidencePackage,null,2)
+);
+
+console.log(
+  "COMPRESSED_EVIDENCE_PACKAGE",
+  JSON.stringify(compressedEvidencePackage,null,2)
+);
+    console.log(
     "COMPRESSED_PACKAGE",
     compressedEvidencePackage?.success
 );
