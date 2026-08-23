@@ -1727,16 +1727,18 @@ try {
   );
 
   
+console.log("PROFILE_AI_HTTP_STATUS", profileResponse.status);
+  console.log("PROFILE_AI_HTTP_OK", profileResponse.ok);
+  console.log("PROFILE_AI_STATUS", profileResponse.status);
+
 } catch (e) {
-  console.error(
-    "PROFILE_AI_ERROR_FULL",
-    e
-  );
-
-  throw e;
+  console.error("PROFILE_AI_ERROR", e);
+  return res.status(500).json({
+    reply: "Profile Engine request failed.",
+    error: e?.message || String(e),
+    stage: "PROFILE_AI_FETCH"
+  });
 }
-    }
-
 if (!profileResponse.ok) {
   const profileErrorBody = await profileResponse.text();
   console.log("PROFILE_GROQ_ERROR_BODY", profileErrorBody);
