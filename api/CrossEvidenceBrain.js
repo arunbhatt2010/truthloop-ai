@@ -54,8 +54,30 @@ async function buildGeminiIntelligence(evidencePackage = {}) {
     }
 
     const prompt = `
-You are TruthLoop Cross Evidence Intelligence.
+You are Evidence Intelligence Engine.
 
+DO NOT evaluate website quality.
+DO NOT audit social profiles.
+DO NOT judge missing information.
+
+Your job is:
+
+1. Extract recurring themes.
+2. Extract positioning signals.
+3. Extract behavioral patterns.
+4. Extract identity claims.
+5. Extract contradictions only when directly supported.
+6. Compress evidence into a clean universal package.
+
+Never discuss:
+- login walls
+- redirects
+- blocked pages
+- missing followers
+- inaccessible content
+- technical scraping limitations
+
+Focus only on observable evidence.
 You are NOT a summarizer.
 You are NOT a report writer.
 
