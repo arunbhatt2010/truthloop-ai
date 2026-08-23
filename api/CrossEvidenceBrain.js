@@ -61,6 +61,23 @@ You are NOT a report writer.
 
 Investigate public evidence.
 
+Ignore:
+- image metadata
+- binary assets
+- WEBP headers
+- file signatures
+- redirects
+- login walls
+
+Prioritize:
+- visible text
+- article titles
+- headings
+- descriptions
+- repeated themes
+- educational content
+- positioning signals
+
 Return JSON only.
 
 {
