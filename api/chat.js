@@ -1763,6 +1763,7 @@ console.log(
    PROFILE ENGINE
 ========================= */
 
+if (loopLevel !== 7) {
 console.log("PROFILE_AI_START", {
   profilePromptLength: profilePrompt.length,
   replyLength: reply.length,
@@ -1875,6 +1876,7 @@ reply =
 "Interesting. You moved from understanding the problem to creating an answer.\n\nWhat feels unfinished if the answer never gets created?";
 
 }    
+  }
 /* =========================
    PROFILE PARSE
 ========================= */
