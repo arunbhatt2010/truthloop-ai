@@ -1064,7 +1064,29 @@ GLOBAL RULES
     console.log("AFTER_LOOP7_INSTRUCTION");
 
 const loop7SystemInstruction = loop7Instruction;
+console.log(
+   "LOOP7_VISIBLE_TEXT",
+   compressedEvidencePackage?.visibleText?.length
+);
 
+console.log(
+   "LOOP7_PUBLIC_EVIDENCE",
+   JSON.stringify(
+      compressedEvidencePackage?.publicEvidence
+   ).length
+);
+
+console.log(
+   "LOOP7_SOCIAL_EVIDENCE",
+   JSON.stringify(
+      compressedEvidencePackage?.crossEvidence
+   ).length
+);
+    console.log(
+  "LOOP7_DATA_SAMPLE",
+  JSON.stringify(compressedEvidencePackage)
+     .substring(0,3000)
+);
 const loop7Data = JSON.stringify({
     compressedEvidencePackage
 });
