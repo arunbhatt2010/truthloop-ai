@@ -1070,17 +1070,13 @@ console.log(
 );
 
 console.log(
-   "LOOP7_PUBLIC_EVIDENCE",
-   JSON.stringify(
-      compressedEvidencePackage?.publicEvidence
-   ).length
+  "LOOP7_PUBLIC_EVIDENCE",
+  compressedEvidencePackage?.publicEvidence?.length
 );
 
 console.log(
-   "LOOP7_SOCIAL_EVIDENCE",
-   JSON.stringify(
-      compressedEvidencePackage?.crossEvidence
-   ).length
+  "LOOP7_SOCIAL_EVIDENCE",
+  compressedEvidencePackage?.crossEvidence?.length
 );
     console.log(
   "LOOP7_DATA_KEYS",
