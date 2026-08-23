@@ -1749,7 +1749,7 @@ if (!profileResponse.ok) {
 
 
 
-const profileData =
+ profileData =
   await profileResponse.json();
 
 
