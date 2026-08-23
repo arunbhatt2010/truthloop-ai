@@ -9,11 +9,7 @@ async function loadEvidenceCompressionBrain({
 }) {
 
   console.log("ECB_START");
-console.log("ECB_INPUT", {
-  success: publicEvidencePackage?.success,
-  sourceCount: sources.length,
-  firstSourceKeys: Object.keys(sources?.[0] || {})
-});
+
   if (!publicEvidencePackage?.success) {
     return {
       success: false,
@@ -25,6 +21,11 @@ console.log("ECB_INPUT", {
     publicEvidencePackage?.universalPackage?.sources ||
     publicEvidencePackage?.sources ||
     [];
+   console.log("ECB_INPUT", {
+  success: publicEvidencePackage?.success,
+  sourceCount: sources.length,
+  firstSourceKeys: Object.keys(sources?.[0] || {})
+});
 
   let rawChars = 0;
 
