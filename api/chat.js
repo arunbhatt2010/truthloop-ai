@@ -1052,8 +1052,7 @@ GLOBAL RULES
 const loop7SystemInstruction = loop7Instruction;
 
 const loop7Data = JSON.stringify({
-  truthLoopPackage,
-  compressedEvidencePackage
+    compressedEvidencePackage
 });
 
 console.log("LOOP7_SYSTEM_SIZE", loop7SystemInstruction.length);
