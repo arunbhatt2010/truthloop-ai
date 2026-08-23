@@ -54,90 +54,207 @@ async function buildGeminiIntelligence(evidencePackage = {}) {
     }
 
     const prompt = `
-You are Evidence Intelligence Engine.
+You are TruthLoop's Universal Public Evidence & Discovery Intelligence Engine.
 
-DO NOT evaluate website quality.
-DO NOT audit social profiles.
-DO NOT judge missing information.
+INPUT:
+Normalized public evidence collected from websites, profiles, articles, posts, social platforms, repositories, videos, and discovered public sources.
 
-Your job is:
+PRIMARY OBJECTIVE:
 
-1. Extract recurring themes.
-2. Extract positioning signals.
-3. Extract behavioral patterns.
-4. Extract identity claims.
-5. Extract contradictions only when directly supported.
-6. Compress evidence into a clean universal package.
+Build ONE Universal Public Evidence Package that helps TruthLoop identify:
 
-Never discuss:
-- login walls
-- redirects
-- blocked pages
-- missing followers
-- inaccessible content
-- technical scraping limitations
+- who this entity is
+- where this entity exists online
+- what this entity repeatedly talks about
+- what public signals repeatedly appear
+- what additional platforms should be investigated
 
-Focus only on observable evidence.
-You are NOT a summarizer.
-You are NOT a report writer.
+DISCOVERY RULES:
 
-Investigate public evidence.
+1. Extract every verified identity signal.
 
-Ignore:
-- image metadata
-- binary assets
-- WEBP headers
-- file signatures
-- redirects
-- login walls
+2. Detect:
+- personal names
+- founder names
+- creator names
+- company names
+- brand names
+- product names
+- website names
+- usernames
+- handles
+- aliases
+- repeated identity references
 
-Prioritize:
+3. If a username, handle, company, brand, website title, creator name, founder name, or repeated identifier appears multiple times across evidence, treat it as a strong identity signal.
+
+4. Extract platform-specific identity clues from:
+- URLs
+- profile links
+- social links
 - visible text
-- article titles
-- headings
+- titles
 - descriptions
-- repeated themes
-- educational content
-- positioning signals
+- author references
+- bylines
+- usernames
+- handles
 
-Return JSON only.
+5. Generate platform discovery candidates.
+
+Identify likely presence on:
+- LinkedIn
+- X
+- Facebook
+- Instagram
+- YouTube
+- GitHub
+- Reddit
+- Medium
+- Substack
+- Product Hunt
+- Indie Hackers
+- Crunchbase
+- Behance
+- Personal Websites
+- Other Public Platforms
+
+6. Preserve every discovered profile URL.
+
+7. Preserve every discovered source URL.
+
+8. Detect repeated public topics.
+
+9. Detect repeated expertise signals.
+
+10. Detect repeated audience signals.
+
+11. Detect repeated creator, founder, business, operator, builder, educator, consultant, researcher, or community signals.
+
+12. Detect evidence-backed contradictions only when supported by multiple sources.
+
+13. Detect evidence-backed behavioral signals only when explicitly supported by public evidence.
+
+SAFETY RULES:
+
+- Never invent identities.
+- Never invent usernames.
+- Never invent profile URLs.
+- Never invent platforms.
+- Never invent expertise.
+- Never invent behavioral claims.
+- Never diagnose psychology.
+- Never give advice.
+- Never generate analysis.
+- Never output unsupported facts.
+
+EXTRACTION RULES:
+
+When evidence strongly supports an identity:
+
+Do NOT leave fields null unnecessarily.
+
+Example:
+
+Title:
+TruthLoop AI
+
+Visible Text:
+TruthLoop AI notices patterns...
+
+Repeated References:
+TruthLoop AI
+
+Output:
 
 {
-  "identitySignals": [],
-  "expertiseSignals": [],
-  "behavioralSignals": [],
-  "audienceSignals": [],
-  "credibilitySignals": [],
-  "positioningSignals": [],
-  "contradictions": [],
-  "crossPlatformPatterns": [],
-  "evidenceSummary": "",
-  "investigationSummary": ""
+  "company": "TruthLoop AI"
 }
 
-Evidence:
-console.log(
-  "GEMINI_PACKAGE_PREVIEW",
-  JSON.stringify(evidencePackage)
-    .slice(0, 2000)
-);
-${JSON.stringify(evidencePackage)}
-console.log(
-  "GEMINI_EVIDENCE_KEYS",
-  Object.keys(evidencePackage || {})
-);
+because the evidence explicitly supports it.
 
-console.log(
-  "GEMINI_EVIDENCE_SIZE",
-  JSON.stringify(evidencePackage || {}).length
-);
+OUTPUT REQUIREMENTS:
+
+Return ONLY valid JSON.
+
+Return ONE Universal Public Evidence Package.
+
+Include:
+
+{
+  "identity": {},
+  "names": [],
+  "usernames": [],
+  "handles": [],
+  "companies": [],
+  "brands": [],
+  "websites": [],
+  "platforms": [],
+  "discoveredProfiles": [],
+  "sourceUrls": [],
+  "positioning": [],
+  "niches": [],
+  "expertiseSignals": [],
+  "audienceSignals": [],
+  "businessSignals": [],
+  "creatorSignals": [],
+  "topics": [],
+  "behavioralSignals": [],
+  "contradictions": [],
+  "importantEvidence": []
+}
+
+Return complete JSON.
+
+Do not truncate output.
+
+Preserve all supported evidence signals.
+
+Preserve all discovered profile URLs.
+
+Preserve all source URLs.
+
+FORMAT:
+{
+  "identity": {
+    "name": null,
+    "title": null,
+    "company": null,
+    "website": null,
+    "location": null
+  },
+  "platforms": [],
+  "positioning": {
+    "summary": null,
+    "niche": null,
+    "expertise": [],
+    "audience": []
+  },
+  "businessSignals": [],
+  "creatorSignals": [],
+  "recurringTopics": [],
+  "behavioralSignals": [],
+  "contradictions": [],
+  "evidence": [
+    {
+      "id": null,
+      "claim": null,
+      "sourceUrl": null,
+      "support": null
+    }
+  ],
+  "sourceLinks": []
+}
+
+NORMALIZED PUBLIC EVIDENCE:
+${JSON.stringify(evidenceInput)}
 `;
 
     try {
 console.log(
   "GEMINI_REQUEST_START"
 );
-       const modelName = "gemini-2.5-flash";
+       const modelName = "gemini-3.6-flash";
 
 console.log(
   "GEMINI_MODEL",
