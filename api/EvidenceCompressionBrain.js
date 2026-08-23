@@ -9,7 +9,11 @@ async function loadEvidenceCompressionBrain({
 }) {
 
   console.log("ECB_START");
-
+console.log("ECB_INPUT", {
+  success: publicEvidencePackage?.success,
+  sourceCount: sources.length,
+  firstSourceKeys: Object.keys(sources?.[0] || {})
+});
   if (!publicEvidencePackage?.success) {
     return {
       success: false,
@@ -54,10 +58,17 @@ async function loadEvidenceCompressionBrain({
 
   for (const source of sources) {
 
-    const visibleText = source?.visibleText || "";
+const visibleText =
+  source?.visibleText ||
+  source?.contentSnippet ||
+  "";
     const title = source?.title || "";
     const description = source?.description || "";
-    const sourceUrl = source?.sourceUrl || source?.url || "";
+    const sourceUrl =
+  source?.sourceUrl ||
+  source?.canonicalUrl ||
+  source?.url ||
+  "";
 
     rawChars += visibleText.length;
 
@@ -72,10 +83,10 @@ async function loadEvidenceCompressionBrain({
       title,
       description,
       content: compressedContent,
-      socialLinks:
-        source?.socialProfiles ||
-        source?.socialLinks ||
-        []
+      socialLinks: [
+  ...(source?.socialProfiles || []),
+  ...(source?.socialLinks || [])
+]
     });
 
     const text = (
