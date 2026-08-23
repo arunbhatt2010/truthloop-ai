@@ -413,6 +413,8 @@ function buildSource({ url, response, html }) {
     const visibleText = extractText(html);
     const socialLinks = extractSocialLinks(html);
     const links = extractHrefLinks(html);
+   
+console.log("ALL_LINKS_FOUND", links);
     const headings = extractHeadings(html);
     const structured = extractPlatformEvidence(html, url, platform);
 
