@@ -144,7 +144,7 @@ console.log(
   modelName
 );
         const response = await fetch(
-          "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey,
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey,
           {
             method: "POST",
             headers: {
@@ -171,17 +171,21 @@ console.log(
   "GEMINI_HTTP_STATUS",
   response.status
 );
-
 if (!response.ok) {
+
+  const errorBody = await response.text();
+
   console.log(
     "GEMINI_ERROR_BODY",
-    await response.text()
+    errorBody
   );
+
   return {
     status: "failed",
-    error: "Gemini HTTP Error"
+    error: errorBody
   };
 }
+
         const data = await response.json();
        console.log(
   "GEMINI_HTTP_STATUS",
