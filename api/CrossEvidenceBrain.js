@@ -116,12 +116,27 @@ Return JSON only.
 }
 
 Evidence:
-
+console.log(
+  "GEMINI_PACKAGE_PREVIEW",
+  JSON.stringify(evidencePackage)
+    .slice(0, 2000)
+);
 ${JSON.stringify(evidencePackage)}
+console.log(
+  "GEMINI_EVIDENCE_KEYS",
+  Object.keys(evidencePackage || {})
+);
+
+console.log(
+  "GEMINI_EVIDENCE_SIZE",
+  JSON.stringify(evidencePackage || {}).length
+);
 `;
 
     try {
-
+console.log(
+  "GEMINI_REQUEST_START"
+);
         const response = await fetch(
           "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey,
           {
@@ -148,10 +163,38 @@ ${JSON.stringify(evidencePackage)}
         );
 
         const data = await response.json();
+       console.log(
+  "GEMINI_HTTP_STATUS",
+  response.status
+);
 
+console.log(
+  "GEMINI_CANDIDATES",
+  data?.candidates?.length || 0
+);
+console.log(
+  "GEMINI_RESPONSE_KEYS",
+  Object.keys(data || {})
+);
         const content =
           data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+       console.log(
+  "GEMINI_RESPONSE_SIZE",
+  content.length
+);
+const parsedContent = JSON.parse(
+  content
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim()
+);
 
+console.log(
+  "GEMINI_OUTPUT_KEYS",
+  Object.keys(parsedContent || {})
+);
+
+return parsedContent;
         return JSON.parse(
           content
             .replace(/```json/gi,"")
