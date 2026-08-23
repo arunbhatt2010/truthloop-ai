@@ -66,15 +66,9 @@ if (DEV_GATE) {
 let masterBrain = {};
 
 try {
-console.log(
-  "MESSAGES_DEBUG",
-  JSON.stringify(messages, null, 2)
-);
 
-console.log(
-  "LAST_USER_MESSAGE",
-  lastUserMessage
-);
+
+
   masterBrain =
   runMasterBrain({
     text: lastUserMessage,
@@ -558,19 +552,7 @@ await loadEvidenceCompressionBrain({
     publicEvidencePackage
 
 });
-    console.log(
-  "PUBLIC_EVIDENCE_PACKAGE",
-  JSON.stringify(publicEvidencePackage,null,2)
-);
-
-console.log(
-  "COMPRESSED_EVIDENCE_PACKAGE",
-  JSON.stringify(compressedEvidencePackage,null,2)
-);
-    console.log(
-    "COMPRESSED_PACKAGE",
-    compressedEvidencePackage?.success
-);
+    
     
     /* =========================
    PLATFORM CARD
@@ -599,29 +581,7 @@ if (
     });
 
 }
-console.log(
-    "PUBLIC_EVIDENCE_PACKAGE",
-    JSON.stringify(publicEvidencePackage, null, 2)
-);
-    console.log(
-  "PUBLIC_EVIDENCE_EXISTS",
-  publicEvidencePackage?.success ? "YES" : "NO"
-);
 
-console.log(
-  "PUBLIC_EVIDENCE_SUCCESS",
-  publicEvidencePackage?.success
-);
-
-console.log(
-  "PUBLIC_EVIDENCE_STAGE",
-  publicEvidencePackage?.stage
-);
-
-console.log(
-  "PUBLIC_EVIDENCE_REASON",
-  publicEvidencePackage?.reason
-);
 if (publicEvidencePackage) {
    /* console.log(
         "PUBLIC_EVIDENCE_KEYS",
@@ -640,32 +600,7 @@ if (publicEvidencePackage) {
 
           }
     let loop7Instruction = "";
-console.log(
-"TRUTHLOOP_PACKAGE_SIZE",
-JSON.stringify(truthLoopPackage).length
-);
 
-console.log(
-"PUBLIC_PACKAGE_SIZE",
-JSON.stringify(publicEvidencePackage).length
-);
-console.log("AFTER_PUBLIC_PACKAGE_SIZE");
-
-console.log(
-  "COMPRESSED_PACKAGE_TYPE",
-  typeof compressedEvidencePackage
-);
-console.log(
-  "COMPRESSED_PACKAGE_SIZE",
-  JSON.stringify(compressedEvidencePackage).length
-);
-
-console.log(
-  "TRUTHLOOP_PACKAGE_TYPE",
-  typeof truthLoopPackage
-);
-
-console.log("BEFORE_LOOP7_INSTRUCTION");
     
 if (loopLevel === 7) {
 
@@ -1061,27 +996,8 @@ GLOBAL RULES
 
 `;
 }
-    console.log("AFTER_LOOP7_INSTRUCTION");
-
-const loop7SystemInstruction = loop7Instruction;
-console.log(
-   "LOOP7_VISIBLE_TEXT",
-   compressedEvidencePackage?.visibleText?.length
-);
-
-console.log(
-  "LOOP7_PUBLIC_EVIDENCE",
-  compressedEvidencePackage?.publicEvidence?.length
-);
-
-console.log(
-  "LOOP7_SOCIAL_EVIDENCE",
-  compressedEvidencePackage?.crossEvidence?.length
-);
-    console.log(
-  "LOOP7_DATA_KEYS",
-  Object.keys(compressedEvidencePackage || {})
-);
+    
+    
 const loop7Data = JSON.stringify(
     compressedEvidencePackage || {},
     null,
@@ -1092,14 +1008,6 @@ const loop7Data = JSON.stringify(
   JSON.stringify(compressedEvidencePackage || {}).length
 );
 
-console.log(
-  "LOOP7_PACKAGE_PREVIEW",
-  JSON.stringify(
-    compressedEvidencePackage || {},
-    null,
-    2
-  ).substring(0,3000)
-);
 
 console.log("LOOP7_SYSTEM_SIZE", loop7SystemInstruction.length);
 console.log("LOOP7_DATA_SIZE", loop7Data.length);
@@ -1652,14 +1560,7 @@ ${outputRules}
 ${finalReview}
 `;
 
-console.log(
-  "LOOP7_PROMPT_SIZE",
-  loop7Instruction.length
-);
-console.log(
-  "SYSTEM_PROMPT_LENGTH_PRE_AI",
-  systemPrompt.length
-);
+
 
 
   /* =========================
