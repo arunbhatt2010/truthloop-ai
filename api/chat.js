@@ -1767,7 +1767,7 @@ console.log(
 /* =========================
    PROFILE ENGINE
 ========================= */
-profileData === null
+let profileData = null;
 if (loopLevel !== 7) {
 
 console.log("PROFILE_AI_START", {
