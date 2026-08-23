@@ -1672,30 +1672,6 @@ if (loopLevel === 7) {
 
 let reply =
   data?.choices?.[0]?.message?.content || "";
-console.log(
-  "LOOP_LEVEL",
-  loopLevel
-);
-
-console.log(
-  "SYSTEM_PROMPT_LENGTH",
-  systemPrompt.length
-);
-
-console.log(
-  "LOOP7_PROMPT_EXISTS",
-  loop7Instruction.length
-);
-
-console.log(
-  "RESPONSE_LENGTH",
-  reply.length
-);
-
-console.log(
-  "RESPONSE_PREVIEW",
-  reply.slice(0,1000)
-);
 
 /* =========================
    PROFILE ENGINE
@@ -1703,11 +1679,7 @@ console.log(
 let profileData = null;
 if (loopLevel !== 7) {
 
-console.log("PROFILE_AI_START", {
-  profilePromptLength: profilePrompt.length,
-  replyLength: reply.length,
-  loopLevel
-});
+
 
 const profileContext = reply;
 
@@ -1747,10 +1719,7 @@ try {
     }
   );
 
-  console.log("PROFILE_AI_HTTP_STATUS", profileResponse.status);
-  console.log("PROFILE_AI_HTTP_OK", profileResponse.ok);
-  console.log("PROFILE_AI_STATUS", profileResponse.status);
-
+  
 } catch (e) {
   console.error("PROFILE_AI_ERROR", e);
   return res.status(500).json({
@@ -1770,15 +1739,12 @@ if (!profileResponse.ok) {
   });
 }
 
-console.log("PROFILE_AI_SUCCESS");
+
 
 const profileData =
   await profileResponse.json();
 
-console.log(
-  "PROFILE_MODEL_RAW",
-  JSON.stringify(profileData, null, 2)
-);
+
               }
 
 const contentLeakWords = [
@@ -1831,11 +1797,7 @@ if (profileData) {
     const rawProfile =
       profileData?.choices?.[0]?.message?.content || "{}";
 
-    console.log(
-      "PROFILE_RAW",
-      rawProfile
-    );
-
+    
     const profile =
       JSON.parse(rawProfile);
 
@@ -1853,10 +1815,7 @@ if (profileData) {
 
 } catch (e) {
 
-  console.log(
-    "PROFILE_RAW_RESPONSE",
-    profileData?.choices?.[0]?.message?.content
-  );
+  
   }
       }
     /* =========================
