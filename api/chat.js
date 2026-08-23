@@ -1082,9 +1082,24 @@ console.log(
   "LOOP7_DATA_KEYS",
   Object.keys(compressedEvidencePackage || {})
 );
-const loop7Data = JSON.stringify({
-    compressedEvidencePackage
-});
+const loop7Data = JSON.stringify(
+    compressedEvidencePackage || {},
+    null,
+    2
+);
+    console.log(
+  "LOOP7_PACKAGE_SIZE",
+  JSON.stringify(compressedEvidencePackage || {}).length
+);
+
+console.log(
+  "LOOP7_PACKAGE_PREVIEW",
+  JSON.stringify(
+    compressedEvidencePackage || {},
+    null,
+    2
+  ).substring(0,3000)
+);
 
 console.log("LOOP7_SYSTEM_SIZE", loop7SystemInstruction.length);
 console.log("LOOP7_DATA_SIZE", loop7Data.length);
