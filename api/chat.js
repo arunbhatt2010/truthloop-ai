@@ -1886,42 +1886,49 @@ let emotionalDriver = "unknown";
 let avoidanceStyle = "unknown";
 let hiddenAssumption = "unknown";
 
-try {
+/* =========================
+   PROFILE PARSE
+========================= */
 
-  const rawProfile =
-    profileData?.choices?.[0]?.message?.content || "{}";
+if (loopLevel !== 7) {
 
-  console.log(
-    "PROFILE_RAW",
-    rawProfile
-  );
+  try {
 
-  const profile =
-    JSON.parse(rawProfile);
+    const rawProfile =
+      profileData?.choices?.[0]?.message?.content || "{}";
 
-  primaryLoop =
-    profile.primaryLoop || "unknown";
+    console.log(
+      "PROFILE_RAW",
+      rawProfile
+    );
 
-  emotionalDriver =
-    profile.emotionalDriver || "unknown";
+    const profile =
+      JSON.parse(rawProfile);
 
-  avoidanceStyle =
-    profile.avoidanceStyle || "unknown";
+    primaryLoop =
+      profile.primaryLoop || "unknown";
 
-  hiddenAssumption =
-    profile.hiddenAssumption || "unknown";
+    emotionalDriver =
+      profile.emotionalDriver || "unknown";
 
-} catch (e) {
+    avoidanceStyle =
+      profile.avoidanceStyle || "unknown";
 
-  console.log(
-    "PROFILE_PARSE_ERROR",
-    e.message
-  );
+    hiddenAssumption =
+      profile.hiddenAssumption || "unknown";
 
-  console.log(
-    "PROFILE_RAW_RESPONSE",
-    profileData?.choices?.[0]?.message?.content
-  );
+  } catch (e) {
+
+    console.log(
+      "PROFILE_PARSE_ERROR",
+      e.message
+    );
+
+    console.log(
+      "PROFILE_RAW_RESPONSE",
+      profileData?.choices?.[0]?.message?.content
+    );
+  }
 
 }
     /* =========================
