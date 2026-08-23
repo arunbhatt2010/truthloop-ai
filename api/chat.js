@@ -1892,7 +1892,7 @@ let hiddenAssumption = "unknown";
 /* =========================
    PROFILE PARSE
 ========================= */
-
+if (profileData) {
   try {
 
     const rawProfile =
@@ -1925,7 +1925,7 @@ let hiddenAssumption = "unknown";
     profileData?.choices?.[0]?.message?.content
   );
   }
-  
+      }
     /* =========================
        ✂️ CLEANER
     ========================= */
