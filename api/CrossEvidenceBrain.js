@@ -42,7 +42,97 @@ const MAX_TOPICS_PER_SOURCE = 8;
 const MAX_EVIDENCE_PER_SOURCE = 4;
 const MAX_TEXT_PER_SOURCE = 650;
 const MAX_TOTAL_PACKAGE_CHARS = 8000;
+async function buildGeminiIntelligence(evidencePackage = {}) {
 
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        return {
+            status: "disabled",
+            reason: "Missing GEMINI_API_KEY"
+        };
+    }
+
+    const prompt = `
+You are TruthLoop Cross Evidence Intelligence.
+
+You are NOT a summarizer.
+You are NOT a report writer.
+
+Investigate public evidence.
+
+Return JSON only.
+
+{
+  "identitySignals": [],
+  "expertiseSignals": [],
+  "behavioralSignals": [],
+  "audienceSignals": [],
+  "credibilitySignals": [],
+  "positioningSignals": [],
+  "contradictions": [],
+  "crossPlatformPatterns": [],
+  "evidenceSummary": "",
+  "investigationSummary": ""
+}
+
+Evidence:
+
+${JSON.stringify(evidencePackage)}
+`;
+
+    try {
+
+        const response = await fetch(
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: prompt
+                    }
+                  ]
+                }
+              ],
+              generationConfig: {
+                responseMimeType: "application/json",
+                maxOutputTokens: 3000
+              }
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        const content =
+          data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+
+        return JSON.parse(
+          content
+            .replace(/```json/gi,"")
+            .replace(/```/g,"")
+            .trim()
+        );
+
+    } catch(error){
+
+        console.error(
+          "GEMINI_INTELLIGENCE_ERROR",
+          error
+        );
+
+        return {
+          status: "failed",
+          error: error.message
+        };
+    }
+                       }
 const SUPPORTED_PLATFORMS = new Set([
     "linkedin",
     "facebook",
@@ -648,7 +738,22 @@ sources.push(...profileSources);
         repeatedTopics: cross.repeatedTopics,
         evidenceLedger
     });
+console.log("GEMINI_TRIGGER");
 
+const geminiIntelligence =
+    await buildGeminiIntelligence(
+        universalPackage
+    );
+
+universalPackage.intelligence =
+    geminiIntelligence;
+
+console.log(
+    "GEMINI_AFTER",
+    Object.keys(
+        geminiIntelligence || {}
+    )
+);
     const packageTextSize = JSON.stringify(universalPackage).length;
 
     result.confidenceScore = confidence;
