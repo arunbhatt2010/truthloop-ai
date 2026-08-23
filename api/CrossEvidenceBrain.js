@@ -247,10 +247,19 @@ FORMAT:
 }
 
 NORMALIZED PUBLIC EVIDENCE:
-${JSON.stringify(evidenceInput)}
+${JSON.stringify(evidencePackage)};
 `;
 
     try {
+       console.log(
+  "GEMINI_EVIDENCE_SIZE",
+  JSON.stringify(evidencePackage).length
+);
+
+console.log(
+  "GEMINI_EVIDENCE_KEYS",
+  Object.keys(evidencePackage || {})
+);
 console.log(
   "GEMINI_REQUEST_START"
 );
