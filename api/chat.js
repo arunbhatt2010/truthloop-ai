@@ -1684,7 +1684,14 @@ if (loopLevel !== 7) {
 const profileContext = reply;
 
 let profileResponse;
-
+console.error(
+  "PROFILE_ENGINE_START",
+  {
+    loopLevel,
+    replyLength: reply?.length,
+    profilePromptLength: profilePrompt?.length
+  }
+);
 try {
   profileResponse = await fetch(
     "https://api.groq.com/openai/v1/chat/completions",
@@ -1721,13 +1728,14 @@ try {
 
   
 } catch (e) {
-  console.error("PROFILE_AI_ERROR", e);
-  return res.status(500).json({
-    reply: "Profile Engine request failed.",
-    error: e?.message || String(e),
-    stage: "PROFILE_AI_FETCH"
-  });
+  console.error(
+    "PROFILE_AI_ERROR_FULL",
+    e
+  );
+
+  throw e;
 }
+    }
 
 if (!profileResponse.ok) {
   const profileErrorBody = await profileResponse.text();
