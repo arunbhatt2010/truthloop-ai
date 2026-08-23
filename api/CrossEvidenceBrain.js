@@ -137,6 +137,12 @@ console.log(
 console.log(
   "GEMINI_REQUEST_START"
 );
+       const modelName = "gemini-2.5-flash";
+
+console.log(
+  "GEMINI_MODEL",
+  modelName
+);
         const response = await fetch(
           "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey,
           {
@@ -161,7 +167,21 @@ console.log(
             })
           }
         );
+console.log(
+  "GEMINI_HTTP_STATUS",
+  response.status
+);
 
+if (!response.ok) {
+  console.log(
+    "GEMINI_ERROR_BODY",
+    await response.text()
+  );
+  return {
+    status: "failed",
+    error: "Gemini HTTP Error"
+  };
+}
         const data = await response.json();
        console.log(
   "GEMINI_HTTP_STATUS",
