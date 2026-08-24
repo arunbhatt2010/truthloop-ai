@@ -992,6 +992,16 @@ sources.push(...profileSources);
         repeatedTopics: cross.repeatedTopics,
         evidenceLedger
     });
+   console.log(
+    "CONTENT_COMPRESSION_CHECK",
+    {
+        exists: !!sources?.[0]?.contentCompressionPackage,
+        sourceCount:
+            sources?.[0]
+                ?.contentCompressionPackage
+                ?.sourceCount || 0
+    }
+);
 console.log("GEMINI_TRIGGER");
 
 const geminiIntelligence =
