@@ -1120,69 +1120,10 @@ GLOBAL RULES
 
 `;
 }
-    if (currentLoop >= 7) {
+    
     console.log("AFTER_LOOP7_INSTRUCTION");
 
-const loop7SystemInstruction = loop7Instruction;
-console.log(
-   "LOOP7_VISIBLE_TEXT",
-   compressedEvidencePackage?.visibleText?.length
-);
-
-console.log(
-  "LOOP7_PUBLIC_EVIDENCE",
-  compressedEvidencePackage?.publicEvidence?.length
-);
-
-console.log(
-  "LOOP7_SOCIAL_EVIDENCE",
-  compressedEvidencePackage?.crossEvidence?.length
-);
-    console.log(
-    "LOOP7_PACKAGE_KEYS",
-    Object.keys(
-        publicEvidence?.loop7Package || {}
-    )
-);
-
-console.log(
-    "LOOP7_PACKAGE_PREVIEW",
-    JSON.stringify(
-        publicEvidence?.loop7Package || {},
-        null,
-        2
-    ).slice(0,1000)
-);
-    console.log(
-  "LOOP7_DATA_KEYS",
-  Object.keys(compressedEvidencePackage || {})
-);
-const loop7Data = JSON.stringify(
-    compressedEvidencePackage || {},
-    null,
-    2
-);
-    console.log(
-  "LOOP7_PACKAGE_SIZE",
-  JSON.stringify(compressedEvidencePackage || {}).length
-);
-
-console.log(
-  "LOOP7_PACKAGE_PREVIEW",
-  JSON.stringify(
-    compressedEvidencePackage || {},
-    null,
-    2
-  ).substring(0,3000)
-);
-
-console.log("LOOP7_SYSTEM_SIZE", loop7SystemInstruction.length);
-console.log("LOOP7_DATA_SIZE", loop7Data.length);
-console.log(
-  "LOOP7_TOTAL_INPUT",
-  loop7SystemInstruction.length + loop7Data.length
-);
-    }
+    
     /* =========================
        🧠 MODE ROUTER
     ========================= */
