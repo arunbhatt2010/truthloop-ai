@@ -1728,10 +1728,10 @@ console.log("LOOP7_BRANCH_REACHED");
           role: "system",
           content: loop7Instruction
         },
-        {
+    {
   role: "user",
   content: JSON.stringify(
-    publicEvidencePackage,
+    compressedEvidencePackage,
     null,
     2
   )
