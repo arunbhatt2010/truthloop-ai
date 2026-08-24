@@ -463,11 +463,17 @@ export async function acquirePublicContent({
    
     
     const requested = Array.isArray(profileLinks) ? profileLinks : [];
+   const MAX_SOURCES = 15;
 const queue = [...requested];
 const visited = new Set();
 const sources = [];
-    while (queue.length > 0) {
-
+    while (
+  queue.length > 0 &&
+  sources.length < MAX_SOURCES
+) {
+console.log("QUEUE_SIZE", queue.length);
+  console.log("VISITED_COUNT", visited.size);
+  console.log("SOURCE_COUNT", sources.length);
   const rawUrl = queue.shift();
 
   if (visited.has(rawUrl)) continue;
@@ -515,7 +521,10 @@ sources.push(source);
   if (!normalized) continue;
 
   if (visited.has(normalized)) continue;
-
+console.log(
+    "DISCOVERED_LINK",
+    normalized
+  );
   const platform = detectPlatform(normalized);
 
   if (
@@ -525,7 +534,16 @@ sources.push(source);
       platform === "facebook" ||
       platform === "website"
   ) {
+     console.log(
+  "DISCOVERED_PLATFORM",
+  platform,
+  normalized
+);
       queue.push(normalized);
+     console.log(
+  "ADDED_TO_QUEUE",
+  normalized
+);
   }
            }
             sources.push(
