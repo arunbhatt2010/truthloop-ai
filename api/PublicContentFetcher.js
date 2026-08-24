@@ -318,6 +318,51 @@ function flattenJsonLd(value, out = []) {
     return out;
 }
 
+function extractJsonLdSocialLinks(html = "", sourceUrl = "") {
+    const jsonLd = flattenJsonLd(parseJsonLd(html));
+    const links = [];
+
+    for (const item of jsonLd) {
+
+        if (Array.isArray(item.sameAs)) {
+            links.push(...item.sameAs);
+        }
+
+        if (typeof item.sameAs === "string") {
+            links.push(item.sameAs);
+        }
+
+        if (item.author?.sameAs) {
+            if (Array.isArray(item.author.sameAs)) {
+                links.push(...item.author.sameAs);
+            } else {
+                links.push(item.author.sameAs);
+            }
+        }
+
+        if (item.publisher?.sameAs) {
+            if (Array.isArray(item.publisher.sameAs)) {
+                links.push(...item.publisher.sameAs);
+            } else {
+                links.push(item.publisher.sameAs);
+            }
+        }
+
+        if (item.url) {
+            links.push(item.url);
+        }
+    }
+
+    return unique(
+        links.filter(link =>
+            PLATFORM_PATTERNS.some(([, pattern]) =>
+                pattern.test(String(link))
+            )
+        ),
+        MAX_SOCIAL_LINKS
+    );
+}
+
 function extractStructuredContent(html = "", baseUrl = "") {
     const jsonLd = flattenJsonLd(parseJsonLd(html));
     const posts = [];
@@ -657,12 +702,21 @@ function buildSource({ url, response, html }) {
     const description = extractMeta(html, "description") || extractMeta(html, "og:description") || null;
     const visibleText = extractText(html);
     const socialLinks = unique(
-    [
-        ...extractSocialLinks(html, sourceUrl),
-        ...extractJsonLdSocialLinks(html, sourceUrl)
-    ],
-    MAX_SOCIAL_LINKS,
-    sourceUrl
+[
+    ...extractSocialLinks(html, sourceUrl),
+    ...extractJsonLdSocialLinks(html, sourceUrl)
+],
+MAX_SOCIAL_LINKS
+);
+
+console.log(
+    "SOCIAL_LINKS_FOUND",
+    socialLinks.length
+);
+
+console.log(
+    "SOCIAL_LINKS_SAMPLE",
+    socialLinks.slice(0,10)
 );
     const links = extractHrefLinks(html, sourceUrl);
     const headings = extractHeadings(html);
