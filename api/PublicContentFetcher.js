@@ -656,7 +656,14 @@ function buildSource({ url, response, html }) {
     const title = extractTitle(html) || extractMeta(html, "og:title") || null;
     const description = extractMeta(html, "description") || extractMeta(html, "og:description") || null;
     const visibleText = extractText(html);
-    const socialLinks = extractSocialLinks(html, sourceUrl);
+    const socialLinks = unique(
+    [
+        ...extractSocialLinks(html, sourceUrl),
+        ...extractJsonLdSocialLinks(html, sourceUrl)
+    ],
+    MAX_SOCIAL_LINKS,
+    sourceUrl
+);
     const links = extractHrefLinks(html, sourceUrl);
     const headings = extractHeadings(html);
     const structured = extractPlatformEvidence(html, sourceUrl, platform);
