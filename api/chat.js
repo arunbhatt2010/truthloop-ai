@@ -1723,9 +1723,9 @@ console.log(
     /******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
-
+console.log("LOOP7_ENTRY");
 if (loopLevel === 7) {
-
+console.log("LOOP7_BRANCH_REACHED");
   messages = messages.filter(m => {
     if (m.role !== "assistant") return true;
 
