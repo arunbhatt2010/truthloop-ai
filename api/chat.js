@@ -1726,7 +1726,7 @@ console.log("LOOP7_BRANCH_REACHED");
                 ? [
                     {
                       role: "system",
-                      content: loop7SystemInstruction
+                      content: loop7Instruction
                     },
                     {
                       role: "user",
