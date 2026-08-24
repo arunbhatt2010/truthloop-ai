@@ -461,7 +461,7 @@ export async function acquirePublicContent({
     profileLinks = []
 } = {}) {
    
-    const sources = [];
+    
     const requested = Array.isArray(profileLinks) ? profileLinks : [];
 const queue = [...requested];
 const visited = new Set();
@@ -501,7 +501,33 @@ const sources = [];
             });
 
             const html = await response.text();
+const source = buildSource({
+  url: response.url || url,
+  response,
+  html
+});
 
+sources.push(source);
+           for (const link of source.links || []) {
+
+  const normalized = normalizeUrl(link);
+
+  if (!normalized) continue;
+
+  if (visited.has(normalized)) continue;
+
+  const platform = detectPlatform(normalized);
+
+  if (
+      platform === "linkedin" ||
+      platform === "instagram" ||
+      platform === "youtube" ||
+      platform === "facebook" ||
+      platform === "website"
+  ) {
+      queue.push(normalized);
+  }
+           }
             sources.push(
                 buildSource({
                     url: response.url || url,
