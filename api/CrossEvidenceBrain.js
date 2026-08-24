@@ -298,6 +298,7 @@ console.log(
   "GEMINI_HTTP_STATUS",
   response.status
 );
+
 if (!response.ok) {
 
   const errorBody = await response.text();
@@ -313,8 +314,9 @@ if (!response.ok) {
   };
 }
 
-        const data = await response.json();
-       console.log(
+const data = await response.json();
+
+console.log(
   "GEMINI_HTTP_STATUS",
   response.status
 );
@@ -323,22 +325,55 @@ console.log(
   "GEMINI_CANDIDATES",
   data?.candidates?.length || 0
 );
+
 console.log(
   "GEMINI_RESPONSE_KEYS",
   Object.keys(data || {})
 );
-        const content =
-          data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-       console.log(
+
+const content =
+  data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+console.log(
   "GEMINI_RESPONSE_SIZE",
   content.length
 );
-const parsedContent = JSON.parse(
+
+console.log(
+  "GEMINI_RAW_CONTENT",
   content
-    .replace(/```json/gi, "")
-    .replace(/```/g, "")
-    .trim()
 );
+
+if (!content.trim()) {
+
+  return {
+    status: "failed",
+    error: "Empty Gemini response"
+  };
+
+}
+
+let parsedContent;
+
+try {
+
+  parsedContent = JSON.parse(
+    content
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim()
+  );
+
+} catch (e) {
+
+  console.log(
+    "GEMINI_PARSE_FAILED_CONTENT",
+    content
+  );
+
+  throw e;
+
+}
 
 console.log(
   "GEMINI_OUTPUT_KEYS",
@@ -346,25 +381,19 @@ console.log(
 );
 
 return parsedContent;
-        return JSON.parse(
-          content
-            .replace(/```json/gi,"")
-            .replace(/```/g,"")
-            .trim()
-        );
 
-    } catch(error){
+} catch(error){
 
-        console.error(
-          "GEMINI_INTELLIGENCE_ERROR",
-          error
-        );
+  console.error(
+    "GEMINI_INTELLIGENCE_ERROR",
+    error
+  );
 
-        return {
-          status: "failed",
-          error: error.message
-        };
-    }
+  return {
+    status: "failed",
+    error: error.message
+  };
+}
                        }
 const SUPPORTED_PLATFORMS = new Set([
     "linkedin",
