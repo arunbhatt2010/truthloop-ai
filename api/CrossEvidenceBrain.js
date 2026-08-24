@@ -677,9 +677,9 @@ function buildCrossFindings(sources = [], sourceLinks = []) {
         const platform = source.sourcePlatform;
         if (platform && platform !== "unknown") platforms.add(platform);
 
-        for (const profile of source.socialProfiles || []) {
-            profileLinks.push(profile);
-        }
+        for (const profile of (source.socialLinks || source.socialProfiles || [])) {
+    profileLinks.push(profile);
+       }
 
         for (const topic of source.topics || []) {
             topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1);
@@ -774,7 +774,7 @@ function trimPackageToBudget(pkg, maxChars = MAX_TOTAL_PACKAGE_CHARS) {
             contentSnippet: cleanText(source.contentSnippet, 300),
             contentLength: source.contentLength,
             topics: (source.topics || []).slice(0, 5),
-            socialProfiles: (source.socialProfiles || []).slice(0, 6),
+            socialProfiles: (source.socialLinks || source.socialProfiles || []).slice(0, 6),
             evidence: (source.evidence || []).slice(0, 2)
         })),
         findings: (pkg.findings || []).slice(0, 6),
@@ -798,7 +798,7 @@ function trimPackageToBudget(pkg, maxChars = MAX_TOTAL_PACKAGE_CHARS) {
             sourceUrl: source.sourceUrl,
             sourcePlatform: source.sourcePlatform,
             title: source.title,
-            socialProfiles: (source.socialProfiles || []).slice(0, 4),
+socialProfiles: (source.socialLinks || source.socialProfiles || []).slice(0, 4),
             contentSnippet: cleanText(source.contentSnippet, 220),
             topics: (source.topics || []).slice(0, 4)
         })).slice(0, 12)
@@ -901,9 +901,11 @@ export async function loadCrossEvidenceBrain({
     }
 
     const discoveredProfiles = uniqueStrings(
-        sources.flatMap(source => source.socialProfiles || []),
-        MAX_PROFILE_LINKS_TOTAL
-    );
+    sources.flatMap(
+        source => source.socialLinks || source.socialProfiles || []
+    ),
+    MAX_PROFILE_LINKS_TOTAL
+);
 /* ==========================================
    PASS 2
    FETCH DISCOVERED PROFILES
