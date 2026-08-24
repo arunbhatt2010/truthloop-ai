@@ -1158,18 +1158,162 @@ export function extractPublicContent(content = {}) {
     };
 }
 
+function buildContentCompressionPackage(
+    sources = [],
+    maxSources = 20
+) {
+
+    console.log(
+        "CONTENT_COMPRESSION_START",
+        sources.length
+    );
+
+    const scoredSources = sources
+        .filter(Boolean)
+        .map(source => {
+
+            const url =
+                source?.sourceUrl ||
+                source?.url ||
+                "";
+
+            let score = 0;
+
+            if (source?.isOriginalInput) score += 100;
+
+            if (/linkedin\.com/i.test(url))
+                score += 90;
+
+            if (/github\.com/i.test(url))
+                score += 80;
+
+            if (/medium\.com/i.test(url))
+                score += 70;
+
+            if (/substack\.com/i.test(url))
+                score += 70;
+
+            if (/youtube\.com/i.test(url))
+                score += 60;
+
+            if (
+                source?.visibleText &&
+                source.visibleText.length > 1000
+            ) {
+                score += 30;
+            }
+
+            if (
+                source?.publicEvidence?.length
+            ) {
+                score +=
+                    source.publicEvidence.length;
+            }
+
+            return {
+                source,
+                score
+            };
+        });
+
+    const filteredSources =
+        scoredSources
+            .sort((a, b) => b.score - a.score)
+            .slice(0, maxSources)
+            .map(item => item.source);
+
+    let compressedContent = "";
+
+    for (const source of filteredSources) {
+
+        const title =
+            source?.title || "";
+
+        const content =
+            source?.visibleText || "";
+
+        compressedContent += `
+
+SOURCE:
+${title}
+
+${content.substring(0, 1500)}
+
+`;
+    }
+
+    compressedContent =
+        compressedContent.substring(
+            0,
+            12000
+        );
+
+    const packageData = {
+
+        sourceCount:
+            filteredSources.length,
+
+        originalSourceCount:
+            sources.length,
+
+        compressedCharacters:
+            compressedContent.length,
+
+        filteredSources:
+            filteredSources.map(source => ({
+
+                url:
+                    source?.sourceUrl ||
+                    source?.url ||
+                    null,
+
+                title:
+                    source?.title || null,
+
+                platform:
+                    source?.sourcePlatform ||
+                    source?.platform ||
+                    "unknown"
+
+            })),
+
+        compressedContent
+    };
+
+    console.log(
+        "CONTENT_COMPRESSION_COMPLETE",
+        {
+            originalSources:
+                sources.length,
+
+            filteredSources:
+                filteredSources.length,
+
+            compressedCharacters:
+                compressedContent.length
+        }
+    );
+
+    return packageData;
+       }
+
 export function buildPublicContentPackage(
     rawPackage = {},
     extractedPackage = {}
 ) {
+   
     const sources = Array.isArray(rawPackage?.sources)
         ? rawPackage.sources
         : [];
-
+const contentCompressionPackage =
+    buildContentCompressionPackage(
+        sources
+    );
     const source = sources[0] || {};
 
     return {
         success: true,
+       contentCompressionPackage,
         sourceUrl: source.sourceUrl || null,
         canonicalUrl: extractedPackage?.canonicalUrl || source.canonicalUrl || null,
         platform: source.platform || source.sourcePlatform || "unknown",
