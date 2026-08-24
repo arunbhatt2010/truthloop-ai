@@ -1138,6 +1138,21 @@ console.log(
   compressedEvidencePackage?.crossEvidence?.length
 );
     console.log(
+    "LOOP7_PACKAGE_KEYS",
+    Object.keys(
+        publicEvidence?.loop7Package || {}
+    )
+);
+
+console.log(
+    "LOOP7_PACKAGE_PREVIEW",
+    JSON.stringify(
+        publicEvidence?.loop7Package || {},
+        null,
+        2
+    ).slice(0,1000)
+);
+    console.log(
   "LOOP7_DATA_KEYS",
   Object.keys(compressedEvidencePackage || {})
 );
