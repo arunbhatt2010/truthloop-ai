@@ -197,7 +197,13 @@ function extractHrefLinks(html = "") {
     const output = [];
     const regex = /<a\b[^>]*href=["']([^"']+)["'][^>]*>/gi;
     let match;
+    const rawLinks =
+      html.match(/href\s*=\s*["'][^"']+["']/gi) || [];
 
+    console.log(
+      "RAW_HREF_MATCHES",
+      rawLinks.length
+    );
     while ((match = regex.exec(html)) && output.length < MAX_LINKS * 2) {
         const raw = match[1].trim();
         if (!raw || raw.startsWith("#") || /^javascript:/i.test(raw)) continue;
@@ -413,7 +419,15 @@ function buildSource({ url, response, html }) {
     const visibleText = extractText(html);
     const socialLinks = extractSocialLinks(html);
     const links = extractHrefLinks(html);
-   
+   console.log(
+  "HTML_LENGTH",
+  html?.length
+);
+
+console.log(
+  "HTML_SAMPLE",
+  html?.slice(0,1000)
+);
 console.log("ALL_LINKS_FOUND", links);
     const headings = extractHeadings(html);
     const structured = extractPlatformEvidence(html, url, platform);
