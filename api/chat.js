@@ -1729,13 +1729,13 @@ console.log("LOOP7_BRANCH_REACHED");
           content: loop7Instruction
         },
         {
-          role: "user",
-          content: JSON.stringify(
-            crossEvidencePackage?.universalPackage || {},
-            null,
-            2
-          )
-        }
+  role: "user",
+  content: JSON.stringify(
+    publicEvidencePackage,
+    null,
+    2
+  )
+}
       ]
     : [
         {
