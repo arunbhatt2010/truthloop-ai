@@ -1871,7 +1871,7 @@ if (!profileResponse.ok) {
 
 console.log("PROFILE_AI_SUCCESS");
 
-const profileData =
+ profileData =
   await profileResponse.json();
 
 console.log(
