@@ -1120,6 +1120,7 @@ GLOBAL RULES
 
 `;
 }
+    if (currentLoop >= 7) {
     console.log("AFTER_LOOP7_INSTRUCTION");
 
 const loop7SystemInstruction = loop7Instruction;
@@ -1181,6 +1182,7 @@ console.log(
   "LOOP7_TOTAL_INPUT",
   loop7SystemInstruction.length + loop7Data.length
 );
+    }
     /* =========================
        🧠 MODE ROUTER
     ========================= */
