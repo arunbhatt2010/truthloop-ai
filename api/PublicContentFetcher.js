@@ -431,7 +431,20 @@ console.log(
 console.log("ALL_LINKS_FOUND", links);
     const headings = extractHeadings(html);
     const structured = extractPlatformEvidence(html, url, platform);
+console.log(
+  "SOURCE_VISIBLE_TEXT",
+  visibleText.length
+);
 
+console.log(
+  "SOURCE_ARTICLES",
+  structured.articles.length
+);
+
+console.log(
+  "SOURCE_EVIDENCE",
+  structured.evidence.length
+);
     return {
         sourceUrl: url,
         canonicalUrl: structured.canonicalUrl,
