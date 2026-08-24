@@ -3,6 +3,8 @@ from "./masterBrain.js";
 import { loadDigitalFootprintBrain } from "./DigitalFootprintBrain.js";
 import { loadEvidenceCompressionBrain }
 from "./EvidenceCompressionBrain.js";
+import { loadCrossEvidenceBrain }
+from "./CrossEvidenceBrain.js";
 export default async function handler(req, res) {
 
   /* =========================
@@ -543,15 +545,68 @@ await loadDigitalFootprintBrain({
     truthLoopPackage,
 
     profileLinks: profileLink
-    ? [profileLink]
-    : [],
+        ? [profileLink]
+        : [],
 
     identityPackage,
 
     currentLoop: 7
 
 });
-     compressedEvidencePackage =
+
+/* ==========================================
+   CROSS EVIDENCE BRAIN
+========================================== */
+
+try {
+
+    const crossEvidencePackage =
+    await loadCrossEvidenceBrain({
+
+        profileLinks:
+            publicEvidencePackage?.profileLinks ||
+            (profileLink ? [profileLink] : []),
+
+        footprintPackage:
+            publicEvidencePackage,
+
+        truthLoopPackage
+
+    });
+
+    if (crossEvidencePackage?.success) {
+
+        publicEvidencePackage =
+            crossEvidencePackage;
+
+        console.log(
+            "CROSS_EVIDENCE_PACKAGE",
+            JSON.stringify(crossEvidencePackage, null, 2)
+        );
+
+    } else {
+
+        console.log(
+            "CROSS_EVIDENCE_SKIPPED",
+            crossEvidencePackage?.errors || []
+        );
+
+    }
+
+} catch (error) {
+
+    console.error(
+        "CROSS_EVIDENCE_ERROR",
+        error
+    );
+
+}
+
+/* ==========================================
+   EVIDENCE COMPRESSION
+========================================== */
+
+compressedEvidencePackage =
 await loadEvidenceCompressionBrain({
 
     truthLoopPackage,
