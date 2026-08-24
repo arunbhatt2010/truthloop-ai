@@ -1720,31 +1720,35 @@ console.log("LOOP7_BRANCH_REACHED");
           },
 
           body: JSON.stringify({
-            model: "qwen/qwen3.6-27b",
-            messages:
-              loopLevel === 7
-                ? [
-                    {
-                      role: "system",
-                      content: loop7Instruction
-                    },
-                    {
-                      role: "user",
-                      content: loop7Data
-                    }
-                  ]
-                : [
-                    {
-                      role: "system",
-                      content: systemPrompt
-                    },
-                    ...messages.slice(-4)
-                  ],
-            temperature: 0.7,
-            max_tokens: maxTokens,
-            reasoning_effort: "none",
-            reasoning_format: "hidden"
-          })
+  model: "qwen/qwen3.6-27b",
+  messages:
+    loopLevel === 7
+      ? [
+          {
+            role: "system",
+            content: loop7Instruction
+          },
+          {
+            role: "user",
+            content: JSON.stringify(
+              extractedPackage || {},
+              null,
+              2
+            )
+          }
+        ]
+      : [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...messages.slice(-4)
+        ],
+  temperature: 0.7,
+  max_tokens: maxTokens,
+  reasoning_effort: "none",
+  reasoning_format: "hidden"
+})
         }
       );
 
