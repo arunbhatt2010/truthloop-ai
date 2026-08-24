@@ -27,13 +27,12 @@ const MAX_SOCIAL_LINKS = 60;
 const MAX_HEADINGS = 60;
 const MAX_POSTS = 40;
 const MAX_ARTICLES = 40;
-const MAX_EVIDENCE = 120;
+const MAX_EVIDENCE = 250;
 
-const MAX_SOURCES = 35;
-const MAX_SITEMAP_URLS = 80;
-const MAX_SITEMAPS = 12;
-const MAX_CONTENT_LINKS = 60;
-
+const MAX_SOURCES = 80;
+const MAX_SITEMAP_URLS = 300;
+const MAX_SITEMAPS = 20;
+const MAX_CONTENT_LINKS = 150;
 const PLATFORM_PATTERNS = [
     ["linkedin", /linkedin\.com/i],
     ["github", /github\.com/i],
@@ -68,11 +67,10 @@ const LEGAL_PATH_PATTERNS = [
 ];
 
 const CONTENT_PATH_PATTERNS = [
-    /(?:^|\/)(?:article|articles|blog|blogs|post|posts|news|insight|insights|guide|guides|resource|resources|learn|tutorial|tutorials|case-study|case-studies|story|stories)(?:\/|\.|$)/i,
+    /(?:^|\/)(?:article|articles|blog|blogs|post|posts|news|insight|insights|guide|guides|resource|resources|learn|tutorial|tutorials|case-study|case-studies|story|stories|writing|essay|essays|journal|research|academy|library|knowledge|perspective|perspectives|newsletter)(?:\/|\.|$)/i,
     /\/\d{4}\/\d{1,2}\/\d{1,2}\//i,
     /\/(?:20\d{2})(?:\/|$)/i
 ];
-
 function detectPlatform(url = "") {
     try {
         const value = String(url);
@@ -557,11 +555,18 @@ async function discoverSitemapUrls(rootUrl = "") {
     const discoveredSitemaps = new Set();
 
     const candidates = [
-        `${origin}/sitemap.xml`,
-        `${origin}/sitemap_index.xml`,
-        `${origin}/sitemap-index.xml`,
-        `${origin}/wp-sitemap.xml`
-    ];
+    `${origin}/sitemap.xml`,
+    `${origin}/sitemap_index.xml`,
+    `${origin}/sitemap-index.xml`,
+    `${origin}/wp-sitemap.xml`,
+
+    `${origin}/post-sitemap.xml`,
+    `${origin}/page-sitemap.xml`,
+    `${origin}/author-sitemap.xml`,
+    `${origin}/category-sitemap.xml`,
+    `${origin}/news-sitemap.xml`,
+    `${origin}/blog-sitemap.xml`
+];
 
     try {
         const robotsResponse = await fetchWithTimeout(`${origin}/robots.txt`);
@@ -927,16 +932,27 @@ export async function acquirePublicContent({
 
             // Discover more public links from the fetched source.
             enqueueUrls(
-                queue,
-                [
-                    ...(source.links || []),
-                    ...(source.socialLinks || []),
-                    ...(source.contentCandidates || []).map(item => item?.url).filter(Boolean)
-                ],
-                visited,
-                rootUrl
-            );
+    queue,
+    [
+        ...(source.links || []),
 
+        ...(source.socialLinks || []),
+
+        ...(source.contentCandidates || [])
+            .map(item => item?.url)
+            .filter(Boolean),
+
+        ...(source.articles || [])
+            .map(item => item?.url)
+            .filter(Boolean),
+
+        ...(source.posts || [])
+            .map(item => item?.url)
+            .filter(Boolean)
+    ],
+    visited,
+    rootUrl
+);
             // Sitemap discovery is seeded once for the root website.
             // Do not refetch the same sitemap set for every internal page.
             if (
