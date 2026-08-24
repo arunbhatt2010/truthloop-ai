@@ -553,7 +553,7 @@ await loadDigitalFootprintBrain({
     currentLoop: 7
 
 });
-
+    
 /* ==========================================
    CROSS EVIDENCE BRAIN
 ========================================== */
@@ -573,7 +573,11 @@ try {
         truthLoopPackage
 
     });
-
+console.log(
+  "PUBLIC_EVIDENCE_RAW",
+  JSON.stringify(publicEvidencePackage, null, 2)
+);
+                            
     if (crossEvidencePackage?.success) {
 
         publicEvidencePackage =
