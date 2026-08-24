@@ -460,10 +460,23 @@ console.log("ALL_LINKS_FOUND", links);
 export async function acquirePublicContent({
     profileLinks = []
 } = {}) {
+   
     const sources = [];
     const requested = Array.isArray(profileLinks) ? profileLinks : [];
+const queue = [...requested];
+const visited = new Set();
+const sources = [];
+    while (queue.length > 0) {
 
-    for (const rawUrl of requested) {
+  const rawUrl = queue.shift();
+
+  if (visited.has(rawUrl)) continue;
+
+  visited.add(rawUrl);
+
+  const url = normalizeUrl(rawUrl);
+
+  if (!url) continue;
         const url = normalizeUrl(rawUrl);
         if (!url) {
             sources.push({
