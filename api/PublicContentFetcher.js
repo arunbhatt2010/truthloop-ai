@@ -1310,7 +1310,15 @@ const contentCompressionPackage =
         sources
     );
     const source = sources[0] || {};
-
+console.log(
+    "CONTENT_COMPRESSION_PACKAGE",
+    JSON.stringify({
+        compressedSources:
+            contentCompressionPackage?.sources?.length || 0,
+        compressedCharacters:
+            contentCompressionPackage?.compressedContent?.length || 0
+    }, null, 2)
+);
     return {
         success: true,
        contentCompressionPackage,
