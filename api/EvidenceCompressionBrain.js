@@ -17,27 +17,20 @@ async function loadEvidenceCompressionBrain({
     };
   }
 
+  const universalPackage =
+    publicEvidencePackage?.universalPackage || {};
+
   const sources =
-    publicEvidencePackage?.universalPackage?.sources ||
+    universalPackage?.sources ||
     publicEvidencePackage?.sources ||
     [];
-   console.log("ECB_INPUT", {
-  success: publicEvidencePackage?.success,
-  sourceCount: sources.length,
-  firstSourceKeys: Object.keys(sources?.[0] || {})
-});
 
-  let rawChars = 0;
-
-  const evidenceSources = [];
-  const identitySignals = new Set();
-  const expertiseSignals = new Set();
-  const businessSignals = new Set();
-  const behaviorSignals = new Set();
+  const intelligence =
+    universalPackage?.intelligence || {};
 
   function detectPlatform(url = "") {
 
-    const u = url.toLowerCase();
+    const u = String(url).toLowerCase();
 
     if (u.includes("linkedin")) return "linkedin";
     if (u.includes("github")) return "github";
@@ -49,103 +42,169 @@ async function loadEvidenceCompressionBrain({
     return "website";
   }
 
-  function compressText(text = "", maxChars = 1200) {
+  function compressText(
+    text = "",
+    maxChars = 600
+  ) {
 
-    return text
+    return String(text)
       .replace(/\s+/g, " ")
       .trim()
       .slice(0, maxChars);
   }
 
-  for (const source of sources) {
+  const websiteSource =
+    sources.find(source =>
+      detectPlatform(
+        source?.sourceUrl ||
+        source?.url ||
+        ""
+      ) === "website"
+    ) || sources[0] || {};
 
-const visibleText =
-  source?.visibleText ||
-  source?.contentSnippet ||
-  "";
-    const title = source?.title || "";
-    const description = source?.description || "";
-    const sourceUrl =
-  source?.sourceUrl ||
-  source?.canonicalUrl ||
-  source?.url ||
-  "";
+  const websiteEvidence = {
+    url:
+      websiteSource?.sourceUrl ||
+      websiteSource?.url ||
+      null,
 
-    rawChars += visibleText.length;
+    title:
+      websiteSource?.title || "",
 
-    const compressedContent = compressText(
-      `${title}\n${description}\n${visibleText}`,
-      1200
+    content:
+      compressText(
+        websiteSource?.visibleText ||
+        websiteSource?.contentSnippet ||
+        websiteSource?.description ||
+        "",
+        1200
+      )
+  };
+
+  const socialPriority = [
+    "linkedin",
+    "youtube",
+    "github",
+    "x",
+    "instagram",
+    "facebook"
+  ];
+
+  const socialEvidence = [];
+
+  for (const platform of socialPriority) {
+
+    const source = sources.find(item =>
+      detectPlatform(
+        item?.sourceUrl ||
+        item?.url ||
+        ""
+      ) === platform
     );
 
-    evidenceSources.push({
-      platform: detectPlatform(sourceUrl),
-      url: sourceUrl,
-      title,
-      description,
-      content: compressedContent,
-      socialLinks: [
-  ...(source?.socialProfiles || []),
-  ...(source?.socialLinks || [])
-]
+    if (!source) continue;
+
+    socialEvidence.push({
+
+      platform,
+
+      url:
+        source?.sourceUrl ||
+        source?.url ||
+        null,
+
+      title:
+        source?.title || "",
+
+      content:
+        compressText(
+          source?.visibleText ||
+          source?.contentSnippet ||
+          source?.description ||
+          "",
+          600
+        )
     });
 
-    const text = (
-      title +
-      " " +
-      description +
-      " " +
-      visibleText
-    ).toLowerCase();
-
-    if (/founder|creator|developer|consultant|coach|educator|researcher/.test(text)) {
-      identitySignals.add("Professional Identity");
-    }
-
-    if (/ai|software|saas|product|marketing|psychology|leadership/.test(text)) {
-      expertiseSignals.add("Expertise Domain");
-    }
-
-    if (/business|customer|client|growth|revenue/.test(text)) {
-      businessSignals.add("Business Growth");
-    }
-
-    if (/pattern|system|decision|clarity|execution|action|behavior/.test(text)) {
-      behaviorSignals.add("Behavior Systems");
+    if (socialEvidence.length >= 5) {
+      break;
     }
   }
 
   const loop7Package = {
-    sourceCount: evidenceSources.length,
 
-    confidenceScore: Number(
-      Math.min(
-        0.95,
-        0.40 + (evidenceSources.length * 0.05)
-      ).toFixed(2)
-    ),
+    packageType:
+      "Loop7EvidencePackage",
 
-    identitySignals: [...identitySignals],
-    expertiseSignals: [...expertiseSignals],
-    businessSignals: [...businessSignals],
-    behaviorSignals: [...behaviorSignals],
+    profileLink:
+      websiteEvidence.url,
 
-    evidenceSources
+    websiteEvidence,
+
+    socialEvidence,
+
+    intelligence: {
+
+      identity:
+        intelligence?.identity || {},
+
+      positioning:
+        intelligence?.positioning || {},
+
+      recurringTopics:
+        intelligence?.recurringTopics || [],
+
+      businessSignals:
+        intelligence?.businessSignals || [],
+
+      creatorSignals:
+        intelligence?.creatorSignals || [],
+
+      behavioralSignals:
+        intelligence?.behavioralSignals || [],
+
+      contradictions:
+        intelligence?.contradictions || [],
+
+      evidence:
+        intelligence?.evidence || []
+    }
   };
 
-  console.log("ECB_COMPRESSION_STATS", {
-    rawChars,
-    finalPackageChars:
-      JSON.stringify(loop7Package).length
-  });
+  const packageSize =
+    JSON.stringify(
+      loop7Package
+    ).length;
+
+  console.log(
+    "ECB_FINAL_PACKAGE",
+    {
+      website:
+        !!websiteEvidence?.url,
+
+      socialProfiles:
+        socialEvidence.length,
+
+      packageSize
+    }
+  );
 
   return {
+
     success: true,
+
     loop7Package,
+
     compressionStats: {
-      rawChars,
+
+      originalSources:
+        sources.length,
+
+      socialProfiles:
+        socialEvidence.length,
+
       compressedChars:
-        JSON.stringify(loop7Package).length
+        packageSize
     }
   };
 }
