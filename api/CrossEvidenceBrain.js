@@ -32,9 +32,10 @@
    ============================================================ */
 
 import {
-    loadPublicContentFetcher
+    loadPublicContentFetcher,
+    extractPublicContent,
+    buildPublicContentPackage
 } from "./PublicContentFetcher.js";
-
 const MAX_SOURCES = 20;
 const MAX_SOCIAL_LINKS_PER_SOURCE = 12;
 const MAX_PROFILE_LINKS_TOTAL = 20;
@@ -828,10 +829,19 @@ async function collectSource(url) {
     }
 
     try {
-        const packageResult = await loadPublicContentFetcher({
-            profileLinks: [normalizedUrl]
-        });
+        const rawPackage =
+    await loadPublicContentFetcher({
+        profileLinks: [normalizedUrl]
+    });
 
+const extractedPackage =
+    extractPublicContent(rawPackage);
+
+const packageResult =
+    buildPublicContentPackage(
+        rawPackage,
+        extractedPackage
+    );
         const fetchedSources = Array.isArray(packageResult?.sources)
             ? packageResult.sources
             : [];
