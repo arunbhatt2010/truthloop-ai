@@ -521,7 +521,16 @@ console.log(
    "VALIDATED_PACKAGE",
    JSON.stringify(validatedPackage,null,2)
 );
-
+console.log(
+    "DFB_RECEIVED_PFC",
+    JSON.stringify({
+        success: footprintPackage?.success,
+        links: footprintPackage?.links?.length || 0,
+        articles: footprintPackage?.articles?.length || 0,
+        visibleTextLength:
+            footprintPackage?.visibleText?.length || 0
+    }, null, 2)
+);
 console.log(
    "CLEAN_PACKAGE",
    JSON.stringify(cleanPackage,null,2)
