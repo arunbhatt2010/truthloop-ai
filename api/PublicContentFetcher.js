@@ -726,7 +726,17 @@ function buildSource({ url, response, html }) {
             value: candidate.description || candidate.title || ""
         });
     }
-
+console.log("PUBLIC_CONTENT_FETCHER", {
+  sourceUrl,
+  titleLength: title?.length || 0,
+  descriptionLength: description?.length || 0,
+  visibleTextLength: visibleText?.length || 0,
+  socialLinks: socialLinks?.length || 0,
+  links: links?.length || 0,
+  headings: headings?.length || 0,
+  publicEvidence: pageEvidence?.length || 0,
+  contentCandidates: contentCandidates?.length || 0
+});
     return {
         sourceUrl,
         canonicalUrl: structured.canonicalUrl || extractCanonical(html, sourceUrl),
