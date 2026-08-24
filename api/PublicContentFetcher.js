@@ -483,17 +483,7 @@ console.log("QUEUE_SIZE", queue.length);
   const url = normalizeUrl(rawUrl);
 
   if (!url) continue;
-        const url = normalizeUrl(rawUrl);
-        if (!url) {
-            sources.push({
-                sourceUrl: rawUrl || "",
-                platform: "unknown",
-                status: 0,
-                error: "Invalid public source URL."
-            });
-            continue;
-        }
-
+        
         try {
             const response = await fetchWithTimeout(url, {
                 method: "GET",
