@@ -502,7 +502,10 @@ async function fetchPublicEvidence(profileLink) {
             validatePublicContent(
                 rawPackage
             );
-
+console.log(
+  "CLEAN_PACKAGE_SIZE",
+  JSON.stringify(cleanPackage).length
+);
         const cleanPackage =
             cleanPublicContent(
                 validatedPackage
