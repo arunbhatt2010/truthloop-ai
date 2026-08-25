@@ -484,29 +484,40 @@ function detectPlatform(profileLink = "") {
 async function fetchPublicEvidence(profileLink) {
 
     try {
-
+console.log("DFB_1_BEFORE_PCF");
         const fetchPackage =
             await loadPublicContentFetcher({
 
                 profileLinks: [profileLink]
 
             });
+       console.log("DFB_2_AFTER_PCF");
        console.log(
  "FETCH_PACKAGE",
  JSON.stringify(fetchPackage,null,2)
 );
 
         const rawPackage = fetchPackage;
-
+console.log(
+  "DFB_3_BEFORE_VALIDATE"
+);
         const validatedPackage =
             validatePublicContent(
                 rawPackage
             );
-
+console.log(
+  "DFB_4_AFTER_VALIDATE"
+);
+       console.log(
+  "DFB_5_BEFORE_CLEAN"
+);
         const cleanPackage =
             cleanPublicContent(
                 validatedPackage
             );
+       console.log(
+  "DFB_6_AFTER_CLEAN"
+);
 console.log(
   "CLEAN_PACKAGE_SIZE",
   JSON.stringify(cleanPackage).length
