@@ -154,7 +154,43 @@ EXTRACTION RULES:
 When evidence strongly supports an identity:
 
 Do NOT leave fields null unnecessarily.
+EVIDENCE PRESERVATION RULES:
 
+1. Do NOT reduce all evidence into summaries.
+
+2. Preserve direct evidence snippets.
+
+3. Preserve important website text.
+
+4. Preserve important article excerpts.
+
+5. Preserve important profile descriptions.
+
+6. Preserve important creator statements.
+
+7. Preserve important business claims.
+
+8. Preserve important positioning statements.
+
+9. Preserve important expertise evidence.
+
+10. Preserve evidence-backed contradictions with supporting text.
+
+11. Store preserved evidence inside:
+
+- importantEvidence
+- contentSamples
+- sourceContent
+
+12. Keep evidence snippets verbatim whenever possible.
+
+13. Preserve the most information-rich evidence first.
+
+14. Maximum 20 evidence snippets.
+
+15. Maximum 500 characters per snippet.
+
+16. Do not invent or rewrite evidence.
 Example:
 
 Title:
@@ -167,7 +203,9 @@ Repeated References:
 TruthLoop AI
 
 Output:
-
+"importantEvidence": [],
+"contentSamples": [],
+"sourceContent": []
 {
   "company": "TruthLoop AI"
 }
@@ -208,43 +246,44 @@ Include:
 Return complete JSON.
 
 Do not truncate output.
+IMPORTANT:
 
+Evidence preservation is more important than compression.
+
+If evidence exists, preserve it.
+
+Do not collapse all source content into short summaries.
+
+Carry forward supporting evidence for later investigation stages.
 Preserve all supported evidence signals.
 
 Preserve all discovered profile URLs.
 
 Preserve all source URLs.
 
-FORMAT:
 {
-  "identity": {
-    "name": null,
-    "title": null,
-    "company": null,
-    "website": null,
-    "location": null
-  },
-  "platforms": [],
-  "positioning": {
-    "summary": null,
-    "niche": null,
-    "expertise": [],
-    "audience": []
-  },
-  "businessSignals": [],
-  "creatorSignals": [],
-  "recurringTopics": [],
-  "behavioralSignals": [],
-  "contradictions": [],
-  "evidence": [
+  "importantEvidence": [
     {
-      "id": null,
       "claim": null,
-      "sourceUrl": null,
-      "support": null
+      "snippet": null,
+      "sourceUrl": null
     }
   ],
-  "sourceLinks": []
+
+  "contentSamples": [
+    {
+      "type": null,
+      "content": null,
+      "sourceUrl": null
+    }
+  ],
+
+  "sourceContent": [
+    {
+      "sourceUrl": null,
+      "content": null
+    }
+  ]
 }
 
 NORMALIZED PUBLIC EVIDENCE:
@@ -289,7 +328,7 @@ console.log(
               ],
               generationConfig: {
                 responseMimeType: "application/json",
-                maxOutputTokens: 8192
+                maxOutputTokens: 15000
               }
             })
           }
