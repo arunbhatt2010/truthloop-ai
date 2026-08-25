@@ -1325,21 +1325,74 @@ console.log(
   source?.visibleText?.length || 0
 );
     return {
-        title: source.title || "",
-        description: source.description || "",
-        visibleText: source.visibleText || "",
-        socialLinks: Array.isArray(source.socialLinks) ? source.socialLinks : [],
-        links: Array.isArray(source.links) ? source.links : [],
-        headings: Array.isArray(source.headings) ? source.headings : [],
-        posts: Array.isArray(source.posts) ? source.posts : [],
-        articles: Array.isArray(source.articles) ? source.articles : [],
-        publicEvidence: Array.isArray(source.publicEvidence) ? source.publicEvidence : [],
-        canonicalUrl: source.canonicalUrl || null,
-        author: source.author || null,
-        publishedAt: source.publishedAt || null,
-        contentLength: source.contentLength || 0,
-        sources
-    };
+    title: sources
+        .map(s => s?.title || "")
+        .join("\n"),
+
+    description: sources
+        .map(s => s?.description || "")
+        .join("\n"),
+
+    visibleText: sources
+        .map(s => s?.visibleText || "")
+        .join("\n\n"),
+
+    socialLinks: sources.flatMap(
+        s => Array.isArray(s?.socialLinks)
+            ? s.socialLinks
+            : []
+    ),
+
+    links: sources.flatMap(
+        s => Array.isArray(s?.links)
+            ? s.links
+            : []
+    ),
+
+    headings: sources.flatMap(
+        s => Array.isArray(s?.headings)
+            ? s.headings
+            : []
+    ),
+
+    posts: sources.flatMap(
+        s => Array.isArray(s?.posts)
+            ? s.posts
+            : []
+    ),
+
+    articles: sources.flatMap(
+        s => Array.isArray(s?.articles)
+            ? s.articles
+            : []
+    ),
+
+    publicEvidence: sources.flatMap(
+        s => Array.isArray(s?.publicEvidence)
+            ? s.publicEvidence
+            : []
+    ),
+
+    canonicalUrl:
+        sources[0]?.canonicalUrl || null,
+
+    author:
+        sources[0]?.author || null,
+
+    publishedAt:
+        sources[0]?.publishedAt || null,
+
+    contentLength:
+        sources.reduce(
+            (sum, s) =>
+                sum + (s?.contentLength || 0),
+            0
+        ),
+
+    sourceCount: sources.length,
+
+    sources
+};
 }
 
 function buildContentCompressionPackage(
@@ -1426,11 +1479,11 @@ ${content.substring(0, 1500)}
 `;
     }
 
-   // compressedContent =
-       // compressedContent.substring(
-      //      0,
-          //  50000
-      //  );
+    compressedContent =
+       compressedContent.substring(
+            0,
+           50000
+        );
 
     const packageData = {
 
