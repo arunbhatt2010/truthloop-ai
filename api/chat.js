@@ -733,6 +733,14 @@ console.log(
     2
   ).slice(0,5000)
 );
+    console.log(
+  "COMPRESSED_LOOP7_PACKAGE",
+  JSON.stringify(
+    compressedEvidencePackage?.loop7Package,
+    null,
+    2
+  ).slice(0,5000)
+);
 console.log(
   "TRUTHLOOP_PACKAGE_TYPE",
   typeof truthLoopPackage
