@@ -1233,47 +1233,51 @@ export function extractPublicContent(content = {}) {
     const sources = Array.isArray(content?.sources) ? content.sources : [];
    console.log(
   "SOURCE_FIELD_SIZES",
-  sources.map(source => ({
-    url: source?.sourceUrl,
+  JSON.stringify(
+    sources.map(source => ({
+      url: source?.sourceUrl,
 
-    visibleText:
-      source?.visibleText?.length || 0,
+      visibleText:
+        source?.visibleText?.length || 0,
 
-    links:
-      JSON.stringify(
-        source?.links || []
-      ).length,
+      links:
+        JSON.stringify(
+          source?.links || []
+        ).length,
 
-    socialLinks:
-      JSON.stringify(
-        source?.socialLinks || []
-      ).length,
+      socialLinks:
+        JSON.stringify(
+          source?.socialLinks || []
+        ).length,
 
-    headings:
-      JSON.stringify(
-        source?.headings || []
-      ).length,
+      headings:
+        JSON.stringify(
+          source?.headings || []
+        ).length,
 
-    posts:
-      JSON.stringify(
-        source?.posts || []
-      ).length,
+      posts:
+        JSON.stringify(
+          source?.posts || []
+        ).length,
 
-    articles:
-      JSON.stringify(
-        source?.articles || []
-      ).length,
+      articles:
+        JSON.stringify(
+          source?.articles || []
+        ).length,
 
-    contentCandidates:
-      JSON.stringify(
-        source?.contentCandidates || []
-      ).length,
+      contentCandidates:
+        JSON.stringify(
+          source?.contentCandidates || []
+        ).length,
 
-    publicEvidence:
-      JSON.stringify(
-        source?.publicEvidence || []
-      ).length
-  }))
+      publicEvidence:
+        JSON.stringify(
+          source?.publicEvidence || []
+        ).length
+    })),
+    null,
+    2
+  )
 );
    console.log(
   "EXTRACT_SOURCES_CHARS",
