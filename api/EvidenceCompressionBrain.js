@@ -19,7 +19,10 @@ async function loadEvidenceCompressionBrain({
 
   const universalPackage =
     publicEvidencePackage?.universalPackage || {};
-
+console.log(
+    "UNIVERSAL_PACKAGE_IN_COMPRESSION",
+    JSON.stringify(universalPackage, null, 2)
+);
   const sources =
     universalPackage?.sources ||
     publicEvidencePackage?.sources ||
