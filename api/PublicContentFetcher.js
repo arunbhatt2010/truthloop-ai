@@ -1268,6 +1268,9 @@ export function cleanPublicContent(content = {}) {
 export function extractPublicContent(content = {}) {
     const sources = Array.isArray(content?.sources) ? content.sources : [];
    console.log(
+  "EXTRACT_START"
+);
+   console.log(
   "SOURCE_FIELD_SIZES",
   JSON.stringify(
     sources.map(source => ({
@@ -1316,6 +1319,9 @@ export function extractPublicContent(content = {}) {
   )
 );
    console.log(
+  "AFTER_SOURCE_FIELD_SIZES"
+);
+   console.log(
   "EXTRACT_SOURCES_CHARS",
   JSON.stringify(sources).length
 );
@@ -1323,6 +1329,9 @@ export function extractPublicContent(content = {}) {
 console.log(
   "EXTRACT_VISIBLE_TEXT",
   source?.visibleText?.length || 0
+);
+   console.log(
+  "EXTRACT_END"
 );
     return {
     title: sources
