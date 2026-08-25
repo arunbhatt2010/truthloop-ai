@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v3
+   EVIDENCE COMPRESSION BRAIN v4
    Preserve evidence. Compress noise.
 ========================================================= */
 
@@ -19,10 +19,7 @@ async function loadEvidenceCompressionBrain({
 
   const universalPackage =
     publicEvidencePackage?.universalPackage || {};
-console.log(
-    "UNIVERSAL_PACKAGE_IN_COMPRESSION",
-    JSON.stringify(universalPackage, null, 2)
-);
+
   const sources =
     universalPackage?.sources ||
     publicEvidencePackage?.sources ||
@@ -47,7 +44,7 @@ console.log(
 
   function compressText(
     text = "",
-    maxChars = 600
+    maxChars = 4000
   ) {
 
     return String(text)
@@ -56,33 +53,51 @@ console.log(
       .slice(0, maxChars);
   }
 
-  const websiteSource =
-    sources.find(source =>
+  /* ========================================
+     WEBSITE EVIDENCE
+  ======================================== */
+
+  const websiteSources =
+    sources.filter(source =>
       detectPlatform(
         source?.sourceUrl ||
         source?.url ||
         ""
       ) === "website"
-    ) || sources[0] || {};
+    );
 
   const websiteEvidence = {
+
+    sourceCount:
+      websiteSources.length,
+
     url:
-      websiteSource?.sourceUrl ||
-      websiteSource?.url ||
+      websiteSources?.[0]?.sourceUrl ||
+      websiteSources?.[0]?.url ||
       null,
 
     title:
-      websiteSource?.title || "",
+      websiteSources?.[0]?.title ||
+      "",
 
     content:
       compressText(
-        websiteSource?.visibleText ||
-        websiteSource?.contentSnippet ||
-        websiteSource?.description ||
-        "",
-        1200
+        websiteSources
+          .map(source =>
+            source?.visibleText ||
+            source?.contentSnippet ||
+            source?.description ||
+            ""
+          )
+          .filter(Boolean)
+          .join("\n\n"),
+        8000
       )
   };
+
+  /* ========================================
+     SOCIAL EVIDENCE
+  ======================================== */
 
   const socialPriority = [
     "linkedin",
@@ -97,42 +112,54 @@ console.log(
 
   for (const platform of socialPriority) {
 
-    const source = sources.find(item =>
-      detectPlatform(
-        item?.sourceUrl ||
-        item?.url ||
-        ""
-      ) === platform
-    );
+    const platformSources =
+      sources.filter(item =>
+        detectPlatform(
+          item?.sourceUrl ||
+          item?.url ||
+          ""
+        ) === platform
+      );
 
-    if (!source) continue;
+    if (!platformSources.length) {
+      continue;
+    }
 
     socialEvidence.push({
 
       platform,
 
+      sourceCount:
+        platformSources.length,
+
       url:
-        source?.sourceUrl ||
-        source?.url ||
+        platformSources?.[0]?.sourceUrl ||
+        platformSources?.[0]?.url ||
         null,
 
       title:
-        source?.title || "",
+        platformSources?.[0]?.title ||
+        "",
 
       content:
         compressText(
-          source?.visibleText ||
-          source?.contentSnippet ||
-          source?.description ||
-          "",
-          600
+          platformSources
+            .map(item =>
+              item?.visibleText ||
+              item?.contentSnippet ||
+              item?.description ||
+              ""
+            )
+            .filter(Boolean)
+            .join("\n\n"),
+          3000
         )
     });
-
-    if (socialEvidence.length >= 5) {
-      break;
-    }
   }
+
+  /* ========================================
+     LOOP 7 PACKAGE
+  ======================================== */
 
   const loop7Package = {
 
@@ -182,8 +209,11 @@ console.log(
   console.log(
     "ECB_FINAL_PACKAGE",
     {
-      website:
-        !!websiteEvidence?.url,
+      totalSources:
+        sources.length,
+
+      websiteSources:
+        websiteSources.length,
 
       socialProfiles:
         socialEvidence.length,
@@ -202,6 +232,9 @@ console.log(
 
       originalSources:
         sources.length,
+
+      websiteSources:
+        websiteSources.length,
 
       socialProfiles:
         socialEvidence.length,
