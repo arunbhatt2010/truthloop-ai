@@ -1708,6 +1708,35 @@ console.log("LOOP7_BRANCH_REACHED");
     let response;
 
     try {
+      console.log(
+  "LOOP7_MESSAGES",
+  JSON.stringify(
+    loopLevel === 7
+      ? [
+          {
+            role: "system",
+            content: loop7Instruction
+          },
+          {
+            role: "user",
+            content: JSON.stringify(
+              compressedEvidencePackage,
+              null,
+              2
+            )
+          }
+        ]
+      : [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          ...messages.slice(-4)
+        ],
+    null,
+    2
+  )
+);
       response = await fetch(
         "https://api.groq.com/openai/v1/chat/completions",
         {
