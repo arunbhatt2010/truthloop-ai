@@ -289,7 +289,7 @@ console.log(
               ],
               generationConfig: {
                 responseMimeType: "application/json",
-                maxOutputTokens: 3000
+                maxOutputTokens: 8192
               }
             })
           }
@@ -353,10 +353,22 @@ if (!content.trim()) {
 
 }
 
-let parsedContent;
 
 try {
+console.log(
+  "FIRST_200_CHARS",
+  content.slice(0, 200)
+);
 
+console.log(
+  "LAST_200_CHARS",
+  content.slice(-200)
+);
+
+console.log(
+  "CONTENT_LENGTH",
+  content.length
+);
   parsedContent = JSON.parse(
     content
       .replace(/```json/gi, "")
