@@ -1231,8 +1231,15 @@ export function cleanPublicContent(content = {}) {
 }
 export function extractPublicContent(content = {}) {
     const sources = Array.isArray(content?.sources) ? content.sources : [];
+   console.log(
+  "EXTRACT_SOURCES_CHARS",
+  JSON.stringify(sources).length
+);
     const source = sources[0] || {};
-
+console.log(
+  "EXTRACT_VISIBLE_TEXT",
+  source?.visibleText?.length || 0
+);
     return {
         title: source.title || "",
         description: source.description || "",
