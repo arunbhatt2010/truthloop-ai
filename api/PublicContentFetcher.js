@@ -953,7 +953,7 @@ export async function acquirePublicContent({
     const requested = Array.isArray(profileLinks)
         ? profileLinks.map(value => normalizeUrl(value)).filter(Boolean)
         : [];
-
+const discoveredEvidenceUrls = new Set();
     const rootUrl = requested[0] || "";
     const queue = [...requested];
     const visited = new Set();
@@ -1003,6 +1003,36 @@ export async function acquirePublicContent({
             });
 
             sources.push(source);
+           if (
+    source.platform === "website" &&
+    discoveredEvidenceUrls.size === 0
+) {
+
+    const evidenceUrls =
+        await discoverEvidenceSources({
+
+            rootUrl: source.sourceUrl,
+
+            title: source.title,
+
+            description: source.description,
+
+            visibleText: source.visibleText,
+
+            socialLinks: source.socialLinks || []
+        });
+
+    evidenceUrls.forEach(url =>
+        discoveredEvidenceUrls.add(url)
+    );
+
+    enqueueUrls(
+        queue,
+        [...evidenceUrls],
+        visited,
+        rootUrl
+    );
+           }
 console.log(
     "DISCOVERED_SOCIAL_LINKS",
     JSON.stringify({
