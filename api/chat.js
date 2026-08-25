@@ -718,7 +718,21 @@ console.log(
   "COMPRESSED_PACKAGE_SIZE",
   JSON.stringify(compressedEvidencePackage).length
 );
+console.log(
+  "COMPRESSED_EVIDENCE_LENGTH",
+  JSON.stringify(
+    compressedEvidencePackage
+  ).length
+);
 
+console.log(
+  "COMPRESSED_EVIDENCE_PREVIEW",
+  JSON.stringify(
+    compressedEvidencePackage,
+    null,
+    2
+  ).slice(0,5000)
+);
 console.log(
   "TRUTHLOOP_PACKAGE_TYPE",
   typeof truthLoopPackage
