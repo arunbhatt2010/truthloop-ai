@@ -1708,9 +1708,9 @@ console.log(
     /******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
-console.log("LOOP7_ENTRY");
+
 if (loopLevel === 7) {
-console.log("LOOP7_BRANCH_REACHED");
+
   messages = messages.filter(m => {
     if (m.role !== "assistant") return true;
 
@@ -1721,45 +1721,11 @@ console.log("LOOP7_BRANCH_REACHED");
     const maxTokens =
   loopLevel === 7 ? 2500 : 220;
 
-    console.log("LOOP7_AI_START", {
-      loopLevel,
-      maxTokens,
-      systemPromptLength: systemPrompt.length,
-      loop7InstructionLength: loop7Instruction.length
-    });
-
+    
     let response;
 
     try {
-      console.log(
-  "LOOP7_MESSAGES",
-  JSON.stringify(
-    loopLevel === 7
-      ? [
-          {
-            role: "system",
-            content: loop7Instruction
-          },
-          {
-            role: "user",
-            content: JSON.stringify(
-              compressedEvidencePackage,
-              null,
-              2
-            )
-          }
-        ]
-      : [
-          {
-            role: "system",
-            content: systemPrompt
-          },
-          ...messages.slice(-4)
-        ],
-    null,
-    2
-  )
-);
+      
       response = await fetch(
         "https://api.groq.com/openai/v1/chat/completions",
         {
@@ -1804,9 +1770,7 @@ console.log("LOOP7_BRANCH_REACHED");
         }
       );
 
-      console.log("LOOP7_AI_HTTP_STATUS", response.status);
-      console.log("LOOP7_AI_HTTP_OK", response.ok);
-      console.log("LOOP7_AI_STATUS", response.status);
+      
 
     } catch (e) {
       console.error("LOOP7_AI_ERROR", e);
@@ -1829,7 +1793,7 @@ console.log("LOOP7_BRANCH_REACHED");
       });
     }
 
-    console.log("LOOP7_AI_SUCCESS");
+    
 
      /* =========================
        📤 RESPONSE
@@ -1844,30 +1808,6 @@ console.log("LOOP7_BRANCH_REACHED");
 
 let reply =
   data?.choices?.[0]?.message?.content || "";
-console.log(
-  "LOOP_LEVEL",
-  loopLevel
-);
-
-console.log(
-  "SYSTEM_PROMPT_LENGTH",
-  systemPrompt.length
-);
-
-console.log(
-  "LOOP7_PROMPT_EXISTS",
-  loop7Instruction.length
-);
-
-console.log(
-  "RESPONSE_LENGTH",
-  reply.length
-);
-
-console.log(
-  "RESPONSE_PREVIEW",
-  reply.slice(0,1000)
-);
 
 /* =========================
    PROFILE ENGINE
@@ -1919,10 +1859,7 @@ try {
     }
   );
 
-  console.log("PROFILE_AI_HTTP_STATUS", profileResponse.status);
-  console.log("PROFILE_AI_HTTP_OK", profileResponse.ok);
-  console.log("PROFILE_AI_STATUS", profileResponse.status);
-
+  
 } catch (e) {
   console.error("PROFILE_AI_ERROR", e);
   return res.status(500).json({
@@ -1942,15 +1879,12 @@ if (!profileResponse.ok) {
   });
 }
 
-console.log("PROFILE_AI_SUCCESS");
+
 
  profileData =
   await profileResponse.json();
 
-console.log(
-  "PROFILE_MODEL_RAW",
-  JSON.stringify(profileData, null, 2)
-);
+
               }
 
 const contentLeakWords = [
