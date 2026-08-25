@@ -1098,6 +1098,7 @@ export function validatePublicContent(content = {}) {
 }
 
 export function cleanPublicContent(content = {}) {
+
     if (!content || typeof content !== "object") {
         return {
             success: false,
@@ -1105,37 +1106,129 @@ export function cleanPublicContent(content = {}) {
         };
     }
 
-    const sources = Array.isArray(content.sources) ? content.sources : [];
+    const sources = Array.isArray(content.sources)
+        ? content.sources
+        : [];
 
     return {
         ...content,
         sourceCount: sources.length,
-        sources: sources.map(source => ({
-            ...source,
-            title: cleanText(source?.title || "", 300) || null,
-            description: cleanText(source?.description || "", 800) || null,
-            visibleText: cleanText(source?.visibleText || "", MAX_VISIBLE_TEXT),
-            socialLinks: unique(source?.socialLinks || [], MAX_SOCIAL_LINKS, source?.sourceUrl || ""),
-            links: unique(source?.links || [], MAX_LINKS, source?.sourceUrl || ""),
-            headings: Array.isArray(source?.headings)
-                ? source.headings.map(item => cleanText(item, 240)).filter(Boolean).slice(0, MAX_HEADINGS)
-                : [],
-            posts: Array.isArray(source?.posts)
-                ? source.posts.slice(0, MAX_POSTS)
-                : [],
-            articles: Array.isArray(source?.articles)
-                ? source.articles.slice(0, MAX_ARTICLES)
-                : [],
-            contentCandidates: Array.isArray(source?.contentCandidates)
-                ? source.contentCandidates.slice(0, MAX_CONTENT_LINKS)
-                : [],
-            publicEvidence: Array.isArray(source?.publicEvidence)
-                ? source.publicEvidence.slice(0, MAX_EVIDENCE)
-                : []
-        }))
+
+        sources: sources.map(source => {
+
+            console.log(
+                "CLEAN_BEFORE",
+                JSON.stringify({
+                    sourceUrl: source?.sourceUrl,
+                    socialLinks: source?.socialLinks?.length || 0,
+                    visibleText: source?.visibleText?.length || 0,
+                    articles: source?.articles?.length || 0
+                })
+            );
+
+            const cleanedSource = {
+                ...source,
+
+                title:
+                    cleanText(
+                        source?.title || "",
+                        300
+                    ) || null,
+
+                description:
+                    cleanText(
+                        source?.description || "",
+                        800
+                    ) || null,
+
+                visibleText:
+                    cleanText(
+                        source?.visibleText || "",
+                        MAX_VISIBLE_TEXT
+                    ),
+
+                socialLinks: unique(
+                    source?.socialLinks || [],
+                    MAX_SOCIAL_LINKS,
+                    source?.sourceUrl || ""
+                ),
+
+                links: unique(
+                    source?.links || [],
+                    MAX_LINKS,
+                    source?.sourceUrl || ""
+                ),
+
+                headings: Array.isArray(
+                    source?.headings
+                )
+                    ? source.headings
+                        .map(item =>
+                            cleanText(item, 240)
+                        )
+                        .filter(Boolean)
+                        .slice(0, MAX_HEADINGS)
+                    : [],
+
+                posts: Array.isArray(
+                    source?.posts
+                )
+                    ? source.posts.slice(
+                        0,
+                        MAX_POSTS
+                    )
+                    : [],
+
+                articles: Array.isArray(
+                    source?.articles
+                )
+                    ? source.articles.slice(
+                        0,
+                        MAX_ARTICLES
+                    )
+                    : [],
+
+                contentCandidates: Array.isArray(
+                    source?.contentCandidates
+                )
+                    ? source.contentCandidates.slice(
+                        0,
+                        MAX_CONTENT_LINKS
+                    )
+                    : [],
+
+                publicEvidence: Array.isArray(
+                    source?.publicEvidence
+                )
+                    ? source.publicEvidence.slice(
+                        0,
+                        MAX_EVIDENCE
+                    )
+                    : []
+            };
+
+            console.log(
+                "CLEAN_AFTER",
+                JSON.stringify({
+                    sourceUrl:
+                        cleanedSource?.sourceUrl,
+                    socialLinks:
+                        cleanedSource?.socialLinks
+                            ?.length || 0,
+                    visibleText:
+                        cleanedSource?.visibleText
+                            ?.length || 0,
+                    articles:
+                        cleanedSource?.articles
+                            ?.length || 0
+                })
+            );
+
+            return cleanedSource;
+
+        })
     };
 }
-
 export function extractPublicContent(content = {}) {
     const sources = Array.isArray(content?.sources) ? content.sources : [];
     const source = sources[0] || {};
