@@ -709,15 +709,7 @@ function buildSource({ url, response, html }) {
 MAX_SOCIAL_LINKS
 );
 
-console.log(
-    "SOCIAL_LINKS_FOUND",
-    socialLinks.length
-);
 
-console.log(
-    "SOCIAL_LINKS_SAMPLE",
-    socialLinks.slice(0,10)
-);
     const links = extractHrefLinks(html, sourceUrl);
     const headings = extractHeadings(html);
     const structured = extractPlatformEvidence(html, sourceUrl, platform);
