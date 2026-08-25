@@ -1074,7 +1074,10 @@ console.log(
     )
 );
     const packageTextSize = JSON.stringify(universalPackage).length;
-
+console.log(
+    "UNIVERSAL_PACKAGE_DEBUG",
+    JSON.stringify(universalPackage, null, 2)
+);
     result.confidenceScore = confidence;
     result.universalPackage = universalPackage;
     result.crossEvidencePackage = {
