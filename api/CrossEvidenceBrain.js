@@ -750,7 +750,9 @@ CRITICAL:
 FETCHED PUBLIC INVESTIGATION INPUT:
 ${JSON.stringify(evidencePackage)};
 `;
-
+console.log(
+  "DFB_7_BEFORE_GEMINI"
+);
     try {
         console.log("GEMINI_EVIDENCE_SIZE", JSON.stringify(evidencePackage).length);
         console.log("GEMINI_EVIDENCE_KEYS", Object.keys(evidencePackage || {}));
