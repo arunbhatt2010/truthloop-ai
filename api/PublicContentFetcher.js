@@ -1426,11 +1426,11 @@ ${content.substring(0, 1500)}
 `;
     }
 
-    compressedContent =
-        compressedContent.substring(
-            0,
-            50000
-        );
+   // compressedContent =
+       // compressedContent.substring(
+      //      0,
+          //  50000
+      //  );
 
     const packageData = {
 
