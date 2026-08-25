@@ -699,6 +699,7 @@ if (publicEvidencePackage) {
 
           }
     let loop7Instruction = "";
+    if (loopLevel === 7) {
 console.log(
 "TRUTHLOOP_PACKAGE_SIZE",
 JSON.stringify(truthLoopPackage).length
@@ -747,7 +748,7 @@ console.log(
 );
 
 console.log("BEFORE_LOOP7_INSTRUCTION");
-    
+} 
 if (loopLevel === 7) {
 
 loop7Instruction = `
