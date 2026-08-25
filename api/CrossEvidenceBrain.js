@@ -890,7 +890,16 @@ const packageResult =
         const fetchedSources = Array.isArray(packageResult?.sources)
             ? packageResult.sources
             : [];
-
+console.log(
+    "COLLECT_SOURCE_DEBUG",
+    {
+        requestedUrl: normalizedUrl,
+        fetchedSourcesCount: fetchedSources.length,
+        fetchedUrls: fetchedSources.map(
+            s => s?.sourceUrl
+        )
+    }
+);
         // PCF can crawl additional sources. CEB must retain the source
         // corresponding to the exact URL it asked PCF to fetch.
         const source =
@@ -900,7 +909,18 @@ const packageResult =
             fetchedSources[0] ||
             packageResult?.source ||
             null;
-
+console.log(
+    "SOURCE_MATCH_DEBUG",
+    {
+        requestedUrl: normalizedUrl,
+        selectedUrl:
+            source?.sourceUrl,
+        matched:
+            normalizeUrl(
+                source?.sourceUrl || ""
+            ) === normalizedUrl
+    }
+);
         if (!source) {
             return {
                 success: false,
@@ -908,7 +928,28 @@ const packageResult =
                 source: null
             };
         }
+console.log(
+    "SOURCE_CONTENT_DEBUG",
+    {
+        url: normalizedUrl,
+        contentLength:
+            source?.sourceContent?.length ||
+            source?.content?.length ||
+            0,
 
+        textLength:
+            source?.visibleText?.length ||
+            0,
+
+        articles:
+            source?.articles?.length ||
+            0,
+
+        socialLinks:
+            source?.socialLinks?.length ||
+            0
+    }
+);
         return {
             success: true,
             source: compactSource(source, normalizedUrl)
