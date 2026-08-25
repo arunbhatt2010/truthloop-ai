@@ -1003,7 +1003,13 @@ export async function acquirePublicContent({
             });
 
             sources.push(source);
-
+console.log(
+    "DISCOVERED_SOCIAL_LINKS",
+    JSON.stringify({
+        sourceUrl: source?.sourceUrl,
+        socialLinks: source?.socialLinks || []
+    })
+);
             // Discover more public links from the fetched source.
             enqueueUrls(
     queue,
