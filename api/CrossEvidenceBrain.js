@@ -988,6 +988,10 @@ async function PublicEvidenceHunter({
         const combined = [title, description, visibleText].filter(Boolean).join(" ");
 
         const linkedinUsername = extractLinkedInUsername(links);
+       console.log(
+    "PEH_LINKEDIN_USERNAME_FINAL",
+    linkedinUsername
+);
         const names = [];
         const companies = [];
 
