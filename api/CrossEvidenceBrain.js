@@ -1307,7 +1307,15 @@ export async function loadCrossEvidenceBrain({
         await buildGeminiIntelligence(
             geminiInput
         );
+console.log(
+  "GEMINI_INPUT_DEBUG",
+  JSON.stringify(geminiInput, null, 2)
+);
 
+console.log(
+  "GEMINI_OUTPUT_DEBUG",
+  JSON.stringify(geminiIntelligence, null, 2)
+);
     const normalizedGeminiIntelligence =
         normalizeGeminiIntelligence(
             geminiIntelligence,
