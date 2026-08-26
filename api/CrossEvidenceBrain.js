@@ -62,7 +62,10 @@ async function buildGeminiIntelligence(evidencePackage = {}) {
             reason: "Missing GEMINI_API_KEY"
         };
     }
-
+console.log(
+  "GEMINI_INPUT_SIZE",
+  JSON.stringify(evidencePackage).length
+);
     const prompt = `
 You are TruthLoop's Targeted Public Evidence Investigator.
 
@@ -282,7 +285,32 @@ ${JSON.stringify(evidencePackage)}
             "GEMINI_OUTPUT_KEYS",
             Object.keys(parsedContent || {})
         );
+console.log(
+  "GEMINI_LINKEDIN_PROFILES",
+  JSON.stringify(
+    parsedContent.discoveredProfiles || [],
+    null,
+    2
+  )
+);
 
+console.log(
+  "GEMINI_LINKEDIN_CONTENT",
+  JSON.stringify(
+    parsedContent.sourceContent?.linkedin || {},
+    null,
+    2
+  )
+);
+
+console.log(
+  "GEMINI_LINKEDIN_EVIDENCE",
+  JSON.stringify(
+    parsedContent.evidence?.linkedin || {},
+    null,
+    2
+  )
+);
         return parsedContent;
 
     } catch(error) {
