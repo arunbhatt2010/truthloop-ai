@@ -27,7 +27,12 @@ async function loadEvidenceCompressionBrain({
 
   const intelligence =
     universalPackage?.intelligence || {};
-
+console.log(
+  "ECB_INTELLIGENCE_KEYS",
+  Object.keys(
+    universalPackage?.intelligence || {}
+  )
+);
   function detectPlatform(url = "") {
 
     const u = String(url).toLowerCase();
