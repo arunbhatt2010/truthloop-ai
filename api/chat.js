@@ -557,10 +557,10 @@ await loadDigitalFootprintBrain({
 /* ==========================================
    CROSS EVIDENCE BRAIN
 ========================================== */
-
+/*
 try {
 
- /*   const crossEvidencePackage =
+   const crossEvidencePackage =
     await loadCrossEvidenceBrain({
 
         profileLinks:
@@ -604,7 +604,8 @@ console.log(
         error
     );
 
-}*/
+}
+*/
 
 /* ==========================================
    EVIDENCE COMPRESSION
