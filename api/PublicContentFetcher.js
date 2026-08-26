@@ -772,7 +772,7 @@ MAX_SOCIAL_LINKS
             value: candidate.description || candidate.title || ""
         });
     }
-console.log("PUBLIC_CONTENT_FETCHER", {
+/*console.log("PUBLIC_CONTENT_FETCHER", {
   sourceUrl,
   titleLength: title?.length || 0,
   descriptionLength: description?.length || 0,
@@ -782,7 +782,7 @@ console.log("PUBLIC_CONTENT_FETCHER", {
   headings: headings?.length || 0,
   publicEvidence: pageEvidence?.length || 0,
   contentCandidates: contentCandidates?.length || 0
-});
+});*/
     return {
         sourceUrl,
         canonicalUrl: structured.canonicalUrl || extractCanonical(html, sourceUrl),
@@ -1025,13 +1025,13 @@ const discoveredEvidenceUrls = new Set();
         rootUrl
     );
            }
-console.log(
+/*console.log(
     "DISCOVERED_SOCIAL_LINKS",
     JSON.stringify({
         sourceUrl: source?.sourceUrl,
         socialLinks: source?.socialLinks || []
     })
-);
+);*/
             // Discover more public links from the fetched source.
             enqueueUrls(
     queue,
@@ -1144,7 +1144,7 @@ export function cleanPublicContent(content = {}) {
 
         sources: sources.map(source => {
 
-            console.log(
+         /*   console.log(
                 "CLEAN_BEFORE",
                 JSON.stringify({
                     sourceUrl: source?.sourceUrl,
@@ -1152,7 +1152,7 @@ export function cleanPublicContent(content = {}) {
                     visibleText: source?.visibleText?.length || 0,
                     articles: source?.articles?.length || 0
                 })
-            );
+            );*/
 
             const cleanedSource = {
                 ...source,
@@ -1235,7 +1235,7 @@ export function cleanPublicContent(content = {}) {
                     : []
             };
 
-            console.log(
+       /*     console.log(
                 "CLEAN_AFTER",
                 JSON.stringify({
                     sourceUrl:
@@ -1250,7 +1250,7 @@ export function cleanPublicContent(content = {}) {
                         cleanedSource?.articles
                             ?.length || 0
                 })
-            );
+            );*/
 
             return cleanedSource;
 
@@ -1259,10 +1259,10 @@ export function cleanPublicContent(content = {}) {
 }
 export function extractPublicContent(content = {}) {
     const sources = Array.isArray(content?.sources) ? content.sources : [];
-   console.log(
+  console.log(
   "EXTRACT_START"
 );
-   console.log(
+/*   console.log(
   "SOURCE_FIELD_SIZES",
   JSON.stringify(
     sources.map(source => ({
@@ -1324,7 +1324,7 @@ console.log(
 );
    console.log(
   "EXTRACT_END"
-);
+); */
     return {
     title: sources
         .map(s => s?.title || "")
@@ -1401,10 +1401,10 @@ function buildContentCompressionPackage(
     maxSources = 20
 ) {
 
-    console.log(
+ /*   console.log(
         "CONTENT_COMPRESSION_START",
         sources.length
-    );
+    ); */
 
     const scoredSources = sources
         .filter(Boolean)
@@ -1518,7 +1518,7 @@ ${content.substring(0, 1500)}
         compressedContent
     };
 
-    console.log(
+ /*   console.log(
         "CONTENT_COMPRESSION_COMPLETE",
         {
             originalSources:
@@ -1531,7 +1531,7 @@ ${content.substring(0, 1500)}
                 compressedContent.length
         }
     );
-
+*/
     return packageData;
        }
 
@@ -1548,7 +1548,7 @@ const contentCompressionPackage =
         sources
     );
     const source = sources[0] || {};
-console.log(
+/*console.log(
     "CONTENT_COMPRESSION_PACKAGE",
     JSON.stringify({
         compressedSources:
@@ -1556,7 +1556,7 @@ console.log(
         compressedCharacters:
             contentCompressionPackage?.compressedContent?.length || 0
     }, null, 2)
-);
+);*/
     return {
         success: true,
        contentCompressionPackage,
