@@ -30,7 +30,7 @@
    result.universalPackage
    or result.crossEvidencePackage.universalPackage
    ============================================================ */
-
+console.log("CROSS_EVIDENCE_START");
 import {
     loadPublicContentFetcher,
     extractPublicContent,
