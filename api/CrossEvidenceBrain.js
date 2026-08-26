@@ -291,18 +291,7 @@ ${JSON.stringify(evidencePackage)};
 `;
 
     try {
-       console.log(
-  "GEMINI_EVIDENCE_SIZE",
-  JSON.stringify(evidencePackage).length
-);
-
-console.log(
-  "GEMINI_EVIDENCE_KEYS",
-  Object.keys(evidencePackage || {})
-);
-console.log(
-  "GEMINI_REQUEST_START"
-);
+       
        const modelName = "gemini-3.6-flash";
 
 console.log(
@@ -373,15 +362,6 @@ console.log(
 const content =
   data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-console.log(
-  "GEMINI_RESPONSE_SIZE",
-  content.length
-);
-
-console.log(
-  "GEMINI_RAW_CONTENT",
-  content
-);
 
 if (!content.trim()) {
 
@@ -397,21 +377,7 @@ let parsedContent;
 
 try {
 
-  console.log(
-    "FIRST_200_CHARS",
-    content.slice(0, 200)
-  );
-
-  console.log(
-    "LAST_200_CHARS",
-    content.slice(-200)
-  );
-
-  console.log(
-    "CONTENT_LENGTH",
-    content.length
-  );
-
+  
   parsedContent = JSON.parse(
     content
       .replace(/```json/gi, "")
@@ -434,7 +400,10 @@ console.log(
   "GEMINI_OUTPUT_KEYS",
   Object.keys(parsedContent || {})
 );
-
+console.log(
+  "CEB_RETURN_SIZE",
+  JSON.stringify(parsedContent || {}).length
+);
 return parsedContent;
 
 } catch(error){
