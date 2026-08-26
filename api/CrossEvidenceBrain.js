@@ -168,7 +168,14 @@ IMPORTANT OUTPUT RULES:
 - discoveredProfiles must contain only profile URLs actually present in the selected evidence universe.
 - Keep the package compact enough for downstream Loop 7 processing.
 - Do not omit strong evidence merely to make the output look short.
-
+console.log(
+    "GEMINI_EVIDENCE_PACKAGE",
+    JSON.stringify(
+        evidencePackage,
+        null,
+        2
+    )
+);
 SELECTED PUBLIC EVIDENCE:
 ${JSON.stringify(evidencePackage)}
 `;
