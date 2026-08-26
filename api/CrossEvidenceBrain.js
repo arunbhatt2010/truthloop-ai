@@ -1216,7 +1216,20 @@ async function PublicEvidenceHunter({
         socialResultCount: socialResults.length,
         providers: [...new Set(ranked.map(item => item.provider).filter(Boolean))]
     });
-
+console.log(
+  "PEH_HUNT_REPORT",
+  JSON.stringify(
+    {
+      identity,
+      searchQueries: dedupedQueries,
+      discoveredUrls,
+      socialProfiles:
+        socialResults.map(item => item.url)
+    },
+    null,
+    2
+  )
+);
     return {
         success: ranked.length > 0,
         identity,
