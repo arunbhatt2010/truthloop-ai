@@ -1302,7 +1302,32 @@ export async function loadCrossEvidenceBrain({
     );
 
     console.log("GEMINI_TRIGGER");
+console.log(
+  "GEMINI_SOCIAL_SOURCES_RAW",
+  JSON.stringify(
+    geminiInput.socialSources || [],
+    null,
+    2
+  )
+);
 
+console.log(
+  "GEMINI_CONTENT_SOURCES_RAW",
+  JSON.stringify(
+    geminiInput.contentSources || [],
+    null,
+    2
+  )
+);
+
+console.log(
+  "GEMINI_SELECTED_URLS",
+  JSON.stringify(
+    geminiInput.selectedSourceUrls || [],
+    null,
+    2
+  )
+);
     const geminiIntelligence =
         await buildGeminiIntelligence(
             geminiInput
