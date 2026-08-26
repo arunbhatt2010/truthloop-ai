@@ -902,20 +902,78 @@ async function PublicEvidenceHunter({
         .replace(/\s+/g, " ")
         .trim();
 
-    const extractLinkedInUsername = (links = []) => {
-        for (const raw of links) {
-            const url = normalizeUrl(raw);
-            if (!url) continue;
-            try {
-                const parsed = new URL(url);
-                if (!parsed.hostname.includes("linkedin.com")) continue;
-                const match = parsed.pathname.match(/\/in\/([^/?#]+)/i);
-                if (match?.[1]) return decodeURIComponent(match[1]).replace(/[-_]+/g, " ").trim();
-            } catch {}
-        }
-        return "";
-    };
+    const extractLinkedInUsername = () => {
 
+    const candidateLinks = [
+        ...(Array.isArray(requestedLinks) ? requestedLinks : []),
+
+        ...(Array.isArray(mainSource?.socialProfiles)
+            ? mainSource.socialProfiles
+            : []),
+
+        ...(Array.isArray(mainSource?.discoveredProfiles)
+            ? mainSource.discoveredProfiles
+            : []),
+
+        ...(Array.isArray(mainSource?.socialSources)
+            ? mainSource.socialSources
+            : []),
+
+        ...(Array.isArray(mainSource?.selectedSourceUrls)
+            ? mainSource.selectedSourceUrls
+            : []),
+
+        mainSource?.linkedinProfile,
+        mainSource?.profileUrl,
+        mainSource?.sourceUrl
+    ].filter(Boolean);
+
+    console.log(
+        "PEH_LINKEDIN_CANDIDATES",
+        JSON.stringify(candidateLinks, null, 2)
+    );
+
+    for (const raw of candidateLinks) {
+
+        const url = normalizeUrl(raw);
+
+        if (!url) continue;
+
+        try {
+
+            const parsed = new URL(url);
+
+            if (!parsed.hostname.includes("linkedin.com"))
+                continue;
+
+            const profileMatch =
+                parsed.pathname.match(/\/in\/([^/?#]+)/i);
+
+            if (profileMatch?.[1]) {
+
+                const username =
+                    decodeURIComponent(profileMatch[1])
+                    .trim();
+
+                console.log(
+                    "PEH_LINKEDIN_USERNAME",
+                    username
+                );
+
+                return username;
+            }
+
+        } catch {}
+
+    }
+
+    console.log(
+        "PEH_LINKEDIN_USERNAME",
+        "NOT_FOUND"
+    );
+
+    return "";
+};
     const extractIdentity = () => {
         const links = [
             mainSource?.sourceUrl,
