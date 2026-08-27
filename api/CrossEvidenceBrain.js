@@ -169,7 +169,10 @@ SELECTED PUBLIC EVIDENCE:
 ${JSON.stringify(evidencePackage)}
 `;
 
-
+console.log(
+  "FULL_EVIDENCE_PACKAGE",
+  JSON.stringify(evidencePackage, null, 2)
+);
 
     try {
         
