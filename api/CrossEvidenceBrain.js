@@ -292,7 +292,23 @@ console.log(
     2
   )
 );
+console.log(
+  "FIRST_SOURCE_CONTENT",
+  JSON.stringify(
+    parsedContent.sourceContent?.[0] || {},
+    null,
+    2
+  )
+);
 
+console.log(
+  "SECOND_SOURCE_CONTENT",
+  JSON.stringify(
+    parsedContent.sourceContent?.[1] || {},
+    null,
+    2
+  )
+);
 console.log(
   "GEMINI_EVIDENCE_RAW",
   JSON.stringify(
