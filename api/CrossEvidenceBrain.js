@@ -2031,10 +2031,15 @@ async function PublicEvidenceHunter({
         };
 
         // Identity gate BEFORE ranking.
-        if (!isHunterIdentityMatch(candidate)) {
-            continue;
-        }
+        const identityMatched =
+    isHunterIdentityMatch(candidate);
 
+candidate.identityMatched =
+    identityMatched;
+
+if (!identityMatched) {
+    candidate.identityPenalty = true;
+}
         const existing = unique.get(url);
 
         if (
@@ -2049,10 +2054,17 @@ async function PublicEvidenceHunter({
     }
 
     const ranked = [...unique.values()]
-        .sort(
-            (a, b) =>
-                scoreResult(b) - scoreResult(a)
-        )
+        .sort((a, b) => {
+    const scoreA =
+        scoreResult(a) -
+        (a.identityPenalty ? 50 : 0);
+
+    const scoreB =
+        scoreResult(b) -
+        (b.identityPenalty ? 50 : 0);
+
+    return scoreB - scoreA;
+})
         .slice(0, MAX_HUNTER_TOP_RESULTS);
        // ------------------------------------------------------------
     // DIRECT PUBLIC EVIDENCE FETCHER
