@@ -2371,7 +2371,7 @@ if (sourceUrl.includes("linkedin.com")) {
     )
   );
 }
-       const hasRealContent =
+      /* const hasRealContent =
 (source?.visibleText?.length || 0) > 200 ||
 (source?.contentSnippet?.length || 0) > 100 ||
 (source?.publicEvidence?.length || 0) > 0 ||
@@ -2401,7 +2401,7 @@ if (
                     ""
             }))
     ];
-           }
+           }*/
         selectedSources.push({
             sourceUrl,
             sourceRole,
