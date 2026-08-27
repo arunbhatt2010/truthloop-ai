@@ -2614,10 +2614,38 @@ console.log(
         normalizeUrl(mainCollected.source.sourceUrl || primaryRequestedUrl),
         mainCollected.source
     );
+       for (
+        const hunterSource of
+        publicEvidenceHunter?.fetchedSources || []
+    ) {
+        const hunterUrl = normalizeUrl(
+            hunterSource?.sourceUrl || ""
+        );
+
+        if (!hunterUrl) continue;
+
+        sourceMap.set(
+            hunterUrl,
+            compactSource(
+                hunterSource,
+                hunterUrl
+            )
+        );
+       }
 
     // PASS 2: fetch ONLY the remaining selected targets.
     for (const url of selectedUniqueUrls.slice(1)) {
-        const collected = await collectSource(url);
+
+    const normalizedUrl = normalizeUrl(url);
+
+    // Hunter already fetched this source directly.
+    if (sourceMap.has(normalizedUrl)) {
+        result.sourcesProcessed++;
+        result.sourcesSucceeded++;
+        continue;
+    }
+
+    const collected = await collectSource(url);
 
         result.sourcesProcessed++;
 
