@@ -2376,8 +2376,50 @@ async function PublicEvidenceHunter({
         const fetched =
             await directFetchEvidence(candidate);
 
-        if (!fetched) continue;
+        if (!fetched) {
+    hunterFetchedSources.push({
+        ...candidate,
+        sourceUrl: candidate.url,
+        sourcePlatform: detectPlatform(candidate.url),
+        status: "hunter-search-evidence",
+        title: candidate.title || null,
+        description: candidate.snippet || null,
+        contentSnippet:
+            cleanText(
+                candidate.snippet ||
+                candidate.title ||
+                "",
+                700
+            ) || null,
+        publicEvidence: [
+            {
+                type: "hunter-search-result",
+                sourceUrl: candidate.url,
+                value: cleanText(
+                    candidate.snippet ||
+                    candidate.title ||
+                    "",
+                    700
+                )
+            }
+        ].filter(item => item.value),
+        evidence: [
+            {
+                type: "search-result-evidence",
+                sourceUrl: candidate.url,
+                value: cleanText(
+                    candidate.snippet ||
+                    candidate.title ||
+                    "",
+                    700
+                )
+            }
+        ].filter(item => item.value),
+        fetched: false
+    });
 
+    continue;
+       }
         hunterFetchedSources.push({
             ...candidate,
             ...fetched,
@@ -2431,7 +2473,25 @@ async function PublicEvidenceHunter({
                 cleanText(item.snippet, 320) || null,
             sourceUrl: item.url
         }));
-
+console.log(
+  "HUNTER_FETCHED_SOURCES",
+  JSON.stringify(
+    hunterFetchedSources.map(item => ({
+      url: item.sourceUrl || item.url,
+      title: item.title,
+      visibleText:
+        item.visibleText?.length ||
+        item.contentSnippet?.length ||
+        0,
+      evidence:
+        item.evidence?.length ||
+        item.publicEvidence?.length ||
+        0
+    })),
+    null,
+    2
+  )
+);
     return {
         success: ranked.length > 0,
         identity,
