@@ -3175,7 +3175,23 @@ console.log(
         discoveredUrls: publicEvidenceHunter?.discoveredUrls || [],
         socialProfiles: publicEvidenceHunter?.socialProfiles || []
     };
+console.log(
+  "PEH_EVIDENCE_DEBUG",
+  JSON.stringify(
+    {
+      compressedCount:
+        publicEvidenceHunter?.compressedEvidence?.length || 0,
 
+      hunterCount:
+        publicEvidenceHunter?.hunterEvidence?.length || 0,
+
+      compressedEvidence:
+        publicEvidenceHunter?.compressedEvidence || []
+    },
+    null,
+    2
+  )
+);
     console.log(
         "GEMINI_TARGETED_SOURCES",
         JSON.stringify({
