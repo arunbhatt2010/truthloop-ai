@@ -2216,7 +2216,7 @@ async function PublicEvidenceHunter({
             return null;
         }
 
-        if (
+    /*    if (
             !strictHunterIdentityMatch(
                 candidate,
                 identity
@@ -2224,6 +2224,7 @@ async function PublicEvidenceHunter({
         ) {
             return null;
         }
+        */
 
         const controller =
             typeof AbortController !== "undefined"
@@ -2277,7 +2278,7 @@ async function PublicEvidenceHunter({
                     ""
             };
 
-            if (
+       /*     if (
                 !strictHunterIdentityMatch(
                     validationCandidate,
                     identity
@@ -2285,6 +2286,7 @@ async function PublicEvidenceHunter({
             ) {
                 return null;
             }
+            */
 
             return {
                 sourceUrl: url,
