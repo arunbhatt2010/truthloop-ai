@@ -1732,73 +1732,265 @@ async function PublicEvidenceHunter({
         "pinterest.com"
     ]);
 
-    const scoreResult = (item) => {
-        let score = 0;
-        let hostName = "";
-        let path = "";
+        // ------------------------------------------------------------
+    // PUBLIC EVIDENCE HUNTER — IDENTITY-AWARE RANKING
+    // ------------------------------------------------------------
+    // Search engines discover candidates.
+    // We keep only candidates that are strongly tied to the
+    // supplied identity seed, but LinkedIn posts/articles are
+    // allowed when the result itself carries strong identity
+    // anchors.
+    // ------------------------------------------------------------
 
+    const getHostPath = (value = "") => {
         try {
-            const parsed = new URL(item.url);
-            hostName = parsed.hostname
-                .replace(/^www\./, "")
-                .toLowerCase();
-            path = parsed.pathname.toLowerCase();
-        } catch {}
+            const parsed = new URL(normalizeSearchUrl(value));
+            return {
+                host: parsed.hostname
+                    .replace(/^www\./, "")
+                    .toLowerCase(),
+                path: parsed.pathname
+                    .toLowerCase()
+                    .replace(/\/+/g, "/")
+            };
+        } catch {
+            return {
+                host: "",
+                path: ""
+            };
+        }
+    };
 
-        const identityMatchScore = scoreIdentityMatch(
-            item,
-            identity
+    const normalizedPrimaryName =
+        normalizeIdentityText(
+            identity.names?.[0] ||
+            identity.linkedinUsername
+                ?.replace(/[-_]+/g, " ")
+                .replace(/\b\d{4,}\b/g, "")
+                .trim() ||
+            ""
         );
 
-        // Identity match is the primary gate/weight.
-        if (identityMatchScore > 0) {
-            score += identityMatchScore;
+    const primaryNameTokens =
+        normalizedPrimaryName
+            .split(" ")
+            .filter(token => token.length >= 3);
+
+    const normalizedLinkedInSlug =
+        normalizeIdentityText(
+            identity.linkedinUsername || ""
+        );
+
+    const identityTextForCandidate = (item = {}) => {
+        return [
+            item?.title || "",
+            item?.snippet || "",
+            item?.description || "",
+            item?.url || ""
+        ]
+            .map(normalizeIdentityText)
+            .filter(Boolean)
+            .join(" ");
+    };
+
+    const linkedinContentIdentityMatch = (item = {}) => {
+        const { host, path } = getHostPath(item?.url || "");
+
+        if (host !== "linkedin.com") {
+            return false;
         }
 
-        if (item.purpose === "linkedin-posts") score += 42;
-        if (item.purpose === "linkedin-profile") score += 40;
-        if (item.purpose === "public-mentions") score += 35;
-        if (item.purpose === "company-content") score += 30;
-        if (item.purpose === "website") score += 28;
-        if (item.purpose === "platform-expansion") score += 24;
-        if (item.purpose === "social-expansion") score += 24;
-        if (item.purpose === "identity-company") score += 18;
+        const text =
+            identityTextForCandidate(item);
 
+        const nameTokenHits =
+            primaryNameTokens.filter(
+                token => text.includes(token)
+            ).length;
+
+        const fullNameMatch =
+            normalizedPrimaryName &&
+            text.includes(normalizedPrimaryName);
+
+        const slugTokenHits =
+            normalizedLinkedInSlug
+                .split(" ")
+                .filter(token => token.length >= 3)
+                .filter(token => text.includes(token))
+                .length;
+
+        const isProfile =
+            /^\/in\/[^/]+/i.test(path);
+
+        const isPost =
+            /^\/posts\//i.test(path) ||
+            /^\/pulse\//i.test(path) ||
+            /^\/feed\//i.test(path);
+
+        // Exact requested LinkedIn profile.
         if (
-            hostName &&
-            hostName === String(identity.host || "").toLowerCase()
+            identity.linkedinUsername &&
+            host === "linkedin.com" &&
+            path === `/in/${String(identity.linkedinUsername)
+                .trim()
+                .toLowerCase()}`
         ) {
-            score += 35;
+            return true;
         }
 
+        // LinkedIn content result:
+        // require the search result itself to carry identity evidence.
+        if (isPost) {
+            if (fullNameMatch) return true;
+            if (nameTokenHits >= 2) return true;
+            if (slugTokenHits >= 2) return true;
+        }
+
+        // LinkedIn profile-like result discovered through search.
+        if (isProfile) {
+            if (fullNameMatch) return true;
+            if (nameTokenHits >= 2) return true;
+        }
+
+        return false;
+    };
+
+    const externalIdentityMatch = (item = {}) => {
+        const text =
+            identityTextForCandidate(item);
+
+        const nameMatch =
+            identity.names?.some(name => {
+                const normalizedName =
+                    normalizeIdentityText(name);
+
+                return (
+                    normalizedName &&
+                    text.includes(normalizedName)
+                );
+            }) || false;
+
+        const companyMatch =
+            identity.companies?.some(companyName => {
+                const normalizedCompany =
+                    normalizeIdentityText(companyName);
+
+                return (
+                    normalizedCompany &&
+                    text.includes(normalizedCompany)
+                );
+            }) || false;
+
+        const brandMatch =
+            identity.host &&
+            text.includes(
+                normalizeIdentityText(
+                    String(identity.host)
+                        .split(".")[0]
+                )
+            );
+
+        // External source = minimum two independent identity anchors.
+        if (nameMatch && companyMatch) return true;
+        if (nameMatch && brandMatch) return true;
+        if (companyMatch && brandMatch) return true;
+
+        return false;
+    };
+
+    const isHunterIdentityMatch = (item = {}) => {
+        const { host } = getHostPath(item?.url || "");
+
+        if (!host) return false;
+
+        // Exact requested website domain.
+        const targetHost =
+            String(identity.host || "")
+                .replace(/^www\./, "")
+                .toLowerCase();
+
         if (
-            path.match(
-                /\/(blog|article|post|posts|news|insight|story|writing|research|podcast|interview|video)/i
+            targetHost &&
+            (
+                host === targetHost ||
+                host.endsWith(`.${targetHost}`)
             )
         ) {
-            score += 20;
+            return true;
         }
 
-        if (item.snippet.length > 80) score += 8;
-        if (item.title.length > 20) score += 5;
+        // LinkedIn gets its own content-aware identity gate.
+        if (host === "linkedin.com") {
+            return linkedinContentIdentityMatch(item);
+        }
 
-        if (bannedHosts.has(hostName)) {
-            score -= 8;
+        // Other public web sources need two independent anchors.
+        return externalIdentityMatch(item);
+    };
+
+    const scoreResult = (item = {}) => {
+        const { host, path } =
+            getHostPath(item?.url || "");
+
+        let score = 0;
+
+        if (isHunterIdentityMatch(item)) {
+            score += 100;
+        }
+
+        switch (item?.purpose) {
+            case "linkedin-posts":
+                score += 55;
+                break;
+            case "linkedin-profile":
+                score += 50;
+                break;
+            case "public-mentions":
+                score += 45;
+                break;
+            case "identity-company":
+                score += 35;
+                break;
+            case "company-content":
+                score += 35;
+                break;
+            case "website":
+                score += 30;
+                break;
+            case "platform-expansion":
+            case "social-expansion":
+                score += 25;
+                break;
+        }
+
+        if (host === "linkedin.com") {
+            score += 20;
 
             if (
-                hostName === "linkedin.com" &&
-                path.match(/^\/(?:posts|feed|in)\//i)
+                /^\/posts\//i.test(path) ||
+                /^\/pulse\//i.test(path)
             ) {
-                score += 18;
+                score += 25;
+            }
+
+            if (/^\/in\//i.test(path)) {
+                score += 15;
             }
         }
 
+        if (item?.snippet?.length >= 80) {
+            score += 10;
+        }
+
+        if (item?.title?.length >= 20) {
+            score += 5;
+        }
+
         if (
-            /\/(privacy|terms|cookie|login|signin|signup|support|help|contact)(\/|$)/i.test(
-                path
-            )
+            /\/(?:privacy|terms|cookie|login|signin|signup|support|help|contact)(?:\/|$)/i
+                .test(path)
         ) {
-            score -= 50;
+            score -= 100;
         }
 
         return score;
@@ -1807,36 +1999,56 @@ async function PublicEvidenceHunter({
     const unique = new Map();
 
     for (const item of results) {
-        const url = normalizeSearchUrl(item.url);
+        const url = normalizeSearchUrl(item?.url || "");
 
         if (!url) continue;
+
+        // Never allow search-engine utility pages.
+        const { host, path } =
+            getHostPath(url);
+
+        if (
+            host === "google.com" ||
+            host.endsWith(".google.com") ||
+            host === "bing.com" ||
+            host.endsWith(".bing.com") ||
+            host === "duckduckgo.com" ||
+            host.endsWith(".duckduckgo.com")
+        ) {
+            continue;
+        }
+
+        if (
+            /(?:^|\/)(?:privacy|terms|cookie|login|signin|signup|support|help)(?:\/|$)/i
+                .test(path)
+        ) {
+            continue;
+        }
+
+        const candidate = {
+            ...item,
+            url
+        };
+
+        // Identity gate BEFORE ranking.
+        if (!isHunterIdentityMatch(candidate)) {
+            continue;
+        }
 
         const existing = unique.get(url);
 
         if (
             !existing ||
-            scoreResult(item) > scoreResult(existing)
+            scoreResult(candidate) > scoreResult(existing)
         ) {
             unique.set(url, {
-                ...item,
-                identityScore: scoreIdentityMatch(
-                    item,
-                    identity
-                )
+                ...candidate,
+                identityScore: scoreResult(candidate)
             });
         }
     }
 
-    // HARD IDENTITY GATE:
-    // Only results that strongly match the main profile identity survive.
-    // Generic search relevance alone is never enough.
     const ranked = [...unique.values()]
-        .filter(
-            item =>
-                item.url !==
-                normalizeUrl(mainSource?.sourceUrl || "")
-        )
-        .filter(item => isStrongIdentityMatch(item, identity))
         .sort(
             (a, b) =>
                 scoreResult(b) - scoreResult(a)
@@ -2179,7 +2391,31 @@ async function PublicEvidenceHunter({
         .filter(item => !isLikelyProfileUrl(item.url))
         .slice(0, MAX_HUNTER_TOP_RESULTS)
         .map(item => item.url);
-
+    const hunterEvidence = ranked.map(
+        (item, index) => ({
+            id: `HUNTER-${String(index + 1).padStart(3, "0")}`,
+            provider: item.provider || null,
+            purpose: item.purpose || "public-evidence",
+            query: item.query || null,
+            identityScore:
+                item.identityScore || 0,
+            title:
+                cleanText(item.title, 180) || null,
+            snippet:
+                cleanText(item.snippet, 600) || null,
+            sourceUrl: item.url,
+            sourceType:
+                detectPlatform(item.url) === "linkedin"
+                    ? (
+                        /^\/posts\//i.test(
+                            getHostPath(item.url).path
+                        )
+                            ? "linkedin-post"
+                            : "linkedin-profile"
+                    )
+                    : "public-web-result"
+        })
+    );
     const compressedEvidence = ranked
         .slice(0, MAX_HUNTER_TOP_RESULTS)
         .map((item, index) => ({
@@ -2205,6 +2441,7 @@ async function PublicEvidenceHunter({
             MAX_HUNTER_TOP_RESULTS
         ),
         compressedEvidence,
+               hunterEvidence,
            fetchedSources: hunterFetchedSources,
         reason: ranked.length
             ? null
