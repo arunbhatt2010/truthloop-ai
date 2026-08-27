@@ -173,7 +173,7 @@ IMPORTANT OUTPUT RULES:
 SELECTED PUBLIC EVIDENCE:
 ${JSON.stringify(evidencePackage)}
 `;
-console.log(
+/*console.log(
    "PEH_EVIDENCE_COUNT",
    geminiInput?.publicEvidenceHunter
       ?.compressedEvidence?.length || 0
@@ -190,7 +190,7 @@ console.log(
 console.log(
   "FULL_EVIDENCE_PACKAGE",
   JSON.stringify(evidencePackage, null, 2)
-);
+); */
 
     try {
         
