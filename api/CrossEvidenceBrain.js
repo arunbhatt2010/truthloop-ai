@@ -62,10 +62,7 @@ async function buildGeminiIntelligence(evidencePackage = {}) {
             reason: "Missing GEMINI_API_KEY"
         };
     }
-console.log(
-  "GEMINI_INPUT_SIZE",
-  JSON.stringify(evidencePackage).length
-);
+
     const prompt = `
 You are TruthLoop's Targeted Public Evidence Investigator.
 
@@ -172,34 +169,20 @@ SELECTED PUBLIC EVIDENCE:
 ${JSON.stringify(evidencePackage)}
 `;
 
-console.log(
-    "GEMINI_EVIDENCE_PACKAGE",
-    JSON.stringify(
-        evidencePackage,
-        null,
-        2
-    )
-);
+
 
     try {
-        console.log(
-            "GEMINI_EVIDENCE_SIZE",
-            JSON.stringify(evidencePackage).length
-        );
-
+        
         console.log(
             "GEMINI_EVIDENCE_KEYS",
             Object.keys(evidencePackage || {})
         );
 
-        console.log("GEMINI_REQUEST_START");
+        
 
         const modelName = "gemini-3.6-flash";
 
-        console.log(
-            "GEMINI_MODEL",
-            modelName
-        );
+        
 
         const response = await fetch(
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey,
@@ -260,10 +243,7 @@ console.log(
         const content =
             data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-        console.log(
-            "GEMINI_RESPONSE_SIZE",
-            content.length
-        );
+        
 
         if (!content.trim()) {
             return {
