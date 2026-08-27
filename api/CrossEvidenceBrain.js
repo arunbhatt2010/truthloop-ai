@@ -2372,11 +2372,14 @@ if (sourceUrl.includes("linkedin.com")) {
   );
 }
        const hasRealContent =
-    (source?.visibleText?.length || 0) > 200 ||
-    (source?.contentSnippet?.length || 0) > 100 ||
-    (source?.publicEvidence?.length || 0) > 0 ||
-    (source?.evidence?.length || 0) > 0;
-
+(source?.visibleText?.length || 0) > 200 ||
+(source?.contentSnippet?.length || 0) > 100 ||
+(source?.publicEvidence?.length || 0) > 0 ||
+(source?.evidence?.length || 0) > 0 ||
+(source?.content?.length || 0) > 200 ||
+(source?.rawContent?.length || 0) > 200 ||
+(source?.extractedText?.length || 0) > 200 ||
+(Array.isArray(source?.posts) && source.posts.length > 0);
 if (
     sourceUrl.includes("linkedin.com") &&
     !hasRealContent
