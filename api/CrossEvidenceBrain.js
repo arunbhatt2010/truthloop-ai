@@ -95,6 +95,11 @@ INVESTIGATION OBJECTIVES:
 EVIDENCE RULES:
 - Never invent names, usernames, platforms, URLs, expertise, audiences, businesses, behavior, or activity.
 - Never turn a URL alone into proof of activity.
+If a selected profile URL contains no extracted page body,
+but verified search-engine evidence exists in evidence snippets,
+use the evidence snippets as traceable public evidence.
+Do not classify the profile as empty unless both
+page content and evidence snippets are absent.
 - Never treat a login page, CDN asset, favicon, policy page, redirect page, or navigation utility URL as substantive evidence.
 - Never diagnose psychology.
 - Never provide advice.
@@ -168,7 +173,20 @@ IMPORTANT OUTPUT RULES:
 SELECTED PUBLIC EVIDENCE:
 ${JSON.stringify(evidencePackage)}
 `;
-
+console.log(
+   "PEH_EVIDENCE_COUNT",
+   geminiInput?.publicEvidenceHunter
+      ?.compressedEvidence?.length || 0
+);
+   console.log(
+   "PEH_SAMPLE",
+   JSON.stringify(
+      geminiInput?.publicEvidenceHunter
+         ?.compressedEvidence?.slice(0,3),
+      null,
+      2
+   )
+);
 console.log(
   "FULL_EVIDENCE_PACKAGE",
   JSON.stringify(evidencePackage, null, 2)
@@ -2353,6 +2371,34 @@ if (sourceUrl.includes("linkedin.com")) {
     )
   );
 }
+       const hasRealContent =
+    (source?.visibleText?.length || 0) > 200 ||
+    (source?.contentSnippet?.length || 0) > 100 ||
+    (source?.publicEvidence?.length || 0) > 0 ||
+    (source?.evidence?.length || 0) > 0;
+
+if (
+    sourceUrl.includes("linkedin.com") &&
+    !hasRealContent
+) {
+    const hunterEvidence =
+        evidencePackage?.publicEvidenceHunter
+            ?.compressedEvidence || [];
+
+    source.evidence = [
+        ...(source.evidence || []),
+        ...hunterEvidence
+            .slice(0, 5)
+            .map(item => ({
+                type: "search-evidence",
+                sourceUrl: item.sourceUrl,
+                value:
+                    item.snippet ||
+                    item.title ||
+                    ""
+            }))
+    ];
+           }
         selectedSources.push({
             sourceUrl,
             sourceRole,
