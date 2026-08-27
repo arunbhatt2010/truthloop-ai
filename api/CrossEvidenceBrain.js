@@ -2298,7 +2298,28 @@ function buildGeminiEvidencePackage(sources = [], selection = {}) {
         const sourceUrl = normalizeUrl(source?.sourceUrl || "");
         const sourceRole = roleMap.get(sourceUrl);
         if (!sourceUrl || !sourceRole) continue;
-
+if (
+  sourceUrl.includes("linkedin.com")
+) {
+  console.log(
+    "LINKEDIN_SOURCE_AUDIT",
+    JSON.stringify(
+      {
+        keys: Object.keys(source || {}),
+        visibleText: source?.visibleText?.length || 0,
+        contentSnippet: source?.contentSnippet?.length || 0,
+        content: source?.content?.length || 0,
+        extractedText: source?.extractedText?.length || 0,
+        rawContent: source?.rawContent?.length || 0,
+        posts: Array.isArray(source?.posts)
+          ? source.posts.length
+          : 0
+      },
+      null,
+      2
+    )
+  );
+}
         selectedSources.push({
             sourceUrl,
             sourceRole,
