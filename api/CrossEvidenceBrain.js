@@ -2330,12 +2330,7 @@ if (sourceUrl.includes("linkedin.com")) {
       )
     );
              }
-       selectedSources.push({
-    sourceUrl,
-    sourceRole,
-    ...
-  });
-           }
+       
        
 if (sourceUrl.includes("linkedin.com")) {
   console.log(
