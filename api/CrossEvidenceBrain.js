@@ -2040,7 +2040,22 @@ export async function loadCrossEvidenceBrain({
         selectedUrls,
         MAX_GEMINI_SOURCES
     );
-
+console.log(
+  "SELECTION_DEBUG",
+  JSON.stringify({
+    mainUrl: selection.mainUrl,
+    contentSources: selection.contentSources,
+    socialSources: selection.socialSources
+  }, null, 2)
+);
+   console.log(
+  "HUNTER_DISCOVERED_URLS",
+  JSON.stringify(
+    publicEvidenceHunter?.discoveredUrls || [],
+    null,
+    2
+  )
+);
     const sourceMap = new Map();
     sourceMap.set(
         normalizeUrl(mainCollected.source.sourceUrl || primaryRequestedUrl),
