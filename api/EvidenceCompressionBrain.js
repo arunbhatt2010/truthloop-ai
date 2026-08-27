@@ -9,7 +9,22 @@ async function loadEvidenceCompressionBrain({
 }) {
 
   console.log("ECB_START");
-
+console.log(
+  "ECB_INPUT_AUDIT",
+  JSON.stringify(
+    {
+      hasPublicEvidencePackage: !!publicEvidencePackage,
+      success: publicEvidencePackage?.success,
+      keys: Object.keys(publicEvidencePackage || {}),
+      hasUniversalPackage:
+        !!publicEvidencePackage?.universalPackage,
+      sourceCount:
+        publicEvidencePackage?.universalPackage?.sources?.length || 0
+    },
+    null,
+    2
+  )
+);
   if (!publicEvidencePackage?.success) {
     return {
       success: false,
