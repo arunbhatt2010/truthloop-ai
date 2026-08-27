@@ -284,7 +284,23 @@ console.log(
     2
   )
 );
+console.log(
+  "GEMINI_SOURCE_CONTENT_RAW",
+  JSON.stringify(
+    parsedContent.sourceContent || [],
+    null,
+    2
+  )
+);
 
+console.log(
+  "GEMINI_EVIDENCE_RAW",
+  JSON.stringify(
+    parsedContent.evidence || [],
+    null,
+    2
+  )
+);
 console.log(
   "GEMINI_LINKEDIN_CONTENT",
   JSON.stringify(
