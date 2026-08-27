@@ -1792,6 +1792,334 @@ async function PublicEvidenceHunter({
                 scoreResult(b) - scoreResult(a)
         )
         .slice(0, MAX_HUNTER_TOP_RESULTS);
+       // ------------------------------------------------------------
+    // DIRECT PUBLIC EVIDENCE FETCHER
+    // ------------------------------------------------------------
+    // Search engines discover candidates.
+    // This layer fetches the actual public page/profile content
+    // for ONLY the top identity-matched candidates.
+    // No PCF dependency here.
+    // ------------------------------------------------------------
+
+    const strictHunterIdentityMatch = (candidate = {}, targetIdentity = {}) => {
+        const url = normalizeSearchUrl(candidate?.url || "");
+        if (!url) return false;
+
+        let hostName = "";
+        let pathName = "";
+
+        try {
+            const parsed = new URL(url);
+
+            hostName = parsed.hostname
+                .replace(/^www\./, "")
+                .toLowerCase();
+
+            pathName = parsed.pathname
+                .toLowerCase()
+                .replace(/\/+$/, "");
+        } catch {
+            return false;
+        }
+
+        const targetHost =
+            String(targetIdentity?.host || "")
+                .replace(/^www\./, "")
+                .toLowerCase();
+
+        const targetLinkedIn =
+            String(targetIdentity?.linkedinUsername || "")
+                .trim()
+                .toLowerCase();
+
+        // 1. Exact main-profile domain = strongest possible match.
+        if (
+            targetHost &&
+            (
+                hostName === targetHost ||
+                hostName.endsWith(`.${targetHost}`)
+            )
+        ) {
+            return true;
+        }
+
+        // 2. Exact LinkedIn profile slug = strongest social match.
+        if (
+            targetLinkedIn &&
+            hostName === "linkedin.com" &&
+            pathName === `/in/${targetLinkedIn}`
+        ) {
+            return true;
+        }
+
+        // 3. External source must carry TWO independent identity anchors.
+        const title = normalizeIdentityText(candidate?.title || "");
+        const snippet = normalizeIdentityText(
+            candidate?.snippet ||
+            candidate?.description ||
+            ""
+        );
+
+        const haystack = [
+            title,
+            snippet,
+            normalizeIdentityText(url)
+        ]
+            .filter(Boolean)
+            .join(" ");
+
+        const nameMatch =
+            targetIdentity?.names?.some(name =>
+                name &&
+                haystack.includes(
+                    normalizeIdentityText(name)
+                )
+            ) || false;
+
+        const companyMatch =
+            targetIdentity?.companies?.some(companyName =>
+                companyName &&
+                haystack.includes(
+                    normalizeIdentityText(companyName)
+                )
+            ) || false;
+
+        const brandMatch =
+            targetIdentity?.host &&
+            haystack.includes(
+                normalizeIdentityText(
+                    String(targetIdentity.host)
+                        .split(".")[0]
+                )
+            );
+
+        if (nameMatch && (companyMatch || brandMatch)) {
+            return true;
+        }
+
+        return false;
+    };
+
+    const extractDirectPublicContent = (html = "") => {
+        const cleaned = stripTags(html);
+
+        const titleMatch =
+            html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+
+        const descriptionMatch =
+            html.match(
+                /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i
+            ) ||
+            html.match(
+                /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']*)["']/i
+            );
+
+        const ogTitleMatch =
+            html.match(
+                /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']*)["']/i
+            );
+
+        const title =
+            cleanText(
+                decodeHtml(
+                    ogTitleMatch?.[1] ||
+                    titleMatch?.[1] ||
+                    ""
+                ),
+                240
+            );
+
+        const description =
+            cleanText(
+                decodeHtml(
+                    descriptionMatch?.[1] || ""
+                ),
+                700
+            );
+
+        return {
+            title: title || null,
+            description: description || null,
+            visibleText: cleanText(
+                cleaned,
+                3500
+            ) || null
+        };
+    };
+
+    const directFetchEvidence = async (candidate = {}) => {
+        const url = normalizeSearchUrl(candidate?.url || "");
+
+        if (!url) {
+            return null;
+        }
+
+        if (
+            !strictHunterIdentityMatch(
+                candidate,
+                identity
+            )
+        ) {
+            return null;
+        }
+
+        const controller =
+            typeof AbortController !== "undefined"
+                ? new AbortController()
+                : null;
+
+        const timeout =
+            controller
+                ? setTimeout(
+                    () => controller.abort(),
+                    8000
+                )
+                : null;
+
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers,
+                redirect: "follow",
+                signal: controller?.signal
+            });
+
+            if (!response.ok) {
+                return null;
+            }
+
+            const html = await response.text();
+
+            if (!html || html.length < 100) {
+                return null;
+            }
+
+            const page =
+                extractDirectPublicContent(html);
+
+            const validationText = [
+                page.title || "",
+                page.description || "",
+                page.visibleText || ""
+            ]
+                .filter(Boolean)
+                .join(" ");
+
+            const validationCandidate = {
+                url,
+                title: page.title || candidate.title || "",
+                snippet:
+                    page.description ||
+                    page.visibleText ||
+                    candidate.snippet ||
+                    ""
+            };
+
+            if (
+                !strictHunterIdentityMatch(
+                    validationCandidate,
+                    identity
+                )
+            ) {
+                return null;
+            }
+
+            return {
+                sourceUrl: url,
+                sourcePlatform: detectPlatform(url),
+                sourceHost: (() => {
+                    try {
+                        return new URL(url).hostname;
+                    } catch {
+                        return null;
+                    }
+                })(),
+                status: "hunter-direct-fetch",
+                title:
+                    page.title ||
+                    candidate.title ||
+                    null,
+                description:
+                    page.description ||
+                    candidate.snippet ||
+                    null,
+                visibleText:
+                    page.visibleText ||
+                    null,
+                contentSnippet:
+                    cleanText(
+                        page.visibleText ||
+                        page.description ||
+                        candidate.snippet ||
+                        validationText,
+                        MAX_GEMINI_SOURCE_CHARS
+                    ) || null,
+                contentLength:
+                    String(
+                        page.visibleText ||
+                        ""
+                    ).length,
+                socialLinks: [],
+                socialProfiles: [],
+                links: [],
+                headings: [],
+                articles: [],
+                posts: [],
+                contentCandidates: [],
+                publicEvidence: [
+                    {
+                        type: "hunter-search-result",
+                        sourceUrl: url,
+                        value: cleanText(
+                            candidate.snippet ||
+                            candidate.title ||
+                            "",
+                            700
+                        )
+                    }
+                ].filter(item => item.value),
+                evidence: [
+                    {
+                        type: "direct-page-content",
+                        sourceUrl: url,
+                        value: cleanText(
+                            page.visibleText ||
+                            page.description ||
+                            candidate.snippet ||
+                            "",
+                            700
+                        )
+                    }
+                ].filter(item => item.value)
+            };
+        } catch {
+            return null;
+        } finally {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+        }
+    };
+
+    const hunterFetchedSources = [];
+
+    for (
+        const candidate of ranked.slice(
+            0,
+            MAX_HUNTER_TOP_RESULTS
+        )
+    ) {
+        const fetched =
+            await directFetchEvidence(candidate);
+
+        if (!fetched) continue;
+
+        hunterFetchedSources.push({
+            ...candidate,
+            ...fetched,
+            fetched: true
+        });
+    }
 
     const socialResults = ranked
         .filter(item => isLikelyProfileUrl(item.url))
@@ -1827,6 +2155,7 @@ async function PublicEvidenceHunter({
             MAX_HUNTER_TOP_RESULTS
         ),
         compressedEvidence,
+           fetchedSources: hunterFetchedSources,
         reason: ranked.length
             ? null
             : "No strongly identity-matched public search results returned."
