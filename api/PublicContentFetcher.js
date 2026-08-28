@@ -639,6 +639,10 @@ function extractLinkedInSkills(html = "") {
 function extractLinkedInProfile(html = "") {
 
   if (!html) return null;
+   console.log(
+    "LINKEDIN_TITLE_MATCH",
+    html.match(/<title[^>]*>(.*?)<\/title>/i)
+);
 
   return {
 
