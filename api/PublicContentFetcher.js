@@ -25,7 +25,7 @@ const MAX_VISIBLE_TEXT = 12000;
 const MAX_LINKS = 100;
 const MAX_SOCIAL_LINKS = 60;
 const MAX_HEADINGS = 60;
-const MAX_POSTS = 40;
+const MAX_POSTS = 10;
 const MAX_ARTICLES = 40;
 const MAX_EVIDENCE = 250;
 
