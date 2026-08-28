@@ -413,6 +413,262 @@ function extractStructuredContent(html = "", baseUrl = "") {
         articles: articles.slice(0, MAX_ARTICLES)
     };
 }
+/* =====================================================
+   LINKEDIN PROFILE EXTRACTION LAYER
+===================================================== */
+
+function cleanLinkedInText(text = "") {
+  return text
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractLinkedInName(html = "") {
+
+  const patterns = [
+
+    /"firstName":"([^"]+)"/i,
+
+    /<title>\s*([^|<]+)\s*\|\s*LinkedIn/i,
+
+    /"name":"([^"]+)"/i
+
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = html.match(pattern);
+
+    if (match?.[1]) {
+      return cleanLinkedInText(match[1]);
+    }
+
+  }
+
+  return "";
+
+}
+
+function extractLinkedInHeadline(html = "") {
+
+  const patterns = [
+
+    /"headline":"([^"]+)"/i,
+
+    /occupation[^>]*>\s*([^<]+)/i,
+
+    /"description":"([^"]+)"/i
+
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = html.match(pattern);
+
+    if (match?.[1]) {
+      return cleanLinkedInText(match[1]);
+    }
+
+  }
+
+  return "";
+
+}
+
+function extractLinkedInAbout(html = "") {
+
+  const patterns = [
+
+    /"summary":"([^"]+)"/i,
+
+    /"about":"([^"]+)"/i
+
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = html.match(pattern);
+
+    if (match?.[1]) {
+      return cleanLinkedInText(match[1]);
+    }
+
+  }
+
+  return "";
+
+}
+
+function extractLinkedInLocation(html = "") {
+
+  const patterns = [
+
+    /"locationName":"([^"]+)"/i,
+
+    /"location":"([^"]+)"/i
+
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = html.match(pattern);
+
+    if (match?.[1]) {
+      return cleanLinkedInText(match[1]);
+    }
+
+  }
+
+  return "";
+
+}
+
+function extractLinkedInFollowerCount(html = "") {
+
+  const patterns = [
+
+    /([\d,\.]+)\s+followers/i,
+
+    /"followerCount":(\d+)/i
+
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = html.match(pattern);
+
+    if (match?.[1]) {
+      return cleanLinkedInText(match[1]);
+    }
+
+  }
+
+  return "";
+
+}
+
+function extractLinkedInExperience(html = "") {
+
+  const experience = [];
+
+  const patterns = [
+
+    /experience[\s\S]{0,3000}/i,
+
+    /positions[\s\S]{0,3000}/i
+
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = html.match(pattern);
+
+    if (match?.[0]) {
+
+      experience.push(
+        cleanLinkedInText(match[0]).slice(0, 1000)
+      );
+
+    }
+
+  }
+
+  return experience;
+
+}
+
+function extractLinkedInEducation(html = "") {
+
+  const education = [];
+
+  const patterns = [
+
+    /education[\s\S]{0,2000}/i
+
+  ];
+
+  for (const pattern of patterns) {
+
+    const match = html.match(pattern);
+
+    if (match?.[0]) {
+
+      education.push(
+        cleanLinkedInText(match[0]).slice(0, 1000)
+      );
+
+    }
+
+  }
+
+  return education;
+
+}
+
+function extractLinkedInSkills(html = "") {
+
+  const skills = [];
+
+  const skillRegex =
+    /"name":"([^"]+)"/gi;
+
+  let match;
+
+  while ((match = skillRegex.exec(html)) !== null) {
+
+    const skill =
+      cleanLinkedInText(match[1]);
+
+    if (
+      skill &&
+      skill.length < 50 &&
+      !skills.includes(skill)
+    ) {
+      skills.push(skill);
+    }
+
+    if (skills.length >= 30) break;
+
+  }
+
+  return skills;
+
+}
+
+function extractLinkedInProfile(html = "") {
+
+  if (!html) return null;
+
+  return {
+
+    name:
+      extractLinkedInName(html),
+
+    headline:
+      extractLinkedInHeadline(html),
+
+    about:
+      extractLinkedInAbout(html),
+
+    location:
+      extractLinkedInLocation(html),
+
+    followers:
+      extractLinkedInFollowerCount(html),
+
+    experience:
+      extractLinkedInExperience(html),
+
+    education:
+      extractLinkedInEducation(html),
+
+    skills:
+      extractLinkedInSkills(html)
+
+  };
+
+}
 
 function extractArticleBlocks(html = "", baseUrl = "") {
     const articles = [];
@@ -732,8 +988,15 @@ if (
                 : linkedinLinks[0];
 
         linkedinProfile =
-            parseLinkedInProfile?.(html) ||
-            null;
+  extractLinkedInProfile(html);
+       console.log(
+  "LINKEDIN_PROFILE",
+  JSON.stringify(
+    linkedinProfile,
+    null,
+    2
+  )
+);
 
         linkedinPosts =
             extractLinkedInPosts?.(html) ||
