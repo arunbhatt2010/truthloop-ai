@@ -29,10 +29,10 @@ const MAX_POSTS = 40;
 const MAX_ARTICLES = 40;
 const MAX_EVIDENCE = 250;
 
-const MAX_SOURCES = 80;
-const MAX_SITEMAP_URLS = 300;
-const MAX_SITEMAPS = 20;
-const MAX_CONTENT_LINKS = 150;
+const MAX_SOURCES = 10;
+const MAX_SITEMAP_URLS = 10;
+const MAX_SITEMAPS = 3;
+const MAX_CONTENT_LINKS = 10;
 const PLATFORM_PATTERNS = [
     ["linkedin", /linkedin\.com/i],
     ["github", /github\.com/i],
