@@ -1023,7 +1023,7 @@ function dedupeSources(sources = []) {
     return [...map.values()];
 }
 
-function buildSource({ url, response, html }) {
+async function buildSource({ url, response, html }) {
     const sourceUrl = response?.url || url;
     const platform = detectPlatform(sourceUrl);
     const title = extractTitle(html) || extractMeta(html, "og:title") || null;
@@ -1442,11 +1442,11 @@ const discoveredEvidenceUrls = new Set();
             });
 
             const html = await response.text();
-            const source = buildSource({
-                url,
-                response,
-                html
-            });
+            const source = await buildSource({
+  url,
+  response,
+  html
+});
 
             sources.push(source);
            if (
