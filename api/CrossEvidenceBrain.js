@@ -1250,6 +1250,110 @@ async function BrandEvidenceFetcher({
         sources
     };
 }
+function buildBrandIdentity({
+    mainSource = {},
+    socialSources = []
+} = {}) {
+
+    const website =
+        mainSource?.sourceUrl ||
+        mainSource?.canonicalUrl ||
+        "";
+
+    const hostname = (() => {
+        try {
+            return new URL(website)
+                .hostname
+                .replace(/^www\./, "");
+        } catch {
+            return "";
+        }
+    })();
+
+    const brandName =
+        mainSource?.title ||
+        hostname.split(".")[0] ||
+        "";
+
+    return {
+        brandName,
+        website,
+        hostname,
+        socialSources
+    };
+}
+function buildBrandQueries(identity) {
+
+    const brand =
+        identity.brandName?.trim();
+
+    const host =
+        identity.hostname?.trim();
+
+    return uniqueStrings([
+        `"${brand}"`,
+        `"${brand}" review`,
+        `"${brand}" interview`,
+        `"${brand}" podcast`,
+        `"${brand}" founder`,
+        `"${brand}" reddit`,
+        `"${brand}" site:linkedin.com`,
+        `"${brand}" site:medium.com`,
+        `"${brand}" site:substack.com`,
+        `"${brand}" site:github.com`,
+        `"${brand}" site:youtube.com`,
+        `"${host}"`
+    ]);
+}
+async function BrandEvidenceFetcher({
+    mainSource = {},
+    socialSources = []
+} = {}) {
+
+    const identity =
+        buildBrandIdentity({
+            mainSource,
+            socialSources
+        });
+
+    const queries =
+        buildBrandQueries(identity);
+
+    const evidence = [];
+
+    for (const query of queries) {
+
+        try {
+
+            const searchResult =
+                await searchPublicEvidence(query);
+
+            evidence.push(
+                ...(searchResult || [])
+            );
+
+        } catch (error) {
+
+            console.log(
+                "BRAND_EVIDENCE_ERROR",
+                query,
+                error?.message
+            );
+
+        }
+    }
+
+    return {
+        brandName:
+            identity.brandName,
+
+        queryCount:
+            queries.length,
+
+        sources:
+            evidence
+    };
+}
 
 function selectInvestigationSources(mainSource = {}, requestedLinks = []) {
     const mainUrl = normalizeUrl(
