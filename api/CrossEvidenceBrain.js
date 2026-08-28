@@ -1558,7 +1558,15 @@ export async function loadCrossEvidenceBrain({
         mainSource: mainCollected.source,
         requestedLinks: [primaryRequestedUrl, ...requestedLinks]
     });
+const brandEvidence =
+ await BrandEvidenceFetcher({
 
+    mainSource: mainCollected.source,
+
+    socialSources:
+      socialMediaContentFetcher?.fetchedSources || []
+
+ });
     selection.socialSources = uniqueStrings(
         [
             ...(selection.socialSources || []),
@@ -1599,6 +1607,24 @@ console.log(
         normalizeUrl(mainCollected.source.sourceUrl || primaryRequestedUrl),
         mainCollected.source
     );
+   if (brandEvidence?.sources?.length) {
+
+   for (const source of brandEvidence.sources) {
+
+      const sourceUrl = normalizeUrl(
+         source?.sourceUrl ||
+         source?.url ||
+         ""
+      );
+
+      if (!sourceUrl) continue;
+
+      sourceMap.set(
+         sourceUrl,
+         compactSource(source, sourceUrl)
+      );
+   }
+   }
     for (const socialSource of socialMediaContentFetcher?.fetchedSources || []) {
         const socialUrl = normalizeUrl(
             socialSource?.sourceUrl || ""
