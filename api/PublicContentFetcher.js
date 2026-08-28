@@ -1058,6 +1058,20 @@ if (
             platform === "linkedin"
                 ? sourceUrl
                 : linkedinLinks[0];
+       console.log(
+    "LINKEDIN_SOURCE_URL",
+    linkedinUrl
+);
+
+console.log(
+    "CURRENT_PLATFORM",
+    platform
+);
+
+console.log(
+    "HTML_LENGTH_BEFORE_LINKEDIN",
+    html?.length
+);
 
         linkedinProfile =
   extractLinkedInProfile(html);
