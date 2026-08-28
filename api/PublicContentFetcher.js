@@ -1043,7 +1043,10 @@ MAX_SOCIAL_LINKS
 const linkedinLinks = socialLinks.filter(link =>
     /linkedin\.com/i.test(link)
 );
-
+console.log(
+  "LINKEDIN_LINKS_FOUND",
+  JSON.stringify(linkedinLinks, null, 2)
+);
 let linkedinProfile = null;
 let linkedinPosts = [];
 let linkedinSignals = [];
