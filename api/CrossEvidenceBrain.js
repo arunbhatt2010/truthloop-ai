@@ -1668,11 +1668,14 @@ async function fetchLinkedInFromApify(url = "") {
 
         if (!response.ok) {
             const errorBody = await response.text();
-
+console.log(
+  "APIFY_ENDPOINT",
+  endpoint
+);
             console.error(
-                "APIFY_LINKEDIN_ERROR_BODY",
-                errorBody.slice(0, 2000)
-            );
+  "APIFY_LINKEDIN_ERROR_BODY_RAW",
+  errorBody
+);
 
             return {
                 success: false,
