@@ -1041,6 +1041,92 @@ function scoreContentCandidate(candidate = {}) {
  * - keep failed/blocked profiles traceable without retrying elsewhere.
  */
 
+async function SocialMediaContentFetcher({
+  mainSource = {},
+  requestedLinks = []
+} = {}) {
+
+  const socialUrls = uniqueStrings([
+    ...(mainSource?.socialProfiles || []),
+    ...(mainSource?.socialLinks || []),
+    ...requestedLinks
+  ]).filter(Boolean);
+
+  const allowedPlatforms = [
+    "linkedin.com",
+    "facebook.com",
+    "instagram.com",
+    "youtube.com",
+    "x.com",
+    "twitter.com",
+    "github.com",
+    "medium.com",
+    "substack.com",
+    "reddit.com"
+  ];
+
+  const selectedUrls = socialUrls.filter(url =>
+    allowedPlatforms.some(platform =>
+      String(url).toLowerCase().includes(platform)
+    )
+  ).slice(0, 8);
+
+  const fetchedSources = [];
+  const compressedEvidence = [];
+
+  for (const url of selectedUrls) {
+    try {
+
+      const rawPackage =
+        await loadPublicContentFetcher({
+          profileLinks: [url]
+        });
+
+      const extractedPackage =
+        extractPublicContent(rawPackage);
+
+      const packageResult =
+        buildPublicContentPackage(
+          rawPackage,
+          extractedPackage
+        );
+
+      const source =
+        packageResult?.sources?.[0];
+
+      if (!source) continue;
+
+      fetchedSources.push(source);
+
+      const text =
+        source.visibleText ||
+        source.contentSnippet ||
+        source.extractedText ||
+        "";
+
+      if (text.length > 100) {
+        compressedEvidence.push({
+          sourceUrl: url,
+          title: source.title || null,
+          snippet: cleanText(text, 700)
+        });
+      }
+
+    } catch (error) {
+      console.error(
+        "SOCIAL_FETCH_FAILED",
+        url,
+        error?.message
+      );
+    }
+  }
+
+  return {
+    socialSources: selectedUrls,
+    fetchedSources,
+    compressedEvidence
+  };
+}
 
 function selectInvestigationSources(mainSource = {}, requestedLinks = []) {
     const mainUrl = normalizeUrl(
