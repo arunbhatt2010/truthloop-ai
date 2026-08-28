@@ -708,7 +708,50 @@ function buildSource({ url, response, html }) {
 ],
 MAX_SOCIAL_LINKS
 );
+/* =====================================================
+   LINKEDIN DETECTION LAYER
+===================================================== */
 
+const linkedinLinks = socialLinks.filter(link =>
+    /linkedin\.com/i.test(link)
+);
+
+let linkedinProfile = null;
+let linkedinPosts = [];
+let linkedinSignals = [];
+
+if (
+    platform === "linkedin" ||
+    linkedinLinks.length > 0
+) {
+    try {
+
+        const linkedinUrl =
+            platform === "linkedin"
+                ? sourceUrl
+                : linkedinLinks[0];
+
+        linkedinProfile =
+            parseLinkedInProfile?.(html) ||
+            null;
+
+        linkedinPosts =
+            extractLinkedInPosts?.(html) ||
+            [];
+
+        linkedinSignals =
+            extractLinkedInActivitySignals?.(html) ||
+            [];
+
+    } catch (error) {
+
+        console.log(
+            "LINKEDIN_EXTRACTION_ERROR",
+            error?.message
+        );
+
+    }
+}
 
     const links = extractHrefLinks(html, sourceUrl);
     const headings = extractHeadings(html);
@@ -797,6 +840,9 @@ MAX_SOCIAL_LINKS
         links,
         headings,
         posts: structured.posts,
+       linkedinProfile,
+linkedinPosts,
+linkedinSignals,
         articles: articles.slice(0, MAX_ARTICLES),
         author: structured.author,
         publishedAt: structured.publishedAt,
