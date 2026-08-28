@@ -1305,6 +1305,66 @@ function buildBrandQueries(identity) {
         `"${host}"`
     ]);
 }
+async function searchPublicEvidence(query = "") {
+console.log(
+   "BRAND_QUERY",
+   query
+);
+    if (!query?.trim()) {
+        return [];
+    }
+
+    try {
+
+        const result =
+            await loadPublicContentFetcher({
+                profileLinks: [query]
+            });
+
+        const sources =
+            Array.isArray(result?.sources)
+                ? result.sources
+                : [];
+
+        return sources.map(source => ({
+
+            sourceUrl:
+                source?.sourceUrl ||
+                source?.url ||
+                "",
+
+            title:
+                source?.title ||
+                "",
+
+            snippet:
+                source?.contentSnippet ||
+                source?.description ||
+                source?.visibleText?.slice(0, 500) ||
+                "",
+
+            platform:
+                source?.platform ||
+                detectPlatform(
+                    source?.sourceUrl || ""
+                ),
+
+            sourceType:
+                "brand-evidence"
+
+        }));
+
+    } catch (error) {
+
+        console.log(
+            "SEARCH_PUBLIC_EVIDENCE_ERROR",
+            query,
+            error?.message
+        );
+
+        return [];
+    }
+}
 async function BrandEvidenceFetcher({
     mainSource = {},
     socialSources = []
