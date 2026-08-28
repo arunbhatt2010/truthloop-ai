@@ -1127,6 +1127,129 @@ async function SocialMediaContentFetcher({
     compressedEvidence
   };
 }
+async function BrandEvidenceFetcher({
+    mainSource = {},
+    socialSources = []
+} = {}) {
+
+    const sources = [];
+
+    const domain =
+        mainSource?.domain ||
+        mainSource?.hostname ||
+        "";
+
+    const brandName =
+        mainSource?.title ||
+        mainSource?.siteName ||
+        mainSource?.brandName ||
+        "";
+
+    const socialPool = Array.isArray(socialSources)
+        ? socialSources
+        : [];
+
+    for (const source of socialPool) {
+
+        const sourceUrl =
+            normalizeUrl(
+                source?.sourceUrl ||
+                source?.url ||
+                ""
+            );
+
+        if (!sourceUrl) continue;
+
+        const evidence = [];
+
+        if (source?.visibleText) {
+            evidence.push({
+                type: "social-content",
+                value: cleanText(
+                    source.visibleText,
+                    1200
+                )
+            });
+        }
+
+        if (source?.contentSnippet) {
+            evidence.push({
+                type: "social-snippet",
+                value: cleanText(
+                    source.contentSnippet,
+                    700
+                )
+            });
+        }
+
+        if (
+            Array.isArray(source?.posts)
+        ) {
+
+            for (const post of source.posts.slice(0, 10)) {
+
+                evidence.push({
+                    type: "post",
+                    value: cleanText(
+                        post?.content ||
+                        post?.text ||
+                        post?.title ||
+                        "",
+                        500
+                    )
+                });
+            }
+        }
+
+        if (
+            Array.isArray(source?.publicEvidence)
+        ) {
+
+            evidence.push(
+                ...source.publicEvidence
+            );
+        }
+
+        sources.push({
+            sourceUrl,
+            sourceRole: "brand-evidence",
+            platform:
+                source?.platform ||
+                detectPlatform(sourceUrl),
+
+            title:
+                source?.title ||
+                brandName,
+
+            visibleText:
+                cleanText(
+                    source?.visibleText ||
+                    source?.contentSnippet ||
+                    "",
+                    3000
+                ),
+
+            evidence: evidence
+                .filter(item => item?.value),
+
+            socialProfiles:
+                source?.socialProfiles ||
+                [],
+
+            contentCandidates:
+                source?.contentCandidates ||
+                []
+        });
+    }
+
+    return {
+        success: true,
+        domain,
+        brandName,
+        sourceCount: sources.length,
+        sources
+    };
+}
 
 function selectInvestigationSources(mainSource = {}, requestedLinks = []) {
     const mainUrl = normalizeUrl(
@@ -1477,7 +1600,20 @@ async function collectSource(url) {
                 source: null
             };
         }
-
+console.log(
+  "SOURCE_AUDIT",
+  JSON.stringify({
+      url,
+      visibleText:
+          source?.visibleText?.length || 0,
+      contentSnippet:
+          source?.contentSnippet?.length || 0,
+      posts:
+          source?.posts?.length || 0,
+      publicEvidence:
+          source?.publicEvidence?.length || 0
+  }, null, 2)
+);
         return {
             success: true,
             source: compactSource(source, normalizedUrl)
