@@ -1061,6 +1061,48 @@ if (
             platform === "linkedin"
                 ? sourceUrl
                 : linkedinLinks[0];
+       const linkedinResponse =
+  await fetchWithTimeout(linkedinUrl, {
+    method: "GET",
+    redirect: "follow",
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/137.0.0.0 Safari/537.36"
+    }
+  });
+
+const linkedinHtml =
+  await linkedinResponse.text();
+
+console.log(
+  "LINKEDIN_AUDIT",
+  JSON.stringify(
+    {
+      status: linkedinResponse.status,
+      finalUrl: linkedinResponse.url,
+      htmlLength: linkedinHtml.length,
+      title:
+        linkedinHtml.match(
+          /<title[^>]*>(.*?)<\/title>/i
+        )?.[1] || null,
+
+      containsLoginWall:
+        /sign in|join now|login/i.test(
+          linkedinHtml
+        ),
+
+      containsCaptcha:
+        /captcha/i.test(
+          linkedinHtml
+        ),
+
+      preview:
+        linkedinHtml.slice(0,500)
+    },
+    null,
+    2
+  )
+);
        
        console.log(
     "LINKEDIN_SOURCE_URL",
@@ -1077,7 +1119,7 @@ console.log(
     html?.length
 );
 
-        linkedinProfile =
+      /*  linkedinProfile =
   extractLinkedInProfile(html);
        console.log(
   "LINKEDIN_PROFILE",
@@ -1086,9 +1128,9 @@ console.log(
     null,
     2
   )
-);
+); */
 
-        linkedinPosts =
+    /*    linkedinPosts =
             extractLinkedInPosts?.(html) ||
             [];
 
@@ -1108,7 +1150,7 @@ console.log(
         2
     )
 );
-
+*/
     } catch (error) {
 
         console.log(
