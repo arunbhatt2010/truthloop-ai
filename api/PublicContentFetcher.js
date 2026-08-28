@@ -669,7 +669,75 @@ function extractLinkedInProfile(html = "") {
   };
 
 }
+/* =====================================================
+   LINKEDIN ACTIVITY EXTRACTION LAYER
+===================================================== */
 
+function extractLinkedInPosts(html = "") {
+
+    const posts = [];
+
+    const patterns = [
+
+        /"text":"([^"]{50,5000})"/g,
+
+        /"commentary":{"text":"([^"]{50,5000})"/g,
+
+        /"shareCommentary":{"text":"([^"]{50,5000})"/g
+
+    ];
+
+    for (const pattern of patterns) {
+
+        let match;
+
+        while ((match = pattern.exec(html)) !== null) {
+
+            const text =
+                cleanLinkedInText(match[1]);
+
+            if (
+                text &&
+                text.length > 50 &&
+                !posts.includes(text)
+            ) {
+                posts.push(text);
+            }
+
+            if (posts.length >= 25) break;
+        }
+
+        if (posts.length >= 25) break;
+    }
+
+    return posts.slice(0, 25);
+}
+
+
+
+function extractLinkedInActivitySignals(html = "") {
+
+    const posts =
+        extractLinkedInPosts(html);
+
+    const activityLevel =
+        posts.length >= 20
+            ? "high"
+            : posts.length >= 5
+            ? "medium"
+            : "low";
+
+    return {
+
+        postCount: posts.length,
+
+        activityLevel,
+
+        hasRecentActivity:
+            posts.length > 0
+
+    };
+}
 function extractArticleBlocks(html = "", baseUrl = "") {
     const articles = [];
     const seen = new Set();
@@ -1005,6 +1073,19 @@ if (
         linkedinSignals =
             extractLinkedInActivitySignals?.(html) ||
             [];
+       console.log(
+    "LINKEDIN_POSTS",
+    linkedinPosts.length
+);
+
+console.log(
+    "LINKEDIN_SIGNALS",
+    JSON.stringify(
+        linkedinSignals,
+        null,
+        2
+    )
+);
 
     } catch (error) {
 
