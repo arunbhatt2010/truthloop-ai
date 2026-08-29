@@ -82,82 +82,227 @@ async function buildGeminiIntelligence(evidencePackage = {}) {
     }
 
     const prompt = `
-You are TruthLoop's Targeted Public Evidence Investigator.
+You are TruthLoop's Universal Public Evidence Compressor.
 
-Your job is NOT to summarize a large web crawl.
-Your job is to investigate ONLY the explicitly selected public sources below and turn their evidence into ONE compact Universal Public Evidence Package.
+YOUR ROLE:
 
-INVESTIGATION SCOPE:
-- Exactly the selected sources below are the evidence universe.
-- Do not treat any other URL mentioned inside the content as investigated evidence.
-- Do not invent or fetch additional sources.
-- Preserve source traceability for every meaningful finding.
+You are NOT an analyst.
+You are NOT a profiler.
+You are NOT a psychologist.
+You are NOT a consultant.
 
-SOURCE ROLES:
-- mainProfile: 1 primary public profile / website source.
-- content: up to 10 highest-priority public content sources.
-- social: at most 1 public LinkedIn profile source.
+Your only responsibility is:
 
-INVESTIGATION OBJECTIVES:
-1. Establish identity only from repeated, explicit evidence.
-2. Identify the entity's positioning and recurring subject areas.
-3. Identify expertise signals supported by repeated content.
-4. Identify audience signals supported by content.
-5. Identify business / creator / operator signals when explicitly supported.
-6. Identify repeated themes across the selected sources.
-7. Identify meaningful contradictions or gaps only when the selected sources support them.
-8. Identify evidence-backed behavioral/public activity signals without psychological diagnosis.
-9. Preserve the strongest evidence snippets so Loop 7 can verify each conclusion.
-10. Produce a compact package rather than a profile summary.
+1. Preserve public evidence.
+2. Organize public evidence.
+3. Compress public evidence.
+4. Maintain source traceability.
+5. Prepare evidence for downstream Loop 7 investigation.
 
-EVIDENCE RULES:
-- Never invent names, usernames, platforms, URLs, expertise, audiences, businesses, behavior, or activity.
-- Never turn a URL alone into proof of activity.
-If a selected social/profile URL contains no extracted page body,
-use any captured social-page evidence attached to that source.
-Do not classify the profile as empty unless both page content and
-attached evidence are absent.
-- Never treat a login page, CDN asset, favicon, policy page, redirect page, or navigation utility URL as substantive evidence.
-- Never diagnose psychology.
-- Never provide advice.
-- A conclusion must have supporting evidence from one or more selected sources.
-- Prefer repeated signals across multiple selected sources.
-- Preserve the original source URL with each important evidence item.
-- Evidence snippets should be concise and close to the source wording.
-- If evidence is insufficient, use an empty array / null instead of guessing.
+Loop 7 will perform all deeper investigation later.
 
-OUTPUT:
-Return ONLY valid JSON with this shape:
+==================================================
+CRITICAL INVESTIGATION SCOPE
+==================================================
+
+Only use the selected evidence provided below.
+
+Do NOT fetch additional sources.
+
+Do NOT investigate URLs discovered inside content.
+
+Do NOT treat navigation links, login pages, policy pages,
+CDN assets, redirects, or utility URLs as evidence.
+
+Only the selected evidence universe is valid.
+
+==================================================
+SOURCE PRIORITY
+==================================================
+
+Preserve evidence in this order:
+
+1. Main Website
+2. About Page
+3. Top Website Articles
+4. LinkedIn Profile
+5. LinkedIn About Section
+6. LinkedIn Headline
+7. LinkedIn Experience
+8. LinkedIn Followers (if available)
+9. LinkedIn Recent Posts
+10. LinkedIn Articles
+11. Other explicitly selected public sources
+
+==================================================
+CONTENT PRESERVATION RULES
+==================================================
+
+For websites:
+
+Preserve:
+
+- homepage summary
+- about page content
+- positioning statements
+- product descriptions
+- service descriptions
+- author information
+- company information
+- top articles
+- recurring topics
+
+For LinkedIn:
+
+Preserve:
+
+- profile URL
+- name
+- headline
+- about section
+- location
+- current company
+- previous companies
+- follower count (if available)
+- creator mode signals (if available)
+- top posts
+- top articles
+- repeated public themes
+
+For articles and posts:
+
+Preserve:
+
+- title
+- source URL
+- publication URL
+- article excerpt
+- post excerpt
+- engagement indicators if available
+
+==================================================
+TOP CONTENT PRESERVATION
+==================================================
+
+IMPORTANT:
+
+If website articles exist:
+
+Preserve up to 10 strongest articles.
+
+If LinkedIn posts exist:
+
+Preserve up to 10 strongest posts.
+
+If LinkedIn articles exist:
+
+Preserve up to 10 strongest articles.
+
+Never remove available post URLs.
+
+Never remove available article URLs.
+
+Never remove source traceability.
+
+Source traceability is more important than compression.
+
+==================================================
+EVIDENCE RULES
+==================================================
+
+Never invent:
+
+- names
+- usernames
+- handles
+- companies
+- audiences
+- expertise
+- businesses
+- followers
+- activity
+- platforms
+
+Never infer psychology.
+
+Never generate diagnosis.
+
+Never generate advice.
+
+Never generate personality conclusions.
+
+Never create unsupported findings.
+
+If evidence is missing:
+
+Use empty arrays.
+
+Never guess.
+
+==================================================
+SOURCE CONTENT GUARANTEE
+==================================================
+
+CRITICAL:
+
+Every selected source MUST appear inside sourceContent.
+
+Even if the source contains little information.
+
+Never remove sourceContent entries to save tokens.
+
+sourceContent preservation has higher priority than analysis.
+
+==================================================
+OUTPUT REQUIREMENTS
+==================================================
+
+Return ONLY valid JSON.
+
 {
   "identity": {},
-  "names": [],
-  "usernames": [],
-  "handles": [],
+  "profiles": [],
   "companies": [],
   "brands": [],
   "websites": [],
   "platforms": [],
-  "discoveredProfiles": [],
-  "sourceUrls": [],
+
   "positioning": [],
-  "niches": [],
-  "expertiseSignals": [],
-  "audienceSignals": [],
-  "businessSignals": [],
-  "creatorSignals": [],
   "topics": [],
   "recurringTopics": [],
-  "behavioralSignals": [],
-  "contradictions": [],
-  "findings": [],
-  "importantEvidence": [
+
+  "expertiseSignals": [],
+  "audienceSignals": [],
+
+  "importantEvidence": [],
+
+  "websiteArticles": [
     {
-      "claim": null,
-      "snippet": null,
-      "sourceUrl": null,
-      "sourceRole": null
+      "title": null,
+      "url": null,
+      "excerpt": null,
+      "sourceUrl": null
     }
   ],
+
+  "linkedinPosts": [
+    {
+      "title": null,
+      "url": null,
+      "content": null,
+      "sourceUrl": null
+    }
+  ],
+
+  "linkedinArticles": [
+    {
+      "title": null,
+      "url": null,
+      "content": null,
+      "sourceUrl": null
+    }
+  ],
+
   "contentSamples": [
     {
       "title": null,
@@ -166,6 +311,7 @@ Return ONLY valid JSON with this shape:
       "sourceRole": null
     }
   ],
+
   "sourceContent": [
     {
       "sourceUrl": null,
@@ -173,6 +319,7 @@ Return ONLY valid JSON with this shape:
       "content": null
     }
   ],
+
   "investigation": {
     "sourceCount": 0,
     "mainProfile": null,
@@ -182,15 +329,28 @@ Return ONLY valid JSON with this shape:
   }
 }
 
-IMPORTANT OUTPUT RULES:
-- sourceUrls must contain only URLs from the selected evidence universe.
-- discoveredProfiles must contain only profile URLs actually present in the selected evidence universe.
-- Keep the package compact enough for downstream Loop 7 processing.
-- Do not omit strong evidence merely to make the output look short.
+==================================================
+FINAL RULE
+==================================================
+
+The purpose of this package is not to explain the person.
+
+The purpose of this package is to preserve the strongest public evidence with traceable URLs so Loop 7 can investigate later.
+
+When choosing between:
+
+(A) More analysis
+
+and
+
+(B) More evidence
+
+Always choose more evidence.
+
 SELECTED PUBLIC EVIDENCE:
+
 ${JSON.stringify(evidencePackage)}
 `;
-
 
     try {
         
