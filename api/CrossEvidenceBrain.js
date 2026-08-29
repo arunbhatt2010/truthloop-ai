@@ -391,65 +391,166 @@ ${JSON.stringify(evidencePackage)}
         );
 
         console.log(
-            "GEMINI_HTTP_STATUS",
-            response.status
-        );
+    "GEMINI_HTTP_STATUS",
+    response.status
+);
 
-        if (!response.ok) {
-            const errorBody = await response.text();
+if (!response.ok) {
+    const errorBody = await response.text();
 
-            console.log(
-                "GEMINI_ERROR_BODY",
-                errorBody
-            );
+    console.log(
+        "GEMINI_ERROR_BODY",
+        errorBody
+    );
 
-            return {
-                status: "failed",
-                error: errorBody
-            };
-        }
+    return {
+        status: "failed",
+        error: errorBody
+    };
+}
 
-        const data = await response.json();
+const data = await response.json();
 
-        console.log(
-            "GEMINI_CANDIDATES",
-            data?.candidates?.length || 0
-        );
+console.log(
+    "GEMINI_CANDIDATES",
+    data?.candidates?.length || 0
+);
 
-        console.log(
-            "GEMINI_RESPONSE_KEYS",
-            Object.keys(data || {})
-        );
+const content =
+    data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-        const content =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+if (!content.trim()) {
+    return {
+        status: "failed",
+        error: "Empty Gemini response"
+    };
+}
 
-        
+let parsedContent;
 
-        if (!content.trim()) {
-            return {
-                status: "failed",
-                error: "Empty Gemini response"
-            };
-        }
+try {
 
-        let parsedContent;
+    parsedContent = JSON.parse(
+        content
+            .replace(/```json/gi, "")
+            .replace(/```/g, "")
+            .trim()
+    );
 
-        try {
-            parsedContent = JSON.parse(
-                content
-                    .replace(/```json/gi, "")
-                    .replace(/```/g, "")
-                    .trim()
-            );
-        } catch (e) {
-            console.log(
-                "GEMINI_PARSE_FAILED_CONTENT",
-                content.slice(0, 1200)
-            );
-            throw e;
-        }
+} catch (e) {
 
+    console.log(
+        "GEMINI_PARSE_FAILED_CONTENT",
+        content.slice(0, 1200)
+    );
+
+    throw e;
+}
+
+console.log(
+    "GEMINI_PACKAGE_SUMMARY",
+    {
+        profiles:
+            parsedContent?.profiles?.length || 0,
+
+        companies:
+            parsedContent?.companies?.length || 0,
+
+        positioning:
+            parsedContent?.positioning?.length || 0,
+
+        topics:
+            parsedContent?.topics?.length || 0,
+
+        expertiseSignals:
+            parsedContent?.expertiseSignals?.length || 0,
+
+        audienceSignals:
+            parsedContent?.audienceSignals?.length || 0,
+
+        importantEvidence:
+            parsedContent?.importantEvidence?.length || 0,
+
+        websiteArticles:
+            parsedContent?.websiteArticles?.length || 0,
+
+        linkedinPosts:
+            parsedContent?.linkedinPosts?.length || 0,
+
+        linkedinArticles:
+            parsedContent?.linkedinArticles?.length || 0,
+
+        sourceContent:
+            parsedContent?.sourceContent?.length || 0
+    }
+);
+
+console.log(
+    "WEBSITE_ARTICLES_PRESERVED",
+    (
+        parsedContent?.websiteArticles || []
+    ).map(article => ({
+        title: article?.title,
+        url: article?.url
+    }))
+);
+
+console.log(
+    "LINKEDIN_POSTS_PRESERVED",
+    (
+        parsedContent?.linkedinPosts || []
+    ).map(post => ({
+        title: post?.title,
+        url: post?.url
+    }))
+);
+
+console.log(
+    "LINKEDIN_ARTICLES_PRESERVED",
+    (
+        parsedContent?.linkedinArticles || []
+    ).map(article => ({
+        title: article?.title,
+        url: article?.url
+    }))
+);
+
+console.log(
+    "LINKEDIN_PROFILES_PRESERVED",
+    parsedContent?.profiles || []
+);
+
+console.log(
+    "IMPORTANT_EVIDENCE_COUNT",
+    parsedContent?.importantEvidence?.length || 0
+);
+
+console.log(
+    "SOURCE_CONTENT_COUNT",
+    parsedContent?.sourceContent?.length || 0
+);
+
+console.log(
+    "GEMINI_OUTPUT_DEBUG",
+    {
+        status: "ok",
+
+        websiteArticles:
+            parsedContent?.websiteArticles?.length || 0,
+
+        linkedinPosts:
+            parsedContent?.linkedinPosts?.length || 0,
+
+        linkedinArticles:
+            parsedContent?.linkedinArticles?.length || 0,
+
+        importantEvidence:
+            parsedContent?.importantEvidence?.length || 0,
+
+        sourceContent:
+            parsedContent?.sourceContent?.length || 0
+    }
+);
         // Guarantee that downstream Loop 7 always receives traceable content
         // for every selected source, even if Gemini compresses sourceContent
         // down to identity metadata only. This is deterministic preservation,
