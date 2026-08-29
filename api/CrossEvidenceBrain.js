@@ -2119,7 +2119,7 @@ console.log(
         sourceCount: sources.length,
         selectedSourceCount: selectedUniqueUrls.length,
         discoveredProfiles: discoveredProfiles.length,
-        intelligenceStatus: removedIntelligence?.status || "ok",
+        intelligenceStatus: "disabled",
         packageTextSize
     });
 
