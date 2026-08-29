@@ -104,6 +104,26 @@ Loop 7 will perform all deeper investigation later.
 ==================================================
 CRITICAL INVESTIGATION SCOPE
 ==================================================
+CRITICAL EVIDENCE PRESERVATION RULE:
+
+For EVERY selected source, including websites, blogs,
+LinkedIn profiles, LinkedIn posts, LinkedIn articles,
+company pages and public pages:
+
+- At least 3 evidence items must be preserved whenever
+  substantive content exists.
+
+- Do NOT prioritize LinkedIn over websites.
+
+- Do NOT discard website claims simply because they are
+  marketing or positioning statements.
+
+- Preserve website positioning, product descriptions,
+  capability statements, audience statements and recurring
+  themes as importantEvidence with sourceUrl.
+
+- Every non-empty source must contribute evidence to
+  importantEvidence.
 
 Only use the selected evidence provided below.
 
