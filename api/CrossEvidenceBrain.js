@@ -1633,10 +1633,16 @@ async function fetchLinkedInFromApify(url = "") {
 
     try {
         const endpoint =
-            "https://api.apify.com/v2/actors/" +
-            encodeURIComponent(APIFY_ACTOR_ID) +
-            "/run-sync-get-dataset-items" +
-            `?timeout=${APIFY_TIMEOUT_SECONDS}&maxItems=1`;
+  "https://api.apify.com/v2/actors/" +
+  encodeURIComponent(APIFY_ACTOR_ID) +
+  "/run-sync-get-dataset-items" +
+  `?timeout=${APIFY_TIMEOUT_SECONDS}` +
+  `&maxItems=1` +
+  `&maxTotalChargeUsd=1`;
+       console.error(
+  "APIFY_FULL_ERROR",
+  JSON.stringify(errorJson, null, 2)
+);
 console.log(
   "APIFY_TIMEOUT_SECONDS",
   APIFY_TIMEOUT_SECONDS
