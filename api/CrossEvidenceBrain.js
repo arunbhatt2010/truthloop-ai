@@ -1637,7 +1637,20 @@ async function fetchLinkedInFromApify(url = "") {
             encodeURIComponent(APIFY_ACTOR_ID) +
             "/run-sync-get-dataset-items" +
             `?timeout=${APIFY_TIMEOUT_SECONDS}&maxItems=1`;
+console.log(
+  "APIFY_TIMEOUT_SECONDS",
+  APIFY_TIMEOUT_SECONDS
+);
 
+console.log(
+  "VERCEL_REGION",
+  process.env.VERCEL_REGION
+);
+
+console.log(
+  "FUNCTION_TIMEOUT_TEST_START",
+  Date.now()
+);
         console.log(
             "APIFY_LINKEDIN_START",
             JSON.stringify({
