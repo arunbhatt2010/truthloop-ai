@@ -1696,7 +1696,31 @@ console.log(
             "APIFY_LINKEDIN_STATUS",
             response.status
         );
+const rawBody = await response.text();
 
+console.log(
+  "APIFY_RAW_RESPONSE",
+  rawBody.slice(0, 5000)
+);
+
+if (!response.ok) {
+  console.error(
+    "APIFY_STATUS",
+    response.status
+  );
+
+  console.error(
+    "APIFY_ERROR_BODY",
+    rawBody
+  );
+
+  return {
+    success: false,
+    reason: rawBody
+  };
+}
+
+const data = JSON.parse(rawBody);
         if (!response.ok) {
             const errorBody = await response.text();
 
