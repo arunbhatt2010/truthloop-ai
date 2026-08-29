@@ -398,11 +398,19 @@ function normalizeUrl(value = "") {
     if (!/^https?:\/\//i.test(cleaned)) return "";
 
     try {
-        const url = new URL(cleaned);
-        if (!/^https?:$/.test(url.protocol)) return "";
-        return url.toString();
-    } catch {
-        return "";
+    const url = new URL(cleaned);
+
+    if (!/^https?:$/.test(url.protocol)) return "";
+
+    // LinkedIn host canonicalization
+    if (
+        url.hostname === "in.linkedin.com" ||
+        url.hostname === "www.linkedin.com"
+    ) {
+        url.hostname = "www.linkedin.com";
+    }
+
+    return url.toString();
     }
 }
 
