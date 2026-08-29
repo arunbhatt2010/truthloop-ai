@@ -1721,28 +1721,7 @@ if (!response.ok) {
 }
 
 const data = JSON.parse(rawBody);
-        if (!response.ok) {
-            const errorBody = await response.text();
-
-console.error(
-  "APIFY_LINKEDIN_ERROR_BODY_RAW_STRING"
-);
-
-console.error(errorBody);
-
-console.error(
-  "APIFY_LINKEDIN_ERROR_BODY_JSON",
-  JSON.stringify(errorBody, null, 2)
-);
-
-            return {
-                success: false,
-                reason: `Apify LinkedIn request failed (${response.status}).`,
-                source: null
-            };
-        }
-
-        const data = await response.json();
+        
 
         const item =
             Array.isArray(data)
