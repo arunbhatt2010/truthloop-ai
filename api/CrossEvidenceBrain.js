@@ -1681,13 +1681,16 @@ console.log(
 
         if (!response.ok) {
             const errorBody = await response.text();
-console.log(
-  "APIFY_ENDPOINT",
-  endpoint
+
+console.error(
+  "APIFY_LINKEDIN_ERROR_BODY_RAW_STRING"
 );
-            console.error(
-  "APIFY_LINKEDIN_ERROR_BODY_RAW",
-  errorBody
+
+console.error(errorBody);
+
+console.error(
+  "APIFY_LINKEDIN_ERROR_BODY_JSON",
+  JSON.stringify(errorBody, null, 2)
 );
 
             return {
