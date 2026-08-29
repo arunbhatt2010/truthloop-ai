@@ -1639,13 +1639,13 @@ async function fetchLinkedInFromApify(url = "") {
   `?timeout=${APIFY_TIMEOUT_SECONDS}` +
   `&maxItems=1` +
   `&maxTotalChargeUsd=0.05`;
-       console.error(
-  "APIFY_FULL_ERROR",
-  {
+       console.log(
+  "APIFY_DEBUG",
+  JSON.stringify({
     endpoint,
     actorId: APIFY_ACTOR_ID,
     timeout: APIFY_TIMEOUT_SECONDS
-  }
+  }, null, 2)
 );
 console.log(
   "APIFY_TIMEOUT_SECONDS",
