@@ -1920,7 +1920,7 @@ async function fetchLinkedInFromApify(url = "") {
   "/run-sync-get-dataset-items" +
   `?timeout=${APIFY_TIMEOUT_SECONDS}` +
   `&maxItems=1` +
-  `&maxTotalChargeUsd=0.05`;
+  `&maxTotalChargeUsd=0.07`;
        console.log(
   "APIFY_DEBUG",
   JSON.stringify({
@@ -1972,7 +1972,10 @@ console.log(
         );
 
         const rawBody = await response.text();
-
+console.log(
+  "APIFY_RAW_RESPONSE_FULL",
+  rawBody
+);
         console.log(
             "APIFY_RAW_RESPONSE",
             rawBody.slice(0, 1500)
