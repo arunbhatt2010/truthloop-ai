@@ -614,18 +614,39 @@ const geminiLinkedInSource = (parsedContent.sourceContent || []).find(item =>
     String(item?.sourceUrl || "").toLowerCase().includes("linkedin.com")
 ) || null;
 
-const geminiLinkedInEvidence = (parsedContent.evidence || []).filter(item =>
-    String(item?.sourceUrl || "").toLowerCase().includes("linkedin.com")
-);
+const geminiLinkedInEvidence =
+    (parsedContent.importantEvidence || []).filter(item =>
+        String(item?.sourceUrl || "")
+            .toLowerCase()
+            .includes("linkedin.com")
+    );
 
 console.log(
   "GEMINI_LINKEDIN_PROFILES",
   JSON.stringify(parsedContent.discoveredProfiles || [], null, 2)
 );
 console.log(
-  "GEMINI_SOURCE_CONTENT_RAW",
+  "GEMINI_EVIDENCE_PACKAGE_RAW",
   JSON.stringify(
-    parsedContent.sourceContent || [],
+    {
+      profiles:
+        parsedContent.profiles || [],
+
+      importantEvidence:
+        parsedContent.importantEvidence || [],
+
+      websiteArticles:
+        parsedContent.websiteArticles || [],
+
+      linkedinPosts:
+        parsedContent.linkedinPosts || [],
+
+      linkedinArticles:
+        parsedContent.linkedinArticles || [],
+
+      sourceContent:
+        parsedContent.sourceContent || []
+    },
     null,
     2
   )
@@ -648,9 +669,9 @@ console.log(
   )
 );
 console.log(
-  "GEMINI_EVIDENCE_RAW",
+  "GEMINI_IMPORTANT_EVIDENCE_RAW",
   JSON.stringify(
-    parsedContent.evidence || [],
+    parsedContent.importantEvidence || [],
     null,
     2
   )
