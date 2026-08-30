@@ -1855,7 +1855,7 @@ async function fetchLinkedInFromApify(url = "") {
   "/run-sync-get-dataset-items" +
   `?timeout=${APIFY_TIMEOUT_SECONDS}` +
   `&maxItems=1` +
-  `&maxTotalChargeUsd=0.05`;
+  `&maxTotalChargeUsd=0.01`;
        console.log(
   "APIFY_DEBUG",
   JSON.stringify({
