@@ -558,7 +558,7 @@ await loadDigitalFootprintBrain({
    CROSS EVIDENCE BRAIN
 ========================================== */
 console.log("CHAT_REACHED_CEB");
-    /*
+   
 try {
 
    const crossEvidencePackage =
@@ -606,7 +606,7 @@ console.log(
     );
 
 }
-*/
+
 
 /* ==========================================
    EVIDENCE COMPRESSION
