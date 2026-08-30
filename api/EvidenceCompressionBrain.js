@@ -564,16 +564,17 @@ async function loadEvidenceCompressionBrain({
    * Deterministic compression only.
    * No source/item is scored or filtered for relevance.
    */
-  if (packageSize > MAX_TOTAL_PACKAGE_CHARS) {
+  while (packageSize > MAX_TOTAL_PACKAGE_CHARS) {
 
   loop7Package.evidenceUniverse.sources =
     loop7Package.evidenceUniverse.sources.map(
       source => ({
         ...source,
-        visibleText: cleanText(
-          source.visibleText || "",
-          500
-        ),
+        visibleText:
+          cleanText(
+            source.visibleText || "",
+            500
+          ),
         publicEvidence: [],
         evidence: [],
         articles: [],
@@ -588,13 +589,8 @@ async function loadEvidenceCompressionBrain({
     "ECB_REDUCED_SIZE",
     packageSize
   );
-}
 
-  break;
 }
-
-    packageSize = JSON.stringify(loop7Package).length;
-  }
 console.log(
   "ECB_AFTER_FIRST_COMPRESSION",
   packageSize
