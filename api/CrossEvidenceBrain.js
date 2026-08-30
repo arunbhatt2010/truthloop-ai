@@ -1154,10 +1154,7 @@ function buildUniversalPackage({
    ------------------------------------------------------------ */
 
 export async function loadCrossEvidenceBrain({
-   console.log(
-    "CEB_START",
-    Date.now()
-);
+   
     profileLinks = [],
     footprintPackage = {},
     truthLoopPackage = {}
@@ -1178,7 +1175,10 @@ export async function loadCrossEvidenceBrain({
             footprintPackage?.sourceUrl ||
             ""
         );
-
+console.log(
+    "CEB_START",
+    Date.now()
+);
     if (!primaryUrl) {
         return {
             success: false,
