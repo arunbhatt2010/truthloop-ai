@@ -1265,7 +1265,7 @@ function buildUniversalPackage({
         postmaster: {
             role: "evidence-delivery-only",
             filtering: false,
-            compression: false,
+            compression: true,
             ranking: false,
             investigation: false
         },
