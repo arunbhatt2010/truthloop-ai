@@ -46,13 +46,12 @@ async function loadEvidenceCompressionBrain({
 
   console.log("ECB_START");
 console.log(
-  "ECB_INPUT_DEBUG",
-  JSON.stringify({
-    publicKeys: Object.keys(publicEvidencePackage || {}),
-    universalKeys: Object.keys(
-      publicEvidencePackage?.universalPackage || {}
-    )
-  }, null, 2)
+  "ECB_UNIVERSAL_DEBUG",
+  JSON.stringify(
+    publicEvidencePackage?.universalPackage || {},
+    null,
+    2
+  )
 );
    
   if (!publicEvidencePackage?.success) {
@@ -73,13 +72,27 @@ console.log(
       ? publicEvidencePackage.sources
       : [];
 console.log(
-  "ECB_SOURCES_DEBUG",
+  "ECB_SOURCE_PATHS",
   JSON.stringify({
-    sourceCount: sources.length,
-    firstSourceKeys:
-      sources?.[0]
-        ? Object.keys(sources[0])
-        : []
+    sources:
+      Array.isArray(universalPackage?.sources)
+        ? universalPackage.sources.length
+        : "missing",
+
+    evidenceSources:
+      Array.isArray(universalPackage?.evidenceSources)
+        ? universalPackage.evidenceSources.length
+        : "missing",
+
+    publicSources:
+      Array.isArray(universalPackage?.publicSources)
+        ? universalPackage.publicSources.length
+        : "missing",
+
+    websiteSources:
+      Array.isArray(universalPackage?.websiteSources)
+        ? universalPackage.websiteSources.length
+        : "missing"
   }, null, 2)
 );
   const intelligence =
