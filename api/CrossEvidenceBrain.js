@@ -36,7 +36,7 @@ import {
 
 const APIFY_ACTOR_ID = "crawlerbros~linkedin-profile-scraper";
 const APIFY_TIMEOUT_SECONDS = 120;
-const APIFY_MAX_TOTAL_CHARGE_USD = "0.01";
+const APIFY_MAX_TOTAL_CHARGE_USD = "0.10";
 const GEMINI_MODEL = "gemini-3.6-flash";
 
 const ENABLE_LINKEDIN_APIFY = true;
