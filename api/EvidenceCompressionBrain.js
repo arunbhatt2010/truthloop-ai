@@ -45,7 +45,16 @@ async function loadEvidenceCompressionBrain({
 } = {}) {
 
   console.log("ECB_START");
-
+console.log(
+  "ECB_INPUT_DEBUG",
+  JSON.stringify({
+    publicKeys: Object.keys(publicEvidencePackage || {}),
+    universalKeys: Object.keys(
+      publicEvidencePackage?.universalPackage || {}
+    )
+  }, null, 2)
+);
+   
   if (!publicEvidencePackage?.success) {
     return {
       success: false,
@@ -63,7 +72,16 @@ async function loadEvidenceCompressionBrain({
     : Array.isArray(publicEvidencePackage?.sources)
       ? publicEvidencePackage.sources
       : [];
-
+console.log(
+  "ECB_SOURCES_DEBUG",
+  JSON.stringify({
+    sourceCount: sources.length,
+    firstSourceKeys:
+      sources?.[0]
+        ? Object.keys(sources[0])
+        : []
+  }, null, 2)
+);
   const intelligence =
     universalPackage?.intelligence &&
     typeof universalPackage.intelligence === "object"
