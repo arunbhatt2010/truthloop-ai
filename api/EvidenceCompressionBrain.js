@@ -558,40 +558,428 @@ async function loadEvidenceCompressionBrain({
         : []
   };
 
-  let packageSize = JSON.stringify(loop7Package).length;
+  let packageSize =
+  JSON.stringify(loop7Package).length;
 
-  /*
-   * Deterministic compression only.
-   * No source/item is scored or filtered for relevance.
-   */
-  if (packageSize > MAX_TOTAL_PACKAGE_CHARS) {
+/*
+ * DETERMINISTIC SIZE COMPRESSION
+ * ------------------------------
+ * No relevance ranking.
+ * No source scoring.
+ * No evidence selection.
+ *
+ * Only reduce text density and duplicated
+ * presentation layers until the final package
+ * fits the hard 14,000 character boundary.
+ */
 
-   loop7Package.evidenceUniverse.sources =
-      loop7Package.evidenceUniverse.sources.map(
-         source => ({
-            ...source,
-            visibleText:
-               cleanText(
-                  source.visibleText || "",
-                  500
-               ),
-            publicEvidence: [],
-            evidence: [],
-            articles: [],
-            posts: []
-         })
+function compactOutputItems(items = [], maxTextChars = 180) {
+  if (!Array.isArray(items)) return [];
+
+  return items.map(item => ({
+    title:
+      cleanText(
+        item?.title || "",
+        120
+      ) || null,
+
+    text:
+      cleanText(
+        item?.text ||
+        item?.content ||
+        item?.description ||
+        "",
+        maxTextChars
+      ) || null,
+
+    url:
+      normalizeUrl(
+        item?.url ||
+        item?.sourceUrl ||
+        ""
+      ) || null,
+
+    publishedDate:
+      item?.publishedDate ||
+      item?.publishedAt ||
+      item?.date ||
+      item?.postedAt ||
+      null,
+
+    likes:
+      item?.likes ??
+      null
+  }));
+}
+
+/* ---------------------------------------------------------
+ * PASS 1
+ * Reduce duplicated evidence text.
+ * --------------------------------------------------------- */
+
+if (packageSize > MAX_TOTAL_PACKAGE_CHARS) {
+
+  loop7Package.evidenceUniverse.sources =
+    loop7Package.evidenceUniverse.sources.map(
+      source => ({
+        ...source,
+
+        visibleText:
+          cleanText(
+            source?.visibleText || "",
+            400
+          ),
+
+        description:
+          cleanText(
+            source?.description || "",
+            160
+          ),
+
+        publicEvidence: [],
+        evidence: [],
+
+        articles: [],
+        posts: []
+      })
+    );
+
+  loop7Package.evidenceUniverse.websiteContent = {
+    top10Articles:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .websiteContent
+          ?.top10Articles || [],
+        180
+      ),
+
+    top10Posts:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .websiteContent
+          ?.top10Posts || [],
+        180
+      )
+  };
+
+  loop7Package.evidenceUniverse.linkedinInvestigation = {
+    profile:
+      loop7Package
+        .evidenceUniverse
+        .linkedinInvestigation
+        ?.profile || null,
+
+    top10Posts:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .linkedinInvestigation
+          ?.top10Posts || [],
+        180
+      ),
+
+    top10Articles:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .linkedinInvestigation
+          ?.top10Articles || [],
+        180
+      )
+  };
+
+  loop7Package.websiteEvidence.sources =
+    loop7Package.websiteEvidence.sources.map(
+      source => ({
+        ...source,
+        content:
+          cleanText(
+            source?.content || "",
+            180
+          )
+      })
+    );
+
+  if (
+    Array.isArray(
+      loop7Package.socialEvidence
+    )
+  ) {
+    loop7Package.socialEvidence =
+      loop7Package.socialEvidence.map(
+        social => ({
+          ...social,
+
+          profile:
+            social?.profile || null,
+
+          posts:
+            compactOutputItems(
+              social?.posts || [],
+              180
+            ),
+
+          articles:
+            compactOutputItems(
+              social?.articles || [],
+              180
+            )
+        })
       );
-
-   packageSize =
-      JSON.stringify(loop7Package).length;
-
-   console.log(
-      "ECB_REDUCED_SIZE",
-      packageSize
-   );
   }
+
+  packageSize =
+    JSON.stringify(loop7Package).length;
+
+  console.log(
+    "ECB_REDUCED_SIZE_PASS_1",
+    packageSize
+  );
+}
+
+
+/* ---------------------------------------------------------
+ * PASS 2
+ * More aggressive text compression.
+ * Still no relevance filtering.
+ * --------------------------------------------------------- */
+
+if (packageSize > MAX_TOTAL_PACKAGE_CHARS) {
+
+  loop7Package.evidenceUniverse.sources =
+    loop7Package.evidenceUniverse.sources.map(
+      source => ({
+        ...source,
+
+        visibleText:
+          cleanText(
+            source?.visibleText || "",
+            220
+          ),
+
+        description:
+          cleanText(
+            source?.description || "",
+            100
+          )
+      })
+    );
+
+  loop7Package.evidenceUniverse.websiteContent = {
+    top10Articles:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .websiteContent
+          ?.top10Articles || [],
+        100
+      ),
+
+    top10Posts:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .websiteContent
+          ?.top10Posts || [],
+        100
+      )
+  };
+
+  loop7Package.evidenceUniverse.linkedinInvestigation = {
+    profile:
+      loop7Package
+        .evidenceUniverse
+        .linkedinInvestigation
+        ?.profile || null,
+
+    top10Posts:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .linkedinInvestigation
+          ?.top10Posts || [],
+        100
+      ),
+
+    top10Articles:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .linkedinInvestigation
+          ?.top10Articles || [],
+        100
+      )
+  };
+
+  loop7Package.websiteEvidence.sources =
+    loop7Package.websiteEvidence.sources.map(
+      source => ({
+        ...source,
+        content:
+          cleanText(
+            source?.content || "",
+            100
+          )
+      })
+    );
+
+  if (
+    Array.isArray(
+      loop7Package.socialEvidence
+    )
+  ) {
+    loop7Package.socialEvidence =
+      loop7Package.socialEvidence.map(
+        social => ({
+          ...social,
+
+          posts:
+            compactOutputItems(
+              social?.posts || [],
+              100
+            ),
+
+          articles:
+            compactOutputItems(
+              social?.articles || [],
+              100
+            )
+        })
+      );
+  }
+
+  packageSize =
+    JSON.stringify(loop7Package).length;
+
+  console.log(
+    "ECB_REDUCED_SIZE_PASS_2",
+    packageSize
+  );
+}
+
+
+/* ---------------------------------------------------------
+ * PASS 3
+ * Final deterministic text tightening.
+ * --------------------------------------------------------- */
+
+if (packageSize > MAX_TOTAL_PACKAGE_CHARS) {
+
+  loop7Package.evidenceUniverse.sources =
+    loop7Package.evidenceUniverse.sources.map(
+      source => ({
+        ...source,
+
+        visibleText:
+          cleanText(
+            source?.visibleText || "",
+            120
+          ),
+
+        description:
+          cleanText(
+            source?.description || "",
+            60
+          )
+      })
+    );
+
+  loop7Package.evidenceUniverse.websiteContent = {
+    top10Articles:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .websiteContent
+          ?.top10Articles || [],
+        60
+      ),
+
+    top10Posts:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .websiteContent
+          ?.top10Posts || [],
+        60
+      )
+  };
+
+  loop7Package.evidenceUniverse.linkedinInvestigation = {
+    profile:
+      loop7Package
+        .evidenceUniverse
+        .linkedinInvestigation
+        ?.profile || null,
+
+    top10Posts:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .linkedinInvestigation
+          ?.top10Posts || [],
+        60
+      ),
+
+    top10Articles:
+      compactOutputItems(
+        loop7Package
+          .evidenceUniverse
+          .linkedinInvestigation
+          ?.top10Articles || [],
+        60
+      )
+  };
+
+  loop7Package.websiteEvidence.sources =
+    loop7Package.websiteEvidence.sources.map(
+      source => ({
+        ...source,
+        content:
+          cleanText(
+            source?.content || "",
+            60
+          )
+      })
+    );
+
+  if (
+    Array.isArray(
+      loop7Package.socialEvidence
+    )
+  ) {
+    loop7Package.socialEvidence =
+      loop7Package.socialEvidence.map(
+        social => ({
+          ...social,
+
+          posts:
+            compactOutputItems(
+              social?.posts || [],
+              60
+            ),
+
+          articles:
+            compactOutputItems(
+              social?.articles || [],
+              60
+            )
+        })
+      );
+  }
+
+  packageSize =
+    JSON.stringify(loop7Package).length;
+
+  console.log(
+    "ECB_REDUCED_SIZE_PASS_3",
+    packageSize
+  );
+}
+
 console.log(
-  "ECB_AFTER_FIRST_COMPRESSION",
+  "ECB_FINAL_PACKAGE_SIZE",
   packageSize
 );
   console.log(
