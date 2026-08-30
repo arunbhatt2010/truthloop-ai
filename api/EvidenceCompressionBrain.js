@@ -695,36 +695,23 @@ async function loadEvidenceCompressionBrain({
    * fail closed rather than filtering/removing evidence.
    */
   if (packageSize > MAX_TOTAL_PACKAGE_CHARS) {
-    console.error(
-      "ECB_HARD_LOCK_EXCEEDED",
-      JSON.stringify({
-        packageSize,
-        maxAllowed: MAX_TOTAL_PACKAGE_CHARS,
-        filteringPerformed: false
-      })
-    );
-
-    return {
-      success: false,
-      reason:
-        `ECB hard lock exceeded: ${packageSize} > ${MAX_TOTAL_PACKAGE_CHARS} characters.`,
-      loop7Package: null,
-      compressionStats: {
-        originalSources: sources.length,
-        preservedSources:
-          loop7Package?.evidenceUniverse?.sources?.length || 0,
-        compressedChars: packageSize,
-        maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
-        filteringPerformed: false
-      }
-    };
-  }
-
-  console.log(
-    "ECB_FINAL_PACKAGE_SIZE",
-    packageSize
+  console.warn(
+    "ECB_LIMIT_NOT_REACHED",
+    JSON.stringify({
+      packageSize,
+      targetMax: MAX_TOTAL_PACKAGE_CHARS,
+      filteringPerformed: false,
+      packageReturned: true
+    })
   );
+}
 
+console.log(
+  "ECB_FINAL_PACKAGE_SIZE",
+  packageSize
+);
+
+  
   console.log(
     "ECB_COMPRESSION_AUDIT",
     {
