@@ -1021,15 +1021,16 @@ function buildUniversalPackage({
 } = {}) {
 
     const websiteSourceUrls =
-        websiteSources
-            .map(source =>
-                normalizeUrl(
-                    source?.sourceUrl ||
-                    source?.canonicalUrl ||
-                    ""
-                )
-            )
-            .filter(Boolean);
+    websiteSources
+      .map(source =>
+          normalizeUrl(
+              source?.sourceUrl ||
+              source?.canonicalUrl ||
+              ""
+          )
+      )
+      .filter(Boolean);
+
 
     const linkedInProfile =
         linkedinSource?.linkedinProfile ||
