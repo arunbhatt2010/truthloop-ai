@@ -349,7 +349,7 @@ async function fetchLinkedInFromApify(url = "") {
                     source: null
                 };
             }
-
+/*
             const datasetEndpoint =
                 "https://api.apify.com/v2/actor-runs/" +
                 encodeURIComponent(runId) +
@@ -396,7 +396,7 @@ async function fetchLinkedInFromApify(url = "") {
             }
 
             var data = parsedDataset;
-
+*/
         } else {
 
             try {
