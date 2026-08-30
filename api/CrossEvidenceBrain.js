@@ -1204,36 +1204,30 @@ export async function loadCrossEvidenceBrain({
     let linkedinSource = null;
 
     /*
-     * PATH A:
-     * Primary URL is LinkedIn.
+     * PUBLIC EVIDENCE ROUTING
      *
-     * Exactly one Apify call.
+     * Exactly ONE Apify call maximum.
+     * There is NO second Apify execution path.
      */
-    if (
-        detectPlatform(primaryUrl) === "linkedin" &&
-        ENABLE_LINKEDIN_APIFY
-    ) {
 
-        const apifyResult =
-            await fetchLinkedInFromApify(
-                primaryUrl
-            );
+    let websiteSources = [];
+    let linkedinSource = null;
+    let linkedinUrl = "";
 
-        if (
-            apifyResult?.success &&
-            apifyResult?.source
-        ) {
-            linkedinSource =
-                apifyResult.source;
-        }
+    if (detectPlatform(primaryUrl) === "linkedin") {
+
+        /*
+         * Primary source itself is LinkedIn.
+         * Use this URL for the single Apify call.
+         */
+        linkedinUrl = primaryUrl;
 
     } else {
 
         /*
-         * PATH B:
-         * Primary URL is a website.
-         * Prefer website evidence already collected by DFB/PCF.
-         * Do not fetch the same website again when that evidence exists.
+         * Primary source is a website.
+         * Reuse website evidence already collected by DFB/PCF.
+         * Only fetch website evidence if nothing was supplied.
          */
         const suppliedWebsiteSources =
             Array.isArray(footprintPackage?.websiteEvidence?.sources)
@@ -1243,8 +1237,11 @@ export async function loadCrossEvidenceBrain({
                     : [];
 
         if (suppliedWebsiteSources.length > 0) {
+
             websiteSources = suppliedWebsiteSources;
+
         } else {
+
             const websiteResult =
                 await fetchWebsiteEvidence(
                     primaryUrl
@@ -1255,42 +1252,44 @@ export async function loadCrossEvidenceBrain({
                     websiteResult.sources || [];
             }
         }
-    }
 
-    /*
-     * LinkedIn URL discovery happens WITHOUT another fetch.
-     *
-     * If LinkedIn was not primary, get the profile URL from:
-     * - explicit requestedLinks
-     * - website socialLinks/socialProfiles
-     */
-    if (!linkedinSource) {
-
-        const linkedinUrl =
+        /*
+         * Discover LinkedIn URL only.
+         * Discovery itself performs NO API call.
+         */
+        linkedinUrl =
             findLinkedInUrl({
                 requestedLinks,
                 websiteSources
             });
+    }
+
+    /*
+     * SINGLE APIFY EXECUTION
+     *
+     * This is the ONLY place in CEB where
+     * fetchLinkedInFromApify() may ever be called.
+     */
+    if (
+        linkedinUrl &&
+        ENABLE_LINKEDIN_APIFY
+    ) {
+
+        const apifyResult =
+            await fetchLinkedInFromApify(
+                linkedinUrl
+            );
 
         if (
-            linkedinUrl &&
-            ENABLE_LINKEDIN_APIFY
+            apifyResult?.success &&
+            apifyResult?.source
         ) {
 
-            const apifyResult =
-                await fetchLinkedInFromApify(
-                    linkedinUrl
-                );
-
-            if (
-                apifyResult?.success &&
-                apifyResult?.source
-            ) {
-                linkedinSource =
-                    apifyResult.source;
-            }
+            linkedinSource =
+                apifyResult.source;
         }
-    }
+           }
+    
 
     /*
      * Gemini gets the SAME collected evidence.
