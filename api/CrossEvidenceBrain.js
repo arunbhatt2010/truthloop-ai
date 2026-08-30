@@ -1201,8 +1201,7 @@ export async function loadCrossEvidenceBrain({
         })
     );
 
-    let websiteSources = [];
-    let linkedinSource = null;
+    
 
     /*
      * PUBLIC EVIDENCE ROUTING
