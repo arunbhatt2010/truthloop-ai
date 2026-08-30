@@ -1314,22 +1314,21 @@ function buildUniversalPackage({
          * Raw evidence remains outside Gemini's output and above.
          */
         geminiSignals:
-            compressedGeminiSignals,
-                identity: {},
-                positioning: [],
-                niches: [],
-                expertiseSignals: [],
-                audienceSignals: [],
-                businessSignals: [],
-                creatorSignals: [],
-                topics: [],
-                recurringTopics: [],
-                behavioralSignals: [],
-                contradictions: [],
-                crossSourceSignals: [],
-                signalConfidence: 0
-            },
-
+    compressedGeminiSignals || {
+        identity: {},
+        positioning: [],
+        niches: [],
+        expertiseSignals: [],
+        audienceSignals: [],
+        businessSignals: [],
+        creatorSignals: [],
+        topics: [],
+        recurringTopics: [],
+        behavioralSignals: [],
+        contradictions: [],
+        crossSourceSignals: [],
+        signalConfidence: 0
+    },
         evidenceCoverage: {
             websitePagesInvestigated:
                 websiteSources.length,
