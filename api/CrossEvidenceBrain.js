@@ -38,7 +38,7 @@ const APIFY_ACTOR_ID = "crustapi~linkedin-profile-posts-scraper";
 const APIFY_TIMEOUT_SECONDS = 60;
 const APIFY_MAX_TOTAL_CHARGE_USD = "0.05";
 // Bovi actor input: profileUrls + residential Apify proxy + maxProfiles.
-const GEMINI_MODEL = "gemini-3.6-flash";
+//const GEMINI_MODEL = "gemini-3.6-flash";
 
 const ENABLE_LINKEDIN_APIFY = true;
 
