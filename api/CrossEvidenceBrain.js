@@ -268,13 +268,14 @@ async function fetchLinkedInFromApify(url = "") {
         `&maxTotalChargeUsd=${APIFY_MAX_TOTAL_CHARGE_USD}`;
 
     console.log(
-        "APIFY_CALL_START",
-        JSON.stringify({
-            actorId: APIFY_ACTOR_ID,
-            profileUrl: normalizedUrl,
-            maxTotalChargeUsd: APIFY_MAX_TOTAL_CHARGE_USD
-        })
-    );
+    "APIFY_CALL_START",
+    JSON.stringify({
+        actorId: APIFY_ACTOR_ID,
+        profileUrl: normalizedUrl,
+        maxTotalChargeUsd: APIFY_MAX_TOTAL_CHARGE_USD,
+        ts: Date.now()
+    })
+);
 
     try {
 
@@ -1153,6 +1154,10 @@ function buildUniversalPackage({
    ------------------------------------------------------------ */
 
 export async function loadCrossEvidenceBrain({
+   console.log(
+    "CEB_START",
+    Date.now()
+);
     profileLinks = [],
     footprintPackage = {},
     truthLoopPackage = {}
