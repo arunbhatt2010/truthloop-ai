@@ -846,14 +846,7 @@ const compressedTruthLoopPackage =
         profileCard
     });
 
-const compressedTruthLoopPackage =
-    buildCompressedTruthLoopPackage({
-        messages,
-        loopLevel,
-        currentCategory,
-        profileLink,
-        identityPackage
-    });
+
 if (
     loopLevel === 7 &&
     (
