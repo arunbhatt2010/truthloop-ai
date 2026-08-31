@@ -141,11 +141,10 @@ function safeText(value = "") {
    - preserve object/array structure
    ------------------------------------------------------------ */
 
-const UNIVERSAL_CONTENT_MAX_CHARS = 800;
-const UNIVERSAL_ITEM_TEXT_MAX_CHARS = 300;
-const UNIVERSAL_ABOUT_MAX_CHARS = 800;
-const UNIVERSAL_SIGNAL_TEXT_MAX_CHARS = 300;
-
+const UNIVERSAL_CONTENT_MAX_CHARS = 5000;
+const UNIVERSAL_ITEM_TEXT_MAX_CHARS = 1000;
+const UNIVERSAL_ABOUT_MAX_CHARS = 4000;
+const UNIVERSAL_SIGNAL_TEXT_MAX_CHARS = 1000;
 function isLinkOrStructuralKey(key = "") {
     const k = String(key || "").toLowerCase();
 
