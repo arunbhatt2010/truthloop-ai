@@ -2023,7 +2023,7 @@ if (loopLevel === 7) {
     let response;
 
     try {
-      
+    console.log("GROQ_CALL_START");  
       response = await fetch(
         "https://api.groq.com/openai/v1/chat/completions",
         {
@@ -2034,7 +2034,11 @@ if (loopLevel === 7) {
             Authorization:
               "Bearer " + process.env.GROQ_API_KEY
           },
-
+console.log("GROQ_HEADERS_READY");
+      console.log(
+  "GROQ_API_KEY_EXISTS",
+  !!process.env.GROQ_API_KEY
+);
           body: JSON.stringify({
   model: "qwen/qwen3.6-27b",
   messages:
