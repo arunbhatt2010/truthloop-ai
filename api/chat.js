@@ -1448,7 +1448,7 @@ FINAL CHECK
 Verify all eight sections are present, all substantive claims use appropriate source IDs, exact URLs appear only in Public Evidence, and no registry data is printed.
 `;
 
-
+}
 
     console.log("AFTER_LOOP7_INSTRUCTION");
 
