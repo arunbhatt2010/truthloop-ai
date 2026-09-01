@@ -1966,7 +1966,10 @@ if (loopLevel === 7) {
 }
     const maxTokens =
   loopLevel === 7 ? 1700 : 220;
-
+const cleanMessages = messages.map(m => ({
+  role: m.role,
+  content: String(m.content || "")
+}));
     
     let response;
 
@@ -2011,7 +2014,7 @@ if (loopLevel === 7) {
           role: "system",
           content: systemPrompt
         },
-        ...messages.slice(-4)
+        ...cleanMessages.slice(-4)
       ],
   temperature: 0.7,
   max_tokens: maxTokens,
