@@ -1000,6 +1000,7 @@ console.log(
 
 console.log("BEFORE_LOOP7_INSTRUCTION");
 } 
+    let loop7EvidenceSourceIndexCompact = [];
 if (loopLevel === 7) {
 
 
@@ -1048,8 +1049,11 @@ function buildLoop7EvidenceSourceIndex(value = {}) {
 const loop7EvidenceSourceIndex =
   buildLoop7EvidenceSourceIndex(compressedEvidencePackage?.loop7Package || {});
 
-const loop7EvidenceSourceIndexCompact =
-  loop7EvidenceSourceIndex.map(({sourceId,label,url}) => ({sourceId,label,url}));
+loop7EvidenceSourceIndexCompact =
+  loop7EvidenceSourceIndex.map(
+    ({ sourceId, label, url }) =>
+    ({ sourceId, label, url })
+  );
 
 console.log("LOOP7_EVIDENCE_SOURCE_COUNT", loop7EvidenceSourceIndexCompact.length);
 
