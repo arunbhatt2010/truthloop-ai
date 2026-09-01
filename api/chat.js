@@ -1623,7 +1623,7 @@ Before returning the report verify:
 
 `;
 
-
+}
 
     console.log("AFTER_LOOP7_INSTRUCTION");
 
@@ -2856,4 +2856,4 @@ paywall:false
 
   }
         }
-}
+
