@@ -2131,6 +2131,24 @@ console.log(
      * Discover GitHub URL only.
      * Discovery performs NO API call.
      */
+   function findPlatformUrl({
+    requestedLinks = [],
+    websiteSources = [],
+    platform = ""
+}) {
+    const allUrls = [
+        ...requestedLinks,
+        ...websiteSources.map(
+            source => source?.url
+        ).filter(Boolean)
+    ];
+
+    return allUrls.find(url =>
+        String(url)
+            .toLowerCase()
+            .includes(platform.toLowerCase())
+    );
+   }
     githubUrl =
         findPlatformUrl({
             requestedLinks,
