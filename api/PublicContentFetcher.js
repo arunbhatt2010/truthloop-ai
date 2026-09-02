@@ -986,8 +986,8 @@ function shouldQueueUrl(url, rootUrl) {
     // Cross-platform discovery belongs to CrossEvidenceBrain.
     // PCF fetches the requested public profile itself, but it must not
     // recursively crawl social-platform assets/help/legal/CDN URLs.
-    if (platform !== "website") return false;
-    if (!isSameHost(url, rootUrl)) return false;
+  //  if (platform !== "website") return false;
+ //   if (!isSameHost(url, rootUrl)) return false;
     if (isLegalUrl(url)) return false;
     if (/\.(?:css|js|mjs|map|png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|eot|mp4|mp3|wav|zip|rar|7z|pdf)$/i.test(url)) return false;
 
