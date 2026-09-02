@@ -1,9 +1,10 @@
-<!DOCTYPE html>  
-<head>  
   
-<meta charset="UTF-8" />  
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />  
-  <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
+<!DOCTYPE html>    
+<html lang="en">    
+<head>    
+<meta charset="UTF-8" />    
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>    
+<link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <!-- TruthLoop AI Brand Icons -->
 
@@ -14,852 +15,4807 @@
 <link rel="preload" as="image" href="/logo-dark.png">
 
 <link rel="preload" as="image" href="/logo-light.png">
-<title>TruthLoop AI - Find what you're avoiding</title>  
-  
-<!-- Primary SEO -->  
-<meta name="title" content="TruthLoop AI - Find what you're avoiding" />  
-  
-<meta name="description" content="TruthLoop AI notices recurring emotional and behavioral patterns affecting decisions, overthinking, procrastination, execution, and repeated avoidance loops." />
-<!-- Open Graph -->  
-<meta property="og:type" content="website" />  
-<meta property="og:url" content="https://truthloop.in/" />  
-  
-<meta property="og:title" content="TruthLoop AI - Find what you're avoiding" />  
-  
-<meta property="og:description" content="Most people don’t fail from lack of information. They fail from unconscious patterns driving their decisions and behavior." />  
-  
+<title>TruthLoop AI - Find what you're avoiding</title>    
+    
+<meta name="description" content="TruthLoop exposes the hidden emotional patterns affecting decisions, execution, procrastination, validation addiction, overthinking, and self-sabotage." />    
+<!-- Open Graph -->    
+<meta property="og:type" content="website" />    
+<meta property="og:url" content="https://truthloop.in/app/" />    
+<meta property="og:title" content="TruthLoop AI - Find what you're avoiding" />    
+<meta property="og:description" content="You don’t need more advice. You’re avoiding something deeper. Find the hidden pattern behind your hesitation in 30 seconds." />    
 <meta property="og:image" content="https://truthloop.in/truthloop_logo.png" />
-
+<meta property="og:image:secure_url" content="https://truthloop.in/truthloop_logo.png" />
+<meta property="og:image:type" content="image/jpeg" />    
+<meta property="og:image:width" content="1200" />    
+<meta property="og:image:height" content="630" />    
+    
+<!-- Twitter -->    
+<meta name="twitter:card" content="summary_large_image" />    
+<meta name="twitter:url" content="https://truthloop.in/app" />    
+<meta name="twitter:title" content="TruthLoop AI - Find what you're avoiding" />    
+<meta name="twitter:description" content="TruthLoop AI exposes hidden emotional patterns affecting decisions, execution, and self-sabotage." />    
 <meta name="twitter:image" content="https://truthloop.in/truthloop_logo.png" />
+    
+<!-- Canonical -->    
+<link rel="canonical" href="https://truthloop.in/app/" />    
+<!-- Google Analytics -->    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RBMQ2F6P9Q"></script>    
+    
+<script>    
+window.dataLayer = window.dataLayer || [];    
+    
+function gtag(){    
+  dataLayer.push(arguments);    
+}    
+    
+gtag('js', new Date());    
+gtag('config', 'G-RBMQ2F6P9Q');    
+</script>    
+    <!-- Force fresh deployment -->
+<!-- Razorpay -->    
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>    
+    
+<!-- PayPal -->    
+<script src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>    
+    
+<style>    
+.truthHighlight{    
+    
+display:inline;    
+    
+margin:12px 0;    
+    
+padding:2px 6px;    
+    
+color:orange;    
+    
+font-weight:bold;    
+    
+border-bottom:1px solid orange;    
+    
+background:rgba(255,140,0,0.08);    
+    
+line-height:1.8;    
+    
+  }
+.heroTitle{
+
+font-size:clamp(30px,7vw,42px);
+
+font-weight:800;
+
+line-height:1.15;
+
+text-wrap:balance;
+
+color:#ffffff;
+
+margin-bottom:12px;
+
+text-shadow:0 0 15px rgba(168,85,247,.12);
+transition: opacity .35s ease;
+min-height: 90px;
+  }
+
+.heroTitle span{
+
+color:#a855f7;
+
+}
+
+.heroSub{
+
+color:#cbd5e1;
+
+font-size:clamp(15px,3.8vw,18px);
+
+line-height:1.8;
+
+max-width:65ch;
+
+margin-inline:auto;
+
+margin-bottom:24px;
+
+}
+ .welcomeOverlay{
+
+width:100%;
+
+margin:20px 0;
+
+text-align:center;
+
+transition:.35s ease;
+
+}
+
+.hidden{
+
+display:none;
+
+}
+
+.translatedSlogan{
+
+font-size:clamp(26px,6vw,38px);
+
+font-weight:800;
+
+color:#a855f7;
+
+margin-bottom:20px;
+
+}
+
+.welcomeMessage{
+
+font-size:clamp(16px,4vw,20px);
+
+line-height:1.9;
+
+color:#ddd;
+
+animation:fadeIn .35s ease;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(10px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+  } 
+.heroLine{
+
+width:100%;
+height:clamp(2px,.5vw,3px);
+
+margin-top:18px;
+margin-bottom:24px;
+
+border-radius:999px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+#ff8c00,
+#ffb347,
+#ff8c00,
+transparent
+);
+
+background-size:220% 100%;
+
+animation:lineFlow 3s linear infinite;
+
+box-shadow:
+0 0 22px rgba(255,140,0,.5);
+
+}
+
+@keyframes lineFlow{
+
+0%{
+background-position:0% 0%;
+opacity:.45;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+background-position:220% 0%;
+opacity:.45;
+}
+
+  }
+body{
+background:#050816;
+color:#fff;
+margin:0;
+padding:0;
+min-height:100dvh;
+overflow-x:hidden;
+}
+    
+.container{
+
+width:100%;
+max-width:720px;
+
+margin:auto;
+
+padding:clamp(14px,4vw,28px);
+
+padding-bottom:max(120px,env(safe-area-inset-bottom));
+
+box-sizing:border-box;
+
+}
+#mainInput:focus{    
+    
+outline:none;    
+    
+border-color:orange;    
+    
+box-shadow:    
+0 0 0 3px rgba(255,140,0,0.12);    
+    
+  }    
+.output{
+
+position:relative;
+
+overflow:visible;
+
+background:
+linear-gradient(
+180deg,
+#091224,
+#0d1326
+);
+
+padding:28px 22px;
+
+border-radius:24px;
+
+margin-bottom:14px;
+
+line-height:1.9;
+
+width:100%;
+
+box-sizing:border-box;
+
+border:
+1px solid rgba(255,255,255,.06);
+
+min-height:clamp(320px,45vh,650px);
+
+box-shadow:
+inset 0 0 60px rgba(255,140,0,.03),
+0 25px 80px rgba(0,0,0,.65);
+
+}
+    
+@media(min-width:768px){    
+    
+.container{    
+padding-top:24px;    
+}    
+    
+.output{    
+min-height:clamp(520px,62dvh,760px);   
+}    
+    
+}    
+    
+input,button{
+width:100%;
+padding:clamp(14px,3vw,18px);
+font-size:clamp(15px,3.5vw,17px);
+margin-top:10px;
+border-radius:10px;
+border:none;
+box-sizing:border-box;
+}
+    
+input{    
+background:#111;    
+color:#fff;    
+font-size:clamp(15px,3.5vw,17px);    
+}    
+    
+button{
+background:linear-gradient(45deg,orange,#ff5e00);
+font-weight:bold;
+font-size:clamp(15px,3.5vw,17px);
+padding:clamp(14px,3vw,18px);
+}
+.categoryBtn{
+width:auto;
+padding:clamp(8px,2vw,10px) clamp(12px,3vw,16px);
+margin-top:0;
+background:#181818;
+border:1px solid #2a2a2a;
+color:#fff;
+font-size:clamp(12px,3vw,14px);
+border-radius:999px;
+cursor:pointer;
+transition:0.2s;
+}
+    
+.categoryBtn:hover{    
+border-color:orange;    
+color:orange;    
+}
+.aiOrb{
+
+position:absolute;
+
+top:22px;
+right:22px;
+
+width:14px;
+height:14px;
+
+border-radius:50%;
+
+background:#a855f7;
+
+box-shadow:
+0 0 18px rgba(168,85,247,.8),
+0 0 40px rgba(168,85,247,.35);
+
+animation:orbBreath 3s ease infinite;
+
+}
+
+@keyframes orbBreath{
+
+0%,100%{
+transform:scale(1);
+opacity:.7;
+}
+
+50%{
+transform:scale(1.45);
+opacity:1;
+}
+
+  }  
+#shareBox,
+#paywallBox{
+display:none;
+background:#0b1020;
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+text-align:center;
+border:1px solid rgba(168,85,247,.18);
+box-shadow:0 0 18px rgba(168,85,247,.12);
+}
+#paywallBox{
+line-height:1.8;
+font-size:15px;
+word-break:break-word;
+}
+
+/* =========================
+   LOOP 7 PROCESSING UI
+   ========================= */
+#loop7Processing{
+  display:none;
+  margin-top:20px;
+  padding:22px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(168,85,247,.08),rgba(255,140,0,.05));
+  border:1px solid rgba(168,85,247,.22);
+  box-shadow:0 0 26px rgba(168,85,247,.08);
+}
+#loop7Processing .lp7-title{
+  font-size:22px;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:8px;
+}
+#loop7Processing .lp7-sub{
+  color:#aab2c0;
+  font-size:14px;
+  line-height:1.7;
+}
+.lp7-progress-line{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:rgba(255,255,255,.03);
+  color:#cbd5e1;
+  font-size:14px;
+}
+.lp7-progress-line.done{
+  color:#d1fae5;
+}
+.lp7-progress-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#64748b;
+  flex:0 0 auto;
+}
+.lp7-progress-line.done .lp7-progress-dot{
+  background:#22c55e;
+  box-shadow:0 0 12px rgba(34,197,94,.45);
+}
+.lp7-progress-line.active .lp7-progress-dot{
+  background:#a855f7;
+  box-shadow:0 0 12px rgba(168,85,247,.55);
+  animation:lp7Pulse 1.2s ease-in-out infinite;
+}
+@keyframes lp7Pulse{
+  0%,100%{transform:scale(.9);opacity:.65}
+  50%{transform:scale(1.35);opacity:1}
+}
+#loop7ProcessingSources{
+  margin-top:18px;
+}
+#loop7ProcessingSources .lp7-source-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-bottom:10px;
+}
+#loop7ProcessingSources .lp7-source-title{
+  color:#fbbf24;
+  font-size:15px;
+  font-weight:800;
+}
+#loop7ProcessingSources .lp7-source-count{
+  color:#94a3b8;
+  font-size:12px;
+}
+#loop7ProcessingSourceList{
+  display:grid;
+  gap:8px;
+  max-height:320px;
+  overflow:auto;
+  padding-right:2px;
+}
+.lp7-source-card{
+  padding:11px 12px;
+  border-radius:11px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(0,0,0,.16);
+}
+.lp7-source-id{
+  color:#fbbf24;
+  font-weight:800;
+  font-size:12px;
+}
+.lp7-source-name{
+  color:#e5e7eb;
+  margin-top:3px;
+  font-size:13px;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+.lp7-source-link{
+  display:block;
+  margin-top:4px;
+  color:#60a5fa;
+  font-size:12px;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+.truthScore{
+
+display:inline-block;
+
+margin-bottom:16px;
+
+padding:10px 14px;
+
+border-radius:999px;
+
+background:
+rgba(255,140,0,.08);
+
+border:
+1px solid rgba(255,140,0,.18);
+
+font-size:13px;
+
+color:#ffba72;
+
+animation:scorePulse 2.5s ease infinite;
+
+}
+
+@keyframes scorePulse{
+
+0%,100%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.06);
+
+box-shadow:
+0 0 35px rgba(255,140,0,.32);
+}
+
+  }
+#paySub{
+margin-bottom:18px;
+color:#f0f0f0;
+  }
+/* TruthLoop Pattern Mirror */
+
+#patternProfile{
+
+position:sticky;
+
+top:10px;
+
+z-index:100;
+
+width:100%;
+
+max-height:none;
+
+overflow:visible;
+
+transform:none;
+
+opacity:1;
+
+backdrop-filter:blur(14px);
+
+transition:.3s ease;
+
+}
+.floating-dot{
+
+position:absolute;
+
+border-radius:50%;
+
+background:#a855f7;
+
+box-shadow:
+0 0 12px #a855f7,
+0 0 25px rgba(168,85,247,.5);
+
+opacity:.75;
+
+animation:floatDot linear infinite;
+
+}
+
+.dot1{
+width:5px;
+height:5px;
+left:8%;
+bottom:12%;
+animation-duration:9s;
+}
+
+.dot2{
+width:7px;
+height:7px;
+left:18%;
+bottom:5%;
+animation-duration:12s;
+}
+
+.dot3{
+width:4px;
+height:4px;
+left:32%;
+bottom:10%;
+animation-duration:8s;
+}
+
+.dot4{
+width:6px;
+height:6px;
+left:46%;
+bottom:8%;
+animation-duration:13s;
+}
+
+.dot5{
+width:5px;
+height:5px;
+left:58%;
+bottom:4%;
+animation-duration:10s;
+}
+@keyframes guidePulse{
+  0%{opacity:.5;}
+  50%{
+    opacity:1;
+    text-shadow:0 0 10px rgba(255,140,0,.8);
+  }
+  100%{opacity:.5;}
+  }
+@keyframes floatDot{
+
+0%{
+transform:
+translateY(0px)
+translateX(0px);
+
+opacity:.1;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+transform:
+translateY(-160px)
+translateX(45px);
+
+opacity:0;
+}
+
+  }
+.loopBadge{
+
+display:inline-block;
+
+padding:10px 18px;
+
+border-radius:999px;
+
+background:
+linear-gradient(
+90deg,
+rgba(255,140,0,.18),
+rgba(255,140,0,.05)
+);
+
+border:1px solid rgba(255,140,0,.28);
+
+color:#ffb347;
+
+font-size:12px;
+
+font-weight:700;
+
+letter-spacing:2px;
+
+text-transform:uppercase;
+
+box-shadow:
+0 0 20px rgba(255,140,0,.12);
+
+backdrop-filter:blur(8px);
+
+  }
+.protected-mode .truthHighlight{
+filter:blur(6px);
+user-select:none;
+}
+
+.protected-mode #profileBelief,
+.protected-mode #profileAvoidance{
+filter:blur(8px);
+opacity:.55;
+}
+
+.protected-mode #profileBelief::after,
+.protected-mode #profileAvoidance::after{
+content:" 🔒 Export Protected";
+color:#ffb347;
+  }
+.protected-mode .aiResponse{
+ filter:blur(12px);
+ pointer-events:none;
+ user-select:none;
+  }
+
+.protected-mode #patternProfile{
+filter:blur(12px);
+pointer-events:none;
+user-select:none;
+  }
+  .aiResponse{
+
+width:100%;
+
+max-width:100%;
+
+overflow-wrap:anywhere;
+
+word-break:break-word;
+
+font-size:clamp(15px,3.8vw,18px);
+
+line-height:1.9;
+
+  }
+/* ==================================
+   TruthLoop Loop 7 Report UI v2
+   Replace previous report CSS
+================================== */
+
+.truthLoopReport{
+    margin-top:24px;
+    padding:24px;
+    background:linear-gradient(180deg,#0b1020,#111827);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+    line-height:1.95;
+}
+
+.truthLoopReport h1{
+    text-align:center;
+    margin-bottom:28px;
+    font-size:30px;
+    color:#fff;
+}
+
+.truthLoopReport>div{
+    margin:22px 0;
+    padding:18px;
+    border-radius:16px;
+    background:rgba(255,255,255,.03);
+    border-left:5px solid;
+}
+
+.truthLoopReport h2{
+    margin:0 0 16px;
+    font-size:22px;
+    font-weight:700;
+}
+
+.truthLoopReport p,
+.truthLoopReport li,
+.truthLoopReport div{
+    color:#e5e7eb;
+    font-size:16px;
+}
+
+.truthLoopReport br{
+    line-height:2.1;
+}
+
+/* Section Colors */
+
+#investigationSummary{border-color:#3b82f6;}
+#behavioralFindings{border-color:#a855f7;}
+#hiddenMechanism{border-color:#f97316;}
+#publicEvidence{border-color:#22c55e;}
+#crossEvidence{border-color:#06b6d4;}
+#evidenceConfidence{border-color:#facc15;}
+#finalReflection{border-color:#ec4899;}
+#oneNextAction{border-color:#ef4444;}
+
+#investigationSummary h2{color:#60a5fa;}
+#behavioralFindings h2{color:#c084fc;}
+#hiddenMechanism h2{color:#fb923c;}
+#publicEvidence h2{color:#4ade80;}
+#crossEvidence h2{color:#22d3ee;}
+#evidenceConfidence h2{color:#fde047;}
+#finalReflection h2{color:#f472b6;}
+#oneNextAction h2{color:#f87171;}
+
+#downloadReportBtn{
+    margin-top:28px;
+    border-radius:14px;
+    font-size:17px;
+    font-weight:700;
+    box-shadow:0 0 25px rgba(255,140,0,.25);
+  }
   
-<meta name="twitter:title" content="TruthLoop AI - Find what you're avoiding" />  
-  
-<meta name="twitter:description" content="TruthLoop AI exposes hidden emotional patterns affecting decisions, execution, and self-sabotage." />  
-  
-<meta name="twitter:image" content="https://truthloop.in/truthloop-hook.jpg" />  
-<!-- Canonical -->  
-<link rel="canonical" href="https://truthloop.in/" />  
-  
-<style>  
-  
-body{  
-  background:#0f0f0f;  
-  color:#fff;  
-  font-family:Arial,sans-serif;  
-  margin:0;  
-  padding:0;  
-}  
-  
-.container{  
-  max-width:520px;  
-  margin:auto;  
-  padding:24px 18px 60px;  
-}  
-  
-h1{  
-  font-size:30px;  
-  line-height:1.2;  
-  margin-bottom:12px;  
-}  
-  
-.tagline{  
-  color:#9a9a9a;  
-  font-size:15px;  
-  line-height:1.6;  
-  margin-bottom:28px;  
-}  
-  
-.box{  
-  background:#111;  
-  border:1px solid #222;  
-  border-radius:14px;  
-  padding:18px;  
-  margin-bottom:16px;  
-  text-align:left;  
-}  
-  
-.point{  
-  margin-bottom:12px;  
-  color:#d2d2d2;  
-  line-height:1.6;  
-}  
-  
-.label{  
-  font-size:12px;  
-  color:orange;  
-  font-weight:bold;  
-  letter-spacing:1px;  
-  margin-bottom:12px;  
-}  
-  
-.quote{  
-  background:#0d0d0d;  
-  border-left:3px solid orange;  
-  padding:14px;  
-  border-radius:10px;  
-  margin-top:14px;  
-  color:#e5e5e5;  
-  line-height:1.6;  
-}  
-  
-.category{  
-  padding:14px 0;  
-  border-bottom:1px solid #1d1d1d;  
-}  
-  
-.category:last-child{  
-  border-bottom:none;  
-}  
-  
-.role{  
-  color:#fff;  
-  font-weight:bold;  
-  margin-bottom:6px;  
-  font-size:16px;  
-}  
-  
-.role a{  
-  color:#fff;  
-  text-decoration:none;  
-}  
-  
-.role a:hover{  
-  color:orange;  
-}  
-  
-.desc{  
-  color:#aaa;  
-  line-height:1.5;  
-  font-size:14px;  
-}  
-  
-.cta{  
-  margin-top:28px;  
-}  
-  
-button{  
-  width:100%;  
-  padding:15px;  
-  border:none;  
-  border-radius:10px;  
-  font-size:16px;  
-  font-weight:bold;  
-  cursor:pointer;  
-  background:linear-gradient(45deg,orange,#ff5e00);  
-  color:#000;  
-}  
-  
-.small{  
-  font-size:12px;  
-  color:#777;  
-  margin-top:10px;  
-  text-align:center;  
-}  
-  
-.deep-link{  
-  color:orange;  
-  text-decoration:none;  
-  font-size:14px;  
-}  
-  
-.deep-link:hover{  
-  text-decoration:underline;  
-}  
-  
-.cta-box{  
-  background:#111;  
-  border:1px solid #262626;  
-  border-radius:18px;  
-  padding:24px 18px;  
-  margin:26px 0;  
-  text-align:center;  
-}  
-  
-.cta-head{  
-  font-size:24px;  
-  font-weight:bold;  
-  line-height:1.4;  
-  margin-bottom:12px;  
-  color:#fff;  
-}  
-  
-.cta-text{  
-  color:#bdbdbd;  
-  font-size:15px;  
-  line-height:1.7;  
-  margin-bottom:18px;  
-}  
-  
-.big-cta{  
-  border:1px solid orange;  
-  box-shadow:0 0 20px rgba(255,140,0,0.12);  
-}  
-  
-</style>  
-</head>  
-  
-<body>  
-  
-<div class="container">  
-  <img src="/truthloop_logo.png" 
-     alt="TruthLoop AI Logo"
-     width="260"
-     style="display:block;margin:0 auto 25px auto;">
-<h1>  
-Most AI gives answers.<br>  
-TruthLoop notices patterns.  
-</h1>  
-  
-<div class="tagline">  
-The patterns hidden inside your language, hesitation, contradictions, and repeated behavior.  
-</div>  
-  
-  
-  
-<!-- FIRST CTA -->  
-  
-<div class="cta-box">  
-  
-<div class="cta-head">  
-You don’t need another productivity hack.  
-</div>  
-  
-<div class="cta-text">  
-You might be avoiding something deeper.  
-</div>  
-  
-<button onclick="start()">  
-Start TruthLoop →  
-</button>  
-  
+
+/* ==========================================
+   TruthLoop Loop 7 Report UI v3
+   Frontend-only presentation layer.
+   Backend contracts untouched.
+   ========================================== */
+
+.truthLoopReport{
+    position:relative;
+    margin-top:24px;
+    padding:clamp(18px,4vw,30px);
+    background:
+      radial-gradient(circle at 92% 4%,rgba(168,85,247,.10),transparent 28%),
+      radial-gradient(circle at 8% 18%,rgba(255,140,0,.06),transparent 24%),
+      linear-gradient(180deg,#0b1020,#0a0f1c);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    box-shadow:0 24px 80px rgba(0,0,0,.48);
+    line-height:1.9;
+    overflow:hidden;
+}
+
+.truthLoopReport::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.025) 45%,transparent 60%);
+    transform:translateX(-100%);
+    animation:tlReportShimmer 8s ease-in-out infinite;
+}
+@keyframes tlReportShimmer{
+    0%,55%{transform:translateX(-100%);}
+    75%,100%{transform:translateX(100%);}
+}
+
+.tlr-header{
+    position:relative;
+    text-align:center;
+    padding:8px 4px 22px;
+}
+.tlr-kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 12px;
+    border:1px solid rgba(255,140,0,.25);
+    border-radius:999px;
+    color:#ffb347;
+    background:rgba(255,140,0,.07);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+}
+.tlr-title{
+    margin:14px 0 6px;
+    font-size:clamp(25px,6vw,34px);
+    line-height:1.15;
+    color:#fff;
+}
+.tlr-subtitle{
+    margin:0;
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.tlr-verdict{
+    position:relative;
+    margin:18px 0 20px;
+    padding:20px;
+    border-radius:20px;
+    background:
+      linear-gradient(145deg,rgba(168,85,247,.12),rgba(15,23,42,.78));
+    border:1px solid rgba(168,85,247,.28);
+    box-shadow:inset 0 0 30px rgba(168,85,247,.035);
+}
+.tlr-verdict-label{
+    color:#a78bfa;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    margin-bottom:7px;
+}
+.tlr-verdict-title{
+    color:#fff;
+    font-size:clamp(19px,4.8vw,25px);
+    font-weight:800;
+    line-height:1.35;
+    margin-bottom:16px;
+}
+.tlr-stat-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:9px;
+}
+.tlr-stat{
+    min-width:0;
+    padding:11px 9px;
+    border-radius:12px;
+    background:rgba(0,0,0,.18);
+    border:1px solid rgba(255,255,255,.06);
+    text-align:center;
+}
+.tlr-stat-value{
+    display:block;
+    color:#fff;
+    font-size:18px;
+    font-weight:800;
+}
+.tlr-stat-label{
+    display:block;
+    margin-top:2px;
+    color:#94a3b8;
+    font-size:10px;
+    line-height:1.4;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+}
+
+.tlr-nav{
+    position:sticky;
+    top:8px;
+    z-index:20;
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    padding:7px;
+    margin:0 0 18px;
+    border-radius:14px;
+    background:rgba(5,8,22,.84);
+    border:1px solid rgba(255,255,255,.07);
+    backdrop-filter:blur(16px);
+    scrollbar-width:none;
+}
+.tlr-nav::-webkit-scrollbar{display:none;}
+.tlr-nav a{
+    flex:0 0 auto;
+    padding:7px 10px;
+    border-radius:999px;
+    color:#aab2c0;
+    text-decoration:none;
+    font-size:11px;
+    font-weight:700;
+    white-space:nowrap;
+    border:1px solid transparent;
+}
+.tlr-nav a:hover{
+    color:#fff;
+    border-color:rgba(168,85,247,.25);
+    background:rgba(168,85,247,.08);
+}
+
+.truthLoopReport>div[id]{
+    position:relative;
+    margin:18px 0;
+    padding:18px;
+    border-radius:17px;
+    background:rgba(255,255,255,.028);
+    border-left:4px solid;
+    scroll-margin-top:70px;
+}
+.truthLoopReport h2{
+    margin:0 0 13px;
+    font-size:clamp(19px,4.8vw,23px);
+    font-weight:800;
+}
+.truthLoopReport p,
+.truthLoopReport li,
+.truthLoopReport div{
+    color:#e5e7eb;
+    font-size:15px;
+}
+.truthLoopReport br{line-height:1.9;}
+
+#investigationSummary{border-color:#3b82f6;}
+#behavioralFindings{border-color:#a855f7;}
+#hiddenMechanism{border-color:#f97316;}
+#publicEvidence{border-color:#22c55e;}
+#crossEvidence{border-color:#06b6d4;}
+#evidenceConfidence{border-color:#facc15;}
+#finalReflection{border-color:#ec4899;}
+#oneNextAction{border-color:#ef4444;}
+
+#investigationSummary h2{color:#60a5fa;}
+#behavioralFindings h2{color:#c084fc;}
+#hiddenMechanism h2{color:#fb923c;}
+#publicEvidence h2{color:#4ade80;}
+#crossEvidence h2{color:#22d3ee;}
+#evidenceConfidence h2{color:#fde047;}
+#finalReflection h2{color:#f472b6;}
+#oneNextAction h2{color:#f87171;}
+
+.tlr-citation{
+    display:inline-flex;
+    align-items:center;
+    vertical-align:middle;
+    margin:0 3px;
+    padding:2px 7px;
+    border-radius:7px;
+    border:1px solid rgba(96,165,250,.30);
+    background:rgba(96,165,250,.08);
+    color:#7dd3fc;
+    font:inherit;
+    font-size:.88em;
+    font-weight:800;
+    cursor:pointer;
+}
+.tlr-citation:hover{
+    background:rgba(96,165,250,.16);
+    border-color:rgba(96,165,250,.5);
+}
+
+.tlr-action{
+    border-left-color:#ef4444 !important;
+    background:
+      linear-gradient(145deg,rgba(239,68,68,.07),rgba(255,255,255,.025)) !important;
+}
+.tlr-action::after{
+    content:"";
+    display:block;
+    height:1px;
+    margin-top:18px;
+    background:linear-gradient(90deg,rgba(239,68,68,.35),transparent);
+}
+
+.tlr-confidence{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:5px 10px;
+    margin-bottom:8px;
+    border-radius:999px;
+    background:rgba(250,204,21,.08);
+    border:1px solid rgba(250,204,21,.22);
+    color:#fde68a;
+    font-size:11px !important;
+    font-weight:800;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+}
+
+.tlr-source-card{
+    margin-top:10px;
+    padding:13px;
+    border-radius:13px;
+    background:rgba(255,255,255,.025);
+    border:1px solid rgba(255,255,255,.07);
+}
+.tlr-source-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.tlr-source-id{
+    color:#fbbf24 !important;
+    font-size:11px !important;
+    font-weight:900 !important;
+    letter-spacing:.8px;
+}
+.tlr-source-type{
+    color:#94a3b8 !important;
+    font-size:10px !important;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+}
+.tlr-source-title{
+    margin-top:5px;
+    color:#f1f5f9 !important;
+    font-size:14px !important;
+    font-weight:700 !important;
+    line-height:1.5;
+}
+.tlr-source-date{
+    margin-top:4px;
+    color:#94a3b8 !important;
+    font-size:11px !important;
+}
+.tlr-source-link{
+    display:inline-flex;
+    margin-top:8px;
+    padding:6px 9px;
+    border-radius:8px;
+    color:#60a5fa !important;
+    background:rgba(96,165,250,.06);
+    border:1px solid rgba(96,165,250,.16);
+    font-size:11px !important;
+    text-decoration:none;
+    overflow-wrap:anywhere;
+}
+.tlr-source-link:hover{background:rgba(96,165,250,.12);}
+
+.tlr-empty{
+    color:#94a3b8 !important;
+    font-size:13px !important;
+}
+
+#downloadReportBtn{
+    margin-top:26px;
+    border-radius:14px;
+    font-size:16px;
+    font-weight:800;
+    box-shadow:0 0 25px rgba(255,140,0,.22);
+}
+
+.tlr-modal-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:100000;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    padding:14px;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(8px);
+}
+.tlr-modal{
+    width:min(620px,100%);
+    max-height:min(78dvh,680px);
+    overflow:auto;
+    padding:20px;
+    border-radius:20px;
+    background:linear-gradient(180deg,#111827,#080c18);
+    border:1px solid rgba(168,85,247,.28);
+    box-shadow:0 25px 90px rgba(0,0,0,.7);
+}
+.tlr-modal-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:15px;
+}
+.tlr-modal h3{
+    margin:0;
+    color:#fff;
+    font-size:20px;
+}
+.tlr-modal-meta{
+    margin-top:5px;
+    color:#94a3b8;
+    font-size:12px;
+}
+.tlr-modal-close{
+    flex:0 0 auto;
+    width:auto;
+    margin:0;
+    padding:7px 10px;
+    border-radius:9px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:#fff;
+    cursor:pointer;
+}
+.tlr-modal-evidence{
+    margin-top:16px;
+    padding:14px;
+    border-radius:13px;
+    background:rgba(255,255,255,.035);
+    border-left:3px solid #a855f7;
+    color:#dbeafe;
+    line-height:1.8;
+    font-size:14px;
+}
+.tlr-modal-open{
+    display:inline-block;
+    margin-top:14px;
+    padding:10px 13px;
+    border-radius:10px;
+    background:rgba(96,165,250,.10);
+    border:1px solid rgba(96,165,250,.22);
+    color:#7dd3fc;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:800;
+}
+
+@media(max-width:520px){
+    .truthLoopReport{padding:15px;border-radius:20px;}
+    .truthLoopReport>div[id]{padding:15px;}
+    .tlr-stat-grid{gap:6px;}
+    .tlr-stat{padding:9px 5px;}
+    .tlr-stat-value{font-size:16px;}
+    .tlr-nav{top:5px;}
+    .tlr-nav a{font-size:10px;padding:6px 8px;}
+}
+
+</style><script type="text/javascript">    
+    (function(c,l,a,r,i,t,y){    
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};    
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;    
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);    
+    })(window, document, "clarity", "script", "wqdq8qf8r3");    
+</script>    
+</head>    
+    
+<body>    
+<div id="restoreScreen" style="display:none;">
+
+<h2>Journey Found</h2>
+
+<p id="restorePattern"></p>
+
+<p id="restoreLoop"></p>
+
+<button id="continueJourneyBtn">
+CONTINUE JOURNEY
+</button>
+
+<button id="newPatternBtn">
+START NEW PATTERN
+</button>
+
 </div>
-  <div class="trust-block">
-<p>✓ No signup required</p>
-<p>✓ No account required</p>
-<p>✓ Free pattern analysis</p>
-<p>✓ Takes less than 2 minutes</p>
-  </div>
-  <section style="max-width:800px;margin:40px auto;padding:20px;">
 
-<h2 style="text-align:center;">
-See TruthLoop In Action
+<div id="mainApp">
 
-Real examples of hesitation loops,
-avoidance patterns, and hidden contradictions.
+<div class="container">    
+<h1 id="heroTitle" class="heroTitle">
+Find what you're <span>avoiding.</span>
+</h1>
+
+<div class="heroLine"></div>
+
+<p class="heroSub">
+Most people don't need more advice.
+<span>
+They need to see the hidden pattern behind their hesitation.
+</span>
+</p>
+<div class="aiOrb"></div>  
+<div class="floatingDot" style="
+top:120px;
+left:12%;
+animation-duration:8s;
+"></div>
+
+<div class="floatingDot" style="
+top:220px;
+left:72%;
+animation-duration:11s;
+"></div>
+
+<div class="floatingDot" style="
+top:420px;
+left:35%;
+animation-duration:9s;
+"></div>
+
+<div class="floatingDot" style="
+top:540px;
+left:82%;
+animation-duration:13s;
+"></div>
+
+<div class="floatingDot" style="
+top:780px;
+left:18%;
+animation-duration:10s;
+"></div>
+
+<div class="floatingDot" style="
+top:980px;
+left:60%;
+animation-duration:14s;
+"></div>
+  <img 
+src="/truthloop_logo.png"
+alt="TruthLoop AI Logo"
+style="
+width:180px;
+max-width:70%;
+height:auto;
+margin-bottom:14px;
+"
+/>
+<h2 style="
+margin-top:0;
+margin-bottom:4px;
+font-size:28px;
+color:#fff;
+
+text-shadow:
+0 0 15px rgba(168,85,247,.15);
+">
+TruthLoop AI 
 </h2>
 
-<img src="TruthLoop AI demo.jpg"
-alt="TruthLoop Example"
-style="width:100%;border-radius:12px;margin-bottom:20px;">
+<p style="    
+color:#aaa;    
+margin-top:0;    
+margin-bottom:14px;    
+font-size:15px;    
+line-height:1.6;    
+">    
+</p>    
 
-<img src="TruthLoop AI demo1.jpg"
-alt="TruthLoop Example"
-style="width:100%;border-radius:12px;">
+  <div style="
+margin-bottom:18px;
 
-  </section>
-  
-  
-<div class="box">  
-  
-<div class="label">WHAT PEOPLE REALIZE</div>  
-  
-<div class="quote">  
-“I refine clarity, not emotion.”  
-</div>  
-  
-<div class="quote">  
-“You keep changing direction right before consistency becomes measurable.”  
-</div>  
-  
-<div class="quote">  
-“Part of you wants growth.<br>  
-Another part avoids proof.”  
-</div>  
-  
-</div>  
-  
-  
-  
-<div class="box">
+background:linear-gradient(
+145deg,
+#0b1020,
+#131a33
+);
 
-<div class="label">THIS ISN’T THERAPY</div>
+border:1px solid rgba(168,85,247,.15);
 
-<div class="point">
-TruthLoop doesn't diagnose, motivate, or give life advice.
-</div>
+padding:14px;
 
-<div class="point">
-It notices hesitation loops, behavioral patterns, and hidden contradictions.
-</div>
+border-radius:14px;
 
-<div class="point">
-Most users already know what they should do.
-</div>
-
-<div class="point">
-The pattern is what keeps stopping them.
-</div>
-
-</div>
-  
-  <div class="cta-box">
-
-<div class="cta-head">
-Not sure how to use TruthLoop AI?
-</div>
-
-<div class="cta-text">
-Learn how the 7-loop clarity system works,
-what questions work best,
-and how TruthLoop notices behavioral patterns,
-emotional patterns,
-and hesitation loops inside real conversations.
-</div>
-
-<button onclick="window.location.href='https://truthloop.in/how-to-use-truthloop.html'">
-How To Use TruthLoop AI →
-</button>
-
-  </div>
-  
-<div class="box">
-
-<div class="label">WHAT WORKS BEST</div>
-
-<div class="category">
-<div class="role">Why do I procrastinate?</div>
-<div class="desc">Repeated delay despite knowing what needs to be done.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I overthink everything?</div>
-<div class="desc">Analysis keeps replacing action.</div>
-</div>
-
-<div class="category">
-<div class="role">Why am I stuck in life?</div>
-<div class="desc">Progress feels blocked despite effort.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I keep delaying important things?</div>
-<div class="desc">Important actions stay permanently postponed.</div>
-</div>
-
-<div class="category">
-<div class="role">Why can't I stay consistent?</div>
-<div class="desc">Strong starts followed by repeated drop-offs.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I lose motivation so quickly?</div>
-<div class="desc">Initial energy disappears before results appear.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I keep restarting everything?</div>
-<div class="desc">Progress resets before momentum compounds.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I avoid difficult tasks?</div>
-<div class="desc">Avoidance feels safer than confronting discomfort.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I fear failure?</div>
-<div class="desc">Fear quietly influences decisions and actions.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I fear success?</div>
-<div class="desc">Growth creates pressure and responsibility.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I seek validation from others?</div>
-<div class="desc">External approval becomes a hidden requirement.</div>
-</div>
-
-<div class="category">
-<div class="role">Why can't I make decisions?</div>
-<div class="desc">Uncertainty keeps replacing commitment.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I self sabotage?</div>
-<div class="desc">Progress triggers resistance instead of momentum.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I feel lost in life?</div>
-<div class="desc">Direction disappears despite constant thinking.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I keep doubting myself?</div>
-<div class="desc">Self-trust collapses when action becomes real.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I never finish what I start?</div>
-<div class="desc">Completion feels harder than beginning.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I know what to do but don't do it?</div>
-<div class="desc">Awareness exists but execution never follows.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I keep comparing myself to others?</div>
-<div class="desc">Comparison quietly drives behavior and decisions.</div>
-</div>
-
-<div class="category">
-<div class="role">Why do I feel overwhelmed all the time?</div>
-<div class="desc">Too many inputs create emotional overload.</div>
-</div>
-
-<div class="category">
-<div class="role">Why can't I take action?</div>
-<div class="desc">Clarity exists but movement never starts.</div>
-</div>
-
-<div class="quote">
-TruthLoop works best when the problem involves hesitation, avoidance, overthinking, procrastination, validation-seeking, execution resistance, emotional patterns, or repeated behavioral loops.
-</div>
-
-  </div>
-  
-  
-  
-<!-- SECOND CTA -->  
-  
-<div class="cta-box">
-
-<div class="cta-head">
-You already know the advice.
-</div>
-
-<div class="cta-text">
-The real question is: what are you still avoiding?
-</div>
-
-<button onclick="start()">
-Start TruthLoop →
-</button>
-
-</div>
-  
-<!-- WHAT IS TRUTHLOOP -->  
-  
-<div class="box">  
-  
-<div class="label">WHAT IS TRUTHLOOP?</div>  
-  
-<div class="point">  
-TruthLoop is an AI clarity system designed to expose the hidden patterns behind procrastination, self-sabotage, overthinking, validation-seeking, hesitation, and repeated behavioral loops.  
-</div>  
-  
-<div class="point">  
-Most AI tools give advice, motivation, or productivity hacks.  
-</div>  
-  
-<div class="point">  
-TruthLoop does the opposite.  
-</div>  
-  
-<div class="point">  
-It listens to how people describe their situation and notices the contradictions, emotional distance, hesitation patterns, and protective behaviors hidden inside their own language.  
-</div>  
-  
-<div class="point">  
-The goal is not motivation.  
-</div>  
-  
-<div class="point">  
-The goal is recognition.  
-</div>  
-  
-<div class="quote">  
-“Most people don’t need more advice.<br>  
-They need to notice what keeps repeating.”  
-</div>  
-  
-</div>  
-  
-  
-  
-<!-- HOW LOOPS WORK -->  
-  
-<div class="box">  
-  
-<div class="label">HOW THE 7 LOOPS WORK</div>  
-  
-<div class="point">  
-TruthLoop works through 7 progressive loops.  
-</div>  
-  
-<div class="point">  
-Each loop moves deeper into the pattern underneath the user's behavior.  
-</div>  
-  
-<div class="point">  
-Loop 1 identifies the visible problem.  
-</div>  
-  
-<div class="point">  
-Loop 2 notices recurring tension.  
-</div>  
-  
-<div class="point">  
-Loop 3 follows hesitation and delay patterns.  
-</div>  
-  
-<div class="point">  
-Loop 4 observes where clarity repeatedly collapses.  
-</div>  
-  
-<div class="point">  
-Loop 5 explores emotional avoidance and self-protection.  
-</div>  
-  
-<div class="point">  
-Loop 6 examines resistance between awareness and action.  
-</div>  
-  
-<div class="point">  
-Loop 7 focuses on contradiction, commitment, and behavioral patterns.
-</div>  
-  
-<div class="point">  
-The system is intentionally progressive.  
-</div>  
-  
-<div class="point">  
-It reveals patterns gradually,  
-not instantly.  
-</div>  
-  
-<div class="quote">  
-“Recognition becomes uncomfortable<br>  
-when the pattern keeps repeating<br>  
-even after awareness appears.”  
-</div>  
-  
-</div>  
-  
-  
-  
-<!-- WHAT TRUTHLOOP IS NOT -->  
-  
-<div class="box">  
-  
-<div class="label">WHAT TRUTHLOOP IS NOT</div>  
-  
-<div class="point">  
-TruthLoop is not therapy.  
-</div>  
-  
-<div class="point">  
-It does not diagnose mental health conditions.  
-</div>  
-  
-<div class="point">  
-It does not predict the future,  
-read minds,  
-or replace professional advice.  
-</div>  
-  
-<div class="point">  
-TruthLoop notices contradictions, hesitation, emotional distance, and repeated behavioral patterns inside the user's own responses.  
-</div>  
-  
-<div class="point">
-The experience often feels accurate because the pattern comes from the user's own language.
-</div>
-
-</div>
-
-<div class="box">
-  
-<div class="label">WHAT TRUTHLOOP FOCUSES ON</div>  
-  
-<div class="point">  
-TruthLoop works best for:  
-decisions,  
-hesitation,  
-overthinking,  
-procrastination,  
-execution problems,  
-creative resistance,  
-validation loops,  
-behavioral contradictions,  
-and repeated avoidance patterns.  
-</div>  
-  
-<div class="point">  
-It is not designed for:  
-medical advice,  
-mental health diagnosis,  
-crisis support,  
-or relationship counseling.  
-</div>  
-  
-<div class="quote">  
-“TruthLoop focuses on patterns behind behavior —  
-not personal diagnosis.”  
-</div>  
-  
-</div>  
-  </div>  
+box-shadow:
+0 0 20px rgba(168,85,247,.05);
+">
+<div class="heroLine"></div>   
+<div style="
+display:none;
+font-size:13px;    
+color:#888;    
+margin-bottom:12px;    
+letter-spacing:1px;    
+text-transform:uppercase;    
+">    
+Choose your current pattern    
+</div>    
     
-  
-<div class="box">  
-  
-<div class="label">GO DEEPER</div>  
-  
-<div class="category">  
-  
-  <div class="role">  
-    Procrastination  
-  </div>  
-  
-  <div class="desc">  
-    Sometimes delay isn’t laziness.  
-    It’s emotional protection.  
-    <br><br>  
-  
-    <a class="deep-link"  
-    href="/why-you-procrastinate.html">  
-      → Why you procrastinate  
-    </a>  
-  </div>  
-  
+<div style="
+display:none;
+flex-wrap:wrap;
+gap:10px;
+">
+    
+<button class="categoryBtn" data-type="creator">Creator</button>    
+    
+<button class="categoryBtn" data-type="writer">Writer</button>    
+    
+<button class="categoryBtn" data-type="author">Author</button>    
+    
+<button class="categoryBtn" data-type="founder">Founder</button>    
+    
+<button class="categoryBtn" data-type="owner">Owner</button>    
+    
+<button class="categoryBtn" data-type="student">Student</button>    
+<button class="categoryBtn" data-type="jobseeker">    
+Job Seeker    
+</button>    
+<button class="categoryBtn" data-type="overthinker">Overthinker</button>    
+<button class="categoryBtn" data-type="pattern">    
+You vs Your Pattern    
+</button>    
+<button class="categoryBtn" data-type="validation">Validation</button>    
+    
+<button class="categoryBtn" data-type="failure">Fear of Failure</button>    
+    
 </div>  
-  
-<div class="category">  
-  
-  <div class="role">  
-    Validation  
-  </div>  
-  
-  <div class="desc">  
-    Attention can quietly become emotional dependency.  
-    <br><br>  
-  
-    <a class="deep-link"  
-    href="/why-you-seek-validation.html">  
-      → Why you seek validation  
-    </a>  
-  </div>  
-  
-</div>  
-  
-<div class="category">  
-  
-  <div class="role">  
-    Feeling Stuck  
-  </div>  
-  
-  <div class="desc">  
-    Confusion sometimes protects people from difficult decisions.  
-    <br><br>  
-  
-    <a class="deep-link"  
-    href="/why-you-feel-stuck.html">  
-      → Why you feel stuck  
-    </a>  
-  </div>  
-  
-</div>  
-  
-</div>  
-  
-  
-  
-<div class="box">  
-  
-<div class="label">WHAT ACTUALLY HAPPENS</div>  
-  
-<div class="point">  
-1. You describe your real situation  
-</div>  
-  
-<div class="point">  
-2. TruthLoop notices behavioral patterns  
-</div>  
-  
-<div class="point">  
-3. The conversation gets uncomfortably accurate  
-</div>  
-  
-<div class="point">  
-4. You realize what you keep repeating  
-</div>  
-  
-</div>  
-<!-- GitHub CTA -->
+  <div id="hintBox" style="
+display:none;    
+margin-top:12px;
+margin-bottom:12px;
+padding:14px 18px;
+border-radius:12px;
+background:rgba(255,140,0,0.12);
+border:1px solid rgba(255,140,0,0.35);
+color:orange;
+font-size:15px;
+font-weight:bold;
+text-align:center;
+cursor:pointer;
+">
 
-<a
-    href="https://github.com/arunbhatt2010/truthloop-ai"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="truthloop-github-cta"
+💡 HOW DOES THIS WORK?
+
+</div>
+
+<div id="hintContent" style="
+display:none;
+background:#111;
+border:1px solid #222;
+padding:12px;
+border-radius:10px;
+font-size:14px;
+line-height:1.7;
+color:#ddd;
+margin-bottom:10px;
+">
+
+• Select a pattern<br><br>
+
+• Use the suggested question or rewrite it<br>
+
+<span style="color:orange;font-weight:bold;">
+(Or ask your own question. Discover the hidden pattern behind it.)
+</span><br><br>
+
+• Click "Show me the truth"<br><br>
+
+• Answer follow-up questions honestly<br>
+
+<span style="color:orange;font-weight:bold;">
+(The pattern appears in your answers. Avoid only "yes", "no", or one-word replies. Detailed responses reveal deeper patterns.)
+</span>
+</div>
+   <div class="cta-box" style="
+margin-top:22px;
+margin-bottom:18px;
+padding:28px;
+border-radius:22px;
+
+background:linear-gradient(
+145deg,
+#0b1020,
+#131a33
+);
+
+border:1px solid rgba(168,85,247,.18);
+
+box-shadow:
+0 0 30px rgba(168,85,247,.12),
+0 0 80px rgba(168,85,247,.05);
+
+text-align:center;
+position:relative;
+overflow:hidden;
+">
+
+<div style="
+position:absolute;
+top:-40px;
+right:-40px;
+width:140px;
+height:140px;
+background:rgba(168,85,247,.12);
+border-radius:50%;
+filter:blur(40px);
+"></div>
+
+<div
+id="loopIndicator"
+class="loopBadge"
+style="display:block;"
 >
-    <i class="fab fa-github"></i>
-    <span>🧡 Behind The Build</span>
-</a>
+LOOP 1 OF 7
+</div>
 
-<style>
-.truthloop-github-cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+<div id="patternProfile"
+style="
+display:block;
+margin:16px 0;
+padding:18px;
 
-    padding: 14px 22px;
-    border-radius: 14px;
+background:linear-gradient(
+145deg,
+rgba(15,23,42,.95),
+rgba(30,27,75,.90)
+);
 
-    background: linear-gradient(
-        135deg,
-        #ff9800,
-        #ff6f00
+border:1px solid rgba(168,85,247,.35);
+
+border-radius:16px;
+
+line-height:1.8;
+
+box-shadow:
+0 0 25px rgba(168,85,247,.12),
+inset 0 0 20px rgba(168,85,247,.05);
+">
+
+<div id="profilePrimary"
+style="
+color:#ffffff;
+font-size:15px;
+font-weight:700;
+margin-top:10px;
+margin-bottom:8px;
+display:block;
+">
+Primary Loop:
+</div>
+
+<div id="profileTrigger"
+style="
+color:#c4b5fd;
+font-size:13px;
+margin-bottom:8px;
+display:block;
+">
+Emotional Driver:
+</div>
+
+<div id="profileAvoidance"
+style="
+color:#94a3b8;
+font-size:13px;
+margin-bottom:8px;
+display:block;
+">
+Avoidance Style:
+</div>
+
+<div id="profileBelief"
+style="
+color:#fbbf24;
+font-size:13px;
+display:block;
+">
+Underlying Belief:
+</div>
+
+</div>
+
+<div id="outputBox" class="output">    
+<div class="floating-dot dot1"></div>
+<div class="floating-dot dot2"></div>
+<div class="floating-dot dot3"></div>
+<div class="floating-dot dot4"></div>
+<div class="floating-dot dot5"></div>    
+<div style="    
+color:orange;    
+font-size:11px;    
+font-weight:bold;    
+letter-spacing:2px;    
+margin-bottom:14px;    
+">    
+PATTERN SCAN   
+</div> 
+  <div style="
+width:70px;
+height:2px;
+margin:0 auto 24px;
+background:linear-gradient(90deg,transparent,#a855f7,transparent);
+"></div>
+  <div id="idleGuide" style="
+display:none;
+margin:32px 0;
+text-align:center;
+line-height:1.9;
+animation:fadeIn .35s ease;
+">
+
+<p style="
+color:#ffffff;
+font-size:19px;
+font-weight:700;
+margin-bottom:22px;
+">
+TruthLoop speaks your language.<br>
+<span style="color:#a855f7;">Human patterns don't.</span>
+</p>
+
+<p style="
+color:#d4d4d4;
+font-size:17px;
+margin-bottom:22px;
+">
+Patterns hide in every language.<br>
+<span style="color:#ffffff;">Recognition doesn't.</span>
+</p>
+
+<p style="
+color:#d4d4d4;
+font-size:17px;
+margin-bottom:22px;
+">
+Every visible problem is part of an invisible loop.<br>
+<span style="color:#ffb347;font-weight:600;">
+Let's break yours.
+</span>
+</p>
+
+<p style="
+color:#ffffff;
+font-size:18px;
+font-weight:700;
+margin-bottom:8px;
+">
+Show me your thoughts.
+</p>
+
+<p style="
+color:#a855f7;
+font-size:17px;
+font-weight:600;
+margin:0;
+">
+Reply to TruthLoop AI.
+</p>
+
+  </div>
+</div>   
+
+    
+
+<div id="categoryMessage" style="    
+display:none;    
+background:#101010;    
+border-left:3px solid orange;    
+padding:14px;    
+border-radius:10px;    
+margin-bottom:18px;    
+color:#f0f0f0;    
+line-height:1.7;    
+font-size:15px;    
+transition:0.2s;    
+">
+
+Category selected.    
+</div>
+</div>
+ <div id="welcomeOverlay" class="welcomeOverlay hidden">
+
+<div id="translatedSlogan" class="translatedSlogan">
+Find what you're avoiding.
+</div>
+
+<div id="welcomeMessage" class="welcomeMessage">
+
+<p>TruthLoop speaks your language.<br>
+Human patterns don't.</p>
+
+<p>Patterns hide in every language.<br>
+Recognition doesn't.</p>
+
+<p>Every visible problem is part of an invisible loop.<br>
+Let's break yours.</p>
+
+<p>Show me your thoughts.<br>
+Reply to TruthLoop AI.</p>
+
+</div>
+
+ </div>   
+<input id="mainInput"    
+placeholder="Start with what's on your mind..."  
+style="    
+background:#101010;    
+border:1px solid #262626;    
+box-shadow:0 0 0 1px rgba(255,140,0,0.05);    
+"/>    
+<div id="guideText" style="display:none;"></div>
+<button id="getBtn">    
+Go deeper →
+</button>    
+    
+<input id="reflectionInput"
+style="display:none;"
+placeholder="Answer honestly..."/>
+
+<button id="nextBtn" style="display:none;">
+Go deeper
+</button>
+    
+<!-- SHARE BOX -->    
+    
+<div id="shareBox">    
+    
+<div id="shareText"></div>    
+    
+<button onclick="copyShare()">    
+Copy    
+</button>    
+    
+<button onclick="whatsappShare()">    
+WhatsApp    
+</button>    
+    
+</div>    
+<div id="articleBlock" style="    
+display:none;    
+margin-top:22px;    
+margin-bottom:18px;    
+padding:16px;    
+background:#111;    
+border:1px solid #222;    
+border-radius:14px;    
+line-height:1.8;    
+">    
+    
+<div style="    
+font-size:16px;    
+font-weight:bold;    
+margin-bottom:10px;    
+color:#fff;    
+">    
+Explore More Clarity Systems    
+</div>    
+    
+<a href="https://truthloop.in/why-you-feel-stuck.html"    
+style="    
+display:block;    
+margin-bottom:10px;    
+color:orange;    
+text-decoration:none;    
+">    
+→ Why You Feel Stuck    
+</a>    
+    
+<a href="https://truthloop.in/why-you-procrastinate.html"    
+style="    
+display:block;    
+margin-bottom:10px;    
+color:orange;    
+text-decoration:none;    
+">    
+→ Why You Procrastinate    
+</a>    
+    
+<a href="https://truthloop.in/why-you-seek-validation.html"    
+style="    
+display:block;    
+margin-bottom:10px;    
+color:orange;    
+text-decoration:none;    
+">    
+→ Why You Seek Validation    
+</a>    
+    
+<a href="https://truthloop.in/"    
+style="    
+display:block;    
+color:#fff;    
+text-decoration:none;    
+font-weight:bold;    
+">    
+→ Visit TruthLoop AI    
+</a>    
+    
+</div>    
+<!-- PAYWALL -->    
+    
+<div id="paywallBox">    
+    
+<div id="paySub"></div>    
+    
+<button id="razorpayBtn"></button>    
+    
+<div id="paypal-button"></div>    
+    
+</div>    
+    
+</div>    
+    
+<script>    
+    
+const API_URL="/api/chat";    
+const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
+    
+const outputBox=document.getElementById("outputBox");    
+const mainInput=document.getElementById("mainInput");    
+const reflectionInput=document.getElementById("reflectionInput");    
+const getBtn=document.getElementById("getBtn");    
+const nextBtn=document.getElementById("nextBtn");    
+    
+const shareBox=document.getElementById("shareBox");    
+const shareText=document.getElementById("shareText");    
+    
+const paywallBox=document.getElementById("paywallBox");    
+const paySub=document.getElementById("paySub");    
+const razorpayBtn=document.getElementById("razorpayBtn");
+  const welcomeOverlay = document.getElementById("welcomeOverlay");
+
+let welcomeShown = false;
+let welcomeDisabled = false;
+
+function disableWelcome() {
+    welcomeDisabled = true;
+
+    const overlay = document.getElementById("idleGuide");
+    if (overlay) overlay.style.display = "none";
+
+    if (welcomeOverlay) {
+        welcomeOverlay.classList.add("hidden");
+    }
+  }
+ mainInput.addEventListener("focus", () => {
+    window.hasStartedJourney = true;
+
+    disableWelcome();
+
+    const overlay = document.getElementById("idleGuide");
+    if (overlay) {
+        overlay.style.display = "none";
+    }
+});
+  document.addEventListener("pointerdown", (e) => {
+
+    if (welcomeDisabled) return;
+
+    // Input ya button touch hua to kuch mat karo
+    if (
+        mainInput.contains(e.target) ||
+        getBtn.contains(e.target)
+    ) {
+        return;
+    }
+
+    // Sirf pehle dead touch par
+    if (!welcomeShown) {
+
+        welcomeShown = true;
+
+        const overlay = document.getElementById("idleGuide");
+
+        if (overlay) {
+            overlay.style.display = "block";
+        }
+
+    }
+
+});
+let loopLevel=1;
+let messages=[];
+let payment49=false;
+let payment199=false;
+let userCountry = "IN";  
+let currentCategory="";
+let waitingForLoop7Bridge = false;
+let isLoading=false;
+let latestTruthLoopReport = "";
+let investigationSource = "";
+let profileCards = [];
+let evidenceSourceRegistry = [];
+const LOOP7_MEMORY_MESSAGE_LIMIT = 12;
+const MEMORY_VERSION = 2;
+const UI_TEXT = {
+  en: {
+    hero: 'Find what you\'re <span>avoiding.</span>',
+    line1: 'TruthLoop speaks your language.<br><span style="color:#a855f7;">Human patterns don\'t.</span>',
+    line2: 'Patterns hide in every language.<br><span style="color:#ffffff;">Recognition doesn\'t.</span>',
+    line3: 'Every visible problem is part of an invisible loop.<br><span style="color:#ffb347;font-weight:600;">Let\'s break yours.</span>',
+    line4: 'Show me your thoughts.',
+    line5: 'Reply to TruthLoop AI.'
+  }
+};
+const questionMap = {
+
+creator:[
+"Why do I keep creating but struggle to grow?",
+"What pattern keeps slowing my progress?",
+"Why does visibility feel uncomfortable?"
+],
+
+writer:[
+"Why do I delay publishing my work?",
+"Why do I keep rewriting instead of sharing?",
+"What pattern keeps repeating here?"
+],
+
+author:[
+"Why do I hesitate to publish?",
+"Why does finishing feel harder than starting?",
+"What am I not seeing?"
+],
+
+founder:[
+"Why do I delay important decisions?",
+"What keeps this pattern alive?",
+"Why do I keep carrying uncertainty?"
+],
+
+owner:[
+"Why do I feel stuck despite effort?",
+"What am I not seeing?",
+"What keeps repeating?"
+],
+
+student:[
+"Why do I know what to do but still delay it?",
+"Why does progress feel slower than expected?",
+"What pattern keeps repeating?"
+],
+
+jobseeker:[
+"Why do I hesitate to put myself forward?",
+"Why does rejection feel so heavy?",
+"What am I not seeing?"
+],
+
+overthinker:[
+"Why do I keep overthinking even when I know what to do?",
+"Why do I need certainty before acting?",
+"Why do simple decisions feel heavy?"
+],
+
+pattern:[
+"What keeps repeating in my life?",
+"What am I not seeing?",
+"Why does this pattern stay alive?"
+],
+
+validation:[
+"Why do I need validation before acting?",
+"Why does criticism affect me so much?",
+"What am I not seeing?"
+],
+
+failure:[
+"Why do I fear failure before I begin?",
+"Why do I avoid situations that test me?",
+"What pattern keeps repeating?"
+]
+
+};
+
+/* =========================
+   🧠 PERSISTENT CASE MEMORY
+   ========================= */
+
+function normalizeProfileCard(data, loop = loopLevel){
+  if(!data || typeof data !== "object") return null;
+
+  const card = {
+    loop: Number(loop) || null,
+    primaryLoop: String(data.primaryLoop || "").trim(),
+    emotionalDriver: String(data.emotionalDriver || "").trim(),
+    avoidanceStyle: String(data.avoidanceStyle || "").trim(),
+    hiddenAssumption: String(
+      data.hiddenAssumption || data.underlyingBelief || ""
+    ).trim()
+  };
+
+  if(!(
+    card.primaryLoop ||
+    card.emotionalDriver ||
+    card.avoidanceStyle ||
+    card.hiddenAssumption
+  )) return null;
+
+  return card;
+}
+
+function rememberProfileCard(data, loop = loopLevel){
+  const card = normalizeProfileCard(data, loop);
+  if(!card) return;
+
+  const key = JSON.stringify(card);
+
+  profileCards = profileCards.filter(
+    item => JSON.stringify(item) !== key
+  );
+
+  profileCards.push(card);
+  profileCards = profileCards.slice(-6);
+}
+
+function restoreLatestProfileCard(){
+  const card = profileCards[profileCards.length - 1];
+  if(!card) return;
+
+  document.getElementById("patternProfile").style.display = "block";
+
+  document.getElementById("profilePrimary").innerText =
+    "Primary Loop: " + (card.primaryLoop || "--");
+
+  document.getElementById("profileTrigger").innerText =
+    "Emotional Driver: " + (card.emotionalDriver || "--");
+
+  document.getElementById("profileAvoidance").innerText =
+    "Avoidance Style: " + (card.avoidanceStyle || "--");
+
+  document.getElementById("profileBelief").innerText =
+    "Underlying Belief: " + (card.hiddenAssumption || "--");
+}
+
+/* Analytics */    
+    
+function track(event,data={}){    
+if(typeof gtag!=="undefined"){    
+gtag('event',event,data);    
+}    
+}    
+    
+/* API */    
+    
+
+function captureEvidenceSourceRegistry(data){
+  const candidates = [
+    data?.evidenceRegistry,
+    data?.loop7EvidenceRegistry,
+    data?.evidenceSourceRegistry,
+    data?.evidenceSourceIndex,
+    data?.evidencePackage?.evidenceRegistry,
+    data?.evidencePackage?.evidenceUniverse?.sourceRegistry,
+    data?.loop7Package?.evidenceRegistry,
+    data?.loop7Package?.evidenceUniverse?.sourceRegistry,
+    data?.compressedEvidencePackage?.loop7Package?.sourceRegistry,
+    data?.compressedEvidencePackage?.loop7Package?.evidenceUniverse?.sourceRegistry,
+    data?.compressedEvidencePackage?.sourceRegistry,
+    data?.crossEvidencePackage?.loop7Package?.sourceRegistry,
+    data?.crossEvidencePackage?.sourceRegistry
+  ];
+
+  for(const candidate of candidates){
+    if(Array.isArray(candidate) && candidate.length){
+      evidenceSourceRegistry = candidate
+        .filter(item => item && typeof item === "object")
+        .map(item => ({
+          sourceId: String(item.sourceId || "").trim(),
+          sourceType: String(item.sourceType || "").trim(),
+          title: String(item.title || "").trim(),
+          url: String(item.url || "").trim(),
+          date: item.date || null
+        }))
+        .filter(item => item.sourceId || item.url);
+
+      console.log("FRONTEND_EVIDENCE_REGISTRY_COUNT", evidenceSourceRegistry.length);
+      return evidenceSourceRegistry;
+    }
+  }
+
+  evidenceSourceRegistry = [];
+  console.log("FRONTEND_EVIDENCE_REGISTRY_COUNT", 0);
+  return evidenceSourceRegistry;
+}
+
+function setLoop7ProcessingStep(step, state){
+  const el = document.getElementById("loop7ProcessingStep-" + step);
+  if(!el) return;
+  el.classList.remove("done","active");
+  if(state === "done") el.classList.add("done");
+  if(state === "active") el.classList.add("active");
+
+  const icon = el.querySelector(".lp7-progress-icon");
+  if(icon){
+    icon.textContent = state === "done" ? "✓" : state === "active" ? "•" : "○";
+  }
+}
+
+function renderLoop7ProcessingShell(profileLink){
+  const safeLink = escapeHtml(profileLink || "");
+  return `
+    <div id="loop7Processing" style="display:block;">
+      <div class="lp7-title">🧠 Building Your Investigation</div>
+      <div class="lp7-sub">
+        TruthLoop is collecting evidence, connecting patterns, and preparing your final investigation.
+        Please keep this page open.
+      </div>
+
+      <div class="lp7-progress-line done" id="loop7ProcessingStep-case">
+        <span class="lp7-progress-icon">✓</span>
+        <span class="lp7-progress-dot"></span>
+        <span>Loop 1–6 case context secured</span>
+      </div>
+
+      <div class="lp7-progress-line active" id="loop7ProcessingStep-evidence">
+        <span class="lp7-progress-icon">•</span>
+        <span class="lp7-progress-dot"></span>
+        <span>Collecting public evidence</span>
+      </div>
+
+      <div class="lp7-progress-line" id="loop7ProcessingStep-cross">
+        <span class="lp7-progress-icon">○</span>
+        <span class="lp7-progress-dot"></span>
+        <span>Building cross-evidence package</span>
+      </div>
+
+      <div class="lp7-progress-line" id="loop7ProcessingStep-report">
+        <span class="lp7-progress-icon">○</span>
+        <span class="lp7-progress-dot"></span>
+        <span>Generating final investigation</span>
+      </div>
+
+      <div id="loop7ProcessingSources">
+        <div class="lp7-source-head">
+          <div class="lp7-source-title">🔗 Evidence Sources</div>
+          <div class="lp7-source-count" id="loop7ProcessingSourceCount">Discovering sources…</div>
+        </div>
+        <div id="loop7ProcessingSourceList">
+          <div style="color:#94a3b8;font-size:13px;line-height:1.7;">
+            ${safeLink ? "Preparing evidence from your public source…" : "Preparing evidence…"}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function updateLoop7ProcessingSources(registry){
+  if(!Array.isArray(registry)) return;
+
+  const count = document.getElementById("loop7ProcessingSourceCount");
+  const list = document.getElementById("loop7ProcessingSourceList");
+  if(!count || !list) return;
+
+  count.textContent = registry.length
+    ? `${registry.length} source${registry.length === 1 ? "" : "s"} found`
+    : "Discovering sources…";
+
+  if(!registry.length){
+    list.innerHTML = `
+      <div style="color:#94a3b8;font-size:13px;line-height:1.7;">
+        Evidence collection is still running…
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = registry.map((item,index)=>{
+    const sourceId = escapeHtml(item?.sourceId || `SOURCE_${String(index+1).padStart(2,"0")}`);
+    const title = escapeHtml(item?.title || item?.sourceType || "Public evidence source");
+    const url = String(item?.url || "").trim();
+    const safeUrl = escapeHtml(url);
+
+    return `
+      <div class="lp7-source-card">
+        <div class="lp7-source-id">${sourceId}</div>
+        <div class="lp7-source-name">${title}</div>
+        ${url ? `<a class="lp7-source-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>` : ""}
+      </div>`;
+  }).join("");
+}
+
+function showLoop7ProcessingError(error){
+  const message = escapeHtml(
+    error?.message || "The investigation could not be completed."
+  );
+
+  const box = document.getElementById("loop7Processing");
+  if(!box) return;
+
+  box.innerHTML = `
+    <div class="lp7-title">⚠️ Investigation paused</div>
+    <div class="lp7-sub">${message}</div>
+    <button
+      id="loop7RetryBtn"
+      style="margin-top:18px;padding:12px 18px;border-radius:10px;cursor:pointer;">
+      Try Again →
+    </button>
+  `;
+
+  const retry = document.getElementById("loop7RetryBtn");
+  if(retry){
+    retry.onclick = () => {
+      nextBtn.style.display = "block";
+      nextBtn.disabled = false;
+      nextBtn.innerText = "Get Your Final Report →";
+      window.loop7Started = true;
+    };
+  }
+}
+
+function beginLoop7Processing(profileLink){
+  outputBox.innerHTML = renderLoop7ProcessingShell(profileLink);
+  mainInput.style.display = "none";
+  reflectionInput.style.display = "none";
+  getBtn.style.display = "none";
+  shareBox.style.display = "none";
+  document.getElementById("articleBlock").style.display = "none";
+  nextBtn.style.display = "none";
+  nextBtn.disabled = true;
+  setLoop7ProcessingStep("evidence","active");
+  setLoop7ProcessingStep("cross","idle");
+  setLoop7ProcessingStep("report","idle");
+  window.loop7ProcessingStartedAt = Date.now();
+}
+
+function handleLoop7ProgressPayload(payload){
+  if(!payload || typeof payload !== "object") return;
+
+  const registryCandidates = [
+    payload?.evidenceRegistry,
+    payload?.loop7EvidenceRegistry,
+    payload?.evidenceSourceRegistry,
+    payload?.evidenceSourceIndex,
+    payload?.evidencePackage?.evidenceRegistry,
+    payload?.evidencePackage?.evidenceUniverse?.sourceRegistry,
+    payload?.loop7Package?.evidenceRegistry,
+    payload?.loop7Package?.evidenceUniverse?.sourceRegistry,
+    payload?.compressedEvidencePackage?.loop7Package?.sourceRegistry,
+    payload?.compressedEvidencePackage?.loop7Package?.evidenceUniverse?.sourceRegistry,
+    payload?.compressedEvidencePackage?.sourceRegistry,
+    payload?.crossEvidencePackage?.loop7Package?.sourceRegistry,
+    payload?.crossEvidencePackage?.sourceRegistry
+  ];
+
+  const hasRegistry = registryCandidates.some(
+    candidate => Array.isArray(candidate)
+  );
+
+  if(hasRegistry){
+    const registry = captureEvidenceSourceRegistry(payload);
+    if(Array.isArray(registry) && registry.length){
+      updateLoop7ProcessingSources(registry);
+      saveJourney();
+      setLoop7ProcessingStep("evidence","done");
+      setLoop7ProcessingStep("cross","done");
+      setLoop7ProcessingStep("report","active");
+    }
+  }
+
+  if(payload?.phase === "evidence") {
+    setLoop7ProcessingStep("evidence", "active");
+  }
+  if(payload?.phase === "cross_evidence" || payload?.phase === "compression") {
+    setLoop7ProcessingStep("evidence", "done");
+    setLoop7ProcessingStep("cross", "active");
+  }
+  if(payload?.phase === "report" || payload?.phase === "generating_report") {
+    setLoop7ProcessingStep("evidence", "done");
+    setLoop7ProcessingStep("cross", "done");
+    setLoop7ProcessingStep("report", "active");
+  }
+}
+
+async function fetchLoop7Investigation(profileLink){
+  const response = await fetch(API_URL,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Accept":"application/json, text/event-stream"
+    },
+    body:JSON.stringify({
+      messages,
+      loopLevel:7,
+      profileLink,
+      paid49:payment49,
+      paid199:payment199,
+      currentCategory,
+      progress:true
+    })
+  });
+
+  if(!response.ok){
+    throw new Error(`Loop 7 API failed (${response.status})`);
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+
+  if(!response.body || !contentType.includes("text/event-stream")){
+    const data = await response.json();
+    handleLoop7ProgressPayload(data);
+    return data;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let finalPayload = null;
+
+  const consumeLine = (line) => {
+    const raw = String(line || "").trim();
+    if(!raw || raw.startsWith(":") || raw === "data: [DONE]") return;
+
+    const candidate = raw.startsWith("data:")
+      ? raw.slice(5).trim()
+      : raw;
+
+    if(!candidate) return;
+
+    try{
+      const payload = JSON.parse(candidate);
+      handleLoop7ProgressPayload(payload);
+      if(payload && (payload.reply || payload.final === true || payload.type === "final")) {
+        finalPayload = payload;
+      }
+    }catch(error){
+      // Ignore non-JSON stream fragments; the final payload still resolves below.
+    }
+  };
+
+  while(true){
+    const {value,done} = await reader.read();
+    if(done) break;
+    buffer += decoder.decode(value,{stream:true});
+
+    const lines = buffer.split(/\r?\n/);
+    buffer = lines.pop() || "";
+    lines.forEach(consumeLine);
+  }
+
+  buffer += decoder.decode();
+  if(buffer.trim()) consumeLine(buffer);
+
+  if(finalPayload) return finalPayload;
+  throw new Error("Loop 7 stream ended without a final response.");
+}
+
+async function callAPI(){    
+    
+try{    
+    
+const res=await fetch(API_URL,{    
+method:"POST",    
+headers:{    
+"Content-Type":"application/json"    
+},    
+body:JSON.stringify({    
+messages,    
+loopLevel,    
+paid49:payment49,    
+paid199:payment199,    
+currentCategory    
+})    
+});    
+    
+if(!res.ok){    
+const errorText=await res.text();    
+console.error("API ERROR:",errorText);    
+return { reply:"Server error 😃" };    
+}    
+  console.log("SENDING:", {  
+messages,  
+loopLevel,  
+paid49:payment49,  
+paid199:payment199,  
+currentCategory  
+});  
+const data = await res.json();
+  captureEvidenceSourceRegistry(data);  
+ if (data.platformCard) {
+
+    renderPlatformCard(data);
+
+    return;
+
+  } 
+console.log("API RESPONSE:", data);  
+if(data.primaryLoop){
+
+document.getElementById(
+"patternProfile"
+).style.display = "block";
+
+document.getElementById(
+"profilePrimary"
+).innerText =
+"Primary Loop: " +
+data.primaryLoop;
+
+document.getElementById(
+"profileTrigger"
+).innerText =
+"Emotional Driver: " +
+data.emotionalDriver;
+
+document.getElementById(
+"profileAvoidance"
+).innerText =
+"Avoidance Style: " +
+data.avoidanceStyle;
+document.getElementById("profileBelief").innerText =
+"Underlying Belief: " + (data.hiddenAssumption || "");
+  }  
+return data;  
+    
+}catch(err){    
+    
+console.error("FETCH FAIL:",err);    
+return { reply:"Network error 😃" };    
+    
+}    
+    
+}    
+ function renderPlatformCard(data) {
+
+    outputBox.innerHTML = `
+
+<div style="
+margin-top:20px;
+padding:18px;
+border-radius:16px;
+background:#111827;
+border:1px solid rgba(255,140,0,.25);
+line-height:1.8;
+">
+
+<div style="
+font-size:20px;
+font-weight:bold;
+color:#ffb347;
+margin-bottom:12px;
+">
+
+${data.platform}
+
+</div>
+
+<div style="
+color:#ddd;
+margin-bottom:16px;
+">
+
+${data.reason}
+
+</div>
+
+${
+data.oauth
+?
+
+`<button id="linkedinConnectBtn">
+Connect with LinkedIn
+</button>`
+
+:
+
+""
+
+}
+
+</div>
+
+`;
+
+  }   
+/* TYPE EFFECT */
+
+function renderLoop7EntryBridge() {
+return `
+<div id="loop7EntryBridge"
+style="
+margin-top:20px;
+padding:20px;
+border-radius:16px;
+border:1px solid rgba(255,140,0,.25);
+background:rgba(255,140,0,.08);
+">
+
+<div style="
+font-size:22px;
+font-weight:700;
+color:#ffb347;
+margin-bottom:14px;
+">
+🔗 Loop 7 Evidence Bridge
+</div>
+
+<div style="
+font-size:14px;
+line-height:1.8;
+color:#ddd;
+">
+
+<b>Build a more trustworthy investigation.</b>
+
+<br><br>
+
+TruthLoop works best when it analyzes the place where you spend most of your professional time.
+
+<br><br>
+
+<b>Choose the place where you are most involved.</b>
+
+<br><br>
+
+The better your evidence represents your real work, the more trustworthy your personalized Loop 7 investigation becomes.
+
+</div>
+
+<div
+style="
+margin-top:20px;
+display:flex;
+flex-direction:column;
+gap:12px;
+">
+
+<button id="publicEvidenceBtn"
+onclick="showEvidence('public')">
+🌐 Public Profile
+</button>
+
+
+
+</div>
+
+<div
+id="evidenceContainer"
+style="
+margin-top:18px;
+display:none;
+">
+</div>
+
+<div
+style="
+margin-top:18px;
+font-size:12px;
+line-height:1.7;
+color:#999;
+">
+
+TruthLoop analyzes only the evidence you choose to provide.
+
+<br><br>
+
+More representative evidence leads to a more trustworthy investigation.
+
+</div>
+
+</div>
+`;
+}
+function showEvidence(type){
+
+    const container = document.getElementById("evidenceContainer");
+
+    container.style.display = "block";
+
+    switch(type){
+
+        case "public":
+
+            container.innerHTML = `
+                <div style="margin-top:10px;color:#ddd;">
+                    <b>Paste your public profile or website:</b>
+                </div>
+
+                <input
+                    id="loop7ProfileLink"
+                    type="text"
+                    placeholder="https://..."
+                    style="
+                        width:100%;
+                        margin-top:12px;
+                        padding:12px;
+                        border-radius:10px;
+                        border:1px solid rgba(255,140,0,.3);
+                        background:#111;
+                        color:#fff;
+                        box-sizing:border-box;
+                    ">
+            `;
+
+            nextBtn.style.display = "block";
+            break;
+
+        case "oauth":
+
+    container.innerHTML = `
+
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        🔐 Connected Apps
+    </div>
+
+    <div style="
+        margin-top:12px;
+        line-height:1.8;
+        color:#cccccc;
+    ">
+        Connect your professional account to improve the quality of your
+        TruthLoop investigation.
+    </div>
+
+    <div style="
+        margin-top:18px;
+        padding:14px;
+        border-radius:12px;
+        border:1px solid rgba(255,140,0,.25);
+        background:rgba(255,140,0,.06);
+        color:#bbbbbb;
+        line-height:1.8;
+    ">
+
+        • LinkedIn Profile<br>
+        • Public Professional Activity<br>
+        • Career Signals<br>
+        • Public Reputation
+
+    </div>
+
+    <button onclick="startLinkedInOAuth()"
+    Connect LinkedIn
+</button>
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Your account is used only with your permission.
+
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
+
+        case "upload":
+
+    container.innerHTML = `
+
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        📄 Upload Files
+    </div>
+
+    <div style="
+        margin-top:12px;
+        color:#cccccc;
+        line-height:1.8;
+    ">
+        Upload documents that help TruthLoop understand your situation more accurately.
+    </div>
+
+    <div style="
+        margin-top:18px;
+        padding:14px;
+        border-radius:12px;
+        border:1px solid rgba(255,140,0,.25);
+        background:rgba(255,140,0,.06);
+        color:#bbbbbb;
+        line-height:1.8;
+    ">
+
+        • PDF Documents<br>
+        • Images<br>
+        • Screenshots<br>
+        • Text Files
+
+    </div>
+
+    <input
+        id="loop7FileInput"
+        type="file"
+        style="margin-top:18px;width:100%;"
+        onchange="alert('File Upload trigger verified');">
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Your files remain private and are only used for this investigation.
+
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
+
+        case "business":
+
+    container.innerHTML = `
+
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        📊 Business Data
+    </div>
+
+    <div style="
+        margin-top:12px;
+        color:#cccccc;
+        line-height:1.8;
+    ">
+        Share your business website or public business information for a deeper investigation.
+    </div>
+
+    <textarea
+        id="businessDataInput"
+        placeholder="Website, business profile, public company information..."
+        style="
+            width:100%;
+            min-height:120px;
+            margin-top:18px;
+            padding:12px;
+            border-radius:10px;
+        "
+        oninput="alert('Business Data trigger verified');">
+    </textarea>
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Only publicly available business information will be analyzed.
+
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
+
+        case "other":
+
+    container.innerHTML = `
+
+    <div style="
+        margin-top:10px;
+        color:#ffffff;
+        font-size:18px;
+        font-weight:bold;
+    ">
+        ✨ Other
+    </div>
+
+    <div style="
+        margin-top:12px;
+        color:#cccccc;
+        line-height:1.8;
+    ">
+        Share any additional public information that may help TruthLoop understand your situation better.
+    </div>
+
+    <textarea
+        id="otherEvidenceInput"
+        placeholder="Paste links, notes, references, public information..."
+        style="
+            width:100%;
+            min-height:120px;
+            margin-top:18px;
+            padding:12px;
+            border-radius:10px;
+        "
+        oninput="alert('Other Evidence trigger verified');">
+    </textarea>
+
+    <div style="
+        margin-top:14px;
+        color:#888;
+        font-size:13px;
+        text-align:center;
+    ">
+        Add only information you want TruthLoop to consider during the investigation.
+    </div>
+
+    `;
+
+    nextBtn.style.display = "block";
+
+    break;
+    }
+
+}
+function typeEffect(text){
+
+text = text.replace(
+    /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+    '<span class="truthHighlight">$1</span>'
+);
+
+text = text.replace(/\[\[highlight\]\]/gi, "");
+text = text.replace(/\[\[end\]\]/gi, "");
+
+text = text.replace(/\n/g,"<br>");
+
+const div = document.createElement("div");
+div.className = "aiResponse";
+outputBox.appendChild(div);
+
+let i = 0;
+const speed = 4;
+
+const interval = setInterval(()=>{
+
+const partial = text.substring(0,i);
+
+// Don't render incomplete HTML tags
+if((partial.match(/</g)||[]).length === (partial.match(/>/g)||[]).length){
+    div.innerHTML = partial;
+}
+
+outputBox.scrollTop = outputBox.scrollHeight;
+
+i++;
+
+if(i > text.length){
+
+clearInterval(interval);
+
+// Work on original text instead of div.innerHTML
+let finalHtml = text;
+
+const match = text.match(/([^.!?]*\?)/g);
+
+if(match && match.length){
+
+const lastQuestion = match[match.length-1];
+
+finalHtml = finalHtml.replace(
+lastQuestion,
+`
+<div style="
+margin-top:20px;
+padding:16px;
+border-radius:14px;
+background:rgba(255,140,0,.08);
+border:1px solid rgba(255,140,0,.25);
+text-align:center;
+">
+
+<div style="
+color:#ffb347;
+font-size:12px;
+font-weight:700;
+letter-spacing:2px;
+margin-bottom:10px;
+text-transform:uppercase;
+">
+❓ Question For You
+</div>
+
+<div style="
+font-size:clamp(18px,5vw,24px);
+font-weight:700;
+line-height:1.7;
+color:#fff;
+white-space:normal;
+overflow-wrap:anywhere;
+word-break:break-word;
+">
+${lastQuestion}
+</div>
+
+</div>
+`
+);
+
+}
+
+div.innerHTML = finalHtml;
+
+if (loopLevel === 6) {
+
+    div.innerHTML += renderLoop7EntryBridge();
+
+    reflectionInput.style.display = "none";
+
+    nextBtn.innerText = window.loop7Started
+        ? "Get Your Final Report →"
+        : "Start Loop 7";
+
+} else {
+    reflectionInput.style.display = "block";
+    nextBtn.style.display = "block";
+  }
+setTimeout(()=>{
+    // reflectionInput.focus();
+},300);
+
+
+}
+
+},speed);
+
+  }
+
+
+function escapeHtml(value){
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;");
+}
+
+function cleanReportSectionText(text){
+    return String(text || "")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:📋\s*)?Investigation Summary\s*$/gim,"")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:🧩\s*)?Behavioral Findings\s*$/gim,"")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:⚙\s*)?Hidden Mechanism\s*$/gim,"")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:🌐\s*)?Public Evidence\s*$/gim,"")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:🔍\s*)?Cross Evidence\s*$/gim,"")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:📊\s*)?Evidence Confidence\s*$/gim,"")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:💡\s*)?Final Reflection\s*$/gim,"")
+        .replace(/^\s*(?:#{1,6}\s*)?(?:🎯\s*)?One Next Action\s*$/gim,"")
+        .trim();
+}
+
+function getLoop7EvidenceSource(sourceId){
+    const key = String(sourceId || "").trim().toUpperCase();
+    return (Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry : [])
+      .find(item => String(item?.sourceId || "").trim().toUpperCase() === key) || null;
+}
+
+function decorateLoop7Citations(text){
+    return String(text || "").replace(/\[SOURCE_(\d+)\]/gi, (match, digits) => {
+        const sourceId = `SOURCE_${String(digits).padStart(2,"0")}`;
+        const source = getLoop7EvidenceSource(sourceId);
+        const label = escapeHtml(sourceId);
+        const title = escapeHtml(
+          source?.title || source?.sourceType || "Public evidence source"
+        );
+        return `<button type="button" class="tlr-citation"
+          data-source-id="${escapeHtml(sourceId)}"
+          title="${title}">${label}</button>`;
+    });
+}
+
+function openLoop7EvidenceSource(sourceId){
+    const source = getLoop7EvidenceSource(sourceId);
+    if(!source) return;
+
+    const sourceIdText = escapeHtml(source.sourceId || sourceId);
+    const title = escapeHtml(source.title || "Public evidence source");
+    const type = escapeHtml(source.sourceType || "public_evidence");
+    const date = escapeHtml(source.date ? String(source.date) : "Date not provided");
+    const url = String(source.url || "").trim();
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "tlr-modal-backdrop";
+    backdrop.id = "tlrEvidenceModal";
+
+    backdrop.innerHTML = `
+      <div class="tlr-modal" role="dialog" aria-modal="true" aria-label="${title}">
+        <div class="tlr-modal-head">
+          <div>
+            <h3>${sourceIdText}</h3>
+            <div class="tlr-modal-meta">${type} · ${date}</div>
+          </div>
+          <button type="button" class="tlr-modal-close" aria-label="Close">✕</button>
+        </div>
+
+        <div style="margin-top:12px;color:#f1f5f9;font-weight:700;line-height:1.55;">
+          ${title}
+        </div>
+
+        <div class="tlr-modal-evidence">
+          This source was used by TruthLoop as public evidence in this investigation.
+          The cited observation and evidence summary are shown in the report above.
+          Use the original source below to inspect the public material directly.
+        </div>
+
+        ${
+          url
+            ? `<a class="tlr-modal-open"
+                  href="${escapeHtml(url)}"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  Open original source ↗
+               </a>`
+            : ""
+        }
+      </div>
+    `;
+
+    document.body.appendChild(backdrop);
+
+    const close = () => backdrop.remove();
+    backdrop.querySelector(".tlr-modal-close")?.addEventListener("click", close);
+    backdrop.addEventListener("click", e => {
+        if(e.target === backdrop) close();
+    });
+    document.addEventListener("keydown", function onKey(e){
+        if(e.key === "Escape"){
+            close();
+            document.removeEventListener("keydown", onKey);
+        }
+    });
+}
+
+function renderEvidenceSources(){
+    const registry = Array.isArray(evidenceSourceRegistry)
+        ? evidenceSourceRegistry
+        : [];
+
+    const rows = registry.map((item,index) => {
+        const sourceId = item.sourceId ||
+          `SOURCE_${String(index + 1).padStart(2,"0")}`;
+        const type = item.sourceType || "public_evidence";
+        const title = item.title || "Untitled source";
+        const url = item.url || "";
+        const date = item.date ? String(item.date) : "Date not provided";
+
+        return `
+          <div class="tlr-source-card">
+            <div class="tlr-source-top">
+              <div class="tlr-source-id">${escapeHtml(sourceId)}</div>
+              <div class="tlr-source-type">${escapeHtml(type)}</div>
+            </div>
+            <div class="tlr-source-title">${escapeHtml(title)}</div>
+            <div class="tlr-source-date">${escapeHtml(date)}</div>
+            ${
+              url
+                ? `<a class="tlr-source-link"
+                     href="${escapeHtml(url)}"
+                     target="_blank"
+                     rel="noopener noreferrer">
+                     Open source ↗
+                   </a>`
+                : ""
+            }
+          </div>
+        `;
+    }).join("");
+
+    return `
+      <div id="evidenceSourcesReference"
+           style="
+             margin-top:24px;
+             padding:18px;
+             border-radius:17px;
+             background:rgba(255,255,255,.025);
+             border-left:4px solid #94a3b8;
+             scroll-margin-top:70px;
+           ">
+        <h2 style="margin:0 0 8px;color:#cbd5e1;">
+          📚 Evidence Sources
+        </h2>
+        <div style="color:#94a3b8;font-size:12px;margin-bottom:10px;">
+          ${registry.length
+            ? `${registry.length} public source${registry.length === 1 ? "" : "s"} mapped to the investigation. Tap a citation above to inspect its source.`
+            : "No public source mapping was returned by the investigation response."
+          }
+        </div>
+        ${
+          rows ||
+          `<p class="tlr-empty">Evidence source mapping was not returned by the investigation response.</p>`
+        }
+      </div>
+    `;
+}
+
+function renderLoop7Report(report){
+    report = String(report || "")
+        .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+            '<span class="truthHighlight">$1</span>')
+        .replace(/\r/g, "")
+        .trim();
+
+    function getSection(icon){
+        const icons = ["📋","🧩","⚙","🌐","🔍","📊","💡","🎯"];
+        const start = report.indexOf(icon);
+        if(start === -1) return "";
+
+        let end = report.length;
+
+        for(const nextIcon of icons){
+            if(nextIcon === icon) continue;
+            const pos = report.indexOf(nextIcon, start + 1);
+            if(pos !== -1 && pos < end) end = pos;
+        }
+
+        let text = report.substring(start, end);
+        text = text.replace(/^.*?\n/, "").trim();
+        text = cleanReportSectionText(text);
+
+        return decorateLoop7Citations(
+          text.replace(/#+\s*/g,"").replace(/\n/g,"<br>")
+        );
+    }
+
+    const summary = getSection("📋");
+    const findings = getSection("🧩");
+    const mechanism = getSection("⚙");
+    const publicEvidence = getSection("🌐");
+    const crossEvidence = getSection("🔍");
+    const confidence = getSection("📊");
+    const reflection = getSection("💡");
+    const action = getSection("🎯");
+
+    const sourceCount = Array.isArray(evidenceSourceRegistry)
+      ? evidenceSourceRegistry.length
+      : 0;
+
+    const sourceTypes = new Set(
+      (Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry : [])
+        .map(item => String(item?.sourceType || "").toLowerCase())
+        .filter(Boolean)
     );
 
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 15px;
+    const primaryPatternMatch = String(summary || "")
+      .replace(/<br>/g," ")
+      .replace(/<[^>]+>/g,"")
+      .match(/Finding:\s*([^.!?]+[.!?])/i);
 
-    border: 1px solid rgba(255,255,255,0.12);
+    const primaryPattern = primaryPatternMatch
+      ? primaryPatternMatch[1].trim().slice(0,220)
+      : "Evidence-backed pattern identified";
 
-    box-shadow:
-        0 0 25px rgba(255,152,0,0.35);
+    return `
+      <div class="truthLoopReport">
 
-    transition: all 0.25s ease;
+        <div class="tlr-header">
+          <div class="tlr-kicker">✓ Investigation Complete</div>
+          <h1 class="tlr-title">🧠 TruthLoop Investigation</h1>
+          <p class="tlr-subtitle">Find what you're avoiding.</p>
+        </div>
+
+        <div class="tlr-verdict">
+          <div class="tlr-verdict-label">Primary Pattern</div>
+          <div class="tlr-verdict-title">${escapeHtml(primaryPattern)}</div>
+
+          <div class="tlr-stat-grid">
+            <div class="tlr-stat">
+              <span class="tlr-stat-value">${sourceCount || "—"}</span>
+              <span class="tlr-stat-label">Public Sources</span>
+            </div>
+            <div class="tlr-stat">
+              <span class="tlr-stat-value">${sourceTypes.size || "—"}</span>
+              <span class="tlr-stat-label">Source Types</span>
+            </div>
+            <div class="tlr-stat">
+              <span class="tlr-stat-value">${sourceCount ? "✓" : "—"}</span>
+              <span class="tlr-stat-label">Evidence Mapped</span>
+            </div>
+          </div>
+        </div>
+
+        <nav class="tlr-nav" aria-label="Investigation sections">
+          <a href="#investigationSummary">Summary</a>
+          <a href="#behavioralFindings">Pattern</a>
+          <a href="#hiddenMechanism">Mechanism</a>
+          ${publicEvidence ? `<a href="#publicEvidence">Evidence</a>` : ""}
+          <a href="#crossEvidence">Cross-check</a>
+          <a href="#evidenceConfidence">Confidence</a>
+          <a href="#oneNextAction">Action</a>
+        </nav>
+
+        <div id="investigationSummary">
+          <h2>📋 Investigation Summary</h2>
+          ${summary || '<p class="tlr-empty">No summary was returned.</p>'}
+        </div>
+
+        <div id="behavioralFindings">
+          <h2>🧩 Behavioral Findings</h2>
+          ${findings || '<p class="tlr-empty">No behavioral findings were returned.</p>'}
+        </div>
+
+        <div id="hiddenMechanism">
+          <h2>⚙ Hidden Mechanism</h2>
+          ${mechanism || '<p class="tlr-empty">No hidden mechanism was returned.</p>'}
+        </div>
+
+        ${publicEvidence ? `
+          <div id="publicEvidence">
+            <h2>🌐 Public Evidence</h2>
+            ${publicEvidence}
+          </div>
+        ` : ""}
+
+        <div id="crossEvidence">
+          <h2>🔍 Cross Evidence</h2>
+          ${crossEvidence || '<p class="tlr-empty">No cross-evidence assessment was returned.</p>'}
+        </div>
+
+        <div id="evidenceConfidence">
+          <h2>📊 Evidence Confidence</h2>
+          <div class="tlr-confidence">Evidence assessment</div>
+          ${confidence || '<p class="tlr-empty">No confidence assessment was returned.</p>'}
+        </div>
+
+        <div id="finalReflection">
+          <h2>💡 Final Reflection</h2>
+          ${reflection || '<p class="tlr-empty">No final reflection was returned.</p>'}
+        </div>
+
+        <div id="oneNextAction" class="tlr-action">
+          <h2>🎯 One Next Action</h2>
+          ${action || '<p class="tlr-empty">No next action was returned.</p>'}
+        </div>
+
+        ${renderEvidenceSources()}
+
+        <div style="margin-top:26px;text-align:center;">
+          <button id="downloadReportBtn">
+            📄 Download Report
+          </button>
+        </div>
+
+      </div>
+    `;
 }
 
-.truthloop-github-cta i {
-    font-size: 18px;
+document.addEventListener("click",(e)=>{
+
+    if(e.target.id==="downloadReportBtn"){
+        downloadTruthLoopReport();
+        return;
+    }
+
+    const citation = e.target.closest?.(".tlr-citation");
+    if(citation){
+        openLoop7EvidenceSource(citation.dataset.sourceId || "");
+    }
+});
+
+/* SHARE */    
+    
+function showShareCard(text){
+
+const clean = text
+.replace(/<[^>]*>?/gm,"")
+.replace(/\[\[|\]\]/g,"")
+.split("?")[0]
+.trim();
+
+shareText.innerText =
+`I thought this was the problem...
+
+${clean}
+
+TruthLoop AI helped me see the hidden pattern behind it.
+
+Find what you're avoiding 👇
+https://truthloop.in/app`;
+
+shareBox.style.display="block";
+
 }
 
-.truthloop-github-cta:hover {
-    transform: translateY(-3px);
+function copyShare(){
 
-    box-shadow:
-        0 0 35px rgba(255,152,0,0.60);
+navigator.clipboard.writeText(shareText.innerText);
 
-    color: #ffffff;
 }
 
-.truthloop-github-cta:active {
-    transform: translateY(0px);
+function whatsappShare(){
+
+window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
+
+  }
+ function downloadTruthLoopReport(){
+  const report = document.querySelector(".truthLoopReport");
+  if(!report) return;
+
+  const generatedDate = new Date().toLocaleDateString(undefined,{
+    year:"numeric",
+    month:"long",
+    day:"numeric"
+  });
+
+  function getCleanSectionBody(id){
+    const source = report.querySelector(id);
+    if(!source) return "";
+
+    const clone = source.cloneNode(true);
+    clone.querySelectorAll("h1,h2,h3,h4").forEach(node => node.remove());
+    return clone.innerHTML.trim();
+  }
+
+  const sourceRows = (Array.isArray(evidenceSourceRegistry)
+    ? evidenceSourceRegistry
+    : []
+  ).map((item,index) => {
+    const sourceId = item.sourceId || `SOURCE_${String(index + 1).padStart(2,"0")}`;
+    const type = item.sourceType || "public_evidence";
+    const title = item.title || "Untitled source";
+    const url = item.url || "";
+    const date = item.date ? String(item.date) : "Date not provided";
+
+    return `
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          ${escapeHtml(sourceId)}
+        </div>
+        <div><b>Type:</b> ${escapeHtml(type)}</div>
+        <div><b>Title:</b> ${escapeHtml(title)}</div>
+        <div><b>Date:</b> ${escapeHtml(date)}</div>
+        ${
+          url
+            ? `<div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="${escapeHtml(url)}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  ${escapeHtml(url)}
+                </a>
+              </div>`
+            : ""
+        }
+      </div>
+    `;
+  }).join("");
+
+  const evidenceReferenceSection = `
+    <section id="downloadEvidenceSources"
+      style="
+        margin-top:36px;
+        padding-top:24px;
+        border-top:2px solid #333;
+      ">
+      <h2>📚 Evidence Sources</h2>
+      <p style="color:#aaa;">
+        Reference key for the source IDs cited in this investigation.
+      </p>
+      ${
+        sourceRows ||
+        `<p style="color:#aaa;">
+          Evidence source mapping was not returned by the investigation response.
+        </p>`
+      }
+    </section>
+  `;
+
+  const downloadReport = `
+    <div style="max-width:900px;margin:0 auto;">
+
+      <h2>Investigation Summary</h2>
+      ${getCleanSectionBody("#investigationSummary")}
+
+      <h2>Behavioral Findings</h2>
+      ${getCleanSectionBody("#behavioralFindings")}
+
+      <h2>Hidden Mechanism</h2>
+      ${getCleanSectionBody("#hiddenMechanism")}
+
+      ${
+        report.querySelector("#publicEvidence")
+          ? `
+            <h2>Public Evidence</h2>
+            ${getCleanSectionBody("#publicEvidence")}
+          `
+          : ""
+      }
+
+      <h2>Cross Evidence</h2>
+      ${getCleanSectionBody("#crossEvidence")}
+
+      <h2>Evidence Confidence</h2>
+      ${getCleanSectionBody("#evidenceConfidence")}
+
+      <h2>Final Reflection</h2>
+      ${getCleanSectionBody("#finalReflection")}
+
+      <h2>One Next Action</h2>
+      ${getCleanSectionBody("#oneNextAction")}
+
+      ${evidenceReferenceSection}
+
+      <p style="margin-top:30px;color:#777;font-size:12px;">
+        Generated ${escapeHtml(generatedDate)} by TruthLoop AI.
+      </p>
+    </div>
+  `;
+
+  const reportHeader = `
+    <div style="
+      max-width:900px;
+      margin:0 auto 40px;
+      padding-bottom:25px;
+      border-bottom:2px solid #333;
+      text-align:center;
+      font-family:Arial,sans-serif;
+    ">
+
+      <h1 style="margin-bottom:8px;">
+        🧠 TruthLoop Investigation Report
+      </h1>
+
+      <p style="color:#666;margin:0;">
+        Find what you're avoiding.
+      </p>
+
+      <div style="
+        margin-top:30px;
+        padding:18px;
+        background:#171a21;
+        border:1px solid #333;
+        border-radius:12px;
+        text-align:left;
+      ">
+
+        <h3 style="margin-top:0;color:#ff9d00;">
+          📂 Investigation Scope
+        </h3>
+
+        <p style="margin:8px 0;">
+          <b>Investigation Basis</b>
+        </p>
+
+        <p style="margin:6px 0;">
+          ✓ Loop 1 → Loop 7 Conversation
+        </p>
+
+        <p style="margin:6px 0;">
+          ✓ Public Footprint Analysis
+        </p>
+
+        <p style="margin-top:12px;">
+          <b>Investigation Source</b><br>
+          ${escapeHtml(investigationSource || "Not provided")}
+        </p>
+
+        <p style="color:#999;font-size:13px;">
+          This investigation report is based on your Loop 1 to Loop 6 case together with publicly available evidence from the investigation source above.
+        </p>
+
+      </div>
+    </div>
+  `;
+
+  const blob = new Blob([`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body{
+          background:#0f1115;
+          color:#f5f5f5;
+          font-family:Arial,sans-serif;
+          line-height:1.8;
+          padding:40px;
+        }
+        .truthLoopReport{
+          max-width:900px;
+          margin:auto;
+        }
+        .truthLoopReport h1,
+        .truthLoopReport h2{
+          color:#ff9d00;
+        }
+        .truthLoopReport p,
+        .truthLoopReport li{
+          color:#ddd;
+        }
+        .truthLoopReport hr{
+          border:0;
+          border-top:1px solid #333;
+        }
+        a{
+          color:#8ab4ff;
+        }
+      </style>
+      <title>TruthLoop Investigation Report</title>
+    </head>
+    <body>
+      ${reportHeader}
+      <div class="truthLoopReport">
+        ${downloadReport}
+      </div>
+    </body>
+    </html>
+  `],{type:"text/html"});
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "TruthLoop-Investigation-Report.html";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-</style>
-  <a
-  href="https://x.com/truthloop_in"
-  target="_blank"
-  rel="noopener noreferrer"
-  style="
-    display:inline-flex;
+
+/* PAYWALL */    
+    
+function showPaywall(message,amount){
+
+track("paywall_shown",{loop:loopLevel,amount});
+
+console.log("PAYWALL RAW:", message);
+
+paywallBox.style.display="block";
+
+paySub.innerHTML = message
+.replace(
+ /\[\[\s*highlight\s*\]\]([\s\S]*?)\[\[\s*end\s*\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
+)
+.replace(/\n/g,"<br>");
+if(amount === 49){
+if(userCountry === "IN"){
+paySub.innerHTML += `
+
+<div style="
+margin-top:18px;
+padding-top:16px;
+border-top:1px solid rgba(168,85,247,.25);
+text-align:left;
+"><div style="
+color:#22c55e;
+font-weight:700;
+font-size:15px;
+margin-bottom:10px;
+">
+✓ Pattern Found
+</div><div style="
+color:#cbd5e1;
+font-size:14px;
+margin-bottom:16px;
+line-height:1.8;
+">
+Most people stop here.
+</div><div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-bottom:14px;
+">
+Unlock:
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Why this keeps happening
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 What you're actually avoiding
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 How to break the loop
+</div><div style="
+margin-top:14px;
+color:#22c55e;
+font-size:13px;
+">
+🔒 100% Secure Payment with UPI
+</div></div>
+
+`;
+
+}else{
+paySub.innerHTML += `
+
+<div style="
+margin-top:18px;
+padding-top:16px;
+border-top:1px solid rgba(168,85,247,.25);
+text-align:left;
+">
+
+<div style="
+color:#22c55e;
+font-weight:700;
+font-size:15px;
+margin-bottom:10px;
+">
+✓ Pattern Found
+</div>
+
+<div style="
+color:#cbd5e1;
+font-size:14px;
+margin-bottom:16px;
+line-height:1.8;
+">
+Most people stop here.
+</div>
+
+<div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-bottom:14px;
+">
+Unlock:
+</div>
+
+<div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Why this keeps happening
+</div>
+
+<div style="color:#94a3b8;margin-bottom:10px;">
+🔒 What you're actually avoiding
+</div>
+
+<div style="color:#94a3b8;margin-bottom:10px;">
+🔒 How to break the loop
+</div>
+<div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-top:14px;
+margin-bottom:10px;
+">
+💳 One-Time Access — $3 USD
+</div>
+<div style="
+margin-top:14px;
+color:#22c55e;
+font-size:13px;
+">
+🔒 100% Secure Payment with PayPal
+</div>
+
+</div>
+
+`;
+  }
+}else{
+
+if(userCountry === "IN"){
+
+paySub.innerHTML += `
+
+<div style="
+margin-top:18px;
+padding-top:16px;
+border-top:1px solid rgba(168,85,247,.25);
+text-align:left;
+"><div style="
+color:#22c55e;
+font-weight:700;
+font-size:15px;
+margin-bottom:10px;
+">
+✓ Root Pattern Fully Exposed
+</div><div style="
+color:#cbd5e1;
+font-size:14px;
+margin-bottom:16px;
+line-height:1.8;
+">
+You now know what's been driving this cycle.
+</div><div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-bottom:14px;
+">
+Unlock:
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Core Contradiction
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 What This Behavior Protects
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Personalized Action Path
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Final TruthLoop Summary
+</div><div style="
+margin-top:14px;
+color:#22c55e;
+font-size:13px;
+">
+🔒 100% Secure Payment with UPI
+</div></div>`;
+
+}else{
+
+paySub.innerHTML += `
+
+<div style="
+margin-top:18px;
+padding-top:16px;
+border-top:1px solid rgba(168,85,247,.25);
+text-align:left;
+"><div style="
+color:#22c55e;
+font-weight:700;
+font-size:15px;
+margin-bottom:10px;
+">
+✓ Root Pattern Fully Exposed
+</div><div style="
+color:#cbd5e1;
+font-size:14px;
+margin-bottom:16px;
+line-height:1.8;
+">
+You now know what's been driving this cycle.
+</div><div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-bottom:14px;
+">
+Unlock:
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Core Contradiction
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 What This Behavior Protects
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Your Personalized Action Path
+</div><div style="color:#94a3b8;margin-bottom:10px;">
+🔒 Final TruthLoop Summary
+</div><div style="
+margin-top:14px;
+color:#22c55e;
+font-size:13px;
+">
+<div style="
+color:#fbbf24;
+font-size:14px;
+font-weight:600;
+margin-top:14px;
+margin-bottom:10px;
+">
+💳 One-Time Access — $9 USD
+</div>
+
+<div style="
+margin-top:14px;
+color:#22c55e;
+font-size:13px;
+">
+🔒 100% Secure Payment with PayPal
+  </div></div>`;
+
+}
+
+}
+if(userCountry === "IN"){
+
+razorpayBtn.style.display="block";
+
+razorpayBtn.innerText =
+amount===49
+? "Break This Loop (₹49)"
+: "Get My Action Plan (₹199)";
+
+document.getElementById(
+"paypal-button"
+).style.display="none";
+
+}else{
+
+razorpayBtn.style.display="none";
+
+document.getElementById(
+"paypal-button"
+).style.display="block";
+
+}    
+    
+razorpayBtn.onclick=function(){    
+track("payment_started",{
+  amount:amount,
+  loop:loopLevel
+});    
+const options = {    
+    
+key: RAZORPAY_KEY_ID,    
+    
+amount: amount * 100,    
+    
+currency: "INR",    
+    
+name: "TruthLoop",    
+    
+description:    
+amount === 49    
+? "Unlock Loop 5"    
+: "Unlock Loop 7",    
+    
+image: "https://truthloop.in/truthloop-hook.jpg",    
+    
+prefill: {    
+name: "",    
+email: "",    
+contact: ""    
+},    
+    
+theme: {    
+color: "#ff7a00"    
+},    
+    
+
+
+retry: {
+  enabled: true,
+  max_count: 2
+},
+
+modal: {
+  backdropclose: false,
+  escape: true,
+  handleback: true
+},
+    
+
+    
+
+    
+handler: function (response) {    
+    
+if(amount===49) payment49=true;    
+if(amount===199) payment199=true;    
+    
+track("payment_success",{    
+method:"razorpay",    
+value:amount    
+});    
+    
+alert("Payment successful 😄");    
+    
+paywallBox.style.display="none";    
+    
+}    
+    
+};    
+    
+const rzp = new Razorpay(options);    
+    
+rzp.open();    
+    
+};    
+    
+document.getElementById("paypal-button").innerHTML="";    
+    
+paypal.Buttons({    
+    
+createOrder:function(data,actions){    
+    
+return actions.order.create({    
+purchase_units:[{    
+amount:{    
+value: amount===49 ? "3.00" : "9.00"    
+}    
+}]    
+});    
+    
+},    
+    
+onApprove:function(data,actions){    
+    
+return actions.order.capture().then(function(){    
+    
+if(amount===49) payment49=true;    
+if(amount===199) payment199=true;    
+    
+track("payment_success",{    
+method:"paypal",    
+value:amount    
+});    
+    
+alert("Payment successful 😄");    
+    
+paywallBox.style.display="none";    
+    
+nextBtn.style.display="block";    
+});    
+    
+}    
+    
+}).render("#paypal-button");
+
+}
+
+document.querySelectorAll(".categoryBtn").forEach(btn=>{
+
+btn.onclick=()=>{
+document.getElementById(
+"patternProfile"
+).style.display = "none";
+alert("Pattern selected");
+
+currentCategory=btn.dataset.type;
+document.getElementById("hintContent").style.display = "none";
+
+document.getElementById("hintBox").innerHTML =
+"💡 HOW DOES THIS WORK?";
+clearJourney();
+
+loopLevel = 1;
+
+
+
+messages = [];
+
+document.getElementById("loopIndicator").innerText =
+"Loop 1 of 7";
+
+outputBox.innerHTML = "";
+document.querySelectorAll(".categoryBtn").forEach(b=>{
+b.style.borderColor="#2a2a2a";
+b.style.color="#fff";
+});
+
+btn.style.borderColor="orange";
+btn.style.color="orange";
+
+if(questionMap[currentCategory]){
+mainInput.value = questionMap[currentCategory][0];
+mainInput.focus();
+}
+
+};
+
+});
+
+/* START */
+    
+getBtn.onclick = async () => {
+
+disableWelcome();
+
+const text = mainInput.value.trim();
+
+if(!text){
+
+    mainInput.focus();
+
+    mainInput.style.borderColor = "orange";
+
+    setTimeout(()=>{
+        mainInput.style.borderColor = "#262626";
+    },1000);
+
+    return;
+
+}
+
+document.getElementById("guideText").style.display = "none";
+
+if (isLoading) return;
+
+isLoading = true;
+
+getBtn.disabled = true;
+
+track("start_clicked");
+
+track("question_submitted",{
+    question_length:text.length
+});
+
+messages=[{
+    role:"user",
+    content:text
+}];
+
+/* hide intro screen */
+outputBox.innerHTML = `
+<div style="
+background:#111;
+padding:18px;
+border-radius:14px;
+border:1px solid #222;
+margin-bottom:18px;
+line-height:1.8;
+font-size:16px;
+">
+<b style="color:orange;">You:</b><br><br>
+${text}
+</div>
+`;
+  
+
+    
+/* smooth scroll */    
+setTimeout(()=>{    
+outputBox.scrollTop=outputBox.scrollHeight;    
+},100);    
+    
+const data=await callAPI();    
+    
+typeEffect(data.reply);    
+showShareCard(data.reply);    
+rememberProfileCard(data, 1);
+
+messages.push({
+role:"assistant",
+content:data.reply,
+profileCard: profileCards[profileCards.length - 1] || null,
+loopLevel: 1
+});
+
+saveJourney();
+
+mainInput.style.display="none";
+getBtn.style.display="none";
+isLoading = false;
+
+getBtn.disabled = false;    
+};    
+    
+/* NEXT */    
+    
+nextBtn.onclick=async()=>{
+
+if (isLoading) return;
+
+/* ==========================================
+   RESTORED LOOP 7 — RE-RUN FINAL REPORT
+   Do not render the old report as the journey UI.
+   Use the restored case + fresh public evidence.
+========================================== */
+if (loopLevel === 7) {
+
+  /*
+   * Restored Loop 7 is a two-step flow:
+   * 1) Start Loop 7
+   * 2) Get Your Final Report
+   * Never generate the report on the first click.
+   */
+  if (!window.loop7Started) {
+    window.loop7Started = true;
+    saveJourney();
+
+    nextBtn.style.display = "block";
+    nextBtn.disabled = false;
+    nextBtn.innerText = "Get Your Final Report →";
+    return;
+  }
+
+  const profileLink =
+    document.getElementById("loop7ProfileLink")?.value.trim() ||
+    investigationSource ||
+    "";
+
+  if (!profileLink) {
+    showEvidence("public");
+    nextBtn.innerText = "Start Loop 7";
+    window.loop7Started = false;
+    return;
+  }
+
+  isLoading = true;
+  nextBtn.disabled = true;
+
+  investigationSource = profileLink;
+
+  /* Remove only the previous Loop 7 report from the
+     in-memory conversation before generating a fresh one. */
+  messages = messages.filter(msg =>
+    !(msg?.role === "assistant" && Number(msg?.loopLevel) === 7)
+  );
+
+  // Keep the persistent case memory at the Loop 1–6 spine.
+  // profileLink is already sent separately in the API payload.
+  window.loop7Started = true;
+  saveJourney();
+
+  document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
+
+  try {
+    beginLoop7Processing(profileLink);
+    const data = await fetchLoop7Investigation(profileLink);
+
+    latestTruthLoopReport = data.reply || JSON.stringify(data);
+    saveJourney();
+
+    if (data.reply) {
+      captureEvidenceSourceRegistry(data);
+      updateLoop7ProcessingSources(evidenceSourceRegistry);
+      setLoop7ProcessingStep("evidence","done");
+      setLoop7ProcessingStep("cross","done");
+      setLoop7ProcessingStep("report","done");
+      outputBox.innerHTML = renderLoop7Report(data.reply);
+      nextBtn.style.display = "none";
+    }
+
+  } catch (error) {
+    console.error("RESTORED_LOOP7_ERROR", error);
+    showLoop7ProcessingError(error);
+  }
+
+  isLoading = false;
+  nextBtn.disabled = false;
+  return;
+}
+
+if (loopLevel === 6) {
+  if (!window.loop7Started) {
+    window.loop7Started = true;
+    nextBtn.innerText = "Get Your Final Report →";
+    return;
+  }
+
+    const profileLink =
+        document.getElementById("loop7ProfileLink")?.value.trim() || "";
+investigationSource = profileLink;
+    // Keep Loop 7 evidence/report out of the persistent 12-message case spine.
+    // profileLink is already sent separately in the API payload.
+    loopLevel = 7;
+    saveJourney();
+
+    document.getElementById("loopIndicator").innerText = "Loop 7 of 7";
+
+    beginLoop7Processing(profileLink);
+
+    try {
+      const data = await fetchLoop7Investigation(profileLink);
+/* console.log("PROFILE UPDATE:", {
+  primaryLoop: data.primaryLoop,
+  emotionalDriver: data.emotionalDriver,
+  avoidanceStyle: data.avoidanceStyle,
+  hiddenAssumption: data.hiddenAssumption
+});
+
+document.getElementById("patternProfile").style.display = "block";
+
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: " + (data.primaryLoop || "—");
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: " + (data.emotionalDriver || "—");
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: " + (data.avoidanceStyle || "—");
+
+document.getElementById("profileBelief").innerText =
+"Underlying Belief: " + (data.hiddenAssumption || "—");*/
+    latestTruthLoopReport = data.reply || JSON.stringify(data);
+    saveJourney();
+
+//if(data.reply.includes("📙")) {
+  if(loopLevel === 7 && data.reply) {
+  latestTruthLoopReport = data.reply;
+    captureEvidenceSourceRegistry(data);
+    updateLoop7ProcessingSources(evidenceSourceRegistry);
+    setLoop7ProcessingStep("evidence","done");
+    setLoop7ProcessingStep("cross","done");
+    setLoop7ProcessingStep("report","done");
+    outputBox.innerHTML = renderLoop7Report(data.reply);
+  nextBtn.style.display = "none";
+  
+} else {
+  
+    typeEffect(data.reply);
+}
+
+      isLoading = false;
+      nextBtn.disabled = false;
+
+      return;
+    } catch(error) {
+      console.error("LOOP7_ERROR", error);
+      showLoop7ProcessingError(error);
+      isLoading = false;
+      nextBtn.disabled = false;
+      return;
+    }
+}
+isLoading = true;
+
+nextBtn.disabled = true;
+
+const text=reflectionInput.value.trim();    
+    
+if(!text){
+   isLoading = false;
+   nextBtn.disabled = false;
+   return;
+  }
+  messages.push({
+  role: "user",
+  content: text
+});
+track(`loop_${loopLevel}_completed`);     
+loopLevel++;
+
+
+document.getElementById("loopIndicator").innerText = `Loop ${loopLevel} of 7`;    
+track("loop_progress",{loop:loopLevel});    
+   
+
+    
+const userReply=document.createElement("div");
+
+userReply.style.marginTop="18px";
+
+userReply.innerHTML=`
+<b style="color:orange;">You:</b><br><br>
+${text}<br><br>
+`;
+
+outputBox.appendChild(userReply);
+alert("BEFORE CALL API");
+const data=await callAPI();
+  alert("AFTER CALL API");
+  alert(JSON.stringify({
+  primaryLoop: data.primaryLoop,
+  emotionalDriver: data.emotionalDriver,
+  avoidanceStyle: data.avoidanceStyle,
+  hiddenAssumption: data.hiddenAssumption
+}, null, 2));
+console.log("CALL API RESULT:", data);
+document.getElementById("patternProfile").style.display = "block";
+document.getElementById("profilePrimary").innerText =
+"Primary Loop: " + (data.primaryLoop || "--");
+
+document.getElementById("profileTrigger").innerText =
+"Emotional Driver: " + (data.emotionalDriver || "--");
+
+document.getElementById("profileAvoidance").innerText =
+"Avoidance Style: " + (data.avoidanceStyle || "--");
+
+document.getElementById("profileBelief").innerText =
+"Underlying Belief: " + (data.hiddenAssumption || "--");
+if(data.paywall){
+
+nextBtn.style.display="none";
+
+isLoading = false;
+nextBtn.disabled = false;
+
+showPaywall(
+data.reply,
+loopLevel===5 ? 49 : 199
+);
+
+return;
+  }
+    
+if (loopLevel <= 6) {
+  rememberProfileCard(data, loopLevel);
+}
+
+messages.push({
+role:"assistant",
+content:data.reply,
+profileCard:
+  loopLevel <= 6
+    ? (profileCards[profileCards.length - 1] || null)
+    : null,
+loopLevel
+});
+
+saveJourney();
+
+if (loopLevel >= 7) {
+
+    typeEffect(data.reply);
+} else {
+
+    typeEffect(data.reply);
+
+}
+
+try{
+    // showShareCard(data.reply);
+}catch(e){
+    console.log("share error", e);
+}
+
+// Duplicate call bhi comment
+// showShareCard(data.reply);
+
+if(loopLevel >= 7){
+
+document.getElementById("articleBlock").style.display="block";
+
+}
+if(window.isRestoredJourney){
+nextBtn.innerText = "Select New Pattern";
+}
+
+
+reflectionInput.value="";    
+isLoading = false;
+nextBtn.disabled = false;    
+};
+document.getElementById("continueJourneyBtn").onclick = () => {
+track("journey_restored",{
+  loop:loopLevel
+});
+document.getElementById("restoreScreen").style.display = "none";
+
+document.getElementById("mainApp").style.display = "block";
+
+/* Re-assert the special Loop 7 restore UI after the modal closes. */
+if(loopLevel === 7){
+
+  outputBox.innerHTML = renderLoop7EntryBridge();
+  evidenceSourceRegistry = [];
+
+  getBtn.style.display = "none";
+  mainInput.style.display = "none";
+  reflectionInput.style.display = "none";
+
+  shareBox.style.display = "none";
+  document.getElementById("articleBlock").style.display = "none";
+  paywallBox.style.display = "none";
+
+  nextBtn.style.display = "block";
+  nextBtn.disabled = false;
+  nextBtn.innerText = "Start Loop 7";
+
+  window.loop7Started = false;
+
+} else {
+
+  getBtn.style.display = "block";
+
+}
+
+window.isRestoredJourney = false;
+};
+document.getElementById("newPatternBtn").onclick = () => {
+
+clearJourney();
+
+loopLevel = 1;
+messages = [];
+profileCards = [];
+latestTruthLoopReport = "";
+investigationSource = "";
+currentCategory = "";
+
+location.reload();
+
+};  
+/* JOURNEY MEMORY */
+async function detectCountry(){
+
+try{
+
+const res = await fetch(
+"https://ipapi.co/json/"
+);
+
+const data = await res.json();
+
+userCountry =
+data.country_code || "IN";
+
+}catch(e){
+
+userCountry = "IN";
+
+}
+
+  }
+detectCountry();  
+const MEMORY_KEY = "truthloopMemory";
+
+function sanitizeLoop7Messages(list){
+  const safe = Array.isArray(list) ? list : [];
+  return loopLevel === 7
+    ? safe.slice(0, LOOP7_MEMORY_MESSAGE_LIMIT)
+    : safe;
+}
+
+
+
+function saveJourney() {
+  try {
+    localStorage.setItem(
+      MEMORY_KEY,
+      JSON.stringify({
+        memoryVersion: MEMORY_VERSION,
+        savedAt: Date.now(),
+        loopLevel,
+        messages: sanitizeLoop7Messages(messages),
+        currentCategory,
+        payment49,
+        payment199,
+        profileCards: Array.isArray(profileCards)
+          ? profileCards.slice(-6)
+          : [],
+        latestTruthLoopReport,
+        investigationSource,
+        evidenceSourceRegistry: Array.isArray(evidenceSourceRegistry)
+          ? evidenceSourceRegistry.slice(0, 100)
+          : [],
+        loop7Started: !!window.loop7Started
+      })
+    );
+
+    console.log("JOURNEY_MEMORY_SAVED", {
+      loopLevel,
+      messageCount: messages.length,
+      profileCardCount: Array.isArray(profileCards)
+        ? profileCards.length
+        : 0
+    });
+  } catch(error) {
+    console.error("JOURNEY_MEMORY_SAVE_ERROR", error);
+  }
+}
+
+function loadJourney() {
+  try {
+    const saved = localStorage.getItem(MEMORY_KEY);
+    if(!saved) return null;
+    const parsed = JSON.parse(saved);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch(error) {
+    console.error("JOURNEY_MEMORY_LOAD_ERROR", error);
+    return null;
+  }
+}
+
+function clearJourney() {
+  localStorage.removeItem(MEMORY_KEY);
+  profileCards = [];
+  latestTruthLoopReport = "";
+  investigationSource = "";
+  window.loop7Started = false;
+}
+
+const restored = loadJourney();
+
+if(restored){
+window.isRestoredJourney = true;
+loopLevel = restored.loopLevel || 1;
+messages = Array.isArray(restored.messages) ? restored.messages : [];
+currentCategory = restored.currentCategory || "";
+payment49 = !!restored.payment49;
+payment199 = !!restored.payment199;
+profileCards = Array.isArray(restored.profileCards)
+  ? restored.profileCards.slice(-6)
+  : [];
+latestTruthLoopReport = restored.latestTruthLoopReport || "";
+investigationSource = restored.investigationSource || "";
+evidenceSourceRegistry = Array.isArray(restored.evidenceSourceRegistry)
+  ? restored.evidenceSourceRegistry.slice(0, 100)
+  : [];
+window.loop7Started = !!restored.loop7Started;
+
+if(loopLevel === 7){
+  messages = messages.slice(0, LOOP7_MEMORY_MESSAGE_LIMIT);
+  latestTruthLoopReport = "";
+  evidenceSourceRegistry = [];
+  window.loop7Started = false;
+
+  console.log("LOOP7_RESTORE_SANITIZED", {
+    messages: messages.length,
+    profileCards: profileCards.length
+  });
+}
+alert(
+  "RESTORED_LOOP = " + loopLevel +
+  "\nRESTORED_MESSAGE_COUNT = " + messages.length +
+  "\nRESTORED_PROFILE_CARD_COUNT = " + profileCards.length
+);
+document.getElementById("loopIndicator").innerText =
+`Loop ${loopLevel} of 7`;
+
+outputBox.innerHTML = "";
+
+/* When restoring Loop 7, keep the Loop 1–6 case history
+   visible but suppress the stale Loop 7 report. */
+const messagesForRestore =
+  loopLevel === 7
+    ? messages.slice(0, LOOP7_MEMORY_MESSAGE_LIMIT)
+    : messages;
+
+messagesForRestore.forEach(msg=>{
+
+const div = document.createElement("div");
+div.className = "aiResponse";
+if(msg.role === "user"){
+
+div.innerHTML = `
+<b style="color:orange;">You:</b><br><br>
+${msg.content}<br><br>
+`;
+
+}else{
+
+let text = msg.content;
+
+text = text.replace(
+ /\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
+ '<span class="truthHighlight">$1</span>'
+);
+
+div.innerHTML = text;
+
+  }
+
+outputBox.appendChild(div);
+
+});
+
+restoreLatestProfileCard();
+
+/* =========================================================
+   LOOP 7 RESTORE UI
+   A saved Loop 7 means the case is ready for a fresh
+   evidence-backed investigation, not a previously generated
+   report. Keep only the bridge + Start Loop 7 action.
+   ========================================================= */
+if(loopLevel === 7){
+
+  outputBox.innerHTML = renderLoop7EntryBridge();
+  evidenceSourceRegistry = [];
+
+  getBtn.style.display = "none";
+  mainInput.style.display = "none";
+  reflectionInput.style.display = "none";
+
+  shareBox.style.display = "none";
+  document.getElementById("articleBlock").style.display = "none";
+  paywallBox.style.display = "none";
+
+  nextBtn.style.display = "block";
+  nextBtn.disabled = false;
+  nextBtn.innerText = "Start Loop 7";
+
+  window.loop7Started = false;
+
+} else if(loopLevel < 7){
+
+  nextBtn.style.display = "block";
+  nextBtn.innerText = "Continue Journey";
+
+} else {
+
+  nextBtn.style.display = "none";
+
+}
+
+document.getElementById("restoreScreen").style.display = "block";
+document.getElementById("mainApp").style.display = "none";
+const selectedBtn =
+document.querySelector(
+'.categoryBtn[data-type="' + currentCategory + '"]'
+);
+document.getElementById("restorePattern").innerText =
+"Pattern: " + currentCategory;
+
+document.getElementById("restoreLoop").innerText =
+"You left at Loop " + loopLevel + " of 7"; 
+getBtn.disabled = false;
+
+  }
+  document.getElementById("hintBox").addEventListener("click", () => {
+
+  const hint =
+  document.getElementById("hintContent");
+
+  if (hint.style.display === "block") {
+
+    hint.style.display = "none";
+
+  } else {
+
+    hint.style.display = "block";
+
+  }
+
+});
+/* ==========================
+   COPY PROTECTION SYSTEM
+========================== */
+function activateProtectedMode(){
+
+  localStorage.setItem(
+    "exportRisk",
+    "true"
+  );
+
+  document.body.classList.add(
+    "protected-mode"
+  );
+
+  }
+function showCopyGate(){
+
+  if(document.getElementById("copyGate")) return;
+
+  const gate = document.createElement("div");
+
+  gate.id = "copyGate";
+
+  gate.innerHTML = `
+  <div style="
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.88);
+    z-index:99999;
+    display:flex;
     align-items:center;
     justify-content:center;
-    gap:8px;
-    padding:14px 28px;
-    border-radius:12px;
-    background:linear-gradient(135deg,#ff7a18,#ff9f43);
-    color:#ffffff;
-    text-decoration:none;
-    font-weight:600;
-    font-size:16px;
-    border:1px solid rgba(255,159,67,0.4);
-    box-shadow:0 4px 20px rgba(255,122,24,0.25);
-    transition:all 0.3s ease;
-  "
-  onmouseover="
-    this.style.transform='translateY(-2px)';
-    this.style.boxShadow='0 8px 30px rgba(255,122,24,0.4)';
-  "
-  onmouseout="
-    this.style.transform='translateY(0)';
-    this.style.boxShadow='0 4px 20px rgba(255,122,24,0.25)';
-  "
->
-  Follow TruthLoop on X →
-  </a>
-  <a
-  href="https://www.reddit.com/user/IllManagement1827/"
-  target="_blank"
-  rel="noopener noreferrer"
-  style="
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    padding:14px 28px;
-    border-radius:12px;
-    background:linear-gradient(135deg,#ff7a18,#ff9f43);
-    color:#ffffff;
-    text-decoration:none;
-    font-weight:600;
-    font-size:16px;
-    border:1px solid rgba(255,159,67,0.4);
-    box-shadow:0 4px 20px rgba(255,122,24,0.25);
-    transition:all 0.3s ease;
-  "
-  onmouseover="
-    this.style.transform='translateY(-2px)';
-    this.style.boxShadow='0 8px 30px rgba(255,122,24,0.4)';
-  "
-  onmouseout="
-    this.style.transform='translateY(0)';
-    this.style.boxShadow='0 4px 20px rgba(255,122,24,0.25)';
-  "
->
-  Join the Reddit Investigation →
-  </a>
-  
-  <a
-  href="https://www.linkedin.com/in/arun-bhatt-truthloop"
-  target="_blank"
-  rel="noopener noreferrer"
-  class="secondary-cta"
->
-  🔍 See TruthLoop In The Wild
-  </a>
-  
-<!-- FINAL CTA -->  
-  
-<div class="cta-box big-cta">  
-  
-<div class="cta-head">  
-You already know the advice.  
-</div>  
-  
-<div class="cta-text">  
-The real question is:  
-what are you still avoiding?  
-</div>  
-  
-<button onclick="start()">  
-Go Deeper →  
-</button>  
-  
-<div class="small">  
-Most users feel uncomfortable accuracy within 60 seconds  
-</div>  
-  
-</div>  
-  
-</div>  
-  
-<script>  
-function start(){  
-  window.location.href="/app";  
-}  
-</script>  
-  
-</body>  
+    padding:20px;
+  ">
+
+    <div style="
+      max-width:460px;
+      width:100%;
+      background:#0b1020;
+      border:1px solid rgba(168,85,247,.25);
+      border-radius:18px;
+      padding:26px;
+      text-align:center;
+      color:white;
+    ">
+
+      <h2 style="
+        color:#ff8c00;
+        margin-top:0;
+      ">
+        ⚠️ Copy Protection
+      </h2>
+
+      <p style="
+        line-height:1.8;
+        color:#ddd;
+      ">
+        This TruthLoop session contains
+        proprietary behavioral analysis.
+      </p>
+
+      <p style="
+        line-height:1.8;
+        color:#bbb;
+      ">
+        Full transcript copying,
+        redistribution,
+        or commercial reuse
+        is not permitted.
+      </p>
+
+      <p style="
+        color:#ffb347;
+        font-weight:bold;
+        margin-top:14px;
+      ">
+        Sign in to save or export your session.
+      </p>
+
+      <button onclick="closeCopyGate()"
+      style="
+        margin-top:14px;
+        background:orange;
+        color:black;
+        border:none;
+        border-radius:10px;
+        padding:14px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+        I Understand
+      </button>
+
+    </div>
+
+  </div>
+  `;
+
+  document.body.appendChild(gate);
+
+}
+
+function closeCopyGate(){
+
+  const gate =
+  document.getElementById("copyGate");
+
+  if(gate) gate.remove();
+
+}
+
+/* Ctrl+A Detection */
+
+document.addEventListener("keydown",(e)=>{
+
+  const isSelectAll =
+  (e.ctrlKey || e.metaKey) &&
+  e.key.toLowerCase()==="a";
+
+  if(!isSelectAll) return;
+
+  const text =
+  document.getElementById("outputBox")
+  ?.innerText || "";
+
+  if(text.length > 300){
+
+    e.preventDefault();
+
+    track("ctrl_a_blocked",{
+      loop:loopLevel
+    });
+activateProtectedMode();
+    showCopyGate();
+
+  }
+
+});
+
+/* Copy Detection */
+
+document.addEventListener("copy",(e)=>{
+
+  const selected =
+  window.getSelection()
+  .toString();
+
+  if(selected.length < 250){
+    return;
+  }
+
+  e.preventDefault();
+
+  track("copy_blocked",{
+    chars:selected.length,
+    loop:loopLevel
+  });
+activateProtectedMode();
+  showCopyGate();
+
+});
+  const heroTitle = document.getElementById("heroTitle");
+
+const heroTranslations = [
+
+'Find what you\'re <span>avoiding.</span>',
+'जानिए कि आप <span>किससे बच रहे हैं।</span>',
+'Encuentra lo que <span>estás evitando.</span>',
+'Trouvez ce que vous <span>évitez.</span>',
+'Finde heraus, was du <span>vermeidest.</span>',
+'Trova ciò che <span>stai evitando.</span>',
+'Encontre o que você <span>está evitando.</span>',
+'あなたが<span>避けているもの</span>を見つけよう。',
+'당신이 <span>피하고 있는 것</span>을 찾아보세요.',
+'找出你正在<span>回避的东西</span>。',
+'اكتشف ما <span>الذي تتجنبه.</span>',
+'Найди то, <span>чего ты избегаешь.</span>'
+
+];
+
+let heroIndex = 0;
+
+setInterval(() => {
+
+    heroTitle.style.opacity = "0";
+
+    setTimeout(() => {
+
+        heroIndex = (heroIndex + 1) % heroTranslations.length;
+
+        heroTitle.innerHTML = heroTranslations[heroIndex];
+
+        heroTitle.style.opacity = "1";
+
+    }, 350);
+
+}, 5000);
+  async function startLinkedInOAuth() {
+
+    try {
+
+        const response = await fetch("/api/connectedApps", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                action: "oauth",
+                provider: "linkedin"
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (data.redirectUrl) {
+
+            window.location.href = data.redirectUrl;
+            return;
+
+        }
+
+        alert(data.reason || "OAuth failed.");
+
+    } catch (err) {
+
+        console.error(err);
+        alert("Connection failed.");
+
+    }
+
+}
+</script>    
+</div>
+  <footer style="
+margin-top:40px;
+padding:20px;
+text-align:center;
+border-top:1px solid #222;
+background:#0b0b0b;
+font-size:13px;
+color:#888;
+">
+
+<div style="margin-bottom:12px;">
+TruthLoop © 2026
+</div>
+
+<div style="
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:14px;
+">
+
+<a href="/privacy.html"
+style="color:orange;text-decoration:none;">
+Privacy Policy
+</a>
+
+<a href="/terms.html"
+style="color:orange;text-decoration:none;">
+Terms
+</a>
+
+<a href="/refund.html"
+style="color:orange;text-decoration:none;">
+Refund Policy
+</a>
+
+<a href="/cookie-policy.html"
+style="color:orange;text-decoration:none;">
+Cookie Policy
+</a>
+
+</div>
+<div style="margin-top:12px;color:#666;font-size:12px;">
+No signup. No account. Privacy first.
+</div>
+</footer>
+</body>    
   </html>
