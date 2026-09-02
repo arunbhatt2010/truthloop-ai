@@ -43,7 +43,13 @@ const PROFILE_MAX_CHARS = 800;
 const SIGNAL_MAX_CHARS = 300;
 
 const PACKAGE_VERSION = "15.0";
-
+const cleanText = value =>
+  typeof value === "string"
+    ? value
+        .replace(/\u0000/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+    : "";
 
   const compressUniversalSource = (
     value,
@@ -133,13 +139,7 @@ async function loadEvidenceCompressionBrain({
       ? publicEvidencePackage.universalPackage
       : publicEvidencePackage;
 
-  const cleanText = value =>
-    typeof value === "string"
-      ? value
-          .replace(/\u0000/g, "")
-          .replace(/\s+/g, " ")
-          .trim()
-      : "";
+  
 
   const firstText = (...values) => {
     for (const value of values) {
