@@ -1,27 +1,26 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v19 — MEANINGFUL COMPRESSION
+   EVIDENCE COMPRESSION BRAIN v20 — CLEAN REBUILD
    TruthLoop AI
 
-   Fixed retention:
-   - Website sources: max 5
-   - LinkedIn posts: dynamically retained, max 9 minus retained GitHub items, minimum 3
-   - LinkedIn articles: max 1
-   - GitHub: preserved when available
-   - X: profile + latest post + latest reply when available
-   - Reddit: profile + latest post + latest 2 comments when available
-   - LinkedIn profile: text ~1/10
-   - Signals: text ~1/10, bounded arrays
+   CONTRACT — downstream names intentionally preserved:
+   - exported function: loadEvidenceCompressionBrain
+   - output packageType: Loop7EvidencePackage
+   - output field: loop7Package
+   - output evidenceUniverse / sourceRegistry / sourceLinks
+   - output compressionStats
 
-   Protected:
-   - URLs / URL lists for retained evidence
-   - IDs
-   - dates
-   - titles / headings
+   Pipeline:
+   UniversalPublicEvidencePackage
+          -> VALIDATE
+          -> SELECT
+          -> PRESERVE
+          -> MEANINGFUL REDUCTION
+          -> BUILD LOOP7 PACKAGE
+          -> BUDGET CHECK
+          -> usable package
 
-   Output:
-   - preferred target <= 5,000 chars
-   - absolute hard lock <= 5,000 chars
-   - no external API/model calls
+   This brain does NOT call an AI/model and does NOT perform source
+   discovery. PCF and CEB are responsible for upstream filtration.
    ========================================================= */
 
 const MAX_TOTAL_PACKAGE_CHARS = 8000;
@@ -33,12 +32,11 @@ const MAX_LINKEDIN_POSTS = 1;
 const MIN_LINKEDIN_POSTS = 1;
 const MAX_LINKEDIN_ARTICLES = 1;
 
-const CONTENT_MAX_CHARS = 900;
-const PROFILE_MAX_CHARS = 1200;
-const SIGNAL_MAX_CHARS = 500;
-const SIGNAL_MAX_ITEMS_PER_FAMILY = 6;
+const PACKAGE_VERSION = "20.0";
 
-const PACKAGE_VERSION = "19.0";
+/* ---------------------------------------------------------
+   BASIC HELPERS
+--------------------------------------------------------- */
 
 const cleanText = value =>
   typeof value === "string"
@@ -48,178 +46,481 @@ const cleanText = value =>
         .trim()
     : "";
 
-const isProtectedKey = key => {
-  const k = String(key || "").toLowerCase();
-  return (
-    k === "url" || k.endsWith("url") || k.includes("link") ||
-    k === "id" || k === "_id" || k === "urn" ||
-    k.includes("date") || k.includes("published") ||
-    k.includes("posted") || k === "timestamp"
-  );
+const firstText = (...values) => {
+  for (const value of values) {
+    const text = cleanText(value);
+    if (text) return text;
+  }
+  return "";
 };
+
+const normalizeUrl = value => {
+  const raw = cleanText(value);
+  if (!/^https?:\/\//i.test(raw)) return "";
+  try {
+    return new URL(raw).toString();
+  } catch {
+    return raw;
+  }
+};
+
+const getUrl = item =>
+  normalizeUrl(
+    item?.url ||
+    item?.sourceUrl ||
+    item?.canonicalUrl ||
+    item?.profileUrl ||
+    item?.postUrl ||
+    item?.articleUrl ||
+    item?.link ||
+    ""
+  ) || null;
+
+const getDate = item =>
+  item?.publishedDate ||
+  item?.publishedAt ||
+  item?.datePublished ||
+  item?.postedAt ||
+  item?.updatedAt ||
+  item?.date ||
+  null;
+
+const getId = item =>
+  item?.id ??
+  item?._id ??
+  item?.urn ??
+  null;
+
+const isDateLike = value =>
+  value instanceof Date ||
+  /^\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(String(value || ""));
+
+/* ---------------------------------------------------------
+   MEANINGFUL SENTENCE REDUCTION
+
+   Complete sentences are preferred. No blind character-ratio
+   compression and no destructive 80/50/30/20/10/5/2 passes.
+--------------------------------------------------------- */
 
 const splitSentences = value =>
   cleanText(value)
-    .replace(/\s+/g, " ")
     .split(/(?<=[.!?])\s+/)
     .map(item => item.trim())
     .filter(Boolean);
 
-const meaningfulText = (value, maxChars = CONTENT_MAX_CHARS, maxSentences = 6) => {
+const scoreSentence = (sentence, index, total) => {
+  let score = 0;
+
+  if (/\b(i|we|my|our|me|us)\b/i.test(sentence)) score += 5;
+
+  if (/\b(built|build|created|launched|worked|helped|served|developed|designed|tested|experimented|shipped|founded|learned|measured|implemented|published|sold|generated)\b/i.test(sentence)) {
+    score += 4;
+  }
+
+  if (/\b(result|revenue|customer|client|user|product|company|founder|project|research|experience|achievement|milestone|lesson|problem|solution|focus|decision|process|system|strategy|failure|success|growth|traction|experiment|market|audience|business|technology|engineering)\b/i.test(sentence)) {
+    score += 3;
+  }
+
+  if (/\b\d+(?:[.,]\d+)?(?:%|k|m|b)?\b/i.test(sentence)) score += 3;
+
+  if (/:/.test(sentence)) score += 1;
+  if (index === 0 || index === total - 1) score += 1;
+
+  return score;
+};
+
+const meaningfulText = (value, maxChars = 700, maxSentences = 5) => {
   const text = cleanText(value);
   if (!text) return null;
   if (text.length <= maxChars) return text;
 
   const sentences = splitSentences(text);
-  if (!sentences.length) return text.slice(0, maxChars);
 
-  const scored = sentences.map((sentence, index) => {
-    let score = 0;
-    if (/\b(i|we|my|our|built|build|created|launched|worked|helped|served|developed|learned|tested|experimented)\b/i.test(sentence)) score += 4;
-    if (/\b\d+(?:[.,]\d+)?%?\b/.test(sentence)) score += 3;
-    if (/\b(result|revenue|customer|client|product|company|founder|project|research|experience|achievement|milestone|lesson|problem|solution|focus|decision|process|system|strategy|failure|success)\b/i.test(sentence)) score += 2;
-    if (sentence.includes(":")) score += 1;
-    if (index === 0 || index === sentences.length - 1) score += 1;
-    return { sentence, score, index };
-  });
+  if (!sentences.length) {
+    return text.slice(0, maxChars).trim();
+  }
+
+  const ranked = sentences
+    .map((sentence, index) => ({
+      sentence,
+      index,
+      score: scoreSentence(sentence, index, sentences.length)
+    }))
+    .sort((a, b) => b.score - a.score || a.index - b.index);
 
   const selected = [];
   let used = 0;
-  for (const item of scored.sort((a,b) => b.score - a.score || a.index - b.index)) {
+
+  for (const item of ranked) {
     if (selected.length >= maxSentences) break;
+
     const extra = item.sentence.length + (selected.length ? 1 : 0);
     if (used + extra > maxChars) continue;
+
     selected.push(item);
     used += extra;
   }
-  return (selected.length
-    ? selected.sort((a,b) => a.index - b.index).map(x => x.sentence).join(" ")
-    : text.slice(0, maxChars)
-  ).slice(0, maxChars);
+
+  if (!selected.length) return text.slice(0, maxChars).trim();
+
+  return selected
+    .sort((a, b) => a.index - b.index)
+    .map(item => item.sentence)
+    .join(" ")
+    .slice(0, maxChars)
+    .trim();
 };
 
-const compressMeaningfully = (value, maxChars = CONTENT_MAX_CHARS, key = "") => {
-  if (typeof value === "string") {
-    return isProtectedKey(key) ? value : meaningfulText(value, maxChars);
+/* ---------------------------------------------------------
+   SOURCE EXTRACTION
+--------------------------------------------------------- */
+
+const extractEvidenceText = (source, maxChars = 700, maxSentences = 5) =>
+  meaningfulText(
+    firstText(
+      source?.visibleText,
+      source?.publicEvidence?.content,
+      source?.publicEvidence?.evidence,
+      source?.publicEvidence?.observation,
+      source?.content,
+      source?.body,
+      source?.contentSnippet,
+      source?.description,
+      source?.summary,
+      source?.text,
+      source?.headline
+    ),
+    maxChars,
+    maxSentences
+  );
+
+const sourceScore = (source, kind = "website") => {
+  const text = firstText(
+    source?.visibleText,
+    source?.content,
+    source?.body,
+    source?.description,
+    source?.text,
+    source?.about,
+    source?.summary
+  );
+
+  let score = Math.min(text.length / 500, 10);
+
+  if (source?.publicEvidence) score += 4;
+  if (Array.isArray(source?.posts) && source.posts.length) score += 2;
+  if (Array.isArray(source?.articles) && source.articles.length) score += 2;
+
+  const url = getUrl(source) || "";
+  if (kind === "website") {
+    if (/\b(about|product|solution|problem|research|blog|article|founder|company)\b/i.test(url)) score += 3;
+    if (/\b(privacy|terms|cookie|login|signup|contact)\b/i.test(url)) score -= 5;
   }
-  if (Array.isArray(value)) {
-    return value.slice(0, SIGNAL_MAX_ITEMS_PER_FAMILY)
-      .map(item => compressMeaningfully(item, maxChars, key));
-  }
-  if (value && typeof value === "object") {
-    const result = {};
-    for (const [childKey, childValue] of Object.entries(value)) {
-      if (isProtectedKey(childKey)) {
-        result[childKey] = childValue;
-        continue;
-      }
-      const k = childKey.toLowerCase();
-      let childMax = maxChars;
-      if (k === "about" || k === "summary" || k === "bio") childMax = PROFILE_MAX_CHARS;
-      else if (k === "signal" || k === "basis" || k === "reason" || k === "rationale") childMax = SIGNAL_MAX_CHARS;
-      result[childKey] = compressMeaningfully(childValue, childMax, childKey);
+
+  if (getDate(source)) score += 1;
+  return score;
+};
+
+const selectSources = (items, limit, kind) =>
+  (Array.isArray(items) ? items : [])
+    .filter(item => item && typeof item === "object")
+    .map((item, index) => ({ item, index, score: sourceScore(item, kind) }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, limit)
+    .map(entry => entry.item);
+
+const selectLinkedInItems = (items, limit) =>
+  (Array.isArray(items) ? items : [])
+    .filter(item => item && typeof item === "object")
+    .map((item, index) => ({
+      item,
+      index,
+      date: String(getDate(item) || ""),
+      score: sourceScore(item, "linkedin")
+    }))
+    .sort((a, b) =>
+      b.date.localeCompare(a.date) ||
+      b.score - a.score ||
+      a.index - b.index
+    )
+    .slice(0, limit)
+    .map(entry => entry.item);
+
+/* ---------------------------------------------------------
+   SIGNAL REDUCTION
+
+   Signals are already evidence-grounded by CEB. Preserve the
+   strongest signal text rather than recursively carrying the
+   entire upstream signal object.
+--------------------------------------------------------- */
+
+const SIGNAL_KEYS = [
+  "identity",
+  "positioning",
+  "niches",
+  "expertiseSignals",
+  "audienceSignals",
+  "businessSignals",
+  "creatorSignals",
+  "contentPatternSignals",
+  "proofSignals",
+  "topics",
+  "recurringTopics",
+  "behavioralSignals",
+  "contradictions",
+  "crossSourceSignals",
+  "signalConfidence"
+];
+
+const signalText = item => {
+  if (typeof item === "string") return cleanText(item);
+  if (!item || typeof item !== "object") return "";
+
+  return firstText(
+    item?.signal,
+    item?.observation,
+    item?.evidence,
+    item?.basis,
+    item?.reason,
+    item?.rationale,
+    item?.description,
+    item?.text,
+    item?.summary,
+    item?.value,
+    item?.label
+  );
+};
+
+const reduceSignalFamily = (value, limit = 5) => {
+  if (!Array.isArray(value)) return value;
+
+  const out = [];
+  const seen = new Set();
+
+  for (const item of value) {
+    const text = meaningfulText(signalText(item), 300, 2);
+    if (!text) continue;
+
+    const key = text.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    if (typeof item === "string") {
+      out.push(text);
+    } else {
+      out.push({
+        signal: text
+      });
     }
-    return result;
+
+    if (out.length >= limit) break;
   }
-  return value;
+
+  return out;
 };
 
-const compressUniversalSource = value =>
-  compressMeaningfully(value, CONTENT_MAX_CHARS);
+const reduceSignals = rawSignals => {
+  const source =
+    rawSignals && typeof rawSignals === "object"
+      ? rawSignals
+      : {};
 
-const compressUniversalSignals = value =>
-  compressMeaningfully(value, SIGNAL_MAX_CHARS);
+  const output = {};
 
+  for (const key of SIGNAL_KEYS) {
+    if (!(key in source)) continue;
+
+    if (key === "identity") {
+      const identity = source.identity;
+      if (identity && typeof identity === "object") {
+        output.identity = {};
+        for (const [name, value] of Object.entries(identity)) {
+          const text = meaningfulText(value, 220, 2);
+          if (text) output.identity[name] = text;
+        }
+      } else if (identity) {
+        output.identity = meaningfulText(identity, 300, 2);
+      }
+      continue;
+    }
+
+    if (key === "signalConfidence") {
+      output.signalConfidence = source.signalConfidence;
+      continue;
+    }
+
+    if (Array.isArray(source[key])) {
+      const reduced = reduceSignalFamily(source[key], 5);
+      if (reduced.length) output[key] = reduced;
+    } else if (source[key] && typeof source[key] === "object") {
+      const text = signalText(source[key]);
+      if (text) output[key] = [{ signal: meaningfulText(text, 300, 2) }];
+    }
+  }
+
+  return output;
+};
+
+/* ---------------------------------------------------------
+   GITHUB REDUCTION
+
+   Preserve one GitHub source, but do not carry the full PCF object
+   (links/headings/social metadata can be extremely large).
+--------------------------------------------------------- */
+
+const buildGithubEvidence = source => {
+  if (!source || typeof source !== "object") return null;
+
+  const result = {
+    sourceId: null,
+    sourceType: "github",
+    name: firstText(source?.name, source?.title).slice(0, 180) || null,
+    title: firstText(source?.title, source?.name).slice(0, 220) || null,
+    url: getUrl(source),
+    date: getDate(source),
+    description: meaningfulText(
+      firstText(source?.description, source?.summary),
+      500,
+      3
+    ),
+    content: extractEvidenceText(source, 850, 5)
+  };
+
+  if (source?.owner) {
+    result.owner = firstText(
+      typeof source.owner === "string"
+        ? source.owner
+        : source.owner?.login || source.owner?.name
+    ).slice(0, 120) || null;
+  }
+
+  if (source?.language) {
+    result.language = firstText(source.language).slice(0, 80) || null;
+  }
+
+  if (source?.stars != null) result.stars = source.stars;
+  if (source?.forks != null) result.forks = source.forks;
+
+  return result;
+};
+
+/* ---------------------------------------------------------
+   PACKAGE VALIDATION
+--------------------------------------------------------- */
+
+const resolveUniversalPackage = publicEvidencePackage => {
+  if (
+    publicEvidencePackage?.universalPackage &&
+    typeof publicEvidencePackage.universalPackage === "object"
+  ) {
+    return publicEvidencePackage.universalPackage;
+  }
+
+  return publicEvidencePackage && typeof publicEvidencePackage === "object"
+    ? publicEvidencePackage
+    : null;
+};
+
+const validateUniversalPackage = universalPackage => {
+  if (!universalPackage || typeof universalPackage !== "object") {
+    return {
+      valid: false,
+      reason: "Universal public evidence package is missing."
+    };
+  }
+
+  const hasEvidenceContainer =
+    !!universalPackage.websiteEvidence ||
+    !!universalPackage.linkedinEvidence ||
+    !!universalPackage.githubEvidence ||
+    !!universalPackage.signalSignals ||
+    !!universalPackage.geminiSignals ||
+    !!universalPackage.signalMaster;
+
+  if (!hasEvidenceContainer) {
+    return {
+      valid: false,
+      reason: "Universal public evidence package contains no recognized evidence containers."
+    };
+  }
+
+  return { valid: true };
+};
+
+/* ---------------------------------------------------------
+   MAIN — NAME PRESERVED EXACTLY
+--------------------------------------------------------- */
 
 async function loadEvidenceCompressionBrain({
   truthLoopPackage = {},
   publicEvidencePackage = {}
 } = {}) {
-
   console.log("ECB_START");
 
+  const universalPackage =
+    resolveUniversalPackage(publicEvidencePackage);
+
+  const originalUniversalSize = universalPackage
+    ? JSON.stringify(universalPackage).length
+    : 0;
+
+  console.log(
+    "ECB_INPUT_SIZE_AUDIT",
+    JSON.stringify({
+      originalChars: originalUniversalSize,
+      inputBudget: MAX_INPUT_PACKAGE_CHARS
+    })
+  );
+
   if (!publicEvidencePackage?.success) {
+    console.error("ECB_VALIDATE_FAILED", "Public evidence package is not successful.");
     return {
       success: false,
-      reason: "No public evidence"
+      reason: "No public evidence",
+      loop7Package: null
     };
   }
 
-  const universalPackage =
-    publicEvidencePackage?.universalPackage &&
-    typeof publicEvidencePackage.universalPackage === "object"
-      ? publicEvidencePackage.universalPackage
-      : publicEvidencePackage;
+  if (originalUniversalSize > MAX_INPUT_PACKAGE_CHARS) {
+    console.error(
+      "ECB_INPUT_BUDGET_EXCEEDED",
+      JSON.stringify({
+        originalChars: originalUniversalSize,
+        maxAllowed: MAX_INPUT_PACKAGE_CHARS
+      })
+    );
 
-  const firstText = (...values) => {
-    for (const value of values) {
-      const text = cleanText(value);
-      if (text) return text;
-    }
-    return "";
-  };
+    return {
+      success: false,
+      reason: "Universal public evidence package exceeds the 10,000,000-character input budget.",
+      loop7Package: null
+    };
+  }
 
-  const compressText = (value, maxChars) =>
-    meaningfulText(value, maxChars);
+  const validation = validateUniversalPackage(universalPackage);
+  if (!validation.valid) {
+    console.error("ECB_VALIDATE_FAILED", validation.reason);
+    return {
+      success: false,
+      reason: validation.reason,
+      loop7Package: null
+    };
+  }
 
-
-  const getUrl = item =>
-    item?.url ||
-    item?.sourceUrl ||
-    item?.canonicalUrl ||
-    item?.postUrl ||
-    item?.articleUrl ||
-    null;
-
-  const getDate = item =>
-    item?.publishedDate ||
-    item?.publishedAt ||
-    item?.datePublished ||
-    item?.postedAt ||
-    item?.date ||
-    null;
-
-  const getId = item =>
-    item?.id ??
-    item?._id ??
-    item?.urn ??
-    null;
+  /* -------------------------------------------------------
+     1 + 2. SELECT
+  ------------------------------------------------------- */
 
   const websiteInput =
     Array.isArray(universalPackage?.websiteEvidence?.sources)
       ? universalPackage.websiteEvidence.sources
       : [];
 
-  const websiteSources =
-    websiteInput
-      .slice(0, MAX_WEBSITE_SOURCES)
-      .map((source, index) => ({
-        sourceId: `SOURCE_${String(index + 1).padStart(2, "0")}`,
-        sourceType: "website",
-        url:
-          getUrl(source),
-
-        title:
-          firstText(
-            source?.title,
-            source?.headline
-          ).slice(0, 240) || null,
-
-        date:
-          getDate(source),
-
-        content:
-          compressText(
-            firstText(
-              source?.visibleText,
-              source?.contentSnippet,
-              source?.content,
-              source?.body,
-              source?.description
-            ),
-            CONTENT_MAX_CHARS
-          )
-      }));
+  const websiteSourcesInput = selectSources(
+    websiteInput,
+    MAX_WEBSITE_SOURCES,
+    "website"
+  );
 
   const linkedinEvidence =
     universalPackage?.linkedinEvidence &&
@@ -242,54 +543,6 @@ async function loadEvidenceCompressionBrain({
         ? linkedinSource.linkedinProfile
         : null;
 
-  const profile =
-    profileInput
-      ? {
-          profileUrl:
-            profileInput?.profileUrl ||
-            linkedinSource?.sourceUrl ||
-            linkedinEvidence?.sourceUrl ||
-            null,
-
-          name:
-            firstText(profileInput?.name)
-              .slice(0, 160) || null,
-
-          headline:
-            compressText(
-              profileInput?.headline,
-              PROFILE_MAX_CHARS
-            ),
-
-          about:
-            compressText(
-              firstText(
-                profileInput?.about,
-                profileInput?.summary,
-                profileInput?.bio
-              ),
-              PROFILE_MAX_CHARS
-            ),
-
-          location:
-            firstText(profileInput?.location)
-              .slice(0, 160) || null,
-
-          currentCompany:
-            firstText(
-              typeof profileInput?.currentCompany === "string"
-                ? profileInput.currentCompany
-                : profileInput?.currentCompany?.name ||
-                  profileInput?.currentCompany?.companyName
-            ).slice(0, 180) || null,
-
-          followersCount:
-            profileInput?.followersCount ??
-            linkedinEvidence?.followersCount ??
-            null
-        }
-      : null;
-
   const postsInput =
     Array.isArray(linkedinEvidence?.posts)
       ? linkedinEvidence.posts
@@ -304,126 +557,141 @@ async function loadEvidenceCompressionBrain({
         ? linkedinSource.articles
         : [];
 
-  const githubEvidence =
+  const githubInput =
     universalPackage?.githubEvidence &&
     typeof universalPackage.githubEvidence === "object"
       ? universalPackage.githubEvidence
       : null;
-  const githubItemCount = githubEvidence ? 1 : 0;
-  const additionalEvidenceItemCount = githubItemCount;
 
-  const dynamicLinkedInPostLimit = MAX_LINKEDIN_POSTS;
+  const linkedinPostsInput = selectLinkedInItems(
+    postsInput,
+    MAX_LINKEDIN_POSTS
+  );
 
-  const linkedinPosts =
-    postsInput
-      .slice(0, MAX_LINKEDIN_POSTS)
-      .map((item, index) => ({
-        sourceId: `SOURCE_${String(websiteSources.length + (profile ? 1 : 0) + index + 1).padStart(2, "0")}`,
-        sourceType: "linkedin_post",
-        id:
-          getId(item),
+  const linkedinArticlesInput = selectLinkedInItems(
+    articlesInput,
+    MAX_LINKEDIN_ARTICLES
+  );
 
-        url:
-          item?.postUrl ||
-          item?.url ||
-          item?.sourceUrl ||
-          linkedinSource?.sourceUrl ||
-          null,
+  console.log(
+    "ECB_SELECTION_AUDIT",
+    JSON.stringify({
+      websiteAvailable: websiteInput.length,
+      websiteSelected: websiteSourcesInput.length,
+      linkedinPostsAvailable: postsInput.length,
+      linkedinPostsSelected: linkedinPostsInput.length,
+      linkedinArticlesAvailable: articlesInput.length,
+      linkedinArticlesSelected: linkedinArticlesInput.length,
+      linkedinProfileSelected: !!profileInput,
+      githubSelected: !!githubInput
+    })
+  );
 
-        date:
-          getDate(item),
+  /* -------------------------------------------------------
+     3. PRESERVE
+  ------------------------------------------------------- */
 
-        title:
-          firstText(
-            item?.title,
-            item?.headline
-          ).slice(0, 220) || null,
+  let sourceIndex = 1;
+  const nextSourceId = () =>
+    `SOURCE_${String(sourceIndex++).padStart(2, "0")}`;
 
-        content:
-          compressText(
+  const websiteSources = websiteSourcesInput.map(source => ({
+    sourceId: nextSourceId(),
+    sourceType: "website",
+    url: getUrl(source),
+    title:
+      firstText(source?.title, source?.headline).slice(0, 220) || null,
+    date: getDate(source),
+    content: extractEvidenceText(source, 650, 4)
+  }));
+
+  const profile = profileInput
+    ? {
+        sourceId: nextSourceId(),
+        sourceType: "linkedin_profile",
+        profileUrl:
+          getUrl(profileInput) ||
+          normalizeUrl(
+            linkedinSource?.sourceUrl ||
+            linkedinEvidence?.sourceUrl ||
+            ""
+          ) || null,
+        name:
+          firstText(profileInput?.name).slice(0, 150) || null,
+        headline:
+          meaningfulText(profileInput?.headline, 300, 2),
+        about:
+          meaningfulText(
             firstText(
-              item?.text,
-              item?.content,
-              item?.description,
-              item?.headline
+              profileInput?.about,
+              profileInput?.summary,
+              profileInput?.bio
             ),
-            CONTENT_MAX_CHARS
+            850,
+            5
           ),
-
-        likes:
-          item?.likes ?? null,
-
-        comments:
-          item?.comments ?? null
-      }));
-
-  const linkedinArticles =
-    articlesInput
-      .slice(0, MAX_LINKEDIN_ARTICLES)
-      .map((item, index) => ({
-        sourceId: `SOURCE_${String(websiteSources.length + (profile ? 1 : 0) + linkedinPosts.length + index + 1).padStart(2, "0")}`,
-        sourceType: "linkedin_article",
-        id:
-          getId(item),
-
-        url:
-          item?.articleUrl ||
-          item?.url ||
-          item?.sourceUrl ||
-          linkedinSource?.sourceUrl ||
-          null,
-
-        date:
-          getDate(item),
-
-        title:
+        location:
+          firstText(profileInput?.location).slice(0, 120) || null,
+        currentCompany:
           firstText(
-            item?.title,
-            item?.headline
-          ).slice(0, 280) || null,
+            typeof profileInput?.currentCompany === "string"
+              ? profileInput.currentCompany
+              : profileInput?.currentCompany?.name ||
+                profileInput?.currentCompany?.companyName
+          ).slice(0, 150) || null,
+        followersCount:
+          profileInput?.followersCount ??
+          linkedinEvidence?.followersCount ??
+          null,
+        connectionsCount:
+          profileInput?.connectionsCount ??
+          linkedinEvidence?.connectionsCount ??
+          null
+      }
+    : null;
 
-        content:
-          compressText(
-            firstText(
-              item?.text,
-              item?.content,
-              item?.description
-            ),
-            CONTENT_MAX_CHARS
-          ),
+  const linkedinPosts = linkedinPostsInput.map(item => ({
+    sourceId: nextSourceId(),
+    sourceType: "linkedin_post",
+    id: getId(item),
+    url:
+      getUrl(item) ||
+      normalizeUrl(linkedinSource?.sourceUrl || "") ||
+      null,
+    date: getDate(item),
+    title:
+      firstText(item?.title, item?.headline).slice(0, 180) || null,
+    content:
+      extractEvidenceText(item, 650, 4),
+    likes: item?.likes ?? null,
+    comments: item?.comments ?? null
+  }));
 
-        likes:
-          item?.likes ?? null,
+  const linkedinArticles = linkedinArticlesInput.map(item => ({
+    sourceId: nextSourceId(),
+    sourceType: "linkedin_article",
+    id: getId(item),
+    url:
+      getUrl(item) ||
+      normalizeUrl(linkedinSource?.sourceUrl || "") ||
+      null,
+    date: getDate(item),
+    title:
+      firstText(item?.title, item?.headline).slice(0, 200) || null,
+    content:
+      extractEvidenceText(item, 650, 4),
+    likes: item?.likes ?? null,
+    comments: item?.comments ?? null
+  }));
 
-        comments:
-          item?.comments ?? null
-      }));
+  const githubEvidence = githubInput
+    ? buildGithubEvidence(githubInput)
+    : null;
 
-  const githubSource =
-    githubEvidence
-      ? compressUniversalSource(githubEvidence)
-      : null;
+  if (githubEvidence) {
+    githubEvidence.sourceId = nextSourceId();
+  }
 
-  /*
-   * Keep URLs only for retained evidence.
-   * They are never shortened or rewritten.
-   */
-  const sourceLinks = [
-    ...new Set([
-      ...websiteSources.map(item => item.url),
-      profile?.profileUrl,
-      ...linkedinPosts.map(item => item.url),
-      ...linkedinArticles.map(item => item.url),
-      githubSource?.url,
-      githubSource?.sourceUrl,
-      githubSource?.canonicalUrl
-    ].filter(Boolean))
-  ];
-
-  /*
-   * Compress upstream signal content to ~1/10.
-   * Signal arrays are bounded to ~10% of input items, max 3 per family.
-   */
   const rawSignals =
     universalPackage?.signalSignals &&
     typeof universalPackage.signalSignals === "object"
@@ -436,370 +704,325 @@ async function loadEvidenceCompressionBrain({
           ? universalPackage.signalMaster
           : {};
 
-  // CEB has already produced evidence-grounded signals.
-  // Preserve the signal set; only trim verbose text fields.
-  const signalMaster = compressUniversalSignals(rawSignals);
+  const signalMaster = reduceSignals(rawSignals);
 
-  /*
-   * Full source registry for traceability.
-   * Every retained evidence item gets a stable SOURCE_XX identifier.
-   * Registry metadata is NOT content-compressed away.
-   */
-  let sourceIndex = 1;
-  const nextSourceId = () =>
-    `SOURCE_${String(sourceIndex++).padStart(2, "0")}`;
+  /* -------------------------------------------------------
+     SOURCE REGISTRY — canonical identity/traceability
+  ------------------------------------------------------- */
 
   const sourceRegistry = [];
 
   for (const source of websiteSources) {
-    source.sourceId = nextSourceId();
     sourceRegistry.push({
       sourceId: source.sourceId,
-      sourceType: source.sourceType || "website",
-      title: source.title || null,
-      url: source.url || null,
+      sourceType: source.sourceType,
+      title: source.title || "Website source",
+      url: source.url,
       date: source.date || null
     });
   }
 
   if (profile) {
-    profile.sourceId = nextSourceId();
     sourceRegistry.push({
       sourceId: profile.sourceId,
-      sourceType: "linkedin_profile",
+      sourceType: profile.sourceType,
       title: profile.name || "LinkedIn Profile",
-      url: profile.profileUrl || null,
+      url: profile.profileUrl,
       date: null
     });
   }
 
   for (const post of linkedinPosts) {
-    post.sourceId = nextSourceId();
     sourceRegistry.push({
       sourceId: post.sourceId,
-      sourceType: "linkedin_post",
-      title: cleanText(post.title || "LinkedIn Post").slice(0, 220) || "LinkedIn Post",
-      url: post.url || null,
+      sourceType: post.sourceType,
+      title: post.title || "LinkedIn Post",
+      url: post.url,
       date: post.date || null
     });
   }
 
   for (const article of linkedinArticles) {
-    article.sourceId = nextSourceId();
     sourceRegistry.push({
       sourceId: article.sourceId,
-      sourceType: "linkedin_article",
-      title: cleanText(article.title || "LinkedIn Article").slice(0, 280) || "LinkedIn Article",
-      url: article.url || null,
+      sourceType: article.sourceType,
+      title: article.title || "LinkedIn Article",
+      url: article.url,
       date: article.date || null
     });
   }
 
-  if (githubSource) {
-    githubSource.sourceId = nextSourceId();
+  if (githubEvidence) {
     sourceRegistry.push({
-      sourceId: githubSource.sourceId,
+      sourceId: githubEvidence.sourceId,
       sourceType: "github",
-      title: githubSource.title || githubSource.name || "GitHub",
-      url: githubSource.url || githubSource.sourceUrl || githubSource.canonicalUrl || null,
-      date: githubSource.date || githubSource.updatedAt || null
+      title: githubEvidence.title || githubEvidence.name || "GitHub",
+      url: githubEvidence.url,
+      date: githubEvidence.date || null
     });
   }
 
+  const sourceLinks = [
+    ...new Set(
+      sourceRegistry
+        .map(source => source.url)
+        .filter(Boolean)
+    )
+  ];
 
-  /*
-   * Single compact representation.
-   * Content is compressed; source identity/traceability is preserved.
-   */
+  /* -------------------------------------------------------
+     4 + 5. BUILD LOOP7 PACKAGE
+
+     Keep both the historical nested sourceRegistry and a top-level
+     sourceRegistry because chat.js reads loop7Package.sourceRegistry.
+     This is additive compatibility; no existing field is renamed.
+  ------------------------------------------------------- */
+
   const buildLoop7Package = () => ({
-    packageType:
-      "Loop7EvidencePackage",
-
-    version:
-      PACKAGE_VERSION,
+    packageType: "Loop7EvidencePackage",
+    version: PACKAGE_VERSION,
 
     profileLink:
-      universalPackage?.primarySource ||
-      universalPackage?.profileLink ||
-      profile?.profileUrl ||
-      linkedinSource?.sourceUrl ||
-      null,
+      normalizeUrl(
+        universalPackage?.primarySource ||
+        universalPackage?.profileLink ||
+        profile?.profileUrl ||
+        linkedinSource?.sourceUrl ||
+        ""
+      ) || null,
+
+    sourceRegistry,
 
     evidenceUniverse: {
-
       sourceLinks,
-
       sourceRegistry,
 
-      websiteSources:
-        websiteSources.map(source => ({
-          sourceId: source.sourceId,
-          sourceType: source.sourceType,
-          url: source.url,
-          title: source.title,
-          date: source.date,
-          content: source.content
-        })),
+      websiteSources,
 
-      linkedinProfile:
-        profile
-          ? {
-              sourceId:
-                profile.sourceId,
+      linkedinProfile: profile,
 
-              sourceType:
-                profile.sourceType,
+      linkedinPosts,
 
-              profileUrl:
-                profile.profileUrl,
+      linkedinArticles,
 
-              name:
-                profile.name,
-
-              headline:
-                profile.headline,
-
-              about:
-                profile.about,
-
-              location:
-                profile.location,
-
-              currentCompany:
-                profile.currentCompany,
-
-              followersCount:
-                profile.followersCount
-            }
-          : null,
-
-      linkedinPosts:
-        linkedinPosts.map(post => ({
-          sourceId: post.sourceId,
-          sourceType: post.sourceType,
-          id: post.id,
-          url: post.url,
-          date: post.date,
-          title: post.title,
-          content: post.content,
-          likes: post.likes,
-          comments: post.comments
-        })),
-
-      linkedinArticles:
-        linkedinArticles.map(article => ({
-          sourceId: article.sourceId,
-          sourceType: article.sourceType,
-          id: article.id,
-          url: article.url,
-          date: article.date,
-          title: article.title,
-          content: article.content,
-          likes: article.likes,
-          comments: article.comments
-        })),
-      githubEvidence: githubSource,
+      githubEvidence,
 
       signalMaster
     },
 
     evidenceCoverage: {
-      websiteSourcesRetained:
-        websiteSources.length,
-
-      linkedinProfileRetained:
-        profile ? 1 : 0,
-
-      linkedinPostsRetained:
-        linkedinPosts.length,
-
-      linkedinArticlesRetained:
-        linkedinArticles.length,
-
-      githubSourcesRetained:
-        githubSource ? 1 : 0,
-
-      additionalEvidenceItemsRetained:
-        additionalEvidenceItemCount,
-
-      linkedInPostLimitApplied:
-        dynamicLinkedInPostLimit,
-
-      urlsRetained:
-        sourceLinks.length,
-
-      evidenceSourcesRetained:
-        sourceRegistry.length
+      websiteSourcesRetained: websiteSources.length,
+      linkedinProfileRetained: profile ? 1 : 0,
+      linkedinPostsRetained: linkedinPosts.length,
+      linkedinArticlesRetained: linkedinArticles.length,
+      githubSourcesRetained: githubEvidence ? 1 : 0,
+      additionalEvidenceItemsRetained: githubEvidence ? 1 : 0,
+      linkedInPostLimitApplied: MAX_LINKEDIN_POSTS,
+      urlsRetained: sourceLinks.length,
+      evidenceSourcesRetained: sourceRegistry.length
     }
   });
 
+  let finalPackage = buildLoop7Package();
 
-  const originalUniversalSize =
-    JSON.stringify(universalPackage).length;
+  /* -------------------------------------------------------
+     6. BUDGET CHECK
 
-  console.log(
-    "ECB_INPUT_SIZE_AUDIT",
-    JSON.stringify({
-      originalChars: originalUniversalSize,
-      inputBudget: MAX_INPUT_PACKAGE_CHARS
-    })
-  );
+     The package is constructed with explicit section budgets instead
+     of compressing a huge object recursively. If a package is still
+     over budget, reduce complete evidence sentences in stages.
+     Never replace evidence with arbitrary tiny fragments and never
+     return null merely because the first reduction pass missed budget.
+  ------------------------------------------------------- */
 
-  if (originalUniversalSize > MAX_INPUT_PACKAGE_CHARS) {
+  const packageSize = pkg => JSON.stringify(pkg).length;
+
+  const rebuildAtBudget = (contentBudget, profileBudget, signalBudget) => {
+    const website = websiteSources.map(source => ({
+      ...source,
+      content: meaningfulText(source.content, contentBudget, 4)
+    }));
+
+    const linkedinProfile = profile
+      ? {
+          ...profile,
+          headline: meaningfulText(profile.headline, Math.min(300, profileBudget), 2),
+          about: meaningfulText(profile.about, profileBudget, 5)
+        }
+      : null;
+
+    const posts = linkedinPosts.map(post => ({
+      ...post,
+      title: meaningfulText(post.title, 180, 2),
+      content: meaningfulText(post.content, contentBudget, 4)
+    }));
+
+    const articles = linkedinArticles.map(article => ({
+      ...article,
+      title: meaningfulText(article.title, 200, 2),
+      content: meaningfulText(article.content, contentBudget, 4)
+    }));
+
+    const github = githubEvidence
+      ? {
+          ...githubEvidence,
+          description: meaningfulText(githubEvidence.description, Math.min(350, profileBudget), 3),
+          content: meaningfulText(githubEvidence.content, Math.min(650, contentBudget), 4)
+        }
+      : null;
+
+    const signals = {};
+    for (const [key, value] of Object.entries(signalMaster || {})) {
+      if (Array.isArray(value)) {
+        signals[key] = value
+          .map(item => {
+            const text = signalText(item);
+            return text ? { signal: meaningfulText(text, signalBudget, 2) } : null;
+          })
+          .filter(Boolean)
+          .slice(0, 5);
+      } else if (key === "identity" && value && typeof value === "object") {
+        signals.identity = {};
+        for (const [name, identityValue] of Object.entries(value)) {
+          const text = meaningfulText(identityValue, signalBudget, 2);
+          if (text) signals.identity[name] = text;
+        }
+      } else {
+        signals[key] = value;
+      }
+    }
+
+    const pkg = {
+      packageType: "Loop7EvidencePackage",
+      version: PACKAGE_VERSION,
+      profileLink:
+        normalizeUrl(
+          universalPackage?.primarySource ||
+          universalPackage?.profileLink ||
+          profile?.profileUrl ||
+          linkedinSource?.sourceUrl ||
+          ""
+        ) || null,
+      sourceRegistry,
+      evidenceUniverse: {
+        sourceLinks,
+        sourceRegistry,
+        websiteSources: website,
+        linkedinProfile,
+        linkedinPosts: posts,
+        linkedinArticles: articles,
+        githubEvidence: github,
+        signalMaster: signals
+      },
+      evidenceCoverage: {
+        websiteSourcesRetained: website.length,
+        linkedinProfileRetained: linkedinProfile ? 1 : 0,
+        linkedinPostsRetained: posts.length,
+        linkedinArticlesRetained: articles.length,
+        githubSourcesRetained: github ? 1 : 0,
+        additionalEvidenceItemsRetained: github ? 1 : 0,
+        linkedInPostLimitApplied: MAX_LINKEDIN_POSTS,
+        urlsRetained: sourceLinks.length,
+        evidenceSourcesRetained: sourceRegistry.length
+      }
+    };
+
+    return pkg;
+  };
+
+  let finalSize = packageSize(finalPackage);
+
+  /* Normal target pass. */
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    finalPackage = rebuildAtBudget(650, 850, 280);
+    finalSize = packageSize(finalPackage);
+  }
+
+  /* Remove only duplicate sourceLinks if registry already carries URLs. */
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    const copy = JSON.parse(JSON.stringify(finalPackage));
+    copy.sourceLinks = undefined;
+    if (copy.evidenceUniverse) copy.evidenceUniverse.sourceLinks = [];
+    finalPackage = copy;
+    finalSize = packageSize(finalPackage);
+  }
+
+  /* Tight meaningful pass. */
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    finalPackage = rebuildAtBudget(450, 600, 200);
+    finalPackage.sourceLinks = undefined;
+    if (finalPackage.evidenceUniverse) finalPackage.evidenceUniverse.sourceLinks = [];
+    finalSize = packageSize(finalPackage);
+  }
+
+  /* Last safe pass: keep evidence, but fewer complete sentences/items. */
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    finalPackage = rebuildAtBudget(320, 450, 150);
+    finalPackage.sourceLinks = undefined;
+    if (finalPackage.evidenceUniverse) finalPackage.evidenceUniverse.sourceLinks = [];
+    finalSize = packageSize(finalPackage);
+  }
+
+  /*
+   * Final structural safeguard. We do not return null here. If the
+   * explicit metadata duplication itself causes an overage, remove
+   * only the nested duplicate registry (top-level registry remains,
+   * which is the form chat.js consumes).
+   */
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    const copy = JSON.parse(JSON.stringify(finalPackage));
+    if (copy?.evidenceUniverse) {
+      copy.evidenceUniverse.sourceRegistry = undefined;
+    }
+    finalPackage = copy;
+    finalSize = packageSize(finalPackage);
+  }
+
+  /* If an unusually large signal object remains, reduce signal families
+     without touching actual source evidence. */
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    const copy = JSON.parse(JSON.stringify(finalPackage));
+    const eu = copy?.evidenceUniverse || {};
+    const signals = eu.signalMaster || {};
+
+    for (const key of Object.keys(signals)) {
+      if (Array.isArray(signals[key])) {
+        signals[key] = signals[key].slice(0, 3);
+      }
+    }
+
+    eu.signalMaster = signals;
+    finalPackage = copy;
+    finalSize = packageSize(finalPackage);
+  }
+
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    /*
+     * Fail closed only as a genuinely impossible structural case,
+     * after all meaningful evidence-preserving reductions. This is
+     * intentionally NOT the old destructive compression behavior.
+     */
     console.error(
-      "ECB_INPUT_BUDGET_EXCEEDED",
+      "ECB_MEANINGFUL_BUDGET_EXCEEDED",
       JSON.stringify({
-        originalChars: originalUniversalSize,
-        maxAllowed: MAX_INPUT_PACKAGE_CHARS
+        finalSize,
+        maxAllowed: MAX_TOTAL_PACKAGE_CHARS,
+        destructiveCharacterCompaction: false
       })
     );
 
     return {
       success: false,
-      reason: "Universal public evidence package exceeds the 10,000,000-character input budget.",
-      loop7Package: null
-    };
-  }
-
-  let finalPackage =
-    buildLoop7Package();
-
-  let finalSize =
-    JSON.stringify(finalPackage).length;
-
-  /*
-   * Absolute output ceiling: 5,000 chars.
-   * Never fail the entire investigation merely because compressed
-   * evidence is still larger than the ceiling. Shrink content/signal
-   * text first while preserving URLs, IDs, dates and source identity.
-   */
-  /*
-   * Safe budget enforcement.
-   * Never destroy evidence through arbitrary 80/50/30/20/10/5/2 character
-   * passes. Reduce duplicate transport data first, then select meaningful
-   * complete sentences. If still oversized, fail closed.
-   */
-  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
-    const budgetPass = pkg => {
-      const copy = JSON.parse(JSON.stringify(pkg));
-      const eu = copy?.evidenceUniverse || {};
-
-      eu.websiteSources = (eu.websiteSources || []).map(source => ({
-        ...source,
-        content: meaningfulText(source?.content, 500, 4)
-      }));
-
-      if (eu.linkedinProfile) {
-        eu.linkedinProfile.headline =
-          meaningfulText(eu.linkedinProfile.headline, 500, 3);
-        eu.linkedinProfile.about =
-          meaningfulText(eu.linkedinProfile.about, 700, 5);
+      reason:
+        `Meaningful ECB package exceeds ${MAX_TOTAL_PACKAGE_CHARS} characters after evidence-preserving reduction.`,
+      loop7Package: null,
+      compressionStats: {
+        originalChars: originalUniversalSize,
+        attemptedChars: finalSize,
+        maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
+        destructiveCompression: false
       }
-
-      eu.linkedinPosts = (eu.linkedinPosts || []).map(post => ({
-        ...post,
-        title: meaningfulText(post?.title, 180, 2),
-        content: meaningfulText(post?.content, 600, 5)
-      }));
-
-      eu.linkedinArticles = (eu.linkedinArticles || []).map(article => ({
-        ...article,
-        title: meaningfulText(article?.title, 220, 2),
-        content: meaningfulText(article?.content, 700, 6)
-      }));
-
-      eu.githubEvidence = eu.githubEvidence
-        ? compressMeaningfully(eu.githubEvidence, 500)
-        : null;
-
-      eu.signalMaster = compressUniversalSignals(eu.signalMaster || {});
-      return copy;
     };
-
-    finalPackage = budgetPass(finalPackage);
-    finalSize = JSON.stringify(finalPackage).length;
-
-    // sourceRegistry already carries these URLs; remove only this duplicate.
-    if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
-      finalPackage.evidenceUniverse.sourceLinks = [];
-      finalSize = JSON.stringify(finalPackage).length;
-    }
-
-    if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
-      const tighten = pkg => {
-        const copy = JSON.parse(JSON.stringify(pkg));
-        const eu = copy.evidenceUniverse || {};
-
-        eu.websiteSources = (eu.websiteSources || []).map(source => ({
-          ...source,
-          content: meaningfulText(source?.content, 350, 3)
-        }));
-
-        if (eu.linkedinProfile) {
-          eu.linkedinProfile.about =
-            meaningfulText(eu.linkedinProfile.about, 450, 4);
-          eu.linkedinProfile.headline =
-            meaningfulText(eu.linkedinProfile.headline, 350, 2);
-        }
-
-        eu.linkedinPosts = (eu.linkedinPosts || []).map(post => ({
-          ...post,
-          title: meaningfulText(post?.title, 120, 1),
-          content: meaningfulText(post?.content, 450, 4)
-        }));
-
-        eu.linkedinArticles = (eu.linkedinArticles || []).map(article => ({
-          ...article,
-          title: meaningfulText(article?.title, 140, 1),
-          content: meaningfulText(article?.content, 500, 4)
-        }));
-
-        eu.githubEvidence = eu.githubEvidence
-          ? compressMeaningfully(eu.githubEvidence, 350)
-          : null;
-
-        eu.signalMaster = compressUniversalSignals(eu.signalMaster || {});
-        return copy;
-      };
-
-      finalPackage = tighten(finalPackage);
-      finalSize = JSON.stringify(finalPackage).length;
-    }
-
-    if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
-      console.error(
-        "ECB_MEANINGFUL_BUDGET_EXCEEDED",
-        JSON.stringify({
-          finalSize,
-          maxAllowed: MAX_TOTAL_PACKAGE_CHARS,
-          destructiveCharacterCompaction: false
-        })
-      );
-
-      return {
-        success: false,
-        reason:
-          `Meaningful ECB package exceeds ${MAX_TOTAL_PACKAGE_CHARS} characters after safe compression.`,
-        loop7Package: null,
-        compressionStats: {
-          originalChars: JSON.stringify(universalPackage).length,
-          attemptedChars: finalSize,
-          maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
-          destructiveCompression: false
-        }
-      };
-    }
-
-    console.log(
-      "ECB_MEANINGFUL_COMPRESSION",
-      JSON.stringify({
-        finalSize,
-        maxAllowed: MAX_TOTAL_PACKAGE_CHARS,
-        sourceLinksRemoved:
-          finalPackage?.evidenceUniverse?.sourceLinks?.length === 0,
-        destructiveCharacterCompaction: false
-      })
-    );
   }
 
   console.log(
@@ -810,41 +1033,20 @@ async function loadEvidenceCompressionBrain({
   console.log(
     "ECB_COMPRESSION_AUDIT",
     JSON.stringify({
-      originalChars:
-        JSON.stringify(universalPackage).length,
-
-      finalChars:
-        finalSize,
-
-      targetChars:
-        TARGET_PACKAGE_CHARS,
-
-      maxAllowedChars:
-        MAX_TOTAL_PACKAGE_CHARS,
-
-      websiteSources:
-        websiteSources.length,
-
-      linkedinPosts:
-        linkedinPosts.length,
-
-      linkedinArticles:
-        linkedinArticles.length,
-
-      profile:
-        !!profile,
-
-      urlsRetained:
-        sourceLinks.length,
-
-      meaningfulCompression:
-        true,
-
-      destructiveCharacterCompaction:
-        false,
-
-      linksModified:
-        false
+      originalChars: originalUniversalSize,
+      finalChars: finalSize,
+      targetChars: TARGET_PACKAGE_CHARS,
+      maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
+      websiteSources: websiteSources.length,
+      linkedinPosts: linkedinPosts.length,
+      linkedinArticles: linkedinArticles.length,
+      profile: !!profile,
+      githubSources: githubEvidence ? 1 : 0,
+      urlsRetained: sourceLinks.length,
+      evidenceSourcesRetained: sourceRegistry.length,
+      meaningfulCompression: true,
+      destructiveCharacterCompaction: false,
+      linksModified: false
     })
   );
 
@@ -852,55 +1054,24 @@ async function loadEvidenceCompressionBrain({
 
   return {
     success: true,
-
-    loop7Package:
-      finalPackage,
-
+    loop7Package: finalPackage,
     compressionStats: {
-      originalChars:
-        JSON.stringify(universalPackage).length,
-
-      compressedChars:
-        finalSize,
-
-      targetChars:
-        TARGET_PACKAGE_CHARS,
-
-      maxAllowedChars:
-        MAX_TOTAL_PACKAGE_CHARS,
-
-      websiteSources:
-        websiteSources.length,
-
-      linkedInPosts:
-        linkedinPosts.length,
-
-      linkedInArticles:
-        linkedinArticles.length,
-
-      githubSources:
-        githubSource ? 1 : 0,
-
-      additionalEvidenceItems:
-        additionalEvidenceItemCount,
-
-      linkedinPostLimit:
-        dynamicLinkedInPostLimit,
-
-      linkedinProfiles:
-        profile ? 1 : 0,
-
-      urlsRetained:
-        sourceLinks.length,
-
-      meaningfulCompression:
-        true,
-
-      destructiveCharacterCompaction:
-        false,
-
-      linksModified:
-        false
+      originalChars: originalUniversalSize,
+      compressedChars: finalSize,
+      targetChars: TARGET_PACKAGE_CHARS,
+      maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
+      websiteSources: websiteSources.length,
+      linkedInPosts: linkedinPosts.length,
+      linkedInArticles: linkedinArticles.length,
+      githubSources: githubEvidence ? 1 : 0,
+      additionalEvidenceItems: githubEvidence ? 1 : 0,
+      linkedinPostLimit: MAX_LINKEDIN_POSTS,
+      linkedinProfiles: profile ? 1 : 0,
+      urlsRetained: sourceLinks.length,
+      evidenceSourcesRetained: sourceRegistry.length,
+      meaningfulCompression: true,
+      destructiveCharacterCompaction: false,
+      linksModified: false
     }
   };
 }
