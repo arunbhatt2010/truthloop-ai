@@ -801,10 +801,10 @@ Do not make an early section excessively long.
 Reserve enough output budget to complete ALL eight sections.
 
 OUTPUT BUDGET
-Maximum output: 2400 tokens.
+Maximum output: 3000 tokens.
 
-Target total report: approximately 1200–1400 words.
-Never exceed the 2400-token limit.
+Target total report: approximately 1400–1600 words.
+Never exceed the 3000-token limit.
 
 Priority order:
 1. Complete all eight sections.
