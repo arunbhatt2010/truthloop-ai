@@ -969,70 +969,85 @@ async function loadEvidenceCompressionBrain({
     }));
 
     const website = websiteSources.map(source => ({
-      sourceId: source.sourceId,
-      sourceType: source.sourceType,
-      url: getUrl(source),
-      title: firstText(source.title, source.headline).slice(0, 64) || null,
-      date: getDate(source),
-      content: null
-    }));
+  sourceId: source.sourceId,
+  sourceType: source.sourceType,
+  url: getUrl(source),
+  title: firstText(source.title, source.headline).slice(0, 64) || null,
+  date: getDate(source),
+  content: meaningfulText(
+    extractEvidenceText(source, 220, 2),
+    220,
+    2
+  )
+}));
 
-    const linkedinProfile = profile
-      ? {
-          sourceId: profile.sourceId,
-          sourceType: profile.sourceType,
-          profileUrl: profile.profileUrl,
-          name: firstText(profile.name).slice(0, 120) || null,
-          headline: meaningfulText(
-            profile.headline,
-            Math.min(180, profileBudget),
-            1
-          ),
-          about: meaningfulText(
-            profile.about,
-            Math.min(120, profileBudget),
-            1
-          ),
-          location: firstText(profile.location).slice(0, 80) || null,
-          currentCompany: firstText(profile.currentCompany).slice(0, 100) || null
-        }
-      : null;
+const linkedinProfile = profile
+  ? {
+      sourceId: profile.sourceId,
+      sourceType: profile.sourceType,
+      profileUrl: profile.profileUrl,
+      name: firstText(profile.name).slice(0, 120) || null,
+      headline: meaningfulText(
+        profile.headline,
+        Math.min(180, profileBudget),
+        1
+      ),
+      about: meaningfulText(
+        profile.about,
+        Math.min(120, profileBudget),
+        1
+      ),
+      location: firstText(profile.location).slice(0, 80) || null,
+      currentCompany: firstText(profile.currentCompany).slice(0, 100) || null
+    }
+  : null;
 
-    const posts = linkedinPosts.map(post => ({
-      sourceId: post.sourceId,
-      sourceType: post.sourceType,
-      url: getUrl(post),
-      date: getDate(post),
-      title: firstText(post.title, post.headline).slice(0, 100) || null,
-      content: null
-    }));
+const posts = linkedinPosts.map(post => ({
+  sourceId: post.sourceId,
+  sourceType: post.sourceType,
+  url: getUrl(post),
+  date: getDate(post),
+  title: firstText(post.title, post.headline).slice(0, 100) || null,
+  content: meaningfulText(
+    extractEvidenceText(post, 180, 2),
+    180,
+    2
+  )
+}));
 
-    const articles = linkedinArticles.map(article => ({
-      sourceId: article.sourceId,
-      sourceType: article.sourceType,
-      url: getUrl(article),
-      date: getDate(article),
-      title: firstText(article.title, article.headline).slice(0, 100) || null,
-      content: null
-    }));
+const articles = linkedinArticles.map(article => ({
+  sourceId: article.sourceId,
+  sourceType: article.sourceType,
+  url: getUrl(article),
+  date: getDate(article),
+  title: firstText(article.title, article.headline).slice(0, 100) || null,
+  content: meaningfulText(
+    extractEvidenceText(article, 220, 2),
+    220,
+    2
+  )
+}));
 
-    const github = githubEvidence
-      ? {
-          sourceId: githubEvidence.sourceId,
-          sourceType: githubEvidence.sourceType,
-          name: firstText(githubEvidence.name, githubEvidence.title).slice(0, 120) || null,
-          title: firstText(githubEvidence.title, githubEvidence.name).slice(0, 160) || null,
-          url: getUrl(githubEvidence),
-          date: getDate(githubEvidence),
-          description: meaningfulText(
-            firstText(githubEvidence.description, githubEvidence.content),
-            Math.min(140, profileBudget),
-            1
-          ),
-          content: null
-        }
-      : null;
-
+const github = githubEvidence
+  ? {
+      sourceId: githubEvidence.sourceId,
+      sourceType: githubEvidence.sourceType,
+      name: firstText(githubEvidence.name, githubEvidence.title).slice(0, 120) || null,
+      title: firstText(githubEvidence.title, githubEvidence.name).slice(0, 160) || null,
+      url: getUrl(githubEvidence),
+      date: getDate(githubEvidence),
+      description: meaningfulText(
+        firstText(githubEvidence.description, githubEvidence.content),
+        Math.min(140, profileBudget),
+        1
+      ),
+      content: meaningfulText(
+        extractEvidenceText(githubEvidence, 180, 2),
+        180,
+        2
+      )
+    }
+  : null;
     const signals = {};
     const preserveCompactArrayKeys = new Set([
       "behavioralSignals",
