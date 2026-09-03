@@ -24,6 +24,8 @@
    ========================================================= */
 
 const MAX_TOTAL_PACKAGE_CHARS = 5000;
+const ECB_OUTPUT_LIMIT = 5000;
+const ECB_TRANSPORT_LIMIT = 15000;
 const MAX_INPUT_PACKAGE_CHARS = 10000000;
 const TARGET_PACKAGE_CHARS = 4500;
 
@@ -1213,7 +1215,7 @@ const github = githubEvidence
     finalSize = packageSize(finalPackage);
   }
 
-  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+if (finalSize > ECB_TRANSPORT_LIMIT) {
     /*
      * Fail closed only as a genuinely impossible structural case,
      * after all meaningful evidence-preserving reductions. This is
@@ -1223,7 +1225,7 @@ const github = githubEvidence
       "ECB_MEANINGFUL_BUDGET_EXCEEDED",
       JSON.stringify({
         finalSize,
-        maxAllowed: MAX_TOTAL_PACKAGE_CHARS,
+        maxAllowed: ECB_TRANSPORT_LIMIT,
         destructiveCharacterCompaction: false
       })
     );
