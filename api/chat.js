@@ -1448,7 +1448,7 @@ if (loopLevel === 7) {
 
 
     const maxTokens =
-  loopLevel === 7 ? 4500 : 220;
+  loopLevel === 7 ? 7500 : 220;
 
     const loop7ReasoningEnabled = false;
 
@@ -1857,7 +1857,13 @@ if (loopLevel === 7) {
     })
   );
 
-
+console.log(
+  "LOOP7_FINAL_REPORTING",
+  JSON.stringify({
+    replyChars: reply?.length || 0,
+    finishReason: completion?.choices?.[0]?.finish_reason
+  })
+);
 
 }/* =========================
    PROFILE ENGINE
