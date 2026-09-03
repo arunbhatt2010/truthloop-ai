@@ -1749,7 +1749,10 @@ console.log(
   "LOOP7_AI_USER_PAYLOAD_SIZE",
   JSON.stringify(loop7AiUserPayload).length
 );
-
+console.log(
+  "LOOP7_USER_PAYLOAD_PREVIEW",
+  JSON.stringify(loop7AiUserPayload).slice(0,3000)
+);
 loop7Instruction = `
 LOOP 7 — FINAL TRUTHLOOP INVESTIGATION
 
