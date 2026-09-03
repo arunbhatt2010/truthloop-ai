@@ -1645,7 +1645,108 @@ if (loopLevel === 7) {
   };
 
   const reportPassesInvestigationGate = value => {
-    if (!reportIsComplete(value)) return false;
+  if (!reportIsComplete(value)) return false;
+
+  const sections = getLoop7SectionBodies(value);
+  const byHeading = Object.fromEntries(
+    sections.map(({ heading, body }) => [heading, body])
+  );
+
+  const hasTerms = (heading, terms, minLength = 60) => {
+    const body = byHeading[heading] || "";
+    return body.length >= minLength &&
+      terms.every(term =>
+        body.toLowerCase().includes(term.toLowerCase())
+      );
+  };
+
+  const registryIds = new Set(
+    loop7EvidenceRegistryCompact
+      .map(item => String(item?.sourceId || "").trim())
+      .filter(Boolean)
+  );
+
+  const citedIds = [
+    ...String(value || "").matchAll(/\[SOURCE_(\d{2})\]/g)
+  ].map(match => `SOURCE_${match[1]}`);
+
+  const invalidCitations = citedIds.filter(
+    id => !registryIds.has(id)
+  );
+
+  const uniqueValidCitations = new Set(
+    citedIds.filter(id => registryIds.has(id))
+  );
+
+  const publicEvidenceExists = registryIds.size > 0;
+
+  const evidenceBody =
+    `${byHeading["📋 Investigation Summary"] || ""} ` +
+    `${byHeading["🧩 Behavioral Findings"] || ""} ` +
+    `${byHeading["🌐 Public Evidence"] || ""} ` +
+    `${byHeading["🔍 Cross Evidence"] || ""}`;
+
+  if (invalidCitations.length) return false;
+
+  if (
+    publicEvidenceExists &&
+    uniqueValidCitations.size < Math.min(4, registryIds.size)
+  ) {
+    return false;
+  }
+
+  if (
+    publicEvidenceExists &&
+    /zero public evidence|no public evidence|absence of public evidence/i.test(
+      evidenceBody
+    )
+  ) {
+    return false;
+  }
+
+  return (
+    hasTerms(
+      "📋 Investigation Summary",
+      ["finding", "evidence", "conclusion"],
+      140
+    ) &&
+    hasTerms(
+      "🧩 Behavioral Findings",
+      ["pattern", "evidence", "conclusion"],
+      120
+    ) &&
+    hasTerms(
+      "⚙ Hidden Mechanism",
+      ["trigger", "reinforcement", "conclusion"],
+      100
+    ) &&
+    hasTerms(
+      "🌐 Public Evidence",
+      ["source", "observation", "evidence summary"],
+      publicEvidenceExists ? 160 : 100
+    ) &&
+    hasTerms(
+      "🔍 Cross Evidence",
+      ["corroboration", "contradiction", "consistency assessment"],
+      120
+    ) &&
+    hasTerms(
+      "📊 Evidence Confidence",
+      ["confidence assessment"],
+      90
+    ) &&
+    hasTerms(
+      "💡 Final Reflection",
+      ["observation", "final conclusion"],
+      100
+    ) &&
+    hasTerms(
+      "🎯 One Next Action",
+      ["recommended action"],
+      60
+    )
+  );
+};
 
   let loop7GatePassed = reportPassesInvestigationGate(reply);
 
