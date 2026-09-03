@@ -800,11 +800,6 @@ A section may be shorter when the evidence is simple, but never empty.
 Do not make an early section excessively long.
 Reserve enough output budget to complete ALL eight sections.
 
-OUTPUT BUDGET
-Maximum output: 4000 tokens.
-
-Target total report: approximately 2000–2200 words.
-Never exceed the 4000-token limit.
 
 Priority order:
 1. Complete all eight sections.
@@ -1296,7 +1291,7 @@ OUTPUT FORMATTING (STRICT)
 
 Highlight is MANDATORY for Loops 1-6 only.
 
-Loop 7 must follow the dedicated seven-section investigation report format and must NOT insert a separate highlight block.
+Loop 7 must follow the dedicated eight-section investigation report format and must NOT insert a separate highlight block.
 
 Every non-Loop-7 response MUST contain EXACTLY ONE highlight block.
 
