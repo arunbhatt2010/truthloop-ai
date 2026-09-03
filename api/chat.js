@@ -2663,7 +2663,25 @@ if (loopLevel === 7) {
     "LOOP7_FINAL_RESPONSE",
     JSON.stringify(data).slice(0,3000)
 );
+console.log(
+  "LOOP7_MESSAGE_CONTENT_TYPE",
+  typeof data?.choices?.[0]?.message?.content
+);
 
+console.log(
+  "LOOP7_MESSAGE_CONTENT",
+  JSON.stringify(
+    data?.choices?.[0]?.message?.content
+  ).slice(0,2000)
+);
+    console.log(
+  "LOOP7_RAW_CHOICE",
+  JSON.stringify(
+    data?.choices?.[0],
+    null,
+    2
+  )
+);
 let reply =
   data?.choices?.[0]?.message?.content || "";
 
