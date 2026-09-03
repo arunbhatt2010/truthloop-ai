@@ -1500,7 +1500,7 @@ if (loopLevel === 7) {
       ],
   temperature: 0.7,
   max_tokens: maxTokens,
-  reasoning_effort: loop7ReasoningEnabled ? "default" : "none",
+  reasoning_effort: "none",
   reasoning_format: "hidden"
 })
         }
