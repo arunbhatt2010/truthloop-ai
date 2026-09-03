@@ -1931,6 +1931,50 @@ Use the full available output budget when needed.
 Do not stop early.
 Do not sacrifice the final sections to save tokens.
 Finish all eight sections before ending the response.
+
+CRITICAL REPORT COMPRESSION RULES
+
+This is an executive investigation report.
+
+Do NOT write essays.
+
+Each section must contain:
+
+- 1 Finding
+- 1 Evidence Summary
+- 1 Conclusion
+
+Maximum 5 bullet points per section.
+
+Maximum 120 words per section.
+
+Avoid repeating the same insight in multiple sections.
+
+If an insight already appears in another section,
+reference it instead of restating it.
+
+Prioritize evidence density over explanation length.
+
+Write like a senior investigator delivering findings,
+not like a teacher writing an article.
+
+Every sentence must either:
+1. introduce evidence,
+2. connect evidence,
+3. produce a conclusion.
+
+Remove filler.
+Remove repetition.
+Remove disclaimers.
+
+TARGET REPORT SIZE: 4000 characters maximum.
+
+If the report exceeds this size,
+compress findings into fewer sentences.
+
+Gagar mein Sagar.
+
+Evidence density > word count.
 `;
 
 }
