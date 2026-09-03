@@ -792,22 +792,14 @@ Each section must contain:
 ⏩ Evidence
 ⏩ Conclusion
 
-Target: 150–180 words per section.
+• Finding (40-60 words)
+• Evidence (3 evidence references max)
+• Conclusion (40-60 words)
 
-Maximum 3–5 bullets per section.
+Total section length:
+120-150 words maximum.
 
-Use evidence first, interpretation second.
-
-Do not repeat the same evidence across multiple sections unless required for corroboration.
-
-Each section must add new investigative value.
-
-Insight density > verbosity.
-
-Avoid filler, motivational language, repetition, and restating previous conclusions.
-
-Target total report length:
-1200–1500 words.
+Do not exceed 1400 words for entire report.
 FINAL QUALITY CHECK
 Before returning:
 - Confirm all eight sections are present and complete.
