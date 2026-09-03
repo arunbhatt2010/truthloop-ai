@@ -861,7 +861,12 @@ const buildInvestigationReport = ({
 };
 
 const generateInvestigationReport = buildInvestigationReport;
-
+function loadEvidenceCompressionBrain() {
+  return {
+    buildInvestigationReport,
+    generateInvestigationReport
+  };
+}
 export {
   loadEvidenceCompressionBrain,
   buildInvestigationReport,
