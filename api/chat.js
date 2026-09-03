@@ -1415,7 +1415,7 @@ let response;
         endLoop7ProgressStream();
         return;
       }
-
+    }
       return res.status(500).json({
         reply: "LOOP7 AI request failed.",
         error: e?.message || String(e),
