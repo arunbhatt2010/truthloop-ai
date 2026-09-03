@@ -1095,9 +1095,16 @@ async function loadEvidenceCompressionBrain({
       sourceRegistry: compactSourceRegistry,
       sourceLinks: [],
       evidenceUniverse: {
-        sourceLinks: [],
-        sourceRegistry: compactSourceRegistry,
-        signalMaster: signals
+  sourceLinks: [],
+  sourceRegistry: compactSourceRegistry,
+
+  websiteSources: website,
+  linkedinProfile,
+  linkedinPosts: posts,
+  linkedinArticles: articles,
+  githubEvidence: github,
+
+  signalMaster: signals
       },
       evidenceCoverage: {
         websiteSourcesRetained: website.length,
