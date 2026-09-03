@@ -30,7 +30,7 @@ const MAX_ARTICLES = 40;
 const MAX_EVIDENCE = 250;
 
 const MAX_SOURCES = 10;
-const MAX_SITEMAP_URLS = 10;
+const MAX_SITEMAP_URLS = 50;
 const MAX_SITEMAPS = 3;
 const MAX_CONTENT_LINKS = 25;
 const PLATFORM_PATTERNS = [
@@ -672,8 +672,8 @@ async function discoverSitemapUrls(rootUrl = "") {
 
 
 
-const MAX_WEBSITE_POST_CANDIDATES = 5;
-const MAX_WEBSITE_POSTS = 2;
+const MAX_WEBSITE_POST_CANDIDATES = 20;
+const MAX_WEBSITE_POSTS = 10;
 const WEBSITE_POST_MIN_CHARS = 500;
 const WEBSITE_POST_MAX_CHARS = 1800;
 
