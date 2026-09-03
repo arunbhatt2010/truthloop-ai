@@ -572,7 +572,7 @@ const validateUniversalPackage = universalPackage => {
    TruthLoop package. It does not call an AI/model.
 
    Output is a complete eight-section Loop 7 investigation report.
-   The report target is 1400–1600 words. It also exposes estimated
+   The report target is 1000 - 1200 words. It also exposes estimated
    token demand for the downstream writer/renderer.
 --------------------------------------------------------- */
 
@@ -834,7 +834,7 @@ const investigationWordCount = text =>
 const investigationTokenEstimate = text =>
   Math.max(1, Math.ceil(cleanText(text).length / 4));
 
-const clampInvestigationSections = (sections, min = 1400, max = 1600) => {
+const clampInvestigationSections = (sections, min = 1000, max = 1200) => {
   const normalize = value => String(value || "").trim().replace(/\s+/g, " ");
   const out = sections.map(([title, body], index) => ({
     title,
@@ -958,14 +958,14 @@ const buildInvestigationReport = ({
     ["🎯 One Next Action", nextAction]
   ];
 
-  const bounded = clampInvestigationSections(rawSections, 1400, 1600);
+  const bounded = clampInvestigationSections(rawSections, 1000, 1200);
   const formattedSections = bounded.sections.map(item =>
     `${item.title}\n${item.number}. ${item.content}`
   );
   const boundedText = formattedSections.join("\n\n");
   const reportBudget = {
-    minWords: 1400,
-    maxWords: 1600,
+    minWords: 1000,
+    maxWords: 1200,
     actualWords: bounded.words,
     estimatedTokens: investigationTokenEstimate(boundedText),
     withinWordTarget: bounded.withinTarget
