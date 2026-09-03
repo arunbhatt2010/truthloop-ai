@@ -1756,45 +1756,57 @@ console.log(
 loop7Instruction = `
 LOOP 7 — FINAL TRUTHLOOP INVESTIGATION
 
-Generate ONLY a premium, case-specific investigation report.
+Generate one premium, case-specific investigation report using the retained public evidence and the Loop 1–6 case context.
 
-INVESTIGATION AUTHORITY — NON-NEGOTIABLE
-1. PUBLIC EVIDENCE = PRIMARY INVESTIGATION AUTHORITY (~80%).
-2. LOOP 1–6 CONVERSATION = SUPPORTING CONTEXT (~20%).
-3. Loop 1–6 statements are claims, beliefs, interpretations, or self-reports. They are NOT automatically evidence.
-4. Public evidence is the reality check for observable behavior, timing, output, changes, gaps, and externally visible commitments.
-5. When conversation and public evidence agree, use the agreement as corroboration; do not repeat the conversation as if it were independent proof.
-6. When they disagree, prioritize the public evidence and explicitly expose the mismatch.
-7. When evidence cannot establish a conclusion, expose the evidence gap instead of filling it with confident language.
-8. Never let a public topic alone prove a private motive, belief, diagnosis, or intention.
-9. The retained evidenceRegistry is the authoritative public-evidence set. Do not infer that public evidence is absent when the registry contains relevant sources.
-10. Treat caseSpine only as contextual history. It may suggest a hypothesis, but every public-facing conclusion must be tested against retained evidence.
-11. The compressed signalMaster is secondary evidence intelligence derived from the retained public evidence; use it to connect sources, not to replace source citations.
+INVESTIGATION PRIORITY
+- PUBLIC EVIDENCE = primary authority (~80% analytical weight).
+- LOOP 1–6 = supporting context/hypotheses (~20%).
+- Loop 1–6 statements are self-reports, claims, beliefs, or interpretations, not automatic facts.
+- Test every important case claim against retained public evidence.
+- If public evidence and conversation agree, use the agreement as corroboration, not duplicate proof.
+- If they conflict, expose the mismatch and prioritize the public evidence.
+- Never convert missing evidence into proof of absence.
+- Never infer a private motive, diagnosis, belief, or intention from a public topic alone.
+- The retained evidenceRegistry is authoritative. Use relevant retained evidence whenever it exists.
+- signalMaster/deep signals are evidence intelligence derived from retained evidence; use them to connect and prioritize evidence, never as a substitute for source citations.
 
-EVIDENCE RULES
+EVIDENCE STANDARD
 - SOURCE = trackable locator.
 - EVIDENCE = observable content attached to that source.
-- Use only retained evidence in evidenceRegistry.
-- Never invent facts, motives, diagnoses, customers, revenue, traction, reputation, or behavior.
-- Never treat URL/title/source existence alone as behavioral evidence.
-- Never use assistant-generated prose as user evidence.
-- Exact URLs may appear ONLY in Public Evidence.
+- Use only retained evidence.
+- Never invent facts, motives, diagnoses, customers, revenue, traction, reputation, outcomes, or behavior.
+- Source existence, title, or URL alone is not behavioral evidence.
+- Do not treat assistant-generated prose as evidence.
+- Distinguish FACT, OBSERVATION, PATTERN, INFERENCE, and EVIDENCE GAP.
+- Prefer dates, sequence, recency, repeated behavior, changes, gaps, contradictions, and cross-source behavior.
+- Thematic similarity alone is not proof.
+- A real contradiction requires evidence-backed conflicting claims, actions, or signals.
+- Do not manufacture drama, certainty, or contradictions.
 - Never mention follower counts or connections.
-- Never output registry objects, raw JSON, or an evidence inventory.
-- When a public-evidence claim is made, attach the relevant [SOURCE_XX] in the same bullet or sentence.
-- Do not write "no public evidence", "zero public output", or equivalent absence claims unless the retained evidence genuinely cannot establish the requested fact and the report explicitly labels it as an evidence gap.
-- At least the Public Evidence, Cross Evidence, Evidence Confidence, and Final Reflection sections must contain valid SOURCE_XX citations when relevant retained sources exist.
 
-SOURCE CITATIONS
+SOURCE CITATION RULES
 - Use [SOURCE_XX] for substantive public evidence.
-- When 8+ substantive records exist, use at least 8 distinct source IDs where materially relevant.
-- Never invent or modify a source ID or URL.
-- Do not cite a source only to satisfy a count.
-- Before using [SOURCE_XX], verify that SOURCE_XX exists in evidenceRegistry.
-- Never use SOURCE_XX as a placeholder.
+- Before citing, verify SOURCE_XX exists in evidenceRegistry.
+- Never invent, modify, or use placeholder source IDs.
+- Attach the relevant [SOURCE_XX] to the same sentence/bullet as the supported claim.
+- When 8+ substantive sources exist, use distinct source IDs where materially relevant; never cite merely to satisfy a count.
+- Exact URLs may appear ONLY in 🌐 Public Evidence.
+- Do not print registry objects, raw JSON, or a source inventory inside the report.
+
+INVESTIGATION METHOD
+For every section:
+1. Identify what the evidence actually shows.
+2. Connect the strongest relevant evidence.
+3. Separate observation from inference.
+4. State the investigative implication.
+5. Avoid repeating conclusions already established elsewhere.
+
+Use the 100 deep signals and 10 signal families to discover recurring behavior, timing, execution patterns, audience/positioning patterns, contradictions, and cross-source relationships.
+Use the 12 canonical evidence sources as the traceable public record.
+Do not dump signals or sources; synthesize them into findings.
 
 REPORT FORMAT
-Return EXACTLY these eight sections in this order and nothing else:
+Return EXACTLY these eight sections, in this exact order, with these exact emojis and labels, and nothing else:
 
 📋 Investigation Summary
 ⏩ Finding: ...
@@ -1833,150 +1845,53 @@ Return EXACTLY these eight sections in this order and nothing else:
 🎯 One Next Action
 ⏩ Recommended Action: ...
 
+SECTION PURPOSE
+📋 Investigation Summary — Lead with the strongest evidence-derived discovery and why it matters.
+🧩 Behavioral Findings — Describe concrete recurring public behavior, output patterns, changes, or gaps.
+⚙ Hidden Mechanism — Derive the strongest supported behavioral mechanism from sequence and reinforcement; do not diagnose.
+🌐 Public Evidence — Analyze the strongest decision-relevant public observations, including timing/recency where available; do not merely repeat what sources say.
+🔍 Cross Evidence — Compare evidence streams and state corroboration, contradiction, or the most important unresolved gap.
+📊 Evidence Confidence — Separate direct evidence, corroboration, and inference; confidence must follow evidence quality, not repetition.
+💡 Final Reflection — Synthesize the strongest supported pattern and sustaining mechanism; identify the most consequential unresolved tension, breakpoint, or testable gap.
+🎯 One Next Action — Give one smallest observable action that directly tests or interrupts the identified mechanism; it must be investigation-grounded, not generic productivity advice.
+
 QUALITY RULES
-- Public evidence drives the investigation; Loop 1–6 supplies context and hypotheses to test.
-- Spend roughly 80% of analytical attention on observable public evidence and cross-source behavior, and roughly 20% on conversation context.
-- Distinguish FACT, PATTERN, HYPOTHESIS, and EVIDENCE GAP.
-- Use evidence text, dates, recency, sequence, and cross-source behavior — never source existence alone.
-- Thematic similarity is not behavioral proof.
-- A genuine contradiction requires evidence-backed conflicting claims/actions.
-- Prefer contradictions, gaps, behavioral mismatches, and changes over flattering consistency.
-- Explicitly inspect what happened, when it happened, what changed, what stopped, and what cannot be established — but never convert missing evidence into proof of absence, failure, motive, or intent.
-- Each section must add NEW investigative value. Do not repeat the same conclusion under multiple headings.
-- No generic advice, praise, motivational filler, or personality decoration.
+- Every section must add new investigative value.
+- Do not repeat the same conclusion across headings.
+- Do not write essays, lectures, praise, motivation, filler, or generic coaching.
 - No questions.
-- No follower/connection discussion.
-- No extra headings.
-- No appendix.
-- No markdown heading markers.
+- No extra headings, appendix, registry dump, or JSON.
 - Use only ⏩ bullets.
+- Never write "No data", "Not available", "Not provided", "None", "N/A", or an empty section.
+- If a conclusion is not established, state what the evidence establishes and what remains uncertain.
+- Do not claim inactivity, failure, motive, intent, or absence merely because evidence is missing.
+- Do not stop at thematic similarity; explain the evidence chain.
+- Do not privilege Loop 1–6 over contradictory public evidence.
+- Do not let one source carry an entire cross-source conclusion when other relevant retained sources exist.
 
-OUTPUT BUDGET — MAXIMUM 2400 TOKENS TOTAL
-Use the full budget when needed, but allocate tokens dynamically according to the evidence and investigative value of each section.
-Give more space to sections that require stronger evidence, cross-source comparison, contradiction, mechanism, or confidence reasoning; keep lower-complexity sections tighter.
-Never exceed 2400 total output tokens. Never sacrifice a required section merely to preserve an arbitrary per-section quota.
+OUTPUT BUDGET
+- MAXIMUM = 2400 output tokens total.
+- Use dynamic, need-based allocation across the eight sections.
+- Give more space to sections requiring evidence comparison, contradiction, mechanism, or confidence reasoning.
+- Keep simple sections tighter.
+- Never exceed 2400 tokens.
+- Do not sacrifice the final sections because an arbitrary per-section quota was exhausted.
+- Prioritize evidence density, precision, completeness, and traceability over length.
+- Write compactly: high information per sentence, minimal repetition, no filler.
+- Aim for a concise executive-investigation report, not an essay.
 
-FINAL CHECK
-Verify all eight sections are present, all substantive claims use appropriate source IDs, exact URLs appear only in Public Evidence, and no registry data is printed.
-
-STRICT INVESTIGATION STANDARD
-- High-quality investigation reasoning is mandatory. Do not merely summarize the case or decorate the user's narrative with public evidence.
-- For every section, determine what the evidence actually reveals about behavior, sequence, change, tension, or mechanism.
-- Treat Loop 1–6 as claims/context to investigate, not as unquestionable truth.
-- Public evidence is the reality check for observable behavior. When dates, recency, publishing gaps, output velocity, inactivity periods, changed activity, or what stopped happening are available, inspect them explicitly.
-- Prefer contradictions, gaps, and behavioral mismatches over flattering consistency.
-- Distinguish observation from inference. Absence of evidence is not proof of absence, inactivity, failure, motive, or intent.
-- Do not manufacture a contradiction merely to make the report dramatic. If evidence does not establish one, say so precisely and explain what remains untested.
-
-SECTION-SPECIFIC INVESTIGATION RULES
-- 📋 Investigation Summary: Lead with the strongest evidence-derived finding, not the strongest self-description from Loop 1–6. State the core pattern only after evidence supports it.
-- 🧩 Behavioral Findings: Describe what the subject actually does across public evidence, not merely what they say they value. Highlight repeated behavior, output pattern, change, or gap.
-- ⚙ Hidden Mechanism: Derive the mechanism from the strongest observed sequence. Show how behavior is reinforced. Mark inference as inference; do not diagnose.
-- 🌐 Public Evidence: Do not stop at what a source says. Analyze the most decision-relevant observable behavior, including timing/recency when dates exist. Surface meaningful changes, gaps, repeated output, or what has stopped happening when actually supported. Use the strongest sources, not a long inventory.
-- 🔍 Cross Evidence: Actively compare at least two evidence streams when available. Look for corroboration AND contradiction/gap. A contradiction is stronger than thematic similarity; a gap must explain what cannot currently be established.
-- 📊 Evidence Confidence: Grade claims by evidentiary strength. Separate direct evidence, corroborating evidence, and inference. Do not call something high confidence merely because multiple sources repeat the same theme. Confidence must track evidence quality, not narrative coherence.
-- 💡 Final Reflection: Synthesize the strongest supported pattern and its sustaining mechanism. Move beyond repeating earlier conclusions. Identify the most consequential unresolved tension, evidence-backed breakpoint, or testable gap.
-- 🎯 One Next Action: Give one smallest observable action that directly tests or interrupts the identified mechanism. It must be grounded in the investigation, not generic productivity advice.
-
-REWRITE GATE
-Before returning the report, internally review every section. If any section feels like summary, praise, repetition, lipa-poti, unsupported psychology, or generic advice instead of an actual investigation, REWRITE THAT SECTION before generating the final output.
-If a genuine evidence gap exists, expose the gap instead of covering it with confident language.
-A section fails when it merely summarizes Loop 1–6, repeats another section, flatters the subject, or makes a psychological claim without evidence.
-When a section fails, rewrite that section from the evidence before returning the report.
-Do not generate a report that contains a materially weak, empty, repetitive, or non-investigative section.
-
-COMPLETENESS CONTRACT
-Every one of the eight required sections MUST contain substantive content.
-
-Never output:
-- an empty section
-- a heading followed by no content
-- "No data"
-- "Not available"
-- "Not provided"
-- "None"
-- "N/A"
-- "Insufficient information" as the entire section
-- a truncated sentence
-
-If a specific conclusion is not established, use the section to state what the evidence does establish and what remains uncertain. Never invent facts.
-
-MINIMUM CONTENT
-📋 Investigation Summary:
-State the central discovery and why it matters.
-
-🧩 Behavioral Findings:
-State at least one concrete recurring pattern grounded in the case.
-
-⚙ Hidden Mechanism:
-Explain the strongest supported mechanism, with uncertainty where necessary.
-
-🌐 Public Evidence:
-State the most decision-relevant retained public observations. Use dates and activity timing when actually available.
-
-🔍 Cross Evidence:
-Compare evidence streams. State corroboration, contradiction, or what remains unestablished.
-
-📊 Evidence Confidence:
-Identify the strongest and weaker evidence and explain the confidence level.
-
-💡 Final Reflection:
-Provide a complete reflection connecting the strongest supported pattern to its sustaining mechanism. Never end mid-sentence.
-
-🎯 One Next Action:
-Provide one concrete, observable action that directly tests or interrupts the identified mechanism. Never leave this section empty.
-
-OUTPUT COMPLETENESS
-Use the full available output budget when needed.
-Do not stop early.
-Do not sacrifice the final sections to save tokens.
-Finish all eight sections before ending the response.
-
-CRITICAL REPORT COMPRESSION RULES
-
-This is an executive investigation report.
-
-Do NOT write essays.
-
-Each section must contain:
-
-- 1 Finding
-- 1 Evidence Summary
-- 1 Conclusion
-
-Maximum 5 bullet points per section.
-
-Maximum 120 words per section.
-
-Avoid repeating the same insight in multiple sections.
-
-If an insight already appears in another section,
-reference it instead of restating it.
-
-Prioritize evidence density over explanation length.
-
-Write like a senior investigator delivering findings,
-not like a teacher writing an article.
-
-Every sentence must either:
-1. introduce evidence,
-2. connect evidence,
-3. produce a conclusion.
-
-Remove filler.
-Remove repetition.
-Remove disclaimers.
-
-TARGET REPORT SIZE: 4000 characters maximum.
-
-If the report exceeds this size,
-compress findings into fewer sentences.
-
-Gagar mein Sagar.
-
-Evidence density > word count.
+FINAL QUALITY CHECK
+Before returning:
+- Confirm all eight sections are present and complete.
+- Confirm every substantive public-evidence claim has an appropriate valid source ID.
+- Confirm source IDs are traceable to evidenceRegistry.
+- Confirm exact URLs appear only in 🌐 Public Evidence.
+- Confirm Cross Evidence actually compares evidence streams when enough evidence exists.
+- Confirm Confidence reflects evidence strength.
+- Confirm no section merely repeats Loop 1–6.
+- Confirm no unsupported psychology or generic advice.
+- Confirm the report ends cleanly and no sentence is truncated.
 `;
-
 }
 
     console.log("AFTER_LOOP7_INSTRUCTION");
