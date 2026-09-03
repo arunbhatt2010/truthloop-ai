@@ -1453,7 +1453,7 @@ if (loopLevel === 7) {
 
 
     const maxTokens =
-  loopLevel === 7 ? 2400 : 220;
+  loopLevel === 7 ? 2600 : 220;
 
     const loop7ReasoningEnabled = false;
 
