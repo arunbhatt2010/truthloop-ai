@@ -23,11 +23,11 @@
    discovery. PCF and CEB are responsible for upstream filtration.
    ========================================================= */
 
-const MAX_TOTAL_PACKAGE_CHARS = 5000;
-const ECB_OUTPUT_LIMIT = 5000;
-const ECB_TRANSPORT_LIMIT = 15000;
+const MAX_TOTAL_PACKAGE_CHARS = 8000;
+const ECB_OUTPUT_LIMIT = 8000;
+const ECB_TRANSPORT_LIMIT = 20000;
 const MAX_INPUT_PACKAGE_CHARS = 10000000;
-const TARGET_PACKAGE_CHARS = 4500;
+const TARGET_PACKAGE_CHARS = 7000;
 
 /*
  * Loop 7 transport boundary:
