@@ -2532,10 +2532,7 @@ if (loopLevel === 7) {
     const maxTokens =
   loopLevel === 7 ? 2400 : 220;
 
-    const loop7ReasoningEnabled =
-      loopLevel === 7 &&
-      Array.isArray(loop7EvidenceSourceIndexCompact) &&
-      loop7EvidenceSourceIndexCompact.length >= 3;
+    const loop7ReasoningEnabled = false;
 
     console.log(
       "LOOP7_REASONING_MODE",
