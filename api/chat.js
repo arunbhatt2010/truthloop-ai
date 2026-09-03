@@ -784,17 +784,30 @@ QUALITY RULES
 - Do not privilege Loop 1–6 over contradictory public evidence.
 - Do not let one source carry an entire cross-source conclusion when other relevant retained sources exist.
 
-OUTPUT BUDGET
-- MAXIMUM = 2400 output tokens total.
-- Use dynamic, need-based allocation across the eight sections.
-- Give more space to sections requiring evidence comparison, contradiction, mechanism, or confidence reasoning.
-- Keep simple sections tighter.
-- Never exceed 2400 tokens.
-- Do not sacrifice the final sections because an arbitrary per-section quota was exhausted.
-- Prioritize evidence density, precision, completeness, and traceability over length.
-- Write compactly: high information per sentence, minimal repetition, no filler.
-- Aim for a concise executive-investigation report, not an essay.
+REPORT DENSITY RULES
 
+Each section must contain:
+
+⏩ Finding
+⏩ Evidence
+⏩ Conclusion
+
+Target: 150–180 words per section.
+
+Maximum 3–5 bullets per section.
+
+Use evidence first, interpretation second.
+
+Do not repeat the same evidence across multiple sections unless required for corroboration.
+
+Each section must add new investigative value.
+
+Insight density > verbosity.
+
+Avoid filler, motivational language, repetition, and restating previous conclusions.
+
+Target total report length:
+1200–1500 words.
 FINAL QUALITY CHECK
 Before returning:
 - Confirm all eight sections are present and complete.
