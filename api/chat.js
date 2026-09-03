@@ -588,10 +588,8 @@ User feels close to an important realization but not there yet.
         });
 
         if (crossEvidencePackage?.success) {
-          publicEvidencePackage =
-            crossEvidencePackage?.universalPackage ||
-            crossEvidencePackage;
-        }
+  publicEvidencePackage = crossEvidencePackage;
+      }
 
         if (wantsLoop7Progress) {
           sendLoop7Progress({
