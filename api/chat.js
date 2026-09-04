@@ -1495,7 +1495,7 @@ const LOOP7_PROVIDER_SETTINGS = {
   openrouter: {
     apiKey: process.env.OPENROUTER_API_KEY,
     endpoint: "https://openrouter.ai/api/v1/chat/completions",
-    model: "deepseek/deepseek-chat-v3.1:free",
+    model: "deepseek/deepseek-chat-v3.1",
     temperature: 0.3,
     maxTokens
   },
@@ -1674,29 +1674,46 @@ try {
        * Provider switching is intentionally limited to HTTP 429.
        * Other HTTP errors are surfaced to the existing error handler.
        */
-      if (response.status === 429) {
-        console.log(
-          "LOOP7_PROVIDER_429_SWITCH",
-          JSON.stringify({
-            from: providerName,
-            next: LOOP7_PROVIDER_ORDER[
-              LOOP7_PROVIDER_ORDER.indexOf(providerName) + 1
-            ] || null
-          })
-        );
-        continue;
-      }
+      const shouldSwitchProvider = [
+  401, // Unauthorized
+  402, // Payment Required
+  403, // Forbidden
+  404, // Model Not Found / Not Available
+  408, // Timeout
+  409, // Conflict
+  429, // Rate Limit
+  500, // Internal Error
+  502, // Bad Gateway
+  503, // Service Unavailable
+  504  // Gateway Timeout
+].includes(response.status);
 
-      console.log(
-        "LOOP7_PROVIDER_NO_SWITCH",
-        JSON.stringify({
-          provider: providerName,
-          status: response.status,
-          reason: "ONLY_429_TRIGGERS_PROVIDER_SWITCH"
-        })
-      );
+if (shouldSwitchProvider) {
+  console.log(
+    "LOOP7_PROVIDER_SWITCH",
+    JSON.stringify({
+      from: providerName,
+      status: response.status,
+      next:
+        LOOP7_PROVIDER_ORDER[
+          LOOP7_PROVIDER_ORDER.indexOf(providerName) + 1
+        ] || null
+    })
+  );
 
-      break;
+  continue;
+}
+
+console.log(
+  "LOOP7_PROVIDER_STOP",
+  JSON.stringify({
+    provider: providerName,
+    status: response.status,
+    reason: "NON_RECOVERABLE_ERROR"
+  })
+);
+
+break;
     }
 
     if (!response) {
