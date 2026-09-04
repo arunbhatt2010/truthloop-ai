@@ -1701,7 +1701,10 @@ if (loopLevel === 7) {
 }
 
 const data = normalizedData;
-
+console.log(
+  "OPENROUTER_KEY_EXISTS",
+  !!process.env.OPENROUTER_API_KEY
+);
 console.log(
   "LOOP7_FINAL_RESPONSE",
   JSON.stringify(data).slice(0,3000)
