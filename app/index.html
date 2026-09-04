@@ -3049,26 +3049,61 @@ function renderLoop7Report(report){
         .trim();
 
     function getSection(icon){
-        const icons = ["📋","🧩","⚙","🌐","🔍","📊","💡","🎯"];
-        const start = report.indexOf(icon);
-        if(start === -1) return "";
+    const sectionHeadings = [
+        "📋 Investigation Summary",
+        "🧩 Behavioral Findings",
+        "⚙ Hidden Mechanism",
+        "🌐 Public Evidence",
+        "🔍 Cross Evidence",
+        "📊 Evidence Confidence",
+        "💡 Final Reflection",
+        "🎯 One Next Action"
+    ];
 
-        let end = report.length;
+    const headingMap = {
+        "📋": "📋 Investigation Summary",
+        "🧩": "🧩 Behavioral Findings",
+        "⚙": "⚙ Hidden Mechanism",
+        "🌐": "🌐 Public Evidence",
+        "🔍": "🔍 Cross Evidence",
+        "📊": "📊 Evidence Confidence",
+        "💡": "💡 Final Reflection",
+        "🎯": "🎯 One Next Action"
+    };
 
-        for(const nextIcon of icons){
-            if(nextIcon === icon) continue;
-            const pos = report.indexOf(nextIcon, start + 1);
-            if(pos !== -1 && pos < end) end = pos;
-        }
+    const heading = headingMap[icon];
+    if(!heading) return "";
 
-        let text = report.substring(start, end);
-        text = text.replace(/^.*?\n/, "").trim();
-        text = cleanReportSectionText(text);
+    const start = report.indexOf(heading);
+    if(start === -1) return "";
 
-        return decorateLoop7Citations(
-          text.replace(/#+\s*/g,"").replace(/\n/g,"<br>")
+    let end = report.length;
+
+    for(const nextHeading of sectionHeadings){
+        if(nextHeading === heading) continue;
+
+        const pos = report.indexOf(
+            nextHeading,
+            start + heading.length
         );
+
+        if(pos !== -1 && pos < end){
+            end = pos;
+        }
     }
+
+    let text = report
+        .slice(start + heading.length, end)
+        .trim();
+
+    text = cleanReportSectionText(text);
+
+    return decorateLoop7Citations(
+        text
+            .replace(/#+\s*/g, "")
+            .replace(/\n/g, "<br>")
+    );
+  }
 
     const summary = getSection("📋");
     const findings = getSection("🧩");
