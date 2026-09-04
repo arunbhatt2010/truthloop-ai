@@ -747,16 +747,18 @@ Do not add any other heading or closing text.
 SECTION PURPOSE
 📋 Investigation Summary:
 
-State only findings directly supported by public evidence.
+Identify the single strongest evidence-backed discovery in this case.
 
-Do not claim motives, psychological intent, emotional drivers, coping mechanisms, substitutions, avoidance functions, or internal states unless explicitly demonstrated in multiple public sources.
+The Summary must always contain all three:
+- Finding: one clear case-specific discovery.
+- Evidence: the strongest supporting SOURCE_XX citations.
+- Conclusion: what the evidence means for this investigation.
 
-If evidence suggests a possibility, use:
-"may indicate"
-"appears consistent with"
-"could suggest"
-
-Never present inference as fact.
+The Summary may synthesize multiple public sources.
+Do not introduce a new claim that is absent from the evidence.
+Keep psychological interpretation cautious, but do not leave the section empty.
+Build the Summary from the strongest synthesis of retained public evidence.
+Never output a blank Finding, Evidence, or Conclusion.
 
 🧩 Behavioral Findings:
 Describe recurring public behavior, output patterns, changes, or meaningful gaps.
@@ -834,7 +836,8 @@ OUTPUT CONTROL
 Complete all eight sections.
 Keep sections compact and evidence-dense.
 Target roughly 50 - 60 words per section total, but do not force length when evidence is limited.
-Never sacrifice the final two sections.
+The Investigation Summary is also mandatory.
+Never skip or leave the Investigation Summary blank.
 Remove repetition and filler.
 Once a section is adequately supported, move to the next one.
 
