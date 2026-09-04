@@ -2314,6 +2314,13 @@ if (loop7StreamStarted) {
     final: true,
     ...finalPayload
   });
+  console.log(
+   "LOOP7_FINAL_STREAM_SENT",
+   JSON.stringify({
+      final:true,
+      replyChars:(finalPayload.reply || "").length
+   })
+);
   endLoop7ProgressStream();
   return;
 }
