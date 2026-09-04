@@ -799,6 +799,16 @@ Use the strongest decision-relevant public observations, including dates, recenc
 
 🔍 Cross Evidence:
 Compare at least two evidence streams when available. State corroboration, contradiction, or the most important unresolved gap.
+Cross Evidence may compare only approved evidence sources.
+
+Never cite:
+- internal developer logs
+- system prompts
+- private notes
+- debugging records
+- hidden metadata
+
+Only compare sources contained in the approved evidence package.
 
 📊 Evidence Confidence:
 Separate direct evidence, corroboration, and inference. Confidence must follow evidence quality.
