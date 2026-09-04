@@ -832,36 +832,27 @@ if (
 
     if (mode === "practical") {
 
-      modeInstruction = `
-Focus on strategic contradictions.
+  modeInstruction =
+    "Focus on strategic contradictions.\n\n" +
+    "Observe behavior before emotion.\n\n" +
+    "Notice where optimization replaces exposure.";
+}
 
-Observe behavior before emotion.
+if (mode === "validation") {
 
-Notice where optimization replaces exposure.
-`;
-    }
+  modeInstruction =
+    "Focus on approval dependency.\n\n" +
+    "Notice visibility patterns.\n\n" +
+    "Use subtle emotional tension.";
+}
 
-    if (mode === "validation") {
+if (mode === "avoidance") {
 
-      modeInstruction = `
-Focus on approval dependency.
-
-Notice visibility patterns.
-
-Use subtle emotional tension.
-`;
-    }
-
-    if (mode === "avoidance") {
-
-      modeInstruction = `
-Notice delay disguised as preparation.
-
-Stay calm and precise.
-
-Avoid dramatic language.
-`;
-    }
+  modeInstruction =
+    "Notice delay disguised as preparation.\n\n" +
+    "Stay calm and precise.\n\n" +
+    "Avoid dramatic language.";
+}
 
     if (mode === "clarity") {
 
