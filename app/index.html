@@ -2262,6 +2262,9 @@ async function fetchLoop7Investigation(profileLink){
 
     try{
       const payload = JSON.parse(candidate);
+      alert(
+  JSON.stringify(payload).slice(0, 500)
+);
       handleLoop7ProgressPayload(payload);
       if(payload && (payload.reply || payload.final === true || payload.type === "final")) {
         finalPayload = payload;
