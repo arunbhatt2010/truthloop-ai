@@ -693,6 +693,21 @@ EVIDENCE PRIORITY
 14. Loop 1–6 remains supporting context; major conclusions should follow the strongest evidence contained within compressedEvidencePackage and retained public evidence.
 15. All substantive public-evidence conclusions must remain traceable to valid SOURCE_XX citations.
 
+CASE SPECIFICITY RULE
+
+Every section must reference case-specific evidence.
+
+Avoid statements that could apply to another person.
+
+Before writing any conclusion, connect it to at least one specific observation from:
+- website content
+- LinkedIn activity
+- LinkedIn article
+- profile evidence
+- cross-source comparison
+
+Generic statements that could fit many founders are prohibited.
+
 INVESTIGATION STANDARD
 Use the retained evidence to determine:
 - what is actually observable
@@ -791,7 +806,7 @@ Give one smallest concrete action that directly tests or interrupts the identifi
 SECTION DENSITY
 Each section must be complete and meaningful.
 
-Target 150–180 words PER SECTION TOTAL, not per bullet.
+Target 100 words PER SECTION TOTAL, not per bullet.
 
 Use 3 bullets where specified by the structure.
 Do not force every bullet to have equal length.
@@ -800,6 +815,16 @@ A section may be shorter when the evidence is simple, but never empty.
 Do not make an early section excessively long.
 Reserve enough output budget to complete ALL eight sections.
 
+OUTPUT ALLOCATION RULE
+
+The final two sections are mandatory.
+
+Reserve output budget for:
+
+💡 Final Reflection
+🎯 One Next Action
+
+Do not expand earlier sections if doing so risks shortening either of these sections.
 
 Priority order:
 1. Complete all eight sections.
