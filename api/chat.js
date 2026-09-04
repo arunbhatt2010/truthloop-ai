@@ -854,27 +854,21 @@ if (mode === "avoidance") {
     "Avoid dramatic language.";
 }
 
-    if (mode === "clarity") {
+if (mode === "clarity") {
 
-      modeInstruction = `
-Reduce noise.
-
-Create mental pause.
-
-Notice indecision patterns.
-`;
-    }
+  modeInstruction =
+    "Reduce noise.\n\n" +
+    "Create mental pause.\n\n" +
+    "Notice indecision patterns.";
+}
 
     if (mode === "mirror") {
 
-      modeInstruction = `
-Notice contradictions slowly.
-
-Avoid dramatic psychology.
-
-Stay believable.
-`;
-    }
+  modeInstruction =
+    "Notice contradictions slowly.\n\n" +
+    "Avoid dramatic psychology.\n\n" +
+    "Stay believable.";
+}
 let categoryInstruction = "";
 
 if(currentCategory){
