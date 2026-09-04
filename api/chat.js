@@ -772,7 +772,7 @@ Give one smallest concrete action that directly tests or interrupts the identifi
 OUTPUT CONTROL
 Complete all eight sections.
 Keep sections compact and evidence-dense.
-Target roughly 100 words per section total, but do not force length when evidence is limited.
+Target roughly 50 - 60 words per section total, but do not force length when evidence is limited.
 Never sacrifice the final two sections.
 Remove repetition and filler.
 Once a section is adequately supported, move to the next one.
@@ -794,19 +794,6 @@ Avoid:
 
 Every sentence should observe, connect evidence, identify a pattern, explain a supported mechanism, assess confidence, expose a gap, or derive a conclusion.
 
-FINAL CHECK
-Silently verify:
-- all 8 sections are present
-- no section is empty
-- no sentence is truncated
-- conclusions are evidence-supported
-- source IDs are valid
-- public evidence is primary
-- Loop 1–6 remains contextual
-- Cross Evidence compares sources
-- confidence matches evidence strength
-- Final Reflection is complete
-- One Next Action is concrete
 
 Return the finished report only.
 `;
