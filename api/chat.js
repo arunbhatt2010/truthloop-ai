@@ -1822,8 +1822,7 @@ console.log(
 console.log(
   "LOOP7_FINAL_REPORTING",
   JSON.stringify({
-    replyChars: reply?.length || 0,
-    finishReason: completion?.choices?.[0]?.finish_reason
+    replyChars: reply?.length || 0
   })
 );
 
