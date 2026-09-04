@@ -746,13 +746,53 @@ Do not add any other heading or closing text.
 
 SECTION PURPOSE
 📋 Investigation Summary:
-State the strongest evidence-backed discovery and why it matters.
+
+State only findings directly supported by public evidence.
+
+Do not claim motives, psychological intent, emotional drivers, coping mechanisms, substitutions, avoidance functions, or internal states unless explicitly demonstrated in multiple public sources.
+
+If evidence suggests a possibility, use:
+"may indicate"
+"appears consistent with"
+"could suggest"
+
+Never present inference as fact.
 
 🧩 Behavioral Findings:
 Describe recurring public behavior, output patterns, changes, or meaningful gaps.
+Describe observable behavioral patterns only.
+
+Focus on:
+- repeated actions
+- repeated themes
+- repeated decisions
+- repeated public statements
+
+Avoid explaining WHY the pattern exists.
+
+Do not infer personality traits, emotional needs, psychological motivations, or internal conflicts.
+
+Behavioral Findings describes behavior.
+Explanation belongs elsewhere.
 
 ⚙ Hidden Mechanism:
 Derive the strongest supported mechanism from the observed sequence. Mark inference as inference.
+Hidden Mechanism is a hypothesis section.
+
+Every mechanism must be framed as a possible explanatory model, not an established fact.
+
+Use language such as:
+
+- may indicate
+- could explain
+- appears consistent with
+- one possible mechanism
+
+Never diagnose mental states.
+
+Never claim emotional motivations unless directly evidenced.
+
+Mechanisms must remain evidence-linked hypotheses.
 
 🌐 Public Evidence:
 Use the strongest decision-relevant public observations, including dates, recency, sequence, repeated output, or gaps when supported.
@@ -765,6 +805,17 @@ Separate direct evidence, corroboration, and inference. Confidence must follow e
 
 💡 Final Reflection:
 Synthesize the strongest supported pattern and sustaining mechanism. Identify the most consequential unresolved tension, breakpoint, or testable gap.
+Final Reflection should synthesize findings.
+
+Do not introduce new claims.
+
+Do not introduce new mechanisms.
+
+Do not introduce new psychological interpretations.
+
+Only summarize patterns already established in previous sections.
+
+Reflection should be lower confidence than evidence sections.
 
 🎯 One Next Action:
 Give one smallest concrete action that directly tests or interrupts the identified mechanism. Keep it investigation-grounded.
