@@ -3201,7 +3201,7 @@ function buildUniversalPackage({
          * Signal is attached as intelligence only.
          * Raw evidence remains outside Signal's output and above.
          */
-        signalSignals:
+     /*   signalSignals:
     compressedSignals || {
         identity: {},
         positioning: [],
@@ -3217,6 +3217,7 @@ function buildUniversalPackage({
         crossSourceSignals: [],
         signalConfidence: 0
     },
+    */
         evidenceCoverage: {
             websitePagesInvestigated:
                 websiteSources.length,
