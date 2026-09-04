@@ -1588,12 +1588,10 @@ if (!response.ok) {
 }
 
 /* =========================
-   GEMINI → OPENAI SHAPE
-   Keep existing Loop 7
-   parser untouched.
-========================= */
+     📤 RESPONSE
+   ========================= */
 
-let data;
+let normalizedData;
 
 if (loopLevel === 7) {
 
@@ -1601,18 +1599,16 @@ if (loopLevel === 7) {
 
   console.log(
     "GEMINI_RAW_RESPONSE",
-    JSON.stringify(geminiData).slice(0, 5000)
+    JSON.stringify(geminiData).slice(0, 3000)
   );
 
-  const geminiParts =
-    geminiData?.candidates?.[0]?.content?.parts || [];
+  const geminiText =
+    geminiData?.candidates?.[0]?.content?.parts
+      ?.map(part => part?.text || "")
+      .join("")
+      .trim() || "";
 
-  const geminiText = geminiParts
-    .map(part => part?.text || "")
-    .join("")
-    .trim();
-
-  data = {
+  normalizedData = {
     choices: [
       {
         message: {
@@ -1622,7 +1618,6 @@ if (loopLevel === 7) {
           geminiData?.candidates?.[0]?.finishReason || null
       }
     ],
-
     usage: geminiData?.usageMetadata || null
   };
 
@@ -1637,20 +1632,17 @@ if (loopLevel === 7) {
 
 } else {
 
-  data = await response.json();
+  normalizedData = await response.json();
 
 }
 
-     /* =========================
-       📤 RESPONSE
-    ========================= */
+const data = normalizedData;
 
-    const data =
-  await response.json();
-    console.log(
-    "LOOP7_FINAL_RESPONSE",
-    JSON.stringify(data).slice(0,3000)
+console.log(
+  "LOOP7_FINAL_RESPONSE",
+  JSON.stringify(data).slice(0,3000)
 );
+
 console.log(
   "LOOP7_MESSAGE_CONTENT_TYPE",
   typeof data?.choices?.[0]?.message?.content
@@ -1662,7 +1654,8 @@ console.log(
     data?.choices?.[0]?.message?.content
   ).slice(0,2000)
 );
-    console.log(
+
+console.log(
   "LOOP7_RAW_CHOICE",
   JSON.stringify(
     data?.choices?.[0],
@@ -1670,8 +1663,10 @@ console.log(
     2
   )
 );
+
 let reply =
   data?.choices?.[0]?.message?.content || "";
+
 
 /* =========================
    LOOP 7 RENDER LABEL NORMALIZER
