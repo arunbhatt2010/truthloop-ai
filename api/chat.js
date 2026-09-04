@@ -689,6 +689,12 @@ Requirements:
 - If evidence is insufficient, explicitly state that evidence is insufficient.
 - Keep the report evidence-led and case-specific.
 
+- Base all observations only on information present inside compressedEvidencePackage.
+- Ignore Loop 1-6 self reports, chat history, profile cards, user statements, private context, and truthLoopPackage.
+- Use valid SOURCE_XX citations where relevant.
+- Do not invent facts.
+- If evidence is insufficient, explicitly state that evidence is insufficient.
+- Keep the report evidence-led and case-specific.
 Return the finished report only.
 `;
     }
