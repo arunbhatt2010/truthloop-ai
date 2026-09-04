@@ -604,7 +604,14 @@ User feels close to an important realization but not there yet.
         compressedEvidencePackage = await loadEvidenceCompressionBrain({
   publicEvidencePackage
 });
-
+console.log(
+  "COMPRESSED_PACKAGE",
+  JSON.stringify(
+    compressedEvidencePackage?.loop7Package,
+    null,
+    2
+  )
+);
         if (wantsLoop7Progress) {
           const registry = Array.isArray(
             compressedEvidencePackage?.loop7Package?.sourceRegistry
