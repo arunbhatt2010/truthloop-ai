@@ -663,9 +663,8 @@ User feels close to an important realization but not there yet.
       }));
 
       loop7AiUserPayload = {
-        truthLoopPackage,
-        compressedEvidencePackage
-      };
+  compressedEvidencePackage
+};
 
     loop7Instruction = `
 LOOP 7 — FINAL TRUTHLOOP INVESTIGATION
