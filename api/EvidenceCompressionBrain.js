@@ -719,7 +719,27 @@ async function loadEvidenceCompressionBrain({
     date: getDate(source),
     content: extractEvidenceText(source, 650, 4)
   }));
-
+console.log(
+  "ECB_WEBSITE_EXPORT_AUDIT",
+  JSON.stringify(
+    websiteSources.map(source => ({
+      sourceId: source.sourceId,
+      title: source.title,
+      originalChars: (() => {
+        const original = websiteSourcesInput.find(
+          item =>
+            getUrl(item) === source.url ||
+            firstText(item?.title, item?.headline) === source.title
+        );
+        return extractEvidenceText(original || {}, 100000, 100000)?.length || 0;
+      })(),
+      exportedChars: source.content?.length || 0,
+      contentPreview: String(source.content || "").slice(0, 300)
+    })),
+    null,
+    2
+  )
+);
   const profile = profileInput
     ? {
         sourceId: nextSourceId(),
@@ -781,7 +801,27 @@ async function loadEvidenceCompressionBrain({
     likes: item?.likes ?? null,
     comments: item?.comments ?? null
   }));
-
+console.log(
+  "ECB_LINKEDIN_POST_EXPORT_AUDIT",
+  JSON.stringify(
+    linkedinPosts.map(post => ({
+      sourceId: post.sourceId,
+      title: post.title,
+      originalChars: (() => {
+        const original = linkedinPostsInput.find(
+          item =>
+            getId(item) === post.id ||
+            getUrl(item) === post.url
+        );
+        return extractEvidenceText(original || {}, 100000, 100000)?.length || 0;
+      })(),
+      exportedChars: post.content?.length || 0,
+      contentPreview: String(post.content || "").slice(0, 300)
+    })),
+    null,
+    2
+  )
+);
   const linkedinArticles = linkedinArticlesInput.map(item => ({
     sourceId: nextSourceId(),
     sourceType: "linkedin_article",
@@ -798,7 +838,27 @@ async function loadEvidenceCompressionBrain({
     likes: item?.likes ?? null,
     comments: item?.comments ?? null
   }));
-
+console.log(
+  "ECB_LINKEDIN_ARTICLE_EXPORT_AUDIT",
+  JSON.stringify(
+    linkedinArticles.map(article => ({
+      sourceId: article.sourceId,
+      title: article.title,
+      originalChars: (() => {
+        const original = linkedinArticlesInput.find(
+          item =>
+            getId(item) === article.id ||
+            getUrl(item) === article.url
+        );
+        return extractEvidenceText(original || {}, 100000, 100000)?.length || 0;
+      })(),
+      exportedChars: article.content?.length || 0,
+      contentPreview: String(article.content || "").slice(0, 300)
+    })),
+    null,
+    2
+  )
+);
   const githubEvidence = githubInput
     ? buildGithubEvidence(githubInput)
     : null;
@@ -836,7 +896,50 @@ async function loadEvidenceCompressionBrain({
       date: source.date || null
     });
   }
-
+console.log(
+  "ECB_SIGNAL_AUDIT",
+  JSON.stringify({
+    rawSignalKeys: Object.keys(rawSignals || {}),
+    rawDeepSignalFamilies:
+      rawSignals?.deepSignalFamilies &&
+      typeof rawSignals.deepSignalFamilies === "object"
+        ? Object.fromEntries(
+            Object.entries(rawSignals.deepSignalFamilies).map(
+              ([family, members]) => [
+                family,
+                {
+                  inputMembers: Array.isArray(members)
+                    ? members.length
+                    : 0,
+                  inputChars: Array.isArray(members)
+                    ? JSON.stringify(members).length
+                    : 0
+                }
+              ]
+            )
+          )
+        : {},
+    reducedSignalKeys: Object.keys(signalMaster || {}),
+    reducedDeepSignalFamilies:
+      signalMaster?.deepSignalFamilies &&
+      typeof signalMaster.deepSignalFamilies === "object"
+        ? Object.fromEntries(
+            Object.entries(signalMaster.deepSignalFamilies).map(
+              ([family, value]) => [
+                family,
+                {
+                  outputChars: JSON.stringify(value).length,
+                  finding: value?.finding || null,
+                  basis: value?.basis || null,
+                  confidence: value?.confidence ?? null,
+                  sourceUrls: value?.supportingSourceUrls || []
+                }
+              ]
+            )
+          )
+        : {}
+  }, null, 2)
+);
   if (profile) {
     sourceRegistry.push({
       sourceId: profile.sourceId,
@@ -1248,7 +1351,47 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
     "ECB_FINAL_PACKAGE_SIZE",
     finalSize
   );
+console.log(
+  "ECB_FINAL_EXPORT_AUDIT",
+  JSON.stringify({
+    finalSize,
+    sourceRegistryCount:
+      finalPackage?.sourceRegistry?.length || 0,
 
+    websiteSources:
+      Array.isArray(finalPackage?.evidenceUniverse?.websiteSources)
+        ? finalPackage.evidenceUniverse.websiteSources.map(source => ({
+            sourceId: source.sourceId,
+            title: source.title,
+            chars: String(source.content || "").length,
+            content: String(source.content || "").slice(0, 500)
+          }))
+        : [],
+
+    linkedinPosts:
+      Array.isArray(finalPackage?.evidenceUniverse?.linkedinPosts)
+        ? finalPackage.evidenceUniverse.linkedinPosts.map(post => ({
+            sourceId: post.sourceId,
+            title: post.title,
+            chars: String(post.content || "").length,
+            content: String(post.content || "").slice(0, 500)
+          }))
+        : [],
+
+    linkedinArticles:
+      Array.isArray(finalPackage?.evidenceUniverse?.linkedinArticles)
+        ? finalPackage.evidenceUniverse.linkedinArticles.map(article => ({
+            sourceId: article.sourceId,
+            title: article.title,
+            chars: String(article.content || "").length,
+            content: String(article.content || "").slice(0, 500)
+          }))
+        : [],
+
+    signalMaster:
+      finalPackage?.evidenceUniverse?.signalMaster || null
+  }, null, 2)
+);
   console.log(
     "ECB_COMPRESSION_AUDIT",
     JSON.stringify({
