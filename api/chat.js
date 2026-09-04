@@ -1408,7 +1408,26 @@ console.log(
   "SYSTEM_PROMPT_LENGTH_PRE_AI",
   systemPrompt.length
 );
+console.log(
+  "TRUTHLOOP_PACKAGE_AUDIT",
+  {
+    messages: JSON.stringify(
+      loop7AiUserPayload?.truthLoopPackage?.messages || []
+    ).length,
 
+    identityPackage: JSON.stringify(
+      loop7AiUserPayload?.truthLoopPackage?.identityPackage || {}
+    ).length,
+
+    profileLink: JSON.stringify(
+      loop7AiUserPayload?.truthLoopPackage?.profileLink || ""
+    ).length,
+
+    totalTruthLoopPackage: JSON.stringify(
+      loop7AiUserPayload?.truthLoopPackage || {}
+    ).length
+  }
+);
 if (loopLevel === 7) {
   console.log(
     "LOOP7_GROQ_REQUEST_ESTIMATE",
