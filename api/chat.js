@@ -602,9 +602,8 @@ User feels close to an important realization but not there yet.
         }
 
         compressedEvidencePackage = await loadEvidenceCompressionBrain({
-          truthLoopPackage,
-          publicEvidencePackage
-        });
+  publicEvidencePackage
+});
 
         if (wantsLoop7Progress) {
           const registry = Array.isArray(
