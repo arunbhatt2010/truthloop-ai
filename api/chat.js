@@ -760,7 +760,8 @@ IMPORTANT
 - Ignore Loop 1–6 assistant interpretations, profile cards, and private context when making public-evidence claims.
 - Return the finished report only.
 
-    }
+    `;
+}
 
     
     /* =========================
