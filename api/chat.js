@@ -1382,157 +1382,264 @@ if (loopLevel === 7) {
   }
 
   /* =========================
-       🤖 AI CALL
-    ========================= */
-    /******************************
+     🤖 AI CALL
+  ========================= */
+
+/******************************
  LOOP 7 RESPONSE SANITIZER
 ******************************/
 
 if (loopLevel === 7) {
-
   messages = messages.filter(m => {
     if (m.role !== "assistant") return true;
-
     return !m.content.includes("?");
   });
-
 }
-    const cleanMessages = messages
-      .map(message => ({
-        role:
-          message?.role === "assistant"
-            ? "assistant"
-            : message?.role === "system"
-              ? "system"
-              : "user",
-        content:
-          typeof message?.content === "string"
-            ? message.content
-            : String(message?.content ?? "")
-      }))
-      .filter(message => message.content.trim());
 
+const cleanMessages = messages
+  .map(message => ({
+    role:
+      message?.role === "assistant"
+        ? "assistant"
+        : message?.role === "system"
+          ? "system"
+          : "user",
+    content:
+      typeof message?.content === "string"
+        ? message.content
+        : String(message?.content ?? "")
+  }))
+  .filter(message => message.content.trim());
 
-    const maxTokens =
-  loopLevel === 7 ? 1500 : 220;
+const maxTokens =
+  loopLevel === 7 ? 4000 : 220;
 
-    const loop7ReasoningEnabled = false;
+const loop7ReasoningEnabled = false;
 
-    console.log(
-      "LOOP7_REASONING_MODE",
-      JSON.stringify({
-        enabled: loop7ReasoningEnabled,
-        evidenceSources: loop7EvidenceSourceIndexCompact.length,
-        maxTokens
-      })
-    );
+console.log(
+  "LOOP7_REASONING_MODE",
+  JSON.stringify({
+    enabled: loop7ReasoningEnabled,
+    evidenceSources: loop7EvidenceSourceIndexCompact.length,
+    maxTokens,
+    provider: loopLevel === 7 ? "gemini" : "groq"
+  })
+);
 
-    let response;
+let response;
 
-    try {
-      
-      response = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
+try {
 
-          headers: {
-            "Content-Type": "application/json",
-            Authorization:
-              "Bearer " + process.env.GROQ_API_KEY
+  /* =========================
+       LOOP 7 → GEMINI
+     OTHER LOOPS → GROQ
+  ========================= */
+
+  if (loopLevel === 7) {
+
+    response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" +
+        process.env.GEMINI_API_KEY,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text: loop7Instruction
+              }
+            ]
           },
 
-          body: JSON.stringify({
-  model: "qwen/qwen3.6-27b",
-  messages:
-  loopLevel === 7
-    ? [
-        {
-          role: "system",
-          content: loop7Instruction
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: JSON.stringify(loop7AiUserPayload)
+                }
+              ]
+            }
+          ],
+
+          generationConfig: {
+            maxOutputTokens: maxTokens
+          }
+        })
+      }
+    );
+
+  } else {
+
+    /* =========================
+         OTHER LOOPS → GROQ
+    ========================= */
+
+    response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer " + process.env.GROQ_API_KEY
         },
-    {
-  role: "user",
-  content: JSON.stringify(
-    loop7AiUserPayload
-  )
+
+        body: JSON.stringify({
+          model: "qwen/qwen3.6-27b",
+
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            ...cleanMessages.slice(-4)
+          ],
+
+          temperature: 0.7,
+          max_tokens: maxTokens
+        })
+      }
+    );
+  }
+
+} catch (e) {
+
+  console.error("LOOP7_AI_ERROR", e);
+
+  if (loop7StreamStarted) {
+    sendLoop7Progress({
+      type: "error",
+      phase: "report",
+      message: "LOOP7 AI request failed.",
+      error: e?.message || String(e),
+      stage: "LOOP7_AI_FETCH"
+    });
+
+    endLoop7ProgressStream();
+    return;
+  }
+
+  return res.status(500).json({
+    reply: "LOOP7 AI request failed.",
+    error: e?.message || String(e),
+    stage: "LOOP7_AI_FETCH"
+  });
 }
-      ]
-    : [
-        {
-          role: "system",
-          content: systemPrompt
+
+if (!response.ok) {
+
+  const aiErrorBody = await response.text();
+
+  console.log(
+    "AI_STATUS",
+    response.status
+  );
+
+  console.log(
+    "AI_STATUS_TEXT",
+    response.statusText
+  );
+
+  console.log(
+    "AI_ERROR_BODY",
+    aiErrorBody
+  );
+
+  if (response.status === 413) {
+    console.error(
+      "LOOP7_PAYLOAD_TOO_LARGE",
+      JSON.stringify({
+        provider:
+          loopLevel === 7 ? "gemini" : "groq",
+        systemChars: loop7Instruction.length,
+        userChars:
+          JSON.stringify(loop7AiUserPayload).length,
+        evidenceSources:
+          loop7EvidenceSourceIndexCompact.length
+      })
+    );
+  }
+
+  if (loop7StreamStarted) {
+    sendLoop7Progress({
+      type: "error",
+      phase: "report",
+      message: "AI service busy. Please try again.",
+      error: aiErrorBody,
+      stage: "LOOP7_AI_HTTP"
+    });
+
+    endLoop7ProgressStream();
+    return;
+  }
+
+  return res.status(500).json({
+    reply: "AI service busy. Please try again.",
+    error: aiErrorBody,
+    stage: "LOOP7_AI_HTTP"
+  });
+}
+
+/* =========================
+   GEMINI → OPENAI SHAPE
+   Keep existing Loop 7
+   parser untouched.
+========================= */
+
+let data;
+
+if (loopLevel === 7) {
+
+  const geminiData = await response.json();
+
+  console.log(
+    "GEMINI_RAW_RESPONSE",
+    JSON.stringify(geminiData).slice(0, 5000)
+  );
+
+  const geminiParts =
+    geminiData?.candidates?.[0]?.content?.parts || [];
+
+  const geminiText = geminiParts
+    .map(part => part?.text || "")
+    .join("")
+    .trim();
+
+  data = {
+    choices: [
+      {
+        message: {
+          content: geminiText
         },
-        ...cleanMessages.slice(-4)
-      ],
-  temperature: 0.7,
-  max_tokens: maxTokens,
-  reasoning_effort: "none",
-  reasoning_format: "hidden"
-})
-        }
-      );
-
-      
-
-    } catch (e) {
-      console.error("LOOP7_AI_ERROR", e);
-
-      if (loop7StreamStarted) {
-        sendLoop7Progress({
-          type: "error",
-          phase: "report",
-          message: "LOOP7 AI request failed.",
-          error: e?.message || String(e),
-          stage: "LOOP7_AI_FETCH"
-        });
-        endLoop7ProgressStream();
-        return;
+        finish_reason:
+          geminiData?.candidates?.[0]?.finishReason || null
       }
+    ],
 
-      return res.status(500).json({
-        reply: "LOOP7 AI request failed.",
-        error: e?.message || String(e),
-        stage: "LOOP7_AI_FETCH"
-      });
-    }
+    usage: geminiData?.usageMetadata || null
+  };
 
-    if (!response.ok) {
-      const groqErrorBody = await response.text();
-      console.log("GROQ_STATUS", response.status);
-      console.log("GROQ_STATUS_TEXT", response.statusText);
-      console.log("GROQ_ERROR_BODY", groqErrorBody);
+  console.log(
+    "GEMINI_NORMALIZED_RESPONSE",
+    JSON.stringify({
+      replyChars: geminiText.length,
+      finishReason:
+        geminiData?.candidates?.[0]?.finishReason || null
+    })
+  );
 
-      if (response.status === 413) {
-        console.error(
-          "LOOP7_PAYLOAD_TOO_LARGE",
-          JSON.stringify({
-            systemChars: loop7Instruction.length,
-            userChars: JSON.stringify(loop7AiUserPayload).length,
-            evidenceSources: loop7EvidenceSourceIndexCompact.length
-          })
-        );
-      }
-      if (loop7StreamStarted) {
-        sendLoop7Progress({
-          type: "error",
-          phase: "report",
-          message: "AI service busy. Please try again.",
-          error: groqErrorBody,
-          stage: "LOOP7_AI_HTTP"
-        });
-        endLoop7ProgressStream();
-        return;
-      }
+} else {
 
-      return res.status(500).json({
-        reply: "AI service busy. Please try again.",
-        error: groqErrorBody,
-        stage: "LOOP7_AI_HTTP"
-      });
-    }
+  data = await response.json();
 
-    
+}
 
      /* =========================
        📤 RESPONSE
