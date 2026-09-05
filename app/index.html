@@ -3678,9 +3678,16 @@ Your complete Loop 7 Investigation Report is ready.
   }
 
   razorpayBtn.onclick=function(){
-    track("payment_started",{amount:499,loop:7,method:"razorpay"});
 
-    const options={
+console.log("LOOP7 TEST MODE");
+
+unlockLoop7Report("test");
+
+return;
+
+track("payment_started",{amount:499,loop:7,method:"razorpay"});
+
+const options={
       key: RAZORPAY_KEY_ID,
       amount: 49900,
       currency: "INR",
