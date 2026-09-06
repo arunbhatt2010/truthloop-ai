@@ -207,4 +207,10 @@
   <changefreq>monthly</changefreq>
   <priority>0.80</priority>
 </url>
+  <url>
+    <loc>https://truthloop.in/why-you-keep-repeating-the-same-pattern.html</loc>
+    <lastmod>2026-09-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+</url>
 </urlset>
