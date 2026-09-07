@@ -1273,7 +1273,7 @@ const cleanMessages = messages
   .filter(message => message.content.trim());
 
 const maxTokens =
-  loopLevel === 7 ? 12000 : 600;
+  loopLevel === 7 ? 12000 : 220;
 
 const loop7ReasoningEnabled = false;
 
