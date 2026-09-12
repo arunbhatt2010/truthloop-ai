@@ -213,4 +213,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.95</priority>
 </url>
+  <url>
+    <loc>https://truthloop.in/i-lost-82-percent-of-my-traffic.html</loc>
+    <lastmod>2026-09-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+</url>
 </urlset>
