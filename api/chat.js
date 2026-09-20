@@ -1329,7 +1329,7 @@ const LOOP7_PROVIDER_SETTINGS = {
   groq: {
     apiKey: process.env.GROQ_API_KEY,
     endpoint: "https://api.groq.com/openai/v1/chat/completions",
-    model: "qwen/qwen3.6-27b",
+    model: "qwen/qwen3.8-27b",
     temperature: 0.3,
     maxTokens
   }
@@ -1565,7 +1565,7 @@ break;
         },
 
         body: JSON.stringify({
-          model: "qwen/qwen3.6-27b",
+          model: "qwen/qwen3.8-27b",
 
           messages: [
             {
@@ -2040,7 +2040,7 @@ try {
       },
 
       body: JSON.stringify({
-        model: "qwen/qwen3.6-27b",
+        model: "qwen/qwen3.8-27b",
         messages: [
           {
             role: "system",
