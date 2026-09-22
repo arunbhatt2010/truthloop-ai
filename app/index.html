@@ -3751,8 +3751,8 @@ if (loopLevel === 7) {
       setLoop7ProcessingStep("cross","done");
       setLoop7ProcessingStep("report","done");
       if(!loop7Unlocked){
-        //showPaywall();
-      unlockLoop7Report("test");
+        showPaywall();
+    //  unlockLoop7Report("test");
       }else{
         outputBox.innerHTML = renderLoop7Report(data.reply);
         nextBtn.style.display = "none";
