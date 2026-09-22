@@ -2308,29 +2308,33 @@ function showEvidence(type){
 
         case "public":
 
-            container.innerHTML = `
-                <div style="margin-top:10px;color:#ddd;">
-                    <b>Paste your public profile or website:</b>
-                </div>
+    container.innerHTML = `
+        <div style="margin-top:10px;color:#ddd;">
+            <b>Paste your public profile or website:</b>
+        </div>
 
-                <input
-                    id="loop7ProfileLink"
-                    type="text"
-                    placeholder="https://..."
-                    style="
-                        width:100%;
-                        margin-top:12px;
-                        padding:12px;
-                        border-radius:10px;
-                        border:1px solid rgba(255,140,0,.3);
-                        background:#111;
-                        color:#fff;
-                        box-sizing:border-box;
-                    ">
-            `;
+        <input
+            id="loop7ProfileLink"
+            type="text"
+            placeholder="https://..."
+            style="
+                width:100%;
+                margin-top:12px;
+                padding:12px;
+                border-radius:10px;
+                border:1px solid rgba(255,140,0,.3);
+                background:#111;
+                color:#fff;
+                box-sizing:border-box;
+            "
+        >
+    `;
 
-            nextBtn.style.display = "block";
-            break;
+    nextBtn.style.display = "block";
+    nextBtn.disabled = false;
+    nextBtn.innerText = "Start Loop 7";
+
+    break;
 
         case "oauth":
 
@@ -2650,14 +2654,17 @@ if (loopLevel === 6) {
 
     reflectionInput.style.display = "none";
 
-    nextBtn.innerText = window.loop7Started
-        ? "Get Your Final Report →"
-        : "Start Loop 7";
+    // Loop 7 cannot start until evidence has been selected.
+    nextBtn.style.display = "none";
+    nextBtn.disabled = true;
+    nextBtn.innerText = "Start Loop 7";
 
 } else {
+
     reflectionInput.style.display = "block";
     nextBtn.style.display = "block";
-  }
+
+}
 setTimeout(()=>{
     // reflectionInput.focus();
 },300);
