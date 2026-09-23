@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" as="image" href="/truthloop_logo.png">
+
+  <title>TruthLoop AI — Public Evidence Investigation for Decision Makers</title>
+  <meta name="title" content="TruthLoop AI — Public Evidence Investigation for Decision Makers" />
+  <meta name="description" content="TruthLoop moves from a guided 7-loop conversation to public evidence and a source-backed investigation report. Find recurring behavioral patterns, contradictions, and avoidance mechanisms affecting decisions and execution." />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <link rel="canonical" href="https://truthloop.in/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://truthloop.in/" />
+  <meta property="og:title" content="TruthLoop AI — Public Evidence Investigation for Decision Makers" />
+  <meta property="og:description" content="A 7-loop investigation that moves from conversation to public evidence and a source-backed report." />
+  <meta property="og:image" content="https://truthloop.in/truthloop_logo.png" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="TruthLoop AI — Public Evidence Investigation for Decision Makers" />
+  <meta name="twitter:description" content="Conversation → pattern → evidence → investigation report." />
+  <meta name="twitter:image" content="https://truthloop.in/truthloop_logo.png" />
+
+  <!-- Google tag (preserved from the current working page) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18466210652"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-18466210652');
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebApplication",
+    "name":"TruthLoop AI",
+    "url":"https://truthloop.in/",
+    "applicationCategory":"BusinessApplication",
+    "description":"A 7-loop behavioral investigation system that moves from conversation to public evidence and a source-backed investigation report.",
+    "operatingSystem":"Web"
+  }
+  </script>
+
+  <style>
+    :root{
+      --bg:#060913;
+      --bg2:#0b1020;
+      --panel:#101728;
+      --panel2:#151323;
+      --line:rgba(255,255,255,.10);
+      --text:#f5f3ef;
+      --muted:#a9adba;
+      --purple:#a96cff;
+      --purple2:#7d42d9;
+      --orange:#ffb000;
+      --orange2:#ff5f00;
+      --gold:#e9ae4b;
+      --max:1120px;
+      --shadow:0 22px 60px rgba(0,0,0,.28);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 72% 9%,rgba(116,59,180,.18),transparent 25%),
+        radial-gradient(circle at 20% 44%,rgba(41,76,142,.10),transparent 26%),
+        var(--bg);
+      font-family:Arial,Helvetica,sans-serif;
+      line-height:1.6;
+    }
+    a{color:inherit}
+    img{max-width:100%;display:block}
+    .image-link{display:block;cursor:zoom-in}
+    .image-link img{transition:transform .18s ease,filter .18s ease}
+    .image-link:hover img,.image-link:focus-visible img{filter:brightness(1.04)}
+    .image-link:focus-visible{outline:2px solid var(--purple);outline-offset:3px;border-radius:14px}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:auto}
+    .topbar{
+      padding:20px 0;
+      border-bottom:1px solid var(--line);
+      position:sticky;top:0;z-index:20;
+      backdrop-filter:blur(18px);
+      background:rgba(6,9,19,.78)
+    }
+    .nav{display:flex;justify-content:space-between;align-items:center;gap:18px}
+    .brand{font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:700}
+    .brand small{display:block;font:12px/1.2 Arial,sans-serif;color:var(--muted);letter-spacing:.3px}
+    .nav-note{font-size:12px;color:#c3c6cf;text-align:right}
+    .hero{padding:70px 0 30px}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
+    .eyebrow,.kicker{
+      display:inline-flex;align-items:center;gap:8px;
+      color:#d7bbff;border:1px solid rgba(169,108,255,.42);
+      background:rgba(99,44,168,.10);border-radius:999px;
+      padding:8px 13px;font-size:12px;font-weight:700;letter-spacing:1.7px;text-transform:uppercase
+    }
+    h1,h2,h3{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.7px}
+    h1{font-size:clamp(48px,7vw,78px);line-height:.98;margin:22px 0 22px;max-width:760px}
+    .accent{color:#ba7fff}
+    .lead{font:20px/1.65 Georgia,'Times New Roman',serif;color:#d8d9de;max-width:690px;margin:0 0 28px}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{
+      display:inline-flex;justify-content:center;align-items:center;
+      padding:15px 21px;border-radius:12px;text-decoration:none;border:1px solid transparent;font-weight:700;
+      transition:transform .2s ease,filter .2s ease,background .2s ease
+    }
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+    .btn-primary{background:linear-gradient(90deg,var(--orange),var(--orange2));color:#111}
+    .btn-secondary{border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#fff}
+    .hero-visual{position:relative}
+    .hero-visual .glow{position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle at 50% 48%,#ffcf5a 0,#a95cff 20%,rgba(169,92,255,.22) 55%,transparent 72%);right:8%;top:5%;filter:blur(8px)}
+    .hero-visual .loop-line{position:absolute;right:15%;top:45%;width:75%;height:150px;border-right:7px solid rgba(169,108,255,.78);border-bottom:7px solid rgba(169,108,255,.78);border-radius:0 0 80px 0;transform:rotate(-23deg);opacity:.9;box-shadow:0 0 22px rgba(169,108,255,.25)}
+    .hero-visual .steps{position:relative;margin-left:auto;width:min(460px,100%);padding:34px 28px 34px 36%;min-height:340px;border:1px solid rgba(255,255,255,.10);border-radius:28px;background:linear-gradient(160deg,rgba(15,16,35,.88),rgba(10,14,24,.70));box-shadow:var(--shadow)}
+    .hero-visual .steps strong{display:block;font:700 15px/2.1 Georgia,serif;letter-spacing:4px;color:#efe9ff}
+    .hero-visual .steps span{display:block;color:#8d88a4;font-size:12px;line-height:1.6;margin-top:18px}
+    .trust{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 70px}
+    .trust-item{padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);color:#c8c9cf;font-size:13px}
+    section{padding:55px 0}
+    .section-head{max-width:760px;margin-bottom:24px}
+    .section-head h2{font-size:42px;line-height:1.1;margin:12px 0}
+    .section-head p{color:var(--muted);font-size:16px;margin:0}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{background:linear-gradient(180deg,rgba(20,24,38,.92),rgba(11,15,27,.92));border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 10px 35px rgba(0,0,0,.12)}
+    .card h3{font-size:22px;margin:0 0 10px}
+    .card p{margin:0;color:#b7bac5}
+    .evidence-strip{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .metric{border:1px solid rgba(233,174,75,.28);background:linear-gradient(160deg,rgba(31,23,18,.95),rgba(15,13,14,.94));padding:25px;border-radius:20px}
+    .metric strong{font:700 44px/1 Georgia,serif;color:var(--gold)}
+    .metric p{color:#bcbfc7;margin:.6rem 0 0}
+    .loop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    .loop-card{overflow:hidden;border:1px solid var(--line);border-radius:20px;background:#0c1120}
+    .loop-card img{width:100%;background:#05070d}
+    .loop-copy{padding:18px 18px 20px}
+    .loop-copy .kicker{font-size:10px;padding:6px 10px}
+    .loop-copy h3{font-size:24px;margin:10px 0 4px}
+    .loop-copy p{margin:0;color:#adb1be}
+    .bridge{margin-top:18px;border:1px solid rgba(233,174,75,.35);border-radius:22px;padding:20px;background:linear-gradient(160deg,#1b1511,#101018)}
+    .bridge img{border-radius:14px;border:1px solid rgba(255,255,255,.07);margin-top:16px}
+    .report-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .report-gallery figure{margin:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#0c1120}
+    .report-gallery figcaption{padding:13px 16px;color:#c4c6ce;font-size:13px}
+    .report-points{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+    .report-point{padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);font-weight:700}
+    .audience{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .audience .card{min-height:180px}
+    .principle{border:1px solid rgba(169,108,255,.25);background:linear-gradient(150deg,rgba(84,43,146,.14),rgba(16,20,33,.92));border-radius:22px;padding:28px;margin-top:20px}
+    .principle h3{font-size:30px;margin:0 0 12px}
+    .principle p{margin:0;color:#c5c8d2}
+    .seo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .seo-group{border:1px solid var(--line);border-radius:18px;padding:20px;background:rgba(255,255,255,.018)}
+    .seo-group h3{font-size:20px;margin:0 0 12px}
+    .seo-list{display:flex;flex-wrap:wrap;gap:8px}
+    .seo-list a{font-size:13px;color:#d4ccff;text-decoration:none;border:1px solid rgba(169,108,255,.22);padding:8px 10px;border-radius:999px;background:rgba(169,108,255,.06)}
+    .seo-list a:hover{background:rgba(169,108,255,.12)}
+    .cta{padding:70px 0 80px}
+    .cta-panel{padding:38px;border-radius:28px;border:1px solid rgba(233,174,75,.32);background:linear-gradient(155deg,#1a1410,#0d101b);text-align:center}
+    .cta-panel h2{font-size:48px;line-height:1.05;margin:0 0 14px}
+    .cta-panel p{max-width:650px;margin:0 auto 22px;color:#bbbfc8;font-size:17px}
+    footer{border-top:1px solid var(--line);padding:26px 0 45px;color:#7f8490;font-size:12px}
+    footer .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    footer a{color:#8b90a0;text-decoration:none;margin-left:14px}
+    @media (max-width:900px){
+      .hero-grid,.evidence-strip{grid-template-columns:1fr}
+      .hero-visual{order:-1}
+      .trust{grid-template-columns:repeat(2,1fr)}
+      .cards,.audience,.seo-grid{grid-template-columns:repeat(2,1fr)}
+      .report-points{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:700px){
+      .wrap{width:min(var(--max),calc(100% - 22px))}
+      .hero{padding-top:42px}
+      h1{font-size:50px}
+      .lead{font-size:18px}
+      .trust,.cards,.audience,.loop-grid,.report-gallery,.report-points,.seo-grid{grid-template-columns:1fr}
+      .hero-visual .steps{padding:26px 24px 26px 30%;min-height:270px}
+      .section-head h2{font-size:36px}
+      .cta-panel h2{font-size:40px}
+      .nav-note{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <div class="brand">TruthLoop AI<small>Find what you're avoiding.</small></div>
+      <div class="nav-note">Private • No signup • Just clarity</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">7-Loop Behavioral Investigation</div>
+          <h1>Find the pattern behind the decision you're <span class="accent">still circling.</span></h1>
+          <p class="lead">TruthLoop moves from a real conversation to behavioral patterns, public evidence, and a source-backed investigation report — so the pattern is examined, not merely advised around.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/app">Start Investigation →</a>
+            <a class="btn btn-secondary" href="#journey">See the 7-loop journey</a>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="TruthLoop 7-loop visual">
+          <div class="glow"></div>
+          <div class="loop-line"></div>
+          <div class="steps">
+            <strong>PAUSE</strong>
+            <strong>QUESTION</strong>
+            <strong>EXPLORE</strong>
+            <strong>UNCOVER</strong>
+            <strong>PROGRESS</strong>
+            <span>Conversation → Pattern → Evidence → Investigation Report</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <div class="trust">
+        <div class="trust-item">✓ No signup required</div>
+        <div class="trust-item">✓ No account required</div>
+        <div class="trust-item">✓ 21 trackable evidence sources</div>
+        <div class="trust-item">✓ Clickable evidence + downloadable report</div>
+      </div>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Why this is different</div>
+          <h2>It starts with your words — then asks what the evidence says.</h2>
+          <p>TruthLoop is designed for decisions, hesitation, execution resistance, overthinking, and repeated behavioral loops. The public-evidence layer exists to test the pattern against the footprint outside the conversation.</p>
+        </div>
+        <div class="cards">
+          <article class="card"><h3>1. Conversation first</h3><p>A guided 7-loop conversation progressively surfaces recurring tension, hesitation, protection, and the gap between awareness and action.</p></article>
+          <article class="card"><h3>2. Evidence bridge</h3><p>At Loop 7, a public profile or website becomes the bridge from what you say about the pattern to what your public footprint actually shows.</p></article>
+          <article class="card"><h3>3. Source-backed report</h3><p>Findings are tied back to source IDs and clickable URLs so the investigation can be inspected instead of treated as an opaque AI verdict.</p></article>
+        </div>
+
+        <div class="evidence-strip" style="margin-top:16px">
+          <div class="metric"><strong>21</strong><p>Trackable evidence sources across the public-footprint investigation, alongside the Loop 1 → Loop 7 conversation.</p></div>
+          <div class="metric"><strong>7</strong><p>Progressive loops that move from the visible problem toward mechanism, evidence, contradiction, and next action.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="journey">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">See it happen</div>
+          <h2>The investigation is the product.</h2>
+          <p>These are real TruthLoop screens from Loop 1 through the Loop 7 evidence bridge.</p>
+        </div>
+        <div class="loop-grid">
+          <article class="loop-card">
+            <a class="image-link" href="assets/loop-1.jpg" target="_blank" rel="noopener" aria-label="Open Loop 1 screenshot in full size">
+              <img src="assets/loop-1.jpg" alt="TruthLoop Loop 1 conversation screenshot" loading="lazy">
+            </a>
+            <div class="loop-copy"><div class="kicker">Loop 1</div><h3>Start with the recurring problem.</h3><p>The system begins with the situation that keeps returning despite attempts to solve it.</p></div>
+          </article>
+          <article class="loop-card">
+            <a class="image-link" href="assets/loop-2.jpg" target="_blank" rel="noopener" aria-label="Open Loop 2 screenshot in full size">
+              <img src="assets/loop-2.jpg" alt="TruthLoop Loop 2 pattern signal screenshot" loading="lazy">
+            </a>
+            <div class="loop-copy"><div class="kicker">Loop 2</div><h3>Turn the story into a pattern.</h3><p>Recurring tension starts becoming explicit: analysis, risk, delay, protection.</p></div>
+          </article>
+          <article class="loop-card">
+            <a class="image-link" href="assets/loop-3.jpg" target="_blank" rel="noopener" aria-label="Open Loop 3 screenshot in full size">
+              <img src="assets/loop-3.jpg" alt="TruthLoop Loop 3 screenshot" loading="lazy">
+            </a>
+            <div class="loop-copy"><div class="kicker">Loop 3</div><h3>Expose the protection underneath.</h3><p>The investigation asks what staying in the loop is protecting the user from.</p></div>
+          </article>
+          <article class="loop-card">
+            <a class="image-link" href="assets/loop-4.jpg" target="_blank" rel="noopener" aria-label="Open Loop 4 screenshot in full size">
+              <img src="assets/loop-4.jpg" alt="TruthLoop Loop 4 screenshot" loading="lazy">
+            </a>
+            <div class="loop-copy"><div class="kicker">Loop 4</div><h3>Make the cost concrete.</h3><p>Delay stops looking neutral when the investigation names its operational cost.</p></div>
+          </article>
+          <article class="loop-card">
+            <a class="image-link" href="assets/loop-5.jpg" target="_blank" rel="noopener" aria-label="Open Loop 5 screenshot in full size">
+              <img src="assets/loop-5.jpg" alt="TruthLoop Loop 5 screenshot" loading="lazy">
+            </a>
+            <div class="loop-copy"><div class="kicker">Loop 5</div><h3>Reframe the stakes.</h3><p>The conversation shifts from avoiding a wrong choice toward learning what a decision can reveal.</p></div>
+          </article>
+          <article class="loop-card">
+            <a class="image-link" href="assets/loop-6.jpg" target="_blank" rel="noopener" aria-label="Open Loop 6 screenshot in full size">
+              <img src="assets/loop-6.jpg" alt="TruthLoop Loop 6 screenshot" loading="lazy">
+            </a>
+            <div class="loop-copy"><div class="kicker">Loop 6</div><h3>Define what would count as evidence.</h3><p>A useful experiment needs a measurable signal — not another round of abstract thinking.</p></div>
+          </article>
+        </div>
+
+        <div class="bridge">
+          <div class="kicker">Loop 7 Evidence Bridge</div>
+          <h3 style="font:700 30px/1.1 Georgia,serif;margin:12px 0 4px">Move from conversation to public evidence.</h3>
+          <p style="color:#bdb7ae;margin:0">TruthLoop asks for the public profile or website that best represents the work being investigated. More representative evidence makes the resulting investigation more inspectable.</p>
+          <a class="image-link" href="assets/loop-7-bridge.jpg" target="_blank" rel="noopener" aria-label="Open Loop 7 evidence bridge screenshot in full size">
+            <img src="assets/loop-7-bridge.jpg" alt="TruthLoop Loop 7 evidence bridge screenshot" loading="lazy">
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Loop 7</div>
+          <h2>The payoff: an investigation report you can inspect.</h2>
+          <p>The report combines the Loop 1 → Loop 7 case with public evidence and exposes the source trail behind the findings.</p>
+        </div>
+        <div class="report-gallery">
+          <figure><a class="image-link" href="assets/loop-7-report-summary.jpg" target="_blank" rel="noopener" aria-label="Open Loop 7 investigation report summary in full size"><img src="assets/loop-7-report-summary.jpg" alt="TruthLoop investigation report summary screenshot" loading="lazy"></a><figcaption>Investigation scope, summary, behavioral findings, hidden mechanism, public evidence, and cross evidence.</figcaption></figure>
+          <figure><a class="image-link" href="assets/loop-7-report-confidence.jpg" target="_blank" rel="noopener" aria-label="Open Loop 7 confidence and next action report in full size"><img src="assets/loop-7-report-confidence.jpg" alt="TruthLoop investigation report confidence and next action screenshot" loading="lazy"></a><figcaption>Evidence confidence, final reflection, and one next action.</figcaption></figure>
+          <figure><a class="image-link" href="assets/loop-7-report-sources-a.jpg" target="_blank" rel="noopener" aria-label="Open Loop 7 evidence sources screenshot in full size"><img src="assets/loop-7-report-sources-a.jpg" alt="TruthLoop evidence sources screenshot" loading="lazy"></a><figcaption>Source IDs resolve to clickable website and LinkedIn evidence.</figcaption></figure>
+          <figure><a class="image-link" href="assets/loop-7-report-sources-b.jpg" target="_blank" rel="noopener" aria-label="Open final evidence sources screenshot in full size"><img src="assets/loop-7-report-sources-b.jpg" alt="TruthLoop final evidence sources screenshot" loading="lazy"></a><figcaption>The evidence trail continues through the source list, including GitHub metadata.</figcaption></figure>
+        </div>
+        <div class="report-points">
+          <div class="report-point">Investigation Summary</div>
+          <div class="report-point">Behavioral Findings</div>
+          <div class="report-point">Hidden Mechanism</div>
+          <div class="report-point">Public Evidence</div>
+          <div class="report-point">Cross Evidence</div>
+          <div class="report-point">Evidence Confidence</div>
+          <div class="report-point">Final Reflection</div>
+          <div class="report-point">One Next Action</div>
+        </div>
+        <div class="principle">
+          <h3>Evidence alignment matters more than dramatic conclusions.</h3>
+          <p>When public evidence, the conversation, and external signals align, TruthLoop does not need to manufacture a contradiction. The investigation can simply show the pattern, its protection mechanism, its observable cost, and what evidence supports the interpretation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Built for decision makers</div>
+          <h2>Use the investigation where the decision actually matters.</h2>
+          <p>TruthLoop is not limited to founders. The same pattern-investigation structure applies anywhere repeated hesitation, analysis, protection, or execution resistance affects a real decision.</p>
+        </div>
+        <div class="audience">
+          <article class="card"><h3>Strategy & direction</h3><p>When every option stays open and analysis keeps replacing a committed direction.</p></article>
+          <article class="card"><h3>Execution & launch</h3><p>When the plan is clear but the last mile keeps creating friction, resets, or new research.</p></article>
+          <article class="card"><h3>Leadership decisions</h3><p>When certainty, approval, or risk management quietly becomes the reason a decision remains unresolved.</p></article>
+          <article class="card"><h3>Independent work</h3><p>When repeated work patterns, comparison, validation, or perfection keep shaping the next move.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="research">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">Explore the research</div>
+          <h2>Go deeper into the patterns TruthLoop investigates.</h2>
+          <p>These internal links are selected from the current sitemap so the landing page connects the product journey to the site's strongest pattern, decision, execution, and self-audit content.</p>
+        </div>
+        <div class="seo-grid">
+          <div class="seo-group">
+            <h3>Decision & certainty</h3>
+            <div class="seo-list">
+              <a href="/decision-avoidance-self-audit.html">Decision Avoidance Self-Audit</a>
+              <a href="/why-cant-i-trust-my-own-decisions.html">Why Can't I Trust My Own Decisions?</a>
+              <a href="/why-i-need-more-certainty-before-acting.html">Why I Need More Certainty Before Acting</a>
+              <a href="/why-i-keep-looking-for-the-right-answer.html">Why I Keep Looking for the Right Answer</a>
+              <a href="/why-you-keep-researching-instead-of-deciding.html">Why I Keep Researching Instead of Deciding</a>
+              <a href="/why-do-i-need-permission-before-acting.html">Why I Need Permission Before Acting</a>
+            </div>
+          </div>
+          <div class="seo-group">
+            <h3>Execution & repeating patterns</h3>
+            <div class="seo-list">
+              <a href="/execution-resistance-self-audit.html">Execution Resistance Self-Audit</a>
+              <a href="/why-you-keep-repeating-the-same-pattern.html">Why You Keep Repeating the Same Pattern</a>
+              <a href="/why-you-keep-starting-over.html">Why You Keep Starting Over</a>
+              <a href="/why-do-i-know-what-to-do-but-dont-do-it.html">Why I Know What to Do but Don't Do It</a>
+              <a href="/why-execution-resistance-keeps-returning.html">Why Execution Resistance Keeps Returning</a>
+              <a href="/why-clarity-doesnt-turn-into-action.html">Why Clarity Doesn't Turn Into Action</a>
+            </div>
+          </div>
+          <div class="seo-group">
+            <h3>Avoidance & overthinking</h3>
+            <div class="seo-list">
+              <a href="/hidden-behavioral-patterns-behind-overthinking.html">Hidden Behavioral Patterns Behind Overthinking</a>
+              <a href="/why-people-avoid-action-even-when-they-know-what-to-do.html">Why People Avoid Action Even When They Know What to Do</a>
+              <a href="/why-you-hide-behind-planning.html">Why You Hide Behind Planning</a>
+              <a href="/why-you-procrastinate.html">Why You Procrastinate</a>
+              <a href="/why-you-overthink.html">Why You Overthink</a>
+              <a href="/why-you-avoid-action.html">Why You Avoid Action</a>
+            </div>
+          </div>
+          <div class="seo-group">
+            <h3>Everyday pattern language</h3>
+            <div class="seo-list">
+              <a href="/why-you-feel-stuck.html">Why You Feel Stuck</a>
+              <a href="/why-you-cant-focus.html">Why You Can't Focus</a>
+              <a href="/why-you-cant-be-consistent.html">Why You Can't Be Consistent</a>
+              <a href="/why-you-seek-validation.html">Why You Seek Validation</a>
+              <a href="/why-you-self-sabotage.html">Why You Self-Sabotage</a>
+              <a href="/why-do-i-feel-overwhelmed-all-the-time.html">Why I Feel Overwhelmed All the Time</a>
+            </div>
+          </div>
+          <div class="seo-group">
+            <h3>Founder & operator research</h3>
+            <div class="seo-list">
+              <a href="/founder-blind-spots.html">Founder Blind Spots</a>
+              <a href="/why-founders-delay-launching-product.html">Why Founders Delay Launching a Product</a>
+              <a href="/why-do-i-keep-comparing-myself-to-others.html">Why You Keep Comparing Myself to Others</a>
+            </div>
+          </div>
+          <div class="seo-group">
+            <h3>TruthLoop resources</h3>
+            <div class="seo-list">
+              <a href="/how-to-use-truthloop.html">How To Use TruthLoop AI</a>
+              <a href="/truthloop-dictionary.html">TruthLoop Dictionary</a>
+              <a href="/loop-7-investigation-report.html">Loop 7 Investigation Report</a>
+              <a href="/why-you-keep-repeating-the-same-pattern.html">Repeat Pattern Research</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div class="kicker">What TruthLoop is not</div>
+          <h2>Pattern investigation, not diagnosis.</h2>
+          <p>TruthLoop is not therapy, does not diagnose mental health conditions, and is not a substitute for professional or crisis support. It focuses on patterns visible in the conversation and, where provided, public evidence.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap">
+        <div class="cta-panel">
+          <div class="kicker">Start the investigation</div>
+          <h2>What pattern keeps returning — even after you understand it?</h2>
+          <p>Start with the situation. Let the seven loops go deeper. Then decide what evidence is worth checking.</p>
+          <a class="btn btn-primary" href="/app">Start TruthLoop →</a>
+          <div style="margin-top:12px;color:#8f95a3;font-size:12px">No signup required • private session • designed for a fast start</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>TruthLoop © 2026</div>
+      <div>
+        <a href="/privacy-policy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms</a>
+        <a href="/refund-policy.html">Refund Policy</a>
+        <a href="/cookie-policy.html">Cookie Policy</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
