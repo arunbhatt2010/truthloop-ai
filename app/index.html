@@ -3141,28 +3141,39 @@ body{font-family:Georgia,"Times New Roman",serif;}
 /* Mobile/desktop submit arrow inside the question box.
    Enter/Return remains a normal textarea newline action. */
 #inputSubmitArrow{
-  position:absolute!important;
-  right:10px!important;
-  bottom:8px!important;
-  width:22px!important;
-  height:22px!important;
-  min-height:22px!important;
-  margin:0!important;
-  padding:0!important;
+  position:absolute;
+  right:10px;
+  bottom:8px;
+
+  width:44px;
+  height:44px;
+
   display:none;
   align-items:center;
   justify-content:center;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  color:#a855f7!important;
-  font-size:24px!important;
-  font-family:Arial,Helvetica,sans-serif!important;
-  font-weight:400!important;
-  line-height:1!important;
-  box-shadow:none!important;
-  cursor:pointer!important;
-  z-index:4;
+
+  background:none;
+  border:none;
+
+  color:#b885ff;
+  font-size:30px;
+  font-weight:700;
+  line-height:1;
+
+  cursor:pointer;
+  z-index:5;
+
+  opacity:.95;
+  transition:all .2s ease;
+}
+
+#inputSubmitArrow:hover{
+  opacity:1;
+  transform:translateY(-1px);
+}
+
+#inputSubmitArrow.show{
+  display:flex;
 }
 #inputSubmitArrow.is-visible{
   display:flex!important;
@@ -3175,20 +3186,20 @@ body{font-family:Georgia,"Times New Roman",serif;}
   padding-right:58px!important;
 }
 #inputCounter.tl-counter-with-arrow{
-  right:40px!important;
-}
+  right:58px !important;
+  }
 @media(max-width:760px){
-  #inputSubmitArrow{
-    right:8px!important;
-    bottom:8px!important;
-    width:22px!important;
-    height:22px!important;
-    min-height:22px!important;
-    font-size:24px!important;
+#inputSubmitArrow{
+  right:10px !important;
+  bottom:8px !important;
+  width:44px !important;
+  height:44px !important;
+  min-height:44px !important;
+  font-size:30px !important;
   }
-  #inputCounter.tl-counter-with-arrow{
-    right:38px!important;
-  }
+#inputCounter.tl-counter-with-arrow{
+  right:58px !important;
+}
 }
 </style>
 </style>
