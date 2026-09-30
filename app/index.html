@@ -3720,9 +3720,15 @@ const inputSubmitArrow = document.getElementById("inputSubmitArrow");
 
 function syncClearMainInput(){
   if(!clearMainInput || !mainInput) return;
-  clearMainInput.classList.toggle("is-hidden", !mainInput.value.trim());
-}
 
+  const userHasStartedTyping =
+    mainInput.dataset.tlUserTyped === "1";
+
+  clearMainInput.classList.toggle(
+    "is-hidden",
+    userHasStartedTyping || !mainInput.value.trim()
+  );
+  }
 function syncInputSubmitArrow(){
   if(!inputSubmitArrow || !mainInput) return;
   const hasUserInput = mainInput.dataset.tlUserTyped === "1" && mainInput.value.trim();
@@ -3745,8 +3751,11 @@ if(clearMainInput && mainInput){
     syncClearMainInput();
     syncInputSubmitArrow();
   });
-  mainInput.addEventListener("input",syncClearMainInput);
+  mainInput.addEventListener("input",()=>{
+  mainInput.dataset.tlUserTyped = "1";
+  clearMainInput.classList.add("is-hidden");
   syncClearMainInput();
+});
 }
 
 if(mainInput){
