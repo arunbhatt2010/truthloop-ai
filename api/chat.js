@@ -1505,7 +1505,10 @@ console.log(
   JSON.stringify({
     loop: loopLevel,
     recentUserEvidenceCount: recentUserEvidence.length,
-    aiConversationMessagesSent: loopLevel === 7 ? 0 : Math.min(cleanMessages?.length || 0, 6)
+    aiConversationMessagesSent:
+  loopLevel === 7
+    ? 0
+    : Math.min(messages?.length || 0, 6)
   })
 );
 console.log(
