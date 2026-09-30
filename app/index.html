@@ -3131,6 +3131,44 @@ body{font-family:Georgia,"Times New Roman",serif;}
   .tl-action-headline p{font-size:14px!important}
   #starterPatterns .tl-founder-example{min-height:96px!important}
 }
+  /* Clear button for preloaded situation */
+.tl-input{
+  position:relative;
+}
+
+#clearMainInput{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:28px;
+  height:28px;
+  margin:0;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:50%;
+  background:rgba(255,255,255,.06);
+  color:#cbd5e1;
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  z-index:3;
+}
+
+#clearMainInput:hover{
+  background:rgba(255,255,255,.10);
+  color:#fff;
+}
+
+#mainInput{
+  padding-right:50px !important;
+}
+
+#clearMainInput.is-hidden{
+  display:none;
+}
 </style>
 </head>    
     
@@ -3363,8 +3401,16 @@ START NEW PATTERN
       <div id="startInstruction" class="tl-start-instruction" aria-live="polite"></div>
 
       <div class="tl-input" id="mainInputWrap">
-        <textarea id="mainInput" maxlength="500">The result keeps repeating, even though I keep changing my approach.</textarea>
-        <span class="tl-counter" id="inputCounter">0 / 500</span>
+  <textarea id="mainInput" maxlength="500">The result keeps repeating, even though I keep changing my approach.</textarea>
+
+  <button
+    type="button"
+    id="clearMainInput"
+    aria-label="Clear situation"
+    title="Clear"
+  >✕</button>
+
+  <span class="tl-counter" id="inputCounter">0 / 500</span>
       </div>
       <div class="tl-edit-hint" aria-live="polite">Edit this sentence or replace it with your own situation.</div>
 
@@ -3567,6 +3613,31 @@ if(mainInput && inputCounter){
       startInstruction.textContent="";
       const mainInputWrap=document.getElementById("mainInputWrap");
       if(mainInputWrap) mainInputWrap.classList.remove("tl-guided");
+      const clearMainInput = document.getElementById("clearMainInput");
+
+function syncClearMainInput(){
+  if(!clearMainInput || !mainInput) return;
+  clearMainInput.classList.toggle(
+    "is-hidden",
+    !mainInput.value.trim()
+  );
+}
+
+if(clearMainInput && mainInput){
+  clearMainInput.addEventListener("click",()=>{
+    mainInput.value = "";
+    mainInput.focus();
+
+    if(inputCounter){
+      inputCounter.textContent = "0 / 500";
+    }
+
+    syncClearMainInput();
+  });
+
+  mainInput.addEventListener("input",syncClearMainInput);
+  syncClearMainInput();
+  }
     }
   };
   mainInput.addEventListener("input",syncCounter);
