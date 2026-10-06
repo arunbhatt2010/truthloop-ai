@@ -6573,7 +6573,9 @@ const responseLoopLevel = loopLevel;
    are rebuilt inside the closed Previous Loops dropdown. */
 tlPrepareActiveLoopView(responseLoopLevel);
 tlReturnNextButtonToAnswerBox();
-document.getElementById("loopIndicator").innerText = `Loop ${responseLoopLevel} of 7`;    
+if(loopIndicator){
+  loopIndicator.innerText = `Loop ${responseLoopLevel} of 7`;
+  }
 const userReply=document.createElement("div");
 userReply.className="tlUserReply tl-active-user";
 userReply.dataset.loop=String(responseLoopLevel);
