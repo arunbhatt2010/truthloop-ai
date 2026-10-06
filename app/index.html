@@ -2415,14 +2415,14 @@ SELECT NEW PATTERN
 const API_URL="/api/chat";    
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
-const outputBox=document.getElementById("outputBox");    
-const mainInput=document.getElementById("mainInput");    
+const outputBox=document.getElementById("outputBox");
+const mainInput=document.getElementById("mainInput");
 const reflectionInput=document.getElementById("reflectionInput");
-const reflectionInputWrap=document.getElementById("reflectionInputWrap");    
+const reflectionInputWrap=document.getElementById("reflectionInputWrap");
 const getBtn=document.getElementById("getBtn");
 const nextBtn=document.getElementById("nextBtn");
+const followupGoDeeperBtn=document.getElementById("followupGoDeeperBtn");
 const loopIndicator=document.getElementById("loopIndicator");
-
 /* Active-loop submit control lives inside the answer box on Loops 1–6. */
 if(reflectionInputWrap && nextBtn && nextBtn.parentElement !== reflectionInputWrap){
   reflectionInputWrap.appendChild(nextBtn);
