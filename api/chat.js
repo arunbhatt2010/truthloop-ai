@@ -2304,10 +2304,18 @@ const userMessages =
     .map(message => message.content.trim())
     .filter(Boolean);
 
-const currentMessage =
-  lastUserMessage.trim();
+//const currentMessage =
+//  lastUserMessage.trim();
 
 const normalizedCurrentMessage =
+  let currentMessage = "";
+
+if (
+  typeof lastUserMessage === "string" &&
+  lastUserMessage.trim()
+) {
+  currentMessage = lastUserMessage.trim();
+  }
   currentMessage
     .toLowerCase()
     .replace(/[.!?,;:]+$/g, "")
