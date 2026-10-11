@@ -357,8 +357,8 @@
       const nextInit = Object.assign({}, init || {}, { headers });
       // Keep all existing API payloads and response contracts unchanged.
       const response = await nativeFetch(input, nextInit);
-     // if (response.ok) setVerifiedBadge();
-     // return response;
+// if (response.ok) setVerifiedBadge();
+return response;
     } catch (error) {
       setSecurityError('Security verification could not be completed. Please retry.');
       return new Response(JSON.stringify({ reply: 'Security verification could not be completed. Please try again.' }), {
