@@ -3304,18 +3304,30 @@ const safeProfileLink = escapeHtml(profileLink || "");
 const directMode = mode === "direct";
 return `
 <div id="loop7EntryBridge"
+
 style="margin-top:20px;padding:20px;border-radius:16px;border:1px solid rgba(255,140,0,.25);background:rgba(255,140,0,.08);">
   <div style="font-size:22px;font-weight:700;color:#ffb347;margin-bottom:14px;">${directMode ? "⚡ Before You Decide, Investigate the Evidence" : "🔗 Loop 7 Evidence Bridge"}</div>
   <div style="font-size:14px;line-height:1.8;color:#ddd;">
     ${directMode
       ? `<b>Not Answers. Patterns.</b><br><br>
          Paste a public profile or website to uncover patterns, inconsistencies, and signals in the available evidence.<br><br>
+         <b>How to get a stronger investigation</b><br><br>
+         <b>1. Start with a public profile or website.</b><br>
+         Provide the public URL you want TruthLoop to investigate.<br><br>
+         <b>2. Connect the public footprint.</b><br>
+         If your website links to public profiles on LinkedIn, X, GitHub, YouTube, or other platforms, those links may help TruthLoop discover additional evidence when accessible.<br><br>
+         <b>3. Understand the evidence limits.</b><br>
+         Websites with more accessible, relevant content may provide a broader evidence base. Missing social links, inaccessible pages, private content, or source restrictions may limit what can be investigated.<br><br>
+         <b>Your report is based on the public evidence TruthLoop can actually retrieve—not a guarantee that every source or publication will be found.</b><br><br>
          <b>No lengthy conversation. Start with the evidence.</b>`
       : `<b>Build a more trustworthy investigation.</b><br><br>
-         TruthLoop works best when it analyzes the place where you spend most of your professional time.<br><br>
+         TruthLoop works best when it can access relevant public evidence about the professional work or subject being investigated.<br><br>
          <b>Add a public profile or website to continue.</b><br><br>
-         The source should represent your real professional work. Only publicly available information from the link you provide will be considered.`}
+         If the website links to public profiles on LinkedIn, X, GitHub, YouTube, or other platforms, those links may help reveal additional evidence when accessible.<br><br>
+         More accessible, relevant content can provide a broader evidence base. Missing links, inaccessible pages, private content, or source restrictions may limit the investigation.<br><br>
+         <b>The report reflects the public evidence TruthLoop can actually retrieve. No source or publication is guaranteed to be found.</b>`}
   </div>
+
   <label class="tl-loop7-link-label" for="loop7ProfileLink">Public profile or website link</label>
   <input id="loop7ProfileLink" type="text" inputmode="url" autocomplete="url" placeholder="https://linkedin.com/in/your-profile" value="${safeProfileLink}" aria-label="Public profile or website link">
   <div class="tl-loop7-link-note">Paste a public profile or website URL. The next action appears after a valid link is entered.</div>
