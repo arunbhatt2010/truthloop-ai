@@ -1,0 +1,700 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body{
+          background:#0f1115;
+          color:#f5f5f5;
+          font-family:Arial,sans-serif;
+          line-height:1.8;
+          padding:40px;
+        }
+        .truthLoopReport{
+          max-width:900px;
+          margin:auto;
+        }
+        .truthLoopReport h1,
+        .truthLoopReport h2{
+          color:#ff9d00;
+        }
+        .truthLoopReport p,
+        .truthLoopReport li{
+          color:#ddd;
+        }
+        .truthLoopReport hr{
+          border:0;
+          border-top:1px solid #333;
+        }
+        a{
+          color:#8ab4ff;
+        }
+      </style>
+      <title>TruthLoop Investigation Report</title>
+    
+<style id="truthloop-final-touch">
+  /* Final landing/investigation state controls */
+  #starterPatterns.is-hidden{
+    display:none !important;
+  }
+  #patternProfile:not(.tl-visible){
+    display:none !important;
+  }
+  #patternProfile.tl-visible{
+    display:block !important;
+    animation:tlProfileReveal .35s ease both;
+  }
+  #loopIndicator:not(.is-active){
+    display:none !important;
+  }
+  #loopIndicator.is-active{
+    display:inline-flex !important;
+    animation:tlIndicatorReveal .3s ease both;
+  }
+  .tl-analysis-state{
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(168,85,247,.18);
+    background:linear-gradient(145deg,rgba(168,85,247,.07),rgba(255,140,0,.04));
+    color:#a9b4c6;
+    font-size:13px;
+    line-height:1.5;
+    letter-spacing:.01em;
+    opacity:.95;
+  }
+  .tl-analysis-state.hidden{
+    display:none !important;
+  }
+  @keyframes tlProfileReveal{
+    from{opacity:0;transform:translateY(6px)}
+    to{opacity:1;transform:none}
+  }
+  @keyframes tlIndicatorReveal{
+    from{opacity:0;transform:translateY(4px) scale(.98)}
+    to{opacity:1;transform:none}
+  }
+</style>
+
+
+<style id="truthloop-profile-card-mobile-width-fix">
+  /* Targeted fix: keep Profile Card within the active Loop panel on narrow screens. */
+  #outputBox .tl-loop-panel-body #patternProfile,
+  #outputBox #patternProfile {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  #outputBox .tl-loop-panel-body #patternProfile > div,
+  #outputBox #patternProfile > div {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  @media (max-width: 760px) {
+    #outputBox .tl-loop-panel-body #patternProfile,
+    #outputBox #patternProfile {
+      padding: 14px !important;
+      border-radius: 16px !important;
+    }
+
+    #outputBox .tl-loop-panel-body #patternProfile > div:not(:first-child),
+    #outputBox #patternProfile > div:not(:first-child) {
+      font-size: 13.5px !important;
+      line-height: 1.5 !important;
+    }
+  }
+</style>
+
+</head>
+    <body>
+      
+    <div style="
+      max-width:900px;
+      margin:0 auto 40px;
+      padding-bottom:25px;
+      border-bottom:2px solid #333;
+      text-align:center;
+      font-family:Arial,sans-serif;
+    ">
+
+      <h1 style="margin-bottom:8px;">
+        🧠 TruthLoop Investigation Report
+      </h1>
+
+      <p style="color:#666;margin:0;">
+        Find what you're avoiding.
+      </p>
+
+      <div style="
+        margin-top:30px;
+        padding:18px;
+        background:#171a21;
+        border:1px solid #333;
+        border-radius:12px;
+        text-align:left;
+      ">
+
+        <h3 style="margin-top:0;color:#ff9d00;">
+          📂 Investigation Scope
+        </h3>
+
+        <p style="margin:8px 0;">
+          <b>Investigation Basis</b>
+        </p>
+
+        
+
+        <p style="margin:6px 0;">
+          ✓ Public Footprint Analysis
+        </p>
+
+        <p style="margin-top:12px;">
+          <b>Investigation Source</b><br>
+          https://truthloop.in/
+        </p>
+
+        <p style="color:#999;font-size:13px;">
+          This investigation report is based on publicly available evidence from the investigation source above. No Loop 1–6 conversation was used.
+        </p>
+
+      </div>
+    </div>
+  
+      <div class="truthLoopReport">
+        
+    <div style="max-width:900px;margin:0 auto;">
+
+      <h2>Investigation Summary</h2>
+      The strongest evidence-backed finding is the consistent pattern of avoidance behaviors across multiple platforms, with the website repeatedly describing avoidance mechanisms that "rarely look obvious" and often manifest as productive-seeming activities like planning or perfectionism instead of direct action <button type="button" class="tlr-citation" data-source-id="SOURCE_03" title="Why You Avoid Action | TruthLoop">SOURCE_03</button>. This matters because it reveals a sophisticated understanding of how avoidance operates beneath surface-level productivity.
+
+      <h2>Behavioral Findings</h2>
+      ⏩ Repetitive focus on avoidance patterns across website articles, with specific descriptions of how avoidance disguises itself as productive behavior <button type="button" class="tlr-citation" data-source-id="SOURCE_03" title="Why You Avoid Action | TruthLoop">SOURCE_03</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_04" title="Why You Feel Stuck | TruthLoop">SOURCE_04</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_09" title="Why You Procrastinate | TruthLoop">SOURCE_09</button>.<br>⏩ Consistent framing of problems as emotional patterns rather than technical deficiencies, emphasizing "hidden emotional patterns" across multiple website pages <button type="button" class="tlr-citation" data-source-id="SOURCE_04" title="Why You Feel Stuck | TruthLoop">SOURCE_04</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_08" title="Why You Seek Validation | TruthLoop">SOURCE_08</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_09" title="Why You Procrastinate | TruthLoop">SOURCE_09</button>.<br>⏩ Cross-platform alignment in messaging about pattern detection rather than advice-giving, with the X profile stating "We doesn't give advice" <button type="button" class="tlr-citation" data-source-id="SOURCE_19" title="We doesn't give advice. We finds the pattern behind why you're not following the advice you already have.">SOURCE_19</button> and website content emphasizing pattern discovery over solutions <button type="button" class="tlr-citation" data-source-id="SOURCE_06" title="How To Use TruthLoop AI | User Guide">SOURCE_06</button>.<br>⏩ Recurring theme of identity protection through avoidance, with website content describing how people avoid action to "protect the idea of who they could have been" <button type="button" class="tlr-citation" data-source-id="SOURCE_03" title="Why You Avoid Action | TruthLoop">SOURCE_03</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_05" title="Why You Overthink | TruthLoop">SOURCE_05</button>.
+
+      <h2>Hidden Mechanism</h2>
+      The most plausible mechanism is that the creator understands avoidance as a sophisticated emotional protection system rather than simple laziness. The evidence suggests they recognize how people use planning, perfectionism, and overthinking as avoidance strategies that protect against potential failure or criticism <button type="button" class="tlr-citation" data-source-id="SOURCE_03" title="Why You Avoid Action | TruthLoop">SOURCE_03</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_05" title="Why You Overthink | TruthLoop">SOURCE_05</button>. This understanding appears informed by observing how intelligent people can produce little meaningful work while feeling mentally exhausted <button type="button" class="tlr-citation" data-source-id="SOURCE_07" title="Why You Can’t Focus | TruthLoop">SOURCE_07</button>.
+
+      
+            <h2>Public Evidence</h2>
+            ⏩ Website content consistently describes avoidance mechanisms that "rarely look obvious" and manifest as productive activities <button type="button" class="tlr-citation" data-source-id="SOURCE_03" title="Why You Avoid Action | TruthLoop">SOURCE_03</button>.<br>⏩ Multiple articles frame procrastination and avoidance as emotional patterns rather than productivity issues <button type="button" class="tlr-citation" data-source-id="SOURCE_04" title="Why You Feel Stuck | TruthLoop">SOURCE_04</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_09" title="Why You Procrastinate | TruthLoop">SOURCE_09</button>.<br>⏩ X posts emphasize pattern detection over advice-giving, stating "We finds the pattern behind why you're not following the advice you already have" <button type="button" class="tlr-citation" data-source-id="SOURCE_19" title="We doesn't give advice. We finds the pattern behind why you're not following the advice you already have.">SOURCE_19</button>.<br>⏩ GitHub description positions the tool as focused on "revealing the pattern behind the question" rather than providing answers <button type="button" class="tlr-citation" data-source-id="SOURCE_15" title="GitHub - arunbhatt2010/truthloop-ai: AI-based uncomfortable truth guidance app inspired by Gita">SOURCE_15</button>.<br>⏩ LinkedIn post promotes external perspective for detecting patterns the user might miss themselves <button type="button" class="tlr-citation" data-source-id="SOURCE_11" title="LinkedIn Post">SOURCE_11</button>.
+          
+
+      <h2>Cross Evidence</h2>
+      ⏩ The avoidance pattern theme shows strong corroboration across website articles, GitHub description, and social media posts <button type="button" class="tlr-citation" data-source-id="SOURCE_03" title="Why You Avoid Action | TruthLoop">SOURCE_03</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_15" title="GitHub - arunbhatt2010/truthloop-ai: AI-based uncomfortable truth guidance app inspired by Gita">SOURCE_15</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_19" title="We doesn't give advice. We finds the pattern behind why you're not following the advice you already have.">SOURCE_19</button>. The messaging about pattern detection versus advice-giving remains consistent across X posts and website content <button type="button" class="tlr-citation" data-source-id="SOURCE_06" title="How To Use TruthLoop AI | User Guide">SOURCE_06</button> <button type="button" class="tlr-citation" data-source-id="SOURCE_19" title="We doesn't give advice. We finds the pattern behind why you're not following the advice you already have.">SOURCE_19</button>. No genuine contradictions were found in the retained evidence regarding the core behavioral patterns described.
+
+      <h2>Evidence Confidence</h2>
+      <div class="tlr-confidence">Evidence assessment</div>
+          High confidence in observed facts about the repetitive focus on avoidance patterns and pattern detection messaging (0.8 confidence). Moderate-high confidence in behavioral interpretation that this represents a coherent understanding of avoidance mechanisms (0.78 confidence). The evidence coverage is comprehensive across multiple platforms with dated evidence from 2025-2026.
+
+      <h2>Final Reflection</h2>
+      The central pattern is creating a system to detect avoidance while potentially avoiding direct solution-giving, maintaining focus on pattern recognition rather than resolution.
+
+      <h2>One Next Action</h2>
+      Run a TruthLoop investigation on your own public footprint to see what avoidance patterns might be appearing in your visible behavior.
+
+      
+    <section id="downloadEvidenceSources"
+      style="
+        margin-top:36px;
+        padding-top:24px;
+        border-top:2px solid #333;
+      ">
+      <h2>📚 Evidence Sources</h2>
+      <p style="color:#aaa;">
+        Reference key for the source IDs cited in this investigation.
+      </p>
+      
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_01
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> Why You Self-Sabotage | TruthLoop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/why-you-self-sabotage.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/why-you-self-sabotage.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_02
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> TruthLoop AI — Public Evidence Investigation for Decision Makers</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_03
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> Why You Avoid Action | TruthLoop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/why-you-avoid-action.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/why-you-avoid-action.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_04
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> Why You Feel Stuck | TruthLoop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/why-you-feel-stuck.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/why-you-feel-stuck.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_05
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> Why You Overthink | TruthLoop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/why-you-overthink.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/why-you-overthink.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_06
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> How To Use TruthLoop AI | User Guide</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/how-to-use-truthloop.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/how-to-use-truthloop.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_07
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> Why You Can’t Focus | TruthLoop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/why-you-cant-focus.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/why-you-cant-focus.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_08
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> Why You Seek Validation | TruthLoop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/why-you-seek-validation.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/why-you-seek-validation.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_09
+        </div>
+        <div><b>Type:</b> website</div>
+        <div><b>Title:</b> Why You Procrastinate | TruthLoop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://truthloop.in/why-you-procrastinate.html"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://truthloop.in/why-you-procrastinate.html
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_10
+        </div>
+        <div><b>Type:</b> linkedin_profile</div>
+        <div><b>Title:</b> arun Bhatt</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://www.linkedin.com/in/arun-bhatt-truthloop"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://www.linkedin.com/in/arun-bhatt-truthloop
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_11
+        </div>
+        <div><b>Type:</b> linkedin_post</div>
+        <div><b>Title:</b> LinkedIn Post</div>
+        <div><b>Date:</b> 2026-10-19T07:34:37.936Z</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://www.linkedin.com/posts/arun-bhatt-truthloop_truthloopai-foundermindset-selfawareness-activity-7517850683832758272-1pSJ"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://www.linkedin.com/posts/arun-bhatt-truthloop_truthloopai-foundermindset-selfawareness-activity-7517850683832758272-1pSJ
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_12
+        </div>
+        <div><b>Type:</b> linkedin_article</div>
+        <div><b>Title:</b> TruthLoop Investigated Its Own Creator</div>
+        <div><b>Date:</b> 2026-09-22T19:39:48.000+00:00</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://www.linkedin.com/pulse/truthloop-investigated-its-own-creator-arun-bhatt-7nqrf"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://www.linkedin.com/pulse/truthloop-investigated-its-own-creator-arun-bhatt-7nqrf
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_13
+        </div>
+        <div><b>Type:</b> linkedin_article</div>
+        <div><b>Title:</b> Why You’re Not Getting Clients (Even After Posting Daily)</div>
+        <div><b>Date:</b> 2026-04-10T09:06:54.000+00:00</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://www.linkedin.com/pulse/why-youre-getting-clients-even-after-posting-daily-arun-bhatt-xveuc"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://www.linkedin.com/pulse/why-youre-getting-clients-even-after-posting-daily-arun-bhatt-xveuc
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_14
+        </div>
+        <div><b>Type:</b> linkedin_article</div>
+        <div><b>Title:</b> 📌 Work From Phone – Top Skills to Earn in 2025 💸🚀 Full Blueprint</div>
+        <div><b>Date:</b> 2025-12-07T10:25:11.000+00:00</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://www.linkedin.com/pulse/work-from-phone-top-skills-earn-2025-full-blueprint-arun-bhatt-o25uf"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://www.linkedin.com/pulse/work-from-phone-top-skills-earn-2025-full-blueprint-arun-bhatt-o25uf
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_15
+        </div>
+        <div><b>Type:</b> github</div>
+        <div><b>Title:</b> GitHub - arunbhatt2010/truthloop-ai: AI-based uncomfortable truth guidance app inspired by Gita</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://github.com/arunbhatt2010/truthloop-ai"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://github.com/arunbhatt2010/truthloop-ai
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_16
+        </div>
+        <div><b>Type:</b> x_profile</div>
+        <div><b>Title:</b> Truthloop</div>
+        <div><b>Date:</b> Date not provided</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://x.com/truthloop_in"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://x.com/truthloop_in
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_17
+        </div>
+        <div><b>Type:</b> x_post</div>
+        <div><b>Title:</b> Most business problems are visible. The pattern behind them often isn&#39;t. TruthLoop AI investigates a public footprint across available sources to identify recurring patterns, contr</div>
+        <div><b>Date:</b> 2026-10-13T19:40:31.000Z</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://x.com/truthloop_in/status/2110093345351688450"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://x.com/truthloop_in/status/2110093345351688450
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_18
+        </div>
+        <div><b>Type:</b> x_post</div>
+        <div><b>Title:</b> Founders: What&#39;s the decision you&#39;ve been avoiding, even though you already know what needs to happen?</div>
+        <div><b>Date:</b> 2026-10-03T14:54:45.000Z</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://x.com/truthloop_in/status/2106397551826276826"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://x.com/truthloop_in/status/2106397551826276826
+                </a>
+              </div>
+      </div>
+    
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          SOURCE_19
+        </div>
+        <div><b>Type:</b> x_post</div>
+        <div><b>Title:</b> We doesn&#39;t give advice. We finds the pattern behind why you&#39;re not following the advice you already have.</div>
+        <div><b>Date:</b> 2026-10-02T10:00:26.000Z</div>
+        <div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="https://x.com/truthloop_in/status/2105961093655089568"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  https://x.com/truthloop_in/status/2105961093655089568
+                </a>
+              </div>
+      </div>
+    
+    </section>
+  
+
+      <p style="margin-top:30px;color:#777;font-size:12px;">
+        Generated 24 October 2026 by TruthLoop AI.
+      </p>
+    </div>
+  
+      </div>
+    </body>
+    </html>
+  
