@@ -3342,9 +3342,9 @@ function renderLoop7EntryBridge(profileLink = "", mode = "conversation") {
 const safeProfileLink = escapeHtml(profileLink || "");
 const directMode = mode === "direct";
 return `
-<div id="loop7EntryBridge" class="${directMode ? "tl-direct-bridge" : ""}" style="margin-top:20px;padding:20px;border-radius:16px;border:1px solid rgba(255,140,0,.25);background:rgba(255,140,0,.08);">
+<div id="loop7EntryBridge" class="${directMode ? "tl-direct-bridge" : ""}" style="margin-top:12px;padding:20px;border-radius:16px;border:1px solid rgba(255,140,0,.25);background:rgba(255,140,0,.08);">
   ${directMode ? `
-    <div class="tl-direct-brand">TRUTHLOOP AI</div>
+    
     <h2 class="tl-direct-title">The Pattern Is Bigger Than One Profile.</h2>
     <div class="tl-direct-intro">One public link can lead to connected evidence across accessible sources. TruthLoop investigates the connections to uncover recurring patterns and inconsistencies you might otherwise miss.</div>
     <div class="tl-direct-preview" aria-label="What your investigation includes">
