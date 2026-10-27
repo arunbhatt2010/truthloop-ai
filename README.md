@@ -1,105 +1,70 @@
-<p align="center">
-  <img src="public/logo.png" alt="TruthLoop AI Logo" width="380">
-</p>
 
-<h1 align="center">TruthLoop AI</h1>
+TruthLoop AI
 
-<p align="center">
-<b>Find what you're avoiding.</b>
-</p>
+Not Answers. Patterns.
 
----
+Investigate public profiles and websites. Examine accessible evidence across sources, identify potential patterns and inconsistencies, and review source-backed findings.
 
-## What is TruthLoop AI?
+"Open TruthLoop AI" (https://truthloop.in/app)
 
-TruthLoop AI is a behavioral clarity system designed to uncover the hidden emotional and psychological patterns that quietly influence decisions.
+What Is TruthLoop AI?
+
+TruthLoop AI is an AI-powered public-evidence investigation tool.
+
+Provide a public profile or website URL to start an investigation. TruthLoop AI attempts to gather accessible public evidence, connect relevant information across sources, and generate an investigation report.
+
+Reports may include:
+
+- Investigation findings
+- Public source references
+- Cross-evidence analysis
+- Confidence assessment
+- One next action
+
+Results depend on accessible evidence, source availability, and successful retrieval. Findings should be independently verified using the cited sources.
+
+How It Works
+
+1. Enter a URL — Provide a supported public profile or website link.
+2. Gather evidence — The system attempts to retrieve accessible public information.
+3. Examine connections — Relevant evidence is analyzed for patterns and inconsistencies.
+4. Review the report — Examine findings, source references, and the confidence assessment.
+
+Use Cases
+
+- Preliminary business and founder research
+- Public-profile research
+- Online due diligence
+- Cross-source information checks
+- Identifying potential inconsistencies in publicly available information
+
+TruthLoop AI supports investigation; it does not guarantee that every source will be accessible or that every finding will be complete.
+
+How TruthLoop AI Approaches Investigation
 
 Most AI tools focus on providing answers.
 
-TruthLoop AI focuses on revealing the pattern behind the question.
+TruthLoop AI focuses on examining the evidence and patterns behind a question.
 
-Because better advice rarely changes behavior.
-
-Better awareness does.
-
----
-
-## Why TruthLoop Exists
-
-People often believe they have an information problem.
-
-In reality, they may be repeating the same hidden behavioral loop.
-
-TruthLoop AI helps identify those invisible loops before they become visible problems.
-
-Instead of asking:
-
-> "What should I do?"
-
-TruthLoop AI asks:
-
-> "What pattern keeps creating this outcome?"
-
----
-
-## Core Philosophy
+Its underlying philosophy remains:
 
 - Diagnosis before advice
 - Awareness before action
 - Patterns before solutions
 - Clarity before confidence
 
----
+Explore TruthLoop AI
 
-## What TruthLoop AI Helps Discover
+Try the live application:
+https://truthloop.in/app
 
-- Hidden Behavioral Patterns
-- Emotional Drivers
-- Decision Blind Spots
-- Avoidance Loops
-- Validation Patterns
-- Founder Thinking Traps
-- System Thinking
-- Behavioral Psychology
+No login or signup is required to get started.
 
----
+Connect
 
-## Current Focus
-
-Building an AI system that helps founders, creators, professionals, and individuals recognize the hidden patterns shaping their choices.
-
-The goal isn't to generate more information.
-
-The goal is to generate deeper clarity.
-
----
-
-## TruthLoop Framework
-
-TruthLoop AI is built around a seven-loop behavioral discovery process.
-
-Each loop moves from surface thinking toward deeper awareness, helping users identify the psychological patterns influencing their actions.
-
----
-
-## Explore TruthLoop AI
-
-🌐 https://truthloop.in/app
-
----
-
-## Connect
-
-**LinkedIn**
-
+LinkedIn:
 https://linkedin.com/in/arunbhatt2010
 
 ---
 
-<p align="center">
-
-### TruthLoop AI
-
-**Find what you're avoiding.**
-
-</p>
+TruthLoop AI — Not Answers. Patterns.
