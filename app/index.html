@@ -2124,6 +2124,24 @@ body.tl-report-not-ready #starterPatterns {
 #tlFroggyToast.is-visible{opacity:1;transform:translateY(0)}
 @media(max-width:760px){#tlFroggyRoot{right:max(12px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom))}#tlFroggyLauncher{width:54px;height:54px;font-size:28px}#tlFroggyPanel{right:0;bottom:64px;width:min(360px,calc(100vw - 24px));height:min(440px,calc(100dvh - 105px))}#tlFroggyLabel{right:62px;bottom:11px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){#tlFroggyToast{transition:none}}
+/* Mobile Froggy placement: keep the launcher anchored to one viewport corner.
+   Desktop FAQ placement remains controlled by the existing desktop class. */
+@media(max-width:760px){
+  #tlFroggyRoot:not([hidden]){
+    position:fixed!important;
+    right:calc(12px + env(safe-area-inset-right,0px))!important;
+    bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;
+    left:auto!important;
+    top:auto!important;
+    z-index:2147483000!important;
+  }
+  #tlFroggyPanel{
+    right:0!important;
+    bottom:72px!important;
+    width:min(360px,calc(100vw - 24px))!important;
+    max-height:calc(100dvh - 112px)!important;
+  }
+}
 </style>
 
 </head>    
