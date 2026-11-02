@@ -657,6 +657,27 @@ box-shadow:
   color:#c4b5fd;
   font-size:15px;
 }
+#paywallBox .tl-paywall-payment-card{
+  max-width:540px;
+  margin:14px auto 0;
+  padding:14px 16px;
+  border:1px solid rgba(196,181,253,.22);
+  border-radius:14px;
+  background:rgba(124,58,237,.09);
+}
+#paywallBox .tl-paywall-payment-kicker{
+  color:#c4b5fd;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.1px;
+}
+#paywallBox .tl-paywall-payment-card .tl-paywall-intro{
+  margin:7px auto 0;
+  font-size:13px;
+}
+#paywallBox .tl-paywall-payment-card .tl-paywall-unlock-title{
+  margin-top:8px;
+}
 #paywallBox .tl-paywall-unlock-title{
   margin-top:12px;
   color:#e9d5ff;
@@ -2628,8 +2649,9 @@ function disableWelcome() {
 let loopLevel=1;
 let messages=[];
 let loop7Unlocked=false;
-let userCountry = "IN";
+let userCountry = "UNKNOWN";
 let userCountryStatus = "pending";
+let countryDetectionPromise = null;
 function paymentAnalyticsContext(){
   return {user_country: userCountryStatus === "detected" ? userCountry : "unknown", country_status: userCountryStatus};
 }  
@@ -5155,8 +5177,12 @@ function renderPaywallFinding(reportText){
   return `<div class="tl-paywall-finding"><div class="tl-paywall-finding-label">A FINDING FROM YOUR REPORT</div><div class="tl-paywall-finding-text">${escapeHtml(finding.text)}</div><div class="tl-paywall-finding-sources">${citations}</div><div class="tl-paywall-finding-tease">The full report explains what this pattern may mean and how the evidence connects.</div></div>`;
 }
 
-function showPaywall(){
+async function showPaywall(){
 
+  // Never render a payment card using a guessed/default country.
+  if(userCountryStatus === "pending"){
+    await detectCountry();
+  }
 
   const directMode = window.tlLoop7ReportMode === "direct";
   track("paywall_shown",{
@@ -5185,6 +5211,19 @@ function showPaywall(){
   saveJourney();
 
   const priceLabel = isIndia ? "₹499" : "$9.99 USD";
+  const paymentCardCopy = isIndia ? {
+    kicker: "INDIA · RAZORPAY CHECKOUT",
+    heading: "Unlock your complete investigation report",
+    description: "Make a one-time payment of ₹499 through Razorpay to access your complete TruthLoop investigation report.",
+    meta: "₹499 · One-time payment · Secure Razorpay checkout · No login or signup required",
+    button: directMode ? "🔓 Unlock Full Report — ₹499" : "🔓 Unlock Your Final Report — ₹499"
+  } : {
+    kicker: "INTERNATIONAL · PAYPAL CHECKOUT",
+    heading: "Unlock your complete investigation report",
+    description: "Your investigation has revealed a pattern. Unlock the complete report to explore the findings, evidence connections, confidence assessment, and one clear next action.",
+    meta: "$9.99 USD · One-time payment · Secure PayPal checkout · No login or signup required",
+    button: "Unlock Full Report — $9.99 USD"
+  };
   const reportPoints = directMode ? [
     "The patterns visible in your public footprint",
     "Why they may repeat and what they may protect or cost you",
@@ -5215,17 +5254,19 @@ function showPaywall(){
     </ul>
     <div class="tl-paywall-slogan">Not Answers. Patterns.</div>
     <div class="tl-paywall-slogan-sub">TruthLoop investigates behavior.</div>
-    <div class="tl-paywall-unlock-title">${unlockTitle}</div>
-    <div class="tl-paywall-price">${priceLabel}</div>
-    <div class="tl-paywall-meta">One-time payment · No login · No signup</div>
+    <div class="tl-paywall-payment-card">
+      <div class="tl-paywall-payment-kicker">${paymentCardCopy.kicker}</div>
+      <div class="tl-paywall-unlock-title">${paymentCardCopy.heading}</div>
+      <p class="tl-paywall-intro">${paymentCardCopy.description}</p>
+      <div class="tl-paywall-price">${priceLabel}</div>
+      <div class="tl-paywall-meta">${paymentCardCopy.meta}</div>
+    </div>
     <a class="tl-paywall-sample" href="https://truthloop.in/example-public-profile-investigation.html" target="_blank" rel="noopener noreferrer">VIEW SAMPLE INVESTIGATION REPORT ↗</a>
   `;
 
   if(isIndia){
     razorpayBtn.style.display="block";
-    razorpayBtn.innerText = directMode
-      ? "🔓 Unlock Full Report — ₹499"
-      : "🔓 Unlock Your Final Report — ₹499";
+    razorpayBtn.innerText = paymentCardCopy.button;
     document.getElementById("paypal-button").style.display="none";
   }else{
     razorpayBtn.style.display="none";
@@ -5926,27 +5967,30 @@ location.reload();
 };  
 /* JOURNEY MEMORY */
 async function detectCountry(){
+  if(countryDetectionPromise) return countryDetectionPromise;
 
-try{
+  countryDetectionPromise = (async function(){
+    try{
+      const res = await fetch("https://ipapi.co/json/", {cache:"no-store"});
+      if(!res.ok) throw new Error("Country lookup failed: " + res.status);
+      const data = await res.json();
+      if(data && data.country_code){
+        userCountry = String(data.country_code).toUpperCase();
+        userCountryStatus = "detected";
+      }else{
+        userCountry = "UNKNOWN";
+        userCountryStatus = "unknown";
+      }
+    }catch(e){
+      userCountry = "UNKNOWN";
+      userCountryStatus = "unknown";
+      console.warn("TRUTHLOOP_COUNTRY_DETECTION_FAILED", e);
+    }
+    return userCountry;
+  })();
 
-const res = await fetch(
-"https://ipapi.co/json/"
-);
-
-const data = await res.json();
-
-if(data && data.country_code){
-  userCountry = String(data.country_code).toUpperCase();
-  userCountryStatus = "detected";
-}else{
-  userCountryStatus = "unknown";
+  return countryDetectionPromise;
 }
-
-}catch(e){
-  userCountryStatus = "unknown";
-}
-
-  }
 detectCountry();  
 const MEMORY_KEY = "truthloopMemory";
 
