@@ -45,7 +45,7 @@ const MAX_LINKEDIN_ARTICLES = 5;
 const MAX_X_POSTS = 3;
 const MAX_REDDIT_POSTS = 3;
 
-const PACKAGE_VERSION = "22.0";
+const PACKAGE_VERSION = "23.0";
 
 /* ---------------------------------------------------------
    BASIC HELPERS
@@ -688,6 +688,13 @@ async function loadEvidenceCompressionBrain({
     "website"
   );
 
+  const websiteScraperInput = Array.isArray(universalPackage?.websiteScraperEvidence?.sources)
+    ? universalPackage.websiteScraperEvidence.sources
+    : [];
+  const websiteScraperSourcesInput = websiteScraperInput
+    .filter(item => item && typeof item === "object")
+    .slice(0, 8);
+
   const linkedinEvidence =
     universalPackage?.linkedinEvidence &&
     typeof universalPackage.linkedinEvidence === "object"
@@ -777,6 +784,29 @@ async function loadEvidenceCompressionBrain({
     date: getDate(source),
     content: extractEvidenceText(source, 6000, 12)
   }));
+
+  const websiteScraperSources = websiteScraperSourcesInput.map(source => ({
+    sourceId: nextSourceId(),
+    sourceType: "website_scraper",
+    url: getUrl(source),
+    title: firstText(source?.title, source?.headline).slice(0, 220) || null,
+    date: getDate(source),
+    pageCategory: firstText(source?.pageCategory, "general_company_information"),
+    content: meaningfulText(
+      firstText(source?.markdown, source?.content, source?.text, source?.description),
+      6000,
+      12
+    ),
+    metadata: {
+      author: firstText(source?.author).slice(0, 120) || null,
+      language: firstText(source?.language).slice(0, 20) || null,
+      httpStatusCode: source?.httpStatusCode ?? null,
+      loadedAt: source?.loadedAt || null,
+      crawlDepth: source?.crawlDepth ?? null,
+      contentType: firstText(source?.contentType).slice(0, 100) || null
+    },
+    structuredData: Array.isArray(source?.structuredData) ? source.structuredData.slice(0, 8) : []
+  })).filter(source => source.url && (source.content || source.structuredData.length));
 
   console.log(
     "ECB_WEBSITE_SOURCE_AUDIT",
@@ -1002,6 +1032,7 @@ async function loadEvidenceCompressionBrain({
 
   const retainedEvidenceUnits = [
     ...websiteSources,
+    ...websiteScraperSources,
     ...linkedinPosts,
     ...linkedinArticles,
     ...(githubEvidence ? [githubEvidence] : []),
@@ -1116,6 +1147,16 @@ async function loadEvidenceCompressionBrain({
     });
   }
 
+  for (const source of websiteScraperSources) {
+    sourceRegistry.push({
+      sourceId: source.sourceId,
+      sourceType: source.sourceType,
+      title: source.title || source.pageCategory || "Website page",
+      url: source.url,
+      date: source.date || null
+    });
+  }
+
   if (profile) {
     sourceRegistry.push({
       sourceId: profile.sourceId,
@@ -1199,6 +1240,7 @@ async function loadEvidenceCompressionBrain({
       sourceRegistry,
 
       websiteSources,
+      websiteScraperSources,
 
       linkedinProfile: profile,
 
@@ -1226,6 +1268,7 @@ async function loadEvidenceCompressionBrain({
 
     evidenceCoverage: {
       websiteSourcesRetained: websiteSources.length,
+      websiteScraperPagesRetained: websiteScraperSources.length,
       linkedinProfileRetained: profile ? 1 : 0,
       linkedinPostsRetained: linkedinPosts.length,
       linkedinArticlesRetained: linkedinArticles.length,
@@ -1286,6 +1329,18 @@ async function loadEvidenceCompressionBrain({
     contentBudget,
     12
   )
+}));
+
+const websiteScraper = websiteScraperSources.map(source => ({
+  sourceId: source.sourceId,
+  sourceType: source.sourceType,
+  url: source.url,
+  title: firstText(source.title).slice(0, 120) || null,
+  date: source.date || null,
+  pageCategory: source.pageCategory,
+  content: meaningfulText(source.content, contentBudget, 12),
+  metadata: source.metadata,
+  structuredData: source.structuredData
 }));
 
 const linkedinProfile = profile
@@ -1457,6 +1512,7 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
   sourceRegistry: compactSourceRegistry,
 
   websiteSources: website,
+  websiteScraperSources: websiteScraper,
   linkedinProfile,
   linkedinPosts: posts,
   linkedinArticles: articles,
@@ -1478,6 +1534,7 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
         universalPackage?.crossEvidenceIntelligence || null,
       evidenceCoverage: {
         websiteSourcesRetained: website.length,
+        websiteScraperPagesRetained: websiteScraper.length,
         linkedinProfileRetained: linkedinProfile ? 1 : 0,
         linkedinPostsRetained: posts.length,
         linkedinArticlesRetained: articles.length,
@@ -1507,6 +1564,7 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
     Math.max(
       1,
       websiteSources.length +
+      websiteScraperSources.length +
       linkedinPosts.length +
       linkedinArticles.length +
       (githubEvidence ? 1 : 0) +
