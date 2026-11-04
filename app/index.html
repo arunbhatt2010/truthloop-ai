@@ -2940,7 +2940,18 @@ function restoreLatestProfileCard(){
     
 function track(event,data={}){    
 if(typeof gtag!=="undefined"){    
-gtag('event',event,data);    
+  const acquisition = window.truthLoopAcquisitionContext || {};
+  const eventData = {
+    ...data,
+    acquisition_source: acquisition.source || "",
+    acquisition_medium: acquisition.medium || "",
+    acquisition_campaign: acquisition.campaign || "",
+    acquisition_content: acquisition.content || "",
+    acquisition_term: acquisition.term || "",
+    acquisition_referrer: acquisition.referrerHost || "",
+    attribution_basis: acquisition.attributionBasis || ""
+  };
+  gtag('event',event,eventData);    
 }    
 }    
     
