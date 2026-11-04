@@ -1,5 +1,5 @@
 /* ============================================================
-   CROSS EVIDENCE BRAIN v23 — LINKEDIN 20-FETCH / 9+1 PACKAGE
+   CROSS EVIDENCE BRAIN v24 — WEBSITE SCRAPER + UNIVERSAL PACKAGE
    TruthLoop AI
 
    RESPONSIBILITY
@@ -566,6 +566,149 @@ async function fetchWebsiteEvidence(primaryUrl) {
         sourceUrl: normalizedUrl,
         sources
     };
+}
+
+/* ------------------------------------------------------------
+   APIFY WEBSITE CONTENT CRAWLER — ADDITIVE WEBSITE EVIDENCE
+   Uses the saved Apify Task and the tested Perak input settings.
+   Existing PublicContentFetcher route remains unchanged.
+   ------------------------------------------------------------ */
+const WEBSITE_CRAWLER_TASK_ID =
+    process.env.APIFY_WEBSITE_CRAWLER_TASK_ID ||
+    "sussurrant_topiary~website-content-crawler-task";
+
+function buildWebsiteCrawlerInput(targetUrl) {
+    return {
+        aggressivePrune: false,
+        blockMedia: true,
+        clickElementsCssSelector: "",
+        clientSideMinChangePercentage: 15,
+        crawlerType: "playwright:adaptive",
+        debugLog: false,
+        debugMode: false,
+        expandIframes: false,
+        ignoreCanonicalUrl: false,
+        ignoreHttpsErrors: false,
+        keepUrlFragments: false,
+        proxyConfiguration: { useApifyProxy: true },
+        readableTextCharThreshold: 100,
+        removeCookieWarnings: true,
+        removeElementsCssSelector: "nav, footer, script, style, noscript, svg, img[src^='data:'], [role='alert'], [role='banner'], [role='dialog'], [role='alertdialog'], [role='region'][aria-label*='skip' i], [aria-modal='true']",
+        renderingTypeDetectionPercentage: 10,
+        respectRobotsTxtFile: true,
+        reuseStoredDetectionResults: false,
+        saveFiles: false,
+        saveHtml: false,
+        saveHtmlAsFile: false,
+        saveMarkdown: true,
+        saveScreenshots: false,
+        signHttpRequests: false,
+        startUrls: [{ url: targetUrl }],
+        storeSkippedUrls: false,
+        summarize: false,
+        useLlmsTxt: false,
+        useSitemaps: false,
+        includeUrlGlobs: [],
+        excludeUrlGlobs: [],
+        maxCrawlDepth: 2,
+        maxCrawlPages: 8,
+        onlyCrawlPagesModifiedSince: "",
+        customHttpHeaders: {},
+        initialConcurrency: 2,
+        maxConcurrency: 4,
+        requestTimeoutSecs: 15,
+        minFileDownloadSpeedKBps: 128,
+        maxRequestRetries: 1,
+        maxSessionRotations: 2,
+        dynamicContentWaitSecs: 2,
+        waitForSelector: "",
+        softWaitForSelector: "",
+        maxScrollHeightPixels: 2000,
+        pageFunction: "",
+        keepElementsCssSelector: "",
+        htmlTransformer: "readableText",
+        maxResults: 8
+    };
+}
+
+function classifyWebsitePage(url = "", title = "") {
+    const value = `${url} ${title}`.toLowerCase();
+    if (/about|founder|leadership|team|management/.test(value)) return "company_and_leadership";
+    if (/product|service|solution|feature|platform/.test(value)) return "products_and_services";
+    if (/customer|client|case-study|case study|testimonial/.test(value)) return "customer_and_case_studies";
+    if (/pricing|plan|price|billing/.test(value)) return "pricing_and_business_model";
+    if (/partner|affiliate|integration/.test(value)) return "partnerships";
+    if (/career|jobs|hiring/.test(value)) return "careers_and_hiring";
+    if (/press|news|announcement/.test(value)) return "press_and_announcements";
+    if (/delivery|operation|workflow/.test(value)) return "operations";
+    return "general_company_information";
+}
+
+async function fetchWebsiteEvidenceFromApifyTask(targetUrl) {
+    const normalizedUrl = normalizeUrl(targetUrl);
+    const token = process.env.APIFY_API_TOKEN || process.env.APIFY_TOKEN || "";
+    if (!normalizedUrl) return { success: false, reason: "Invalid website URL.", sources: [] };
+    if (!token) return { success: false, reason: "Apify token environment variable is missing.", sources: [] };
+    if (!WEBSITE_CRAWLER_TASK_ID) return { success: false, reason: "Website crawler task ID is missing.", sources: [] };
+
+    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=30&maxItems=8&maxTotalChargeUsd=0.05`;
+    const startedAt = Date.now();
+    try {
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(buildWebsiteCrawlerInput(normalizedUrl))
+        });
+        const raw = await response.text();
+        if (!response.ok) {
+            console.warn("CEB_WEBSITE_APIFY_HTTP_ERROR", JSON.stringify({ status: response.status, body: raw.slice(0, 500) }));
+            return { success: false, reason: `Apify website task HTTP ${response.status}`, sources: [] };
+        }
+        let rows;
+        try { rows = raw.trim() ? JSON.parse(raw) : []; }
+        catch { return { success: false, reason: "Apify website task returned invalid JSON.", sources: [] }; }
+        if (!Array.isArray(rows)) rows = rows?.items || rows?.data || [];
+
+        const sources = rows.filter(row => row && typeof row === "object").slice(0, 8).map((row, index) => {
+            const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
+            const crawl = row.crawl && typeof row.crawl === "object" ? row.crawl : {};
+            const url = normalizeUrl(row.url || crawl.loadedUrl || metadata.canonicalUrl || normalizedUrl);
+            const title = safeText(metadata.title || row.title || "").slice(0, 300);
+            const markdown = safeText(row.markdown || row.text || row.content || row.readableText || "");
+            const pageText = markdown.slice(0, 18000);
+            return {
+                sourceId: `WEBSITE_CRAWLER_${String(index + 1).padStart(2, "0")}`,
+                sourceType: "website_scraper",
+                platform: "website",
+                url,
+                sourceUrl: url,
+                canonicalUrl: normalizeUrl(metadata.canonicalUrl || url) || url,
+                title: title || null,
+                pageCategory: classifyWebsitePage(url, title),
+                content: pageText,
+                text: pageText,
+                markdown: pageText,
+                description: safeText(metadata.description || "").slice(0, 1200) || null,
+                author: safeText(metadata.author || "").slice(0, 160) || null,
+                language: safeText(metadata.languageCode || "").slice(0, 20) || null,
+                publishedAt: metadata.datePublished || metadata.dateModified || null,
+                httpStatusCode: crawl.httpStatusCode ?? null,
+                loadedAt: crawl.loadedTime || null,
+                crawlDepth: Number.isFinite(Number(crawl.depth)) ? Number(crawl.depth) : null,
+                contentType: crawl.contentType || null,
+                structuredData: Array.isArray(metadata.jsonLd) ? metadata.jsonLd.slice(0, 12) : [],
+            };
+        }).filter(source => source.url && (source.content || source.description || source.structuredData.length));
+
+        console.log("CEB_WEBSITE_APIFY_RESULT", JSON.stringify({ taskId: WEBSITE_CRAWLER_TASK_ID, pages: sources.length, durationMs: Date.now() - startedAt }));
+        return { success: sources.length > 0, sourceUrl: normalizedUrl, sources, durationMs: Date.now() - startedAt };
+    } catch (error) {
+        console.error("CEB_WEBSITE_APIFY_FAILED", error?.message || String(error));
+        return { success: false, reason: error?.message || "Apify website crawl failed.", sources: [] };
+    }
 }
 
 /* ------------------------------------------------------------
@@ -2998,6 +3141,7 @@ function buildSecondarySignalFetcher({
 function buildUniversalPackage({
     primaryUrl = "",
     websiteSources = [],
+    websiteScraperSources = [],
     linkedinSource = null,
     githubEvidence = null,
     xEvidence = null,
@@ -3210,7 +3354,7 @@ function buildUniversalPackage({
         packageType:
             "UniversalPublicEvidencePackage",
 
-        version: "22.0",
+        version: "23.0",
 
         postmaster: {
             role: "evidence-delivery-only",
@@ -3226,6 +3370,13 @@ function buildUniversalPackage({
         websiteEvidence: {
             sources: compressedWebsiteSources,
             sourceUrls: websiteSourceUrls
+        },
+
+        websiteScraperEvidence: {
+            source: "apify-website-content-crawler-task",
+            sources: websiteScraperSources,
+            sourceUrls: websiteScraperSources.map(item => item.url).filter(Boolean),
+            pagesCollected: websiteScraperSources.length
         },
 
         linkedinEvidence: linkedinSource
@@ -3398,6 +3549,7 @@ console.log(
      */
 
     let websiteSources = [];
+    let websiteScraperSources = [];
     let linkedinSource = null;
     let linkedinUrl = "";
     let githubEvidence = null;
@@ -3452,6 +3604,17 @@ console.log(
                 websiteSources =
                     websiteResult.sources || [];
             }
+        }
+
+        /*
+         * ADDITIVE WEBSITE INTELLIGENCE COLLECTION.
+         * PCF remains untouched. Apify Task adds non-article website pages.
+         */
+        const websiteScraperResult = await fetchWebsiteEvidenceFromApifyTask(primaryUrl);
+        if (websiteScraperResult?.success) {
+            websiteScraperSources = websiteScraperResult.sources || [];
+        } else {
+            console.warn("CEB_WEBSITE_APIFY_SKIPPED_OR_FAILED", websiteScraperResult?.reason || "No additional website pages returned.");
         }
 
         /*
@@ -3611,7 +3774,7 @@ console.log(
     const signalResult =
         await buildSignalSignals({
             websiteEvidence:
-                websiteSources,
+                [...websiteSources, ...websiteScraperSources],
             linkedinEvidence:
                 linkedinSource,
             githubEvidence:
@@ -3628,6 +3791,7 @@ console.log(
         buildUniversalPackage({
             primaryUrl,
             websiteSources,
+            websiteScraperSources,
             linkedinSource,
             githubEvidence,
             xEvidence,
@@ -3638,6 +3802,7 @@ console.log(
 
     const sourcesSucceeded =
         websiteSources.length +
+        websiteScraperSources.length +
         (linkedinSource ? 1 : 0) +
         (githubEvidence ? 1 : 0) +
         (xEvidence ? 1 + (xEvidence.posts?.length || 0) : 0) +
