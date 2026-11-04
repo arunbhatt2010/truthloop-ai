@@ -729,7 +729,7 @@ box-shadow:
   box-shadow:0 12px 28px rgba(255,140,0,.20);
   cursor:pointer;
 }
-#paywallBox #paypal-button{margin-top:16px;}
+#paywallBox #paypal-button{margin-top:16px;min-height:48px;}
   #paywallBox .tl-paywall-finding{margin:13px 0 15px;padding:13px 14px;text-align:left;border:1px solid rgba(96,165,250,.24);border-radius:13px;background:linear-gradient(145deg,rgba(96,165,250,.07),rgba(168,85,247,.055))}
   #paywallBox .tl-paywall-finding-label{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#a5b4fc;margin-bottom:8px}
   #paywallBox .tl-paywall-finding-text{font-size:13px;line-height:1.55;color:#f1f5f9;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
@@ -5347,82 +5347,132 @@ const options={
   };
 
   const paypalContainer = document.getElementById("paypal-button");
-  const mountPayPalButton = () => {
-    // PayPal is optional for the India/Razorpay path and may still be loading
-    // while the inline journey-restoration script is running.
-    if(!paypalContainer || !window.paypal || typeof window.paypal.Buttons !== "function") return;
-    if(paypalContainer.dataset.tlPayPalMounted === "1") return;
+  const showPayPalLoadError = (message) => {
+    if(!paypalContainer) return;
+    paypalContainer.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "padding:12px;border:1px solid rgba(248,113,113,.45);border-radius:12px;background:rgba(127,29,29,.16);color:#fee2e2;text-align:center;font-size:13px;line-height:1.5";
+    const note = document.createElement("div");
+    note.textContent = message || "PayPal checkout could not load. Please try again.";
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.textContent = "Retry PayPal checkout";
+    retry.style.cssText = "display:block;width:100%;margin-top:10px;padding:12px;border:0;border-radius:10px;background:#ffc439;color:#111827;font-weight:800;font-size:15px;cursor:pointer";
+    retry.addEventListener("click", () => {
+      retry.disabled = true;
+      retry.textContent = "Loading PayPal…";
+      loadAndMountPayPal(true);
+    });
+    wrap.append(note, retry);
+    paypalContainer.appendChild(wrap);
+  };
 
-    try {
-      paypalContainer.innerHTML = "";
-      const paypalRender = window.paypal.Buttons({
-        createOrder:function(data,actions){
-          track("payment_started", {
-            amount: 9.99, currency: "USD", loop: 7, method: "paypal", payment_method: "paypal",
-            report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation",
-            ...paymentAnalyticsContext()
-          });
-          track("paypal_payment_started", {amount:9.99, currency:"USD", payment_method:"paypal", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-          if(window.tlLoop7ReportMode === "direct"){
-            track("direct_report_payment_started", {amount:9.99, currency:"USD", method:"paypal", payment_method:"paypal", report_mode:"direct", ...paymentAnalyticsContext()});
-          }
-          return actions.order.create({
-            purchase_units:[{
-              description: window.tlLoop7ReportMode === "direct" ? "TruthLoop Investigation Report" : "TruthLoop Loop 7 Investigation",
-              amount:{
-                currency_code:"USD",
-                value:"9.99"
-              }
-            }]
-          });
-        },
-        onApprove:function(data,actions){
-          return actions.order.capture().then(function(details){
-            console.log("PAYPAL_SUCCESS",details);
-            track("paypal_payment_success", {payment_method:"paypal", currency:"USD", value:9.99, report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
-            unlockLoop7Report("paypal");
-          }).catch(function(error){
-            track("paypal_payment_failed", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-            throw error;
-          });
-        },
-        onCancel:function(data){
-          track("paypal_checkout_cancelled", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
-        },
-        onError:function(error){
-          track("paypal_payment_failed", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-          console.error("PAYPAL_CHECKOUT_ERROR", error);
+  const loadPayPalSdk = (forceReload) => {
+    if(window.paypal && typeof window.paypal.Buttons === "function") return Promise.resolve(window.paypal);
+    if(window.__tlPayPalSdkPromise && !forceReload) return window.__tlPayPalSdkPromise;
+    const existingSdk = document.querySelector('script[src*="paypal.com/sdk/js"]');
+    const sdkUrl = existingSdk ? existingSdk.src : (window.__tlPayPalSdkUrl || "");
+    if(!sdkUrl) return Promise.reject(new Error("PayPal SDK script URL is missing."));
+    window.__tlPayPalSdkUrl = sdkUrl;
+    if(existingSdk) existingSdk.remove();
+    window.__tlPayPalSdkPromise = new Promise((resolve, reject) => {
+      const sdk = document.createElement("script");
+      let settled = false;
+      const finish = (error) => {
+        if(settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if(error){
+          window.__tlPayPalSdkPromise = null;
+          sdk.remove();
+          reject(error);
+        }else if(window.paypal && typeof window.paypal.Buttons === "function"){
+          resolve(window.paypal);
+        }else{
+          window.__tlPayPalSdkPromise = null;
+          sdk.remove();
+          reject(new Error("PayPal SDK loaded but Buttons API is unavailable."));
         }
-      }).render("#paypal-button");
-      paypalContainer.dataset.tlPayPalMounted = "1";
-      if(paypalRender && typeof paypalRender.catch === "function"){
-        paypalRender.catch(error => {
-          delete paypalContainer.dataset.tlPayPalMounted;
-          console.error("PAYPAL_BUTTON_RENDER_ERROR", error);
-        });
-      }
-    } catch(error) {
-      delete paypalContainer.dataset.tlPayPalMounted;
-      console.error("PAYPAL_BUTTON_MOUNT_ERROR", error);
+      };
+      const timer = setTimeout(() => finish(new Error("PayPal SDK load timed out.")), 20000);
+      sdk.src = sdkUrl;
+      sdk.async = true;
+      sdk.onload = () => finish(null);
+      sdk.onerror = () => finish(new Error("PayPal SDK failed to load."));
+      document.head.appendChild(sdk);
+    });
+    return window.__tlPayPalSdkPromise;
+  };
+
+  const mountPayPalButton = () => {
+    if(!paypalContainer || !window.paypal || typeof window.paypal.Buttons !== "function"){
+      return Promise.reject(new Error("PayPal Buttons API is not ready."));
     }
+    if(paypalContainer.dataset.tlPayPalMounted === "1") return Promise.resolve();
+    paypalContainer.innerHTML = "";
+    const paypalRender = window.paypal.Buttons({
+      createOrder:function(data,actions){
+        track("payment_started", {
+          amount: 9.99, currency: "USD", loop: 7, method: "paypal", payment_method: "paypal",
+          report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation",
+          ...paymentAnalyticsContext()
+        });
+        track("paypal_payment_started", {amount:9.99, currency:"USD", payment_method:"paypal", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
+        if(window.tlLoop7ReportMode === "direct"){
+          track("direct_report_payment_started", {amount:9.99, currency:"USD", method:"paypal", payment_method:"paypal", report_mode:"direct", ...paymentAnalyticsContext()});
+        }
+        return actions.order.create({
+          purchase_units:[{
+            description: window.tlLoop7ReportMode === "direct" ? "TruthLoop Investigation Report" : "TruthLoop Loop 7 Investigation",
+            amount:{currency_code:"USD",value:"9.99"}
+          }]
+        });
+      },
+      onApprove:function(data,actions){
+        return actions.order.capture().then(function(details){
+          console.log("PAYPAL_SUCCESS",details);
+          track("paypal_payment_success", {payment_method:"paypal", currency:"USD", value:9.99, report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
+          unlockLoop7Report("paypal");
+        }).catch(function(error){
+          track("paypal_payment_failed", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
+          throw error;
+        });
+      },
+      onCancel:function(data){
+        track("paypal_checkout_cancelled", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
+      },
+      onError:function(error){
+        track("paypal_payment_failed", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
+        console.error("PAYPAL_CHECKOUT_ERROR", error);
+        showPayPalLoadError("PayPal checkout encountered an error. Please retry.");
+      }
+    }).render("#paypal-button");
+    return Promise.resolve(paypalRender).then(() => {
+      paypalContainer.dataset.tlPayPalMounted = "1";
+      console.log("PAYPAL_BUTTON_RENDERED");
+    });
+  };
+
+  const loadAndMountPayPal = (forceReload) => {
+    if(!paypalContainer) return;
+    paypalContainer.innerHTML = '<div style="padding:10px;text-align:center;color:#cbd5e1;font-size:13px">Loading secure PayPal checkout…</div>';
+    loadPayPalSdk(forceReload)
+      .then(() => mountPayPalButton())
+      .catch(error => {
+        delete paypalContainer.dataset.tlPayPalMounted;
+        console.error("PAYPAL_SDK_OR_RENDER_ERROR", error);
+        showPayPalLoadError("Secure PayPal checkout did not load. Your payment has not been taken.");
+      });
   };
 
   if(isIndia){
-    // Do not initialize an invisible PayPal checkout on the Razorpay path.
+    // Keep the existing India/Razorpay payment path unchanged.
     paypalContainer.style.display = "none";
     paypalContainer.innerHTML = "";
     delete paypalContainer.dataset.tlPayPalMounted;
   }else{
     paypalContainer.style.display = "block";
-    if(window.paypal && typeof window.paypal.Buttons === "function"){
-      mountPayPalButton();
-    }else{
-      const paypalSdk = document.querySelector('script[src*="paypal.com/sdk/js"]');
-      if(paypalSdk && paypalSdk.dataset.tlPayPalReadyListener !== "1"){
-        paypalSdk.dataset.tlPayPalReadyListener = "1";
-        paypalSdk.addEventListener("load", mountPayPalButton, {once:true});
-      }
-    }
+    loadAndMountPayPal(false);
   }
 }
 
