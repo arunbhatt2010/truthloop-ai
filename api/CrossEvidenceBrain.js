@@ -1,5 +1,5 @@
 /* ============================================================
-   CROSS EVIDENCE BRAIN v24 — WEBSITE SCRAPER + UNIVERSAL PACKAGE
+   CROSS EVIDENCE BRAIN v25 — API SAMURAI + WEBSITE SCRAPER + UNIVERSAL PACKAGE
    TruthLoop AI
 
    RESPONSIBILITY
@@ -33,13 +33,11 @@ import {
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
 
-const APIFY_ACTOR_ID = "blueskyscraper~linkedin-profile-posts-scraper";
+const APIFY_ACTOR_ID = "apisamurai~linkedin-scraper";
 const APIFY_TIMEOUT_SECONDS = 60;
 const APIFY_MAX_TOTAL_CHARGE_USD = "0.05";
 const X_APIFY_ACTOR_ID = process.env.APIFY_X_ACTOR_ID || "simple.actor~x-profile-posts";
 const REDDIT_APIFY_ACTOR_ID = process.env.APIFY_REDDIT_ACTOR_ID || "scrapers_lat~reddit-user-scraper";
-const SOCIAL_DISCOVERY_ACTOR_ID = process.env.APIFY_SOCIAL_DISCOVERY_ACTOR_ID || "apify~web-search";
-const SOCIAL_DISCOVERY_MAX_CHARGE_USD = process.env.APIFY_SOCIAL_DISCOVERY_MAX_CHARGE_USD || "0.01";
 const UNUSED_SIGNAL_MODEL = "unused";
 
 const ENABLE_LINKEDIN_APIFY = true;
@@ -171,6 +169,20 @@ function isLinkedInProfileUrl(value = "") {
     } catch {
         return false;
     }
+}
+
+function isLinkedInCompanyUrl(value = "") {
+    try {
+        const url = new URL(value);
+        return /linkedin\.com$/i.test(url.hostname.replace(/^www\./i, "")) &&
+            /^\/company\//i.test(url.pathname);
+    } catch {
+        return false;
+    }
+}
+
+function isLinkedInActorTargetUrl(value = "") {
+    return isLinkedInCompanyUrl(value) || isLinkedInProfileUrl(value);
 }
 
 function safeText(value = "") {
@@ -749,62 +761,9 @@ function findLinkedInUrl({
     const linkedinCandidates = uniqueUrls(candidates)
         .filter(url => detectPlatform(url) === "linkedin");
 
-    // Company pages are preferred for company investigations; founder/person
-    // profiles remain a fallback. Never route posts/articles as profile URLs.
-    const isLinkedInCompanyUrl = value => {
-        try { return /linkedin\.com$/i.test(new URL(value).hostname.replace(/^www\./i, "")) && /^\/company\//i.test(new URL(value).pathname); }
-        catch { return false; }
-    };
-    return linkedinCandidates.find(isLinkedInCompanyUrl) || linkedinCandidates.find(isLinkedInProfileUrl) || "";
-}
-
-/* ------------------------------------------------------------
-   CONDITIONAL SOCIAL LINK DISCOVERY — ONE SEARCH FOR MISSING PLATFORMS
-   Trigger when LinkedIn OR X is missing. Preserve valid PCF/DFB URLs
-   and classify/accept search results only for the missing platforms.
-   ------------------------------------------------------------ */
-async function discoverSocialProfilesWithWebSearch({ companyName = "", companyDomain = "", needLinkedIn = true, needX = true } = {}) {
-    const token = process.env.APIFY_API_TOKEN || process.env.APIFY_TOKEN || "";
-    if (!token) return { success: false, reason: "Missing APIFY_API_TOKEN.", linkedinUrl: "", xUrl: "", results: [] };
-
-    const name = safeText(companyName).slice(0, 120);
-    const domain = safeText(companyDomain).replace(/^https?:\/\//i, "").replace(/^www\./i, "").split(/[/?#]/)[0];
-    if (!domain) return { success: false, reason: "Company domain is required for social discovery.", linkedinUrl: "", xUrl: "", results: [] };
-
-    const identity = name ? `"${name}" ` : "";
-    const platformClauses = [];
-    if (needLinkedIn) platformClauses.push("site:linkedin.com/company", "site:linkedin.com/in");
-    if (needX) platformClauses.push("site:x.com", "site:twitter.com");
-    if (!platformClauses.length) return { success: true, reason: "No missing social platforms; search skipped.", linkedinUrl: "", xUrl: "", results: [] };
-    const query = `${identity}"${domain}" (${platformClauses.join(" OR ")})`;
-    const input = { countryCode: "US", languageCode: "en", query, provider: "google" };
-    const endpoint = `https://api.apify.com/v2/acts/${encodeURIComponent(SOCIAL_DISCOVERY_ACTOR_ID)}/run-sync-get-dataset-items?timeout=45&maxItems=10&maxTotalChargeUsd=${encodeURIComponent(SOCIAL_DISCOVERY_MAX_CHARGE_USD)}`;
-
-    try {
-        const response = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-            body: JSON.stringify(input)
-        });
-        const raw = await response.text();
-        if (!response.ok) return { success: false, reason: `Social discovery Actor HTTP ${response.status}: ${raw.slice(0, 350)}`, linkedinUrl: "", xUrl: "", results: [] };
-        let rows;
-        try { rows = JSON.parse(raw); } catch { return { success: false, reason: "Social discovery Actor returned invalid JSON.", linkedinUrl: "", xUrl: "", results: [] }; }
-        if (!Array.isArray(rows)) rows = rows && typeof rows === "object" ? [rows] : [];
-        const results = rows.flatMap(row => Array.isArray(row?.results) ? row.results : (row?.url ? [row] : []));
-        const urls = uniqueUrls(results.map(item => item?.url || item?.link || ""));
-        const linkedin = urls.filter(url => detectPlatform(url) === "linkedin");
-        const x = urls.filter(url => detectPlatform(url) === "x");
-        const isCompany = url => /linkedin\.com\/company\//i.test(url);
-        const isPerson = url => isLinkedInProfileUrl(url);
-        const isXProfile = url => /^https?:\/\/(?:www\.)?(?:x\.com|twitter\.com)\/[^/]+\/?(?:\?.*)?$/i.test(url);
-        const linkedinUrl = needLinkedIn ? (linkedin.find(isCompany) || linkedin.find(isPerson) || "") : "";
-        const xUrl = needX ? (x.find(isXProfile) || "") : "";
-        return { success: true, linkedinUrl, xUrl, results, query, actorId: SOCIAL_DISCOVERY_ACTOR_ID,
-            searchedPlatforms: { linkedin: !!needLinkedIn, x: !!needX } };
-    } catch (error) {
-        return { success: false, reason: error?.message || "Social discovery Actor failed.", linkedinUrl: "", xUrl: "", results: [] };
-    }
+    // Company page is preferred for company investigations; person profiles remain supported.
+    return linkedinCandidates.find(isLinkedInCompanyUrl) ||
+        linkedinCandidates.find(isLinkedInProfileUrl) || "";
 }
 
 /* ------------------------------------------------------------
@@ -1289,16 +1248,15 @@ async function fetchGitHubDirect(url = "") {
 }
 
 /* ------------------------------------------------------------
-   APIFY — LINKEDIN PUBLIC POSTS + ARTICLES
-   Tested BlueskyScraper schema: up to 20 posts, reposts and quote posts.
-   Articles are retained when the Actor returns article rows.
-   No engagement metrics/comments are passed into normalized evidence.
+   APIFY — API SAMURAI UNIVERSAL LINKEDIN COLLECTOR
+   Supports public company pages (/company/) and person profiles (/in/).
+   Normalizes profile/company About, posts and articles into one source.
    ------------------------------------------------------------ */
 
 async function fetchLinkedInFromApify(url = "") {
     const normalizedUrl = normalizeUrl(url);
-    if (!normalizedUrl || detectPlatform(normalizedUrl) !== "linkedin") {
-        return { success: false, reason: "A valid LinkedIn public URL is required.", source: null };
+    if (!normalizedUrl || detectPlatform(normalizedUrl) !== "linkedin" || !isLinkedInActorTargetUrl(normalizedUrl)) {
+        return { success: false, reason: "A valid public LinkedIn company (/company/) or person (/in/) URL is required.", source: null };
     }
 
     const cached = SOURCE_CACHE.get(normalizedUrl);
@@ -1310,10 +1268,15 @@ async function fetchLinkedInFromApify(url = "") {
         return { success: false, reason: "Missing APIFY_API_TOKEN.", source: null };
     }
 
-    // Tested BlueskyScraper input schema: fetch up to 20 public posts,
-    // include reposts and quote posts, and allow article rows returned by the Actor.
-    // Keep the fetched evidence available to signal analysis; the Universal Package
-    // later exposes only the latest 9 posts + 1 article (10 items total).
+    const isCompanyTarget = isLinkedInCompanyUrl(normalizedUrl);
+    const actorInput = {
+        profileUrls: isCompanyTarget ? [] : [normalizedUrl],
+        companyUrls: isCompanyTarget ? [normalizedUrl] : [],
+        postUrls: [],
+        includePosts: true,
+        maxPostsPerProfile: 20
+    };
+
     const endpoint =
         "https://api.apify.com/v2/acts/" +
         encodeURIComponent(APIFY_ACTOR_ID) +
@@ -1324,12 +1287,10 @@ async function fetchLinkedInFromApify(url = "") {
 
     console.log("APIFY_LINKEDIN_CALL_START", JSON.stringify({
         actorId: APIFY_ACTOR_ID,
-        profileUrl: normalizedUrl,
-        maxPostsPerProfile: 20,
-        includeReposts: true,
-        includeQuotePosts: true,
-        includeTopComments: false,
-        includeReactionBreakdown: false,
+        targetType: isCompanyTarget ? "company" : "person",
+        linkedinUrl: normalizedUrl,
+        inputKeys: Object.keys(actorInput),
+        maxPostsPerProfile: actorInput.maxPostsPerProfile,
         maxItems: 100,
         timeoutSeconds: APIFY_TIMEOUT_SECONDS,
         maxTotalChargeUsd: APIFY_MAX_TOTAL_CHARGE_USD,
@@ -1343,22 +1304,7 @@ async function fetchLinkedInFromApify(url = "") {
                 "Authorization": `Bearer ${apiToken}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                includeMedia: true,
-                includeQuotePosts: true,
-                includeReactionBreakdown: false,
-                includeReposts: true,
-                includeTopComments: false,
-                maxPostsPerProfile: 20,
-                profiles: [normalizedUrl],
-                proxyConfiguration: {
-                    useApifyProxy: true
-                },
-                postsNewerThan: "",
-                postsOlderThan: "",
-                minReactions: 0,
-                minComments: 0
-            })
+            body: JSON.stringify(actorInput)
         });
         const rawBody = await response.text();
         console.log("APIFY_LINKEDIN_CALL_STATUS", response.status);
@@ -1368,13 +1314,13 @@ async function fetchLinkedInFromApify(url = "") {
             try { errorPayload = JSON.parse(rawBody); } catch {}
             const errorMessage = errorPayload?.error?.message || errorPayload?.message || rawBody.slice(0, 800) || "Unknown Apify error.";
             console.error("APIFY_LINKEDIN_CALL_ERROR", JSON.stringify({ status: response.status, actorId: APIFY_ACTOR_ID, message: errorMessage }));
-            return { success: false, reason: `Apify LinkedIn request failed (${response.status}): ${errorMessage}`, source: null };
+            return { success: false, reason: `API Samurai LinkedIn request failed (${response.status}): ${errorMessage}`, source: null };
         }
 
         let payload;
         try { payload = JSON.parse(rawBody); }
         catch (parseError) {
-            return { success: false, reason: `Apify returned invalid JSON: ${parseError?.message || "parse failed"}`, source: null };
+            return { success: false, reason: `API Samurai returned invalid JSON: ${parseError?.message || "parse failed"}`, source: null };
         }
 
         const rows = Array.isArray(payload)
@@ -1384,40 +1330,51 @@ async function fetchLinkedInFromApify(url = "") {
                 : payload && typeof payload === "object" ? [payload] : [];
 
         const firstText = (...values) => {
-            for (const value of values) if (typeof value === "string" && value.trim()) return value.trim();
+            for (const value of values) {
+                if (typeof value === "string" && value.trim()) return value.trim();
+                if (typeof value === "number" && Number.isFinite(value)) return String(value);
+            }
             return "";
         };
-        const dateOf = row => row?.publishedAt || row?.datePublished || row?.date || row?.createdAt || row?.timestamp || null;
-        const urlOf = row => row?.postUrl || row?.articleUrl || row?.url || row?.linkedinUrl || row?.sourceUrl || row?.link || null;
+        const typeOf = row => firstText(row?.type, row?.rowType, row?.contentType, row?.postType).toLowerCase();
+        const dateOf = row => row?.postedAt || row?.publishedAt || row?.datePublished || row?.publishedDate || row?.date || row?.createdAt || row?.timestamp || null;
+        const urlOf = row => row?.url || row?.postUrl || row?.articleUrl || row?.activityUrl || row?.originalUrl || row?.linkedinUrl || row?.sourceUrl || row?.link || null;
         const textOf = row => firstText(row?.text, row?.content, row?.articleText, row?.postText, row?.description, row?.body, row?.summary);
-        const titleOf = row => firstText(row?.headline, row?.articleTitle, row?.title, row?.documentTitle);
+        const titleOf = row => firstText(row?.title, row?.headline, row?.articleTitle, row?.documentTitle);
         const isArticleRow = row => {
-            const type = firstText(row?.postType, row?.type, row?.rowType, row?.contentType).toLowerCase();
+            const type = typeOf(row);
             const candidateUrl = String(urlOf(row) || "");
-            return type === "article" || type.includes("article") || /\/pulse\//i.test(candidateUrl);
+            return type.includes("article") || !!row?.articleUrl || /\/pulse\//i.test(candidateUrl);
         };
 
-        // Handle both the actor's normal row-per-item output and any profile
-        // summary row that contains nested latestPosts/articles arrays.
-        const profileRow = rows.find(row =>
-            String(row?.rowType || row?.type || "").toLowerCase() === "profile" ||
-            (row?.linkedinUrl && (Array.isArray(row?.latestPosts) || Array.isArray(row?.articles)))
-        ) || {};
-        const nestedRows = [
-            ...(Array.isArray(profileRow?.latestPosts) ? profileRow.latestPosts : []),
-            ...(Array.isArray(profileRow?.articles) ? profileRow.articles : [])
-        ].filter(row => row && typeof row === "object");
-        const activityRows = rows.filter(row => {
-            const rowType = String(row?.rowType || row?.type || "").toLowerCase();
-            return rowType === "post" || rowType === "article" || !!row?.postType || !!row?.postUrl || !!row?.articleUrl;
-        }).concat(nestedRows);
+        const targetRow = rows.find(row => {
+            const type = typeOf(row);
+            return isCompanyTarget
+                ? type === "company" || !!row?.companyType || !!row?.employeeCount || !!row?.universalName
+                : type === "profile" || type === "person" || !!row?.fullName || !!row?.firstName;
+        }) || rows[0] || {};
+
+        const nestedPosts = [
+            ...(Array.isArray(targetRow?.recentPosts) ? targetRow.recentPosts : []),
+            ...(Array.isArray(targetRow?.posts) ? targetRow.posts : []),
+            ...(Array.isArray(targetRow?.latestPosts) ? targetRow.latestPosts : [])
+        ];
+        const nestedArticles = [
+            ...(Array.isArray(targetRow?.articles) ? targetRow.articles : []),
+            ...(Array.isArray(targetRow?.recentArticles) ? targetRow.recentArticles : [])
+        ];
+        const explicitActivityRows = rows.filter(row => {
+            const type = typeOf(row);
+            return type === "post" || type.includes("article") || !!row?.postUrl || !!row?.articleUrl;
+        });
+        const activityRows = [...nestedPosts, ...nestedArticles, ...explicitActivityRows]
+            .filter(row => row && typeof row === "object");
 
         const seen = new Set();
         const uniqueRows = activityRows.filter(row => {
             const itemUrl = String(urlOf(row) || "").trim();
             const itemText = textOf(row);
             const title = titleOf(row);
-            // Exclude error/notice/undefined rows, missing URLs and empty content.
             if (!itemUrl || (!itemText && !title)) return false;
             const key = itemUrl.toLowerCase();
             if (seen.has(key)) return false;
@@ -1430,27 +1387,21 @@ async function fetchLinkedInFromApify(url = "") {
             const text = textOf(row);
             const title = titleOf(row);
             const publishedAt = dateOf(row);
-            const {
-                likes, likeCount, reactions, reactionCount, reactionTypes,
-                comments, commentCount, numComments, engagement,
-                engagementCount, commentsData, topComments,
-                ...evidenceRow
-            } = row;
-
             return {
-                ...evidenceRow,
+                ...row,
                 postType: kind,
                 title: title || null,
                 ...(kind === "article" ? { headline: title || null, articleUrl: itemUrl } : {}),
-                text: text || "",
+                text: text || title || "",
                 content: text || title || "",
                 date: publishedAt || null,
                 datePublished: publishedAt || null,
                 publishedAt: publishedAt || null,
+                postedAt: publishedAt || null,
                 url: itemUrl,
                 sourceUrl: itemUrl,
                 postUrl: kind === "post" ? itemUrl : (row?.postUrl || null),
-                sourceName: firstText(row?.sourceName, row?.authorName, row?.fullName, row?.author?.name, profileRow?.fullName, profileRow?.sourceName) || null
+                sourceName: firstText(row?.sourceName, row?.authorName, row?.author?.name, targetRow?.name, targetRow?.fullName) || null
             };
         };
 
@@ -1459,48 +1410,62 @@ async function fetchLinkedInFromApify(url = "") {
         const posts = selectLatestLinkedInItems(allPosts, "post", 20);
         const articles = selectLatestLinkedInItems(allArticles, "article", 20);
 
-        const profileUrl = normalizeUrl(String(
-            profileRow?.linkedinUrl || profileRow?.profileUrl || profileRow?.sourceUrl || normalizedUrl
-        )) || normalizedUrl;
-        const profileName = firstText(
-            profileRow?.fullName, profileRow?.sourceName, profileRow?.name,
-            ...uniqueRows.map(row => row?.sourceName || row?.authorName || row?.fullName)
-        );
-        const about = firstText(profileRow?.about, profileRow?.description, profileRow?.summary, profileRow?.bio);
+        const targetUrl = normalizeUrl(String(urlOf(targetRow) || targetRow?.profileUrl || targetRow?.companyUrl || normalizedUrl)) || normalizedUrl;
+        const about = firstText(targetRow?.about, targetRow?.description, targetRow?.overview, targetRow?.summary, targetRow?.bio, targetRow?.slogan, targetRow?.tagline);
+        const profileName = firstText(targetRow?.name, targetRow?.fullName, targetRow?.companyName, targetRow?.firstName);
         const profile = {
-            ...profileRow,
-            profileUrl,
-            linkedinUrl: profileUrl,
+            ...targetRow,
+            entityType: isCompanyTarget ? "company" : "person",
+            profileUrl: targetUrl,
+            linkedinUrl: targetUrl,
+            companyUrl: isCompanyTarget ? targetUrl : (targetRow?.companyUrl || null),
             name: profileName || null,
-            fullName: profileName || null,
-            headline: firstText(profileRow?.sourceHeadline, profileRow?.headline) || null,
+            fullName: firstText(targetRow?.fullName, profileName) || null,
+            headline: firstText(targetRow?.headline, targetRow?.tagline, targetRow?.slogan) || null,
             about: about || null,
-            currentCompany: firstText(profileRow?.company, profileRow?.currentCompany) || null,
-            location: firstText(profileRow?.location) || null
+            description: about || null,
+            currentCompany: firstText(targetRow?.currentCompany, targetRow?.company) || null,
+            location: firstText(targetRow?.location, targetRow?.headquarters) || null,
+            followersCount: targetRow?.followersCount ?? targetRow?.followers ?? null,
+            connectionsCount: targetRow?.connectionsCount ?? targetRow?.connections ?? null,
+            website: firstText(targetRow?.website, targetRow?.websiteUrl) || null,
+            industry: firstText(targetRow?.industry) || null,
+            companySize: firstText(targetRow?.size, targetRow?.companySize, targetRow?.employeeRange) || null,
+            employeeCount: targetRow?.employeeCount ?? null,
+            headquarters: firstText(targetRow?.headquarters, targetRow?.location) || null,
+            founded: targetRow?.founded ?? null,
+            specialties: Array.isArray(targetRow?.specialties) ? targetRow.specialties : [],
+            companyType: firstText(targetRow?.companyType) || null,
+            tagline: firstText(targetRow?.tagline, targetRow?.slogan) || null,
+            slug: firstText(targetRow?.slug, targetRow?.universalName) || null
         };
 
         const visibleText = [
             profile.name ? `Name: ${profile.name}` : "",
             profile.headline ? `Headline: ${profile.headline}` : "",
             profile.about ? `About: ${profile.about}` : "",
+            profile.industry ? `Industry: ${profile.industry}` : "",
+            profile.companySize ? `Company size: ${profile.companySize}` : "",
+            profile.employeeCount != null ? `Employees: ${profile.employeeCount}` : "",
+            profile.headquarters ? `Headquarters: ${profile.headquarters}` : "",
             ...posts.map(row => textOf(row)),
             ...articles.map(row => [titleOf(row), textOf(row)].filter(Boolean).join("\n"))
         ].filter(Boolean).join("\n");
 
         const source = {
-            sourceUrl: profileUrl,
-            canonicalUrl: profileUrl,
+            sourceUrl: targetUrl,
+            canonicalUrl: targetUrl,
             sourcePlatform: "linkedin",
             platform: "linkedin",
             sourceHost: "www.linkedin.com",
             status: 200,
             fetchStatus: "success",
-            title: profile.name || profile.headline || "LinkedIn Profile",
+            title: profile.name || profile.headline || "LinkedIn Public Page",
             description: about || profile.headline || "",
             visibleText,
             contentLength: visibleText.length,
-            socialLinks: [profileUrl],
-            socialProfiles: [profileUrl],
+            socialLinks: [targetUrl],
+            socialProfiles: [targetUrl],
             linkedinProfile: profile,
             profile,
             posts,
@@ -1508,25 +1473,26 @@ async function fetchLinkedInFromApify(url = "") {
             apifyData: rows
         };
         SOURCE_CACHE.set(normalizedUrl, source);
-        SOURCE_CACHE.set(profileUrl, source);
+        SOURCE_CACHE.set(targetUrl, source);
 
         console.log("APIFY_LINKEDIN_RESULT_COUNTS", JSON.stringify({
             actorId: APIFY_ACTOR_ID,
-            profileUrl,
+            targetType: profile.entityType,
+            targetUrl,
             rawRows: rows.length,
             validUniqueItems: uniqueRows.length,
             postsAvailable: allPosts.length,
             articlesAvailable: allArticles.length,
             postsSelectedForAnalysis: posts.length,
             articlesSelectedForAnalysis: articles.length,
-            reportPackagePostLimit: 9,
-            reportPackageArticleLimit: 1,
+            profileAboutChars: String(profile.about || "").length,
+            companyEmployeeCount: profile.employeeCount,
             elapsedTargetSeconds: APIFY_TIMEOUT_SECONDS
         }));
         return { success: true, source };
     } catch (error) {
         console.error("APIFY_LINKEDIN_CALL_FAILED", error?.message || "Unknown error");
-        return { success: false, reason: error?.message || "Apify LinkedIn fetch failed.", source: null };
+        return { success: false, reason: error?.message || "API Samurai LinkedIn fetch failed.", source: null };
     }
 }
 
@@ -3203,8 +3169,7 @@ function buildUniversalPackage({
     xEvidence = null,
     redditEvidence = null,
     signalResult = null,
-    crossEvidenceIntelligence = null,
-    socialDiscovery = null
+    crossEvidenceIntelligence = null
 } = {}) {
 
     /*
@@ -3424,8 +3389,6 @@ function buildUniversalPackage({
         primarySource:
             normalizeUrl(primaryUrl) || null,
 
-        socialDiscovery: socialDiscovery || null,
-
         websiteEvidence: {
             sources: compressedWebsiteSources,
             sourceUrls: websiteSourceUrls
@@ -3617,7 +3580,6 @@ console.log(
     let xUrl = "";
     let redditEvidence = null;
     let redditUrl = "";
-    let socialDiscovery = { attempted: false, reason: "Not applicable for direct social-profile investigation.", actorId: SOCIAL_DISCOVERY_ACTOR_ID, query: null, resultCount: 0, linkedinUrl: null, xUrl: null };
 
     const primaryPlatform = detectPlatform(primaryUrl);
 
@@ -3721,24 +3683,6 @@ console.log(
         xUrl = findPlatformProfileUrl("x", { requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks });
         redditUrl = findPlatformProfileUrl("reddit", { requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks });
 
-        // Trigger when EITHER platform is missing; search only for missing platforms.
-        const needLinkedIn = !linkedinUrl;
-        const needX = !xUrl;
-        socialDiscovery = { attempted: false, reason: "Skipped: PCF/DFB supplied valid LinkedIn and X URLs.", actorId: SOCIAL_DISCOVERY_ACTOR_ID, query: null, resultCount: 0, linkedinUrl: null, xUrl: null, searchedPlatforms: { linkedin: false, x: false } };
-        if (needLinkedIn || needX) {
-            const websiteTitle = websiteSources.map(source => safeText(source?.title || source?.pageTitle || "")).find(Boolean) || "";
-            const domain = (() => { try { return new URL(primaryUrl).hostname.replace(/^www\./i, ""); } catch { return ""; } })();
-            const companyName = safeText(footprintPackage?.companyName || footprintPackage?.organizationName || footprintPackage?.name || websiteTitle);
-            socialDiscovery = { ...socialDiscovery, attempted: true, reason: `PCF/DFB missing ${[needLinkedIn ? "LinkedIn" : "", needX ? "X" : ""].filter(Boolean).join(" and ")}; one targeted discovery search was triggered.`, searchedPlatforms: { linkedin: needLinkedIn, x: needX } };
-            const searchResult = await discoverSocialProfilesWithWebSearch({ companyName, companyDomain: domain, needLinkedIn, needX });
-            socialDiscovery = { ...socialDiscovery, success: !!searchResult.success, reason: searchResult.reason || socialDiscovery.reason, query: searchResult.query || null, resultCount: searchResult.results?.length || 0, linkedinUrl: searchResult.linkedinUrl || null, xUrl: searchResult.xUrl || null };
-            if (searchResult.success) {
-                // Preserve every valid URL already supplied by PCF/DFB.
-                if (needLinkedIn && searchResult.linkedinUrl) linkedinUrl = searchResult.linkedinUrl;
-                if (needX && searchResult.xUrl) xUrl = searchResult.xUrl;
-            }
-        }
-
         console.log(
             "CEB_PUBLIC_LINK_DISCOVERY",
             JSON.stringify({
@@ -3749,12 +3693,12 @@ console.log(
                 nestedLinkedInUrls: nestedLinkedInUrls.length,
                 sourceLinkedInUrls: sourceLinkedInUrls.length,
                 linkedinUrl: linkedinUrl || null,
-                linkedinProfileUrlSelected: !!linkedinUrl,
+                linkedinTargetUrlSelected: !!linkedinUrl,
+                linkedinTargetType: linkedinUrl ? (isLinkedInCompanyUrl(linkedinUrl) ? "company" : "person") : null,
                 apifyCallWillRun: !!(linkedinUrl && ENABLE_LINKEDIN_APIFY),
                 githubUrl: githubUrl || null,
                 xUrl: xUrl || null,
-                redditUrl: redditUrl || null,
-                socialDiscovery
+                redditUrl: redditUrl || null
             })
         );
     }
@@ -3791,8 +3735,8 @@ console.log(
 
     /* ------------------------------------------------------------
        LINKEDIN APIFY COLLECTION
-       One Actor call fetches up to 20 public posts plus available articles.
-       Universal Package later selects 9 posts + 1 article for report-facing evidence.
+       One API Samurai Actor call supports either a company page or a person profile.
+       It normalizes profile/About, posts and articles for the Universal Package.
        ------------------------------------------------------------ */
 
     if (
@@ -3821,7 +3765,7 @@ console.log(
     } else if (!linkedinUrl) {
         console.warn(
             "CEB_LINKEDIN_APIFY_SKIPPED_NO_PROFILE_URL",
-            "No LinkedIn person-profile URL was found in the supplied links or nested footprint package."
+            "No LinkedIn public company (/company/) or person (/in/) URL was found in the supplied links or nested footprint package."
         );
     }
 
@@ -3876,8 +3820,7 @@ console.log(
             xEvidence,
             redditEvidence,
             signalResult,
-            crossEvidenceIntelligence: signalResult?.crossEvidenceIntelligence || null,
-            socialDiscovery
+            crossEvidenceIntelligence: signalResult?.crossEvidenceIntelligence || null
         });
 
     const sourcesSucceeded =
