@@ -580,7 +580,12 @@ let investigationState = {
           loopLevel,
           currentCategory,
           profileLink,
-          identityPackage
+          identityPackage,
+          // Guided Loop 7 receives the prior Direct Report through this
+          // single package route; Direct mode never receives a TruthLoop Package.
+          ...(loopLevel === 7 && reportMode === "conversation" && hasPublicReportContext
+            ? { publicInvestigationReportContext: publicReportContext }
+            : {})
         };
 
     /* ==========================================
@@ -689,10 +694,7 @@ console.log(
 
       loop7AiUserPayload = {
         compressedEvidencePackage,
-        ...(reportMode === "conversation" ? { truthLoopPackage } : {}),
-        ...(hasPublicReportContext
-          ? { existingDirectReportContext: publicReportContext }
-          : {})
+        ...(reportMode === "conversation" ? { truthLoopPackage } : {})
       };
 
     loop7Instruction = `
@@ -702,12 +704,12 @@ ROLE
 You are producing a specific, evidence-led investigation of this exact subject. This is not a generic personality analysis, generic company profile, motivational summary, or advice article. Every conclusion must arise from identifiable evidence in this case.
 
 THREE INPUTS IN GUIDED MODE — KEEP THEIR ROLES DISTINCT
-For guided/conversation mode, reason from all three inputs when they are actually present in the payload:
-1. EXISTING DIRECT PUBLIC-PROFILE REPORT: when present, it is supplied in existingDirectReportContext. Use its findings as prior investigative context and as leads to verify, challenge, refine, or qualify. It is not a new source and its inherited source count is zero for this report.
-2. LOOP 1–6 CONVERSATION FINDINGS: use the user's own statements, answers, examples, goals, and case context to understand what questions matter and to compare stated intent with public evidence. These are conversation-derived inputs, not public sources; they must never be counted as sources or cited with SOURCE_XX IDs. Do not treat prior assistant interpretations as facts.
-3. NEW LOOP 7 PUBLIC INVESTIGATION: this is the only source pool that may contribute to the seven section source count and public-evidence citations in this report.
+For guided/conversation mode, reason from all three inputs when they are actually present:
+1. EXISTING DIRECT PUBLIC-PROFILE REPORT: when present, it is carried inside truthLoopPackage.publicInvestigationReportContext. Use its findings as prior investigative context and as leads to verify, challenge, refine, or qualify. It is not a new source and its inherited source count is zero for this report.
+2. LOOP 1–6 CONVERSATION FINDINGS: carried in truthLoopPackage.messages, use the user's own statements, answers, examples, goals, and case context to understand what questions matter and to compare stated intent with public evidence. These are conversation-derived inputs, not public sources; they must never be counted as sources or cited with SOURCE_XX IDs. Do not treat prior assistant interpretations as facts.
+3. NEW LOOP 7 PUBLIC INVESTIGATION: carried in compressedEvidencePackage; this is the only source pool that may contribute to the seven section source count and public-evidence citations in this report.
 
-Do not claim that an existing Direct Report was supplied if existingDirectReportContext is absent or empty. Do not invent or reconstruct missing conversation details. If one of the guided-mode inputs is unavailable, disclose the limitation only where it materially affects interpretation. In direct mode there is no Loop 1–6 conversation input; reason from the available public evidence and any explicitly supplied prior report context only.
+The Loop 7 user payload must contain truthLoopPackage only once. The Direct Report context must not be sent as a separate parallel payload field. Do not claim that an existing Direct Report was supplied if truthLoopPackage.publicInvestigationReportContext is absent or empty. Do not invent or reconstruct missing conversation details. If one of the guided-mode inputs is unavailable, disclose the limitation only where it materially affects interpretation. In direct mode there is no Loop 1–6 conversation input and no TruthLoop Package; reason from the available public evidence only.
 
 SOURCE ALLOCATION — NON-NEGOTIABLE
 The report has seven evidence sections and must use seven independent public sources from the NEW Loop 7 investigation: one dedicated source allocation for each of Sections 1–7.
