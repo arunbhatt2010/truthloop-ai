@@ -5053,51 +5053,150 @@ async function showPaywall(){
     document.getElementById("paypal-button").style.display="block";
   }
 
-  razorpayBtn.onclick=function(){
+  razorpayBtn.onclick = async function(){
+    if(razorpayBtn.dataset.tlPaymentBusy === "1") return;
+    razorpayBtn.dataset.tlPaymentBusy = "1";
+    const originalButtonText = razorpayBtn.innerText;
+    razorpayBtn.disabled = true;
+    razorpayBtn.innerText = "Creating secure payment…";
 
-track("payment_started",{
-  amount:499, currency:"INR", loop:7, method:"razorpay", payment_method:"razorpay",
-  report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation",
-  ...paymentAnalyticsContext()
-});
-track("razorpay_payment_started", {amount:499, currency:"INR", payment_method:"razorpay", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-if(window.tlLoop7ReportMode === "direct"){
-  track("direct_report_payment_started", {amount:499, currency:"INR", method:"razorpay", payment_method:"razorpay", report_mode:"direct", ...paymentAnalyticsContext()});
-}
+    const reportMode = window.tlLoop7ReportMode === "direct" ? "direct" : "conversation";
+    const analyticsContext = paymentAnalyticsContext();
 
-const options={
-      key: RAZORPAY_KEY_ID,
-      amount: 49900,
-      currency: "INR",
-      name: "TruthLoop",
-      description: window.tlLoop7ReportMode === "direct" ? "Unlock TruthLoop Investigation Report" : "Unlock Loop 7 Investigation",
-      image: "https://truthloop.in/truthloop-hook.jpg",
-      prefill:{name:"",email:"",contact:""},
-      theme:{color:"#ff7a00"},
-      method: {    
-upi: true,    
-card: true,    
-netbanking: true,    
-wallet: true,    
-emi: false,    
-paylater: false    
-},
-      retry:{enabled:true,max_count:2},
-      modal:{backdropclose:false,escape:true,handleback:true, ondismiss:function(){
-        track("razorpay_checkout_cancelled", {payment_method:"razorpay", currency:"INR", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-      }},
-      handler:function(response){
-        console.log("RAZORPAY_SUCCESS",response);
-        track("razorpay_payment_success", {payment_method:"razorpay", currency:"INR", value:499, report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-        unlockLoop7Report("razorpay");
-      }
-    };
-
-    const rzp=new Razorpay(options);
-    rzp.on("payment.failed", function(response){
-      track("razorpay_payment_failed", {payment_method:"razorpay", currency:"INR", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", error_code: response?.error?.code || "unknown", ...paymentAnalyticsContext()});
+    track("payment_started", {
+      amount: 499, currency: "INR", loop: 7, method: "razorpay",
+      payment_method: "razorpay", report_mode: reportMode, ...analyticsContext
     });
-    rzp.open();
+    track("razorpay_payment_started", {
+      amount: 499, currency: "INR", payment_method: "razorpay",
+      report_mode: reportMode, ...analyticsContext
+    });
+    if(reportMode === "direct"){
+      track("direct_report_payment_started", {
+        amount: 499, currency: "INR", method: "razorpay",
+        payment_method: "razorpay", report_mode: "direct", ...analyticsContext
+      });
+    }
+
+    try {
+      if(typeof window.Razorpay !== "function"){
+        throw new Error("Razorpay Checkout could not load. Please refresh and try again.");
+      }
+
+      // The server creates the authoritative INR 499 order (49900 paise).
+      const orderResponse = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        credentials: "same-origin",
+        body: JSON.stringify({amount:499})
+      });
+      const orderData = await orderResponse.json().catch(() => ({}));
+      if(!orderResponse.ok || !orderData.id || orderData.amount !== 49900 ||
+         orderData.currency !== "INR" || !orderData.key){
+        throw new Error(orderData.message || orderData.error || "Could not create the Razorpay order. Please try again.");
+      }
+
+      razorpayBtn.innerText = "Opening secure checkout…";
+      const options = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.id,
+        name: "TruthLoop",
+        description: reportMode === "direct" ? "Unlock TruthLoop Investigation Report" : "Unlock Loop 7 Investigation",
+        image: "https://truthloop.in/truthloop-hook.jpg",
+        prefill: {name:"", email:"", contact:""},
+        theme: {color:"#ff7a00"},
+        // July 13 UPI Intent configuration; default payment methods remain available.
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay using UPI",
+                instruments: [{method:"upi", flows:["intent"]}]
+              }
+            },
+            sequence: ["block.upi"],
+            preferences: {show_default_blocks:true}
+          }
+        },
+        retry: {enabled:true, max_count:2},
+        modal: {
+          backdropclose:false,
+          escape:true,
+          handleback:true,
+          ondismiss:function(){
+            track("razorpay_checkout_cancelled", {
+              payment_method:"razorpay", currency:"INR",
+              report_mode:reportMode, ...paymentAnalyticsContext()
+            });
+            razorpayBtn.disabled = false;
+            razorpayBtn.dataset.tlPaymentBusy = "0";
+            razorpayBtn.innerText = originalButtonText;
+          }
+        },
+        handler: async function(response){
+          // A Checkout success callback is NOT proof of payment. Verify it on the server.
+          razorpayBtn.disabled = true;
+          razorpayBtn.innerText = "Verifying payment…";
+          try {
+            const verifyResponse = await fetch("/api/razorpay/verify", {
+              method:"POST",
+              headers:{"Content-Type":"application/json"},
+              credentials:"same-origin",
+              body:JSON.stringify({
+                razorpay_order_id:response.razorpay_order_id,
+                razorpay_payment_id:response.razorpay_payment_id,
+                razorpay_signature:response.razorpay_signature
+              })
+            });
+            const verifyData = await verifyResponse.json().catch(() => ({}));
+            if(!verifyResponse.ok || verifyData.success !== true ||
+               verifyData.paid !== true || verifyData.amount !== 49900 ||
+               verifyData.currency !== "INR"){
+              throw new Error(verifyData.message || "Payment verification is pending or unsuccessful. Your report has not been unlocked.");
+            }
+
+            track("razorpay_payment_success", {
+              payment_method:"razorpay", currency:"INR", value:499,
+              razorpay_order_id:response.razorpay_order_id,
+              razorpay_payment_id:response.razorpay_payment_id,
+              report_mode:reportMode, ...paymentAnalyticsContext()
+            });
+            unlockLoop7Report("razorpay");
+          } catch(verifyError) {
+            console.error("RAZORPAY_SERVER_VERIFICATION_FAILED", verifyError);
+            track("razorpay_payment_verification_failed", {
+              payment_method:"razorpay", currency:"INR",
+              report_mode:reportMode, ...paymentAnalyticsContext()
+            });
+            alert(verifyError.message || "We could not verify the payment yet. Please contact support with your payment ID.");
+            razorpayBtn.disabled = false;
+            razorpayBtn.dataset.tlPaymentBusy = "0";
+            razorpayBtn.innerText = originalButtonText;
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function(response){
+        track("razorpay_payment_failed", {
+          payment_method:"razorpay", currency:"INR", report_mode:reportMode,
+          error_code:response?.error?.code || "unknown",
+          ...paymentAnalyticsContext()
+        });
+        razorpayBtn.disabled = false;
+        razorpayBtn.dataset.tlPaymentBusy = "0";
+        razorpayBtn.innerText = originalButtonText;
+      });
+      rzp.open();
+    } catch(error) {
+      console.error("RAZORPAY_ORDER_OR_CHECKOUT_ERROR", error);
+      alert(error.message || "Unable to start Razorpay checkout. Please try again.");
+      razorpayBtn.disabled = false;
+      razorpayBtn.dataset.tlPaymentBusy = "0";
+      razorpayBtn.innerText = originalButtonText;
+    }
   };
 
   const paypalContainer = document.getElementById("paypal-button");
