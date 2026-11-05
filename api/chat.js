@@ -687,111 +687,117 @@ console.log(
         date
       }));
 
-      loop7AiUserPayload = reportMode === "conversation"
-        ? { compressedEvidencePackage, truthLoopPackage }
-        : { compressedEvidencePackage };
+      loop7AiUserPayload = {
+        compressedEvidencePackage,
+        ...(reportMode === "conversation" ? { truthLoopPackage } : {}),
+        ...(hasPublicReportContext
+          ? { existingDirectReportContext: publicReportContext }
+          : {})
+      };
 
     loop7Instruction = `
 LOOP 7 — FINAL TRUTHLOOP INVESTIGATION
 
-You are the final investigation narrator.
+ROLE
+You are producing a specific, evidence-led investigation of this exact subject. This is not a generic personality analysis, generic company profile, motivational summary, or advice article. Every conclusion must arise from identifiable evidence in this case.
+
+THREE INPUTS IN GUIDED MODE — KEEP THEIR ROLES DISTINCT
+For guided/conversation mode, reason from all three inputs when they are actually present in the payload:
+1. EXISTING DIRECT PUBLIC-PROFILE REPORT: when present, it is supplied in existingDirectReportContext. Use its findings as prior investigative context and as leads to verify, challenge, refine, or qualify. It is not a new source and its inherited source count is zero for this report.
+2. LOOP 1–6 CONVERSATION FINDINGS: use the user's own statements, answers, examples, goals, and case context to understand what questions matter and to compare stated intent with public evidence. These are conversation-derived inputs, not public sources; they must never be counted as sources or cited with SOURCE_XX IDs. Do not treat prior assistant interpretations as facts.
+3. NEW LOOP 7 PUBLIC INVESTIGATION: this is the only source pool that may contribute to the seven section source count and public-evidence citations in this report.
+
+Do not claim that an existing Direct Report was supplied if existingDirectReportContext is absent or empty. Do not invent or reconstruct missing conversation details. If one of the guided-mode inputs is unavailable, disclose the limitation only where it materially affects interpretation. In direct mode there is no Loop 1–6 conversation input; reason from the available public evidence and any explicitly supplied prior report context only.
+
+SOURCE ALLOCATION — NON-NEGOTIABLE
+The report has seven evidence sections and must use seven independent public sources from the NEW Loop 7 investigation: one dedicated source allocation for each of Sections 1–7.
+- Allocate one distinct, relevant, publicly accessible source record to each of Sections 1–7. Each allocation must have its own unique SOURCE_XX ID from the current sourceRegistry.
+- A SOURCE_XX ID assigned to one section is reserved to that section and MUST NOT appear anywhere in another section. Never reuse a source across sections, even if it supports multiple findings.
+- Prefer genuinely independent sources and distinct underlying public records, not seven URL variants, duplicate mirrors, repeated snippets, or multiple scraped fragments of the same page. Do not call multiple pages from one source independent merely to reach seven.
+- If a source contains several facts, select the single section where it is most directly relevant. Do not cite it in another section.
+- Each of Sections 1–7 must identify its dedicated source with an inline citation. The section's substantive factual claims must be supported by that section's allocated source only. Do not use prior Direct Report citations or Loop 1–6 statements to satisfy this allocation.
+- Section 8 is a synthesis of Sections 1–7. It may refer to their findings in prose, but must not introduce new public sources, new source IDs, or additional source count. Do not repeat citations in Section 8; the evidence trail already exists in the relevant earlier sections.
+- Count only the seven distinct eligible source records collected in this new Loop 7 investigation. Exclude the existing Direct Report, its inherited citations/sources, Loop 1–6 messages, assistant-generated summaries, metadata, and derived intelligence from the source count.
+- Never invent a source, source ID, URL, independent corroboration, or evidence to fill a gap. If fewer than seven genuinely independent and relevant new public sources exist, use only the available sources, leave unsupported sections explicitly evidence-limited, and state that the seven-source target could not be met. Truthfulness outranks the target count. Never relabel a duplicate as independent.
 
 WEBSITE SCRAPER EVIDENCE — REQUIRED EXAMINATION
-- The evidence package may contain evidenceUniverse.websiteScraperSources, collected from accessible public pages of the target website by the Apify Website Content Crawler.
-- Examine every retained websiteScraperSources item alongside the existing websiteSources and social/profile evidence. Use pageCategory, title, URL, content, metadata and structuredData where present.
-- Look for publicly stated company identity, founder/leadership, team roles, products/services, customer or case-study claims, pricing/business model, partnerships, careers/hiring, operations and company positioning.
-- Use only information actually present in the retained source content or structuredData. Attribute company-published claims to the company/site; do not present them as independently verified outcomes.
-- Cite relevant items using their SOURCE_XX identifiers from sourceRegistry. Do not invent source IDs or URLs.
-- Missing information is an evidence gap, not a negative finding. Do not infer confidential information, revenue, customer counts, funding, traction or performance when not publicly evidenced.
-- Do not dump raw scraped text. Select only decision-relevant findings and explain why each matters, with calibrated confidence and limitations. The user payload contains retained public evidence plus compact deterministic cross-evidence intelligence. In conversation mode it also contains a TruthLoop Package with the user's available Loop 1–6 messages and case metadata; use those user statements for case context, but keep them distinct from public-source evidence. In direct mode the package is absent, so rely only on retained public evidence and be explicit about what that evidence cannot establish.
+- Examine every retained evidenceUniverse.websiteScraperSources item alongside the other retained public evidence. Use pageCategory, title, URL, content, metadata and structuredData where present.
+- Look for publicly stated identity, leadership, team roles, products/services, customer or case-study claims, pricing/business model, partnerships, careers/hiring, operations and positioning.
+- Treat company-published statements as company claims, not independent validation of outcomes.
+- Use only information actually present in retained source content or structuredData. Missing information is an evidence gap, not a negative finding.
+- Do not infer confidential information, revenue, customer counts, funding, traction or performance when not publicly evidenced.
 
-Return exactly these 8 headings, each on its own line:
+RETURN EXACTLY THESE 8 HEADINGS, EACH ON ITS OWN LINE, IN THIS ORDER:
 
-Investigation Summary
-Behavioral Findings
-Hidden Mechanism
-Public Evidence
-Cross Evidence
-Evidence Confidence
-Final Reflection
-One Next Action
+01. Identity & Self-Representation
+02. Claims, Commitments & Intentions
+03. Actions & Demonstrated Track Record
+04. Capability & Execution Evidence
+05. Independent Validation & Relationships
+06. Consistency & Evolution Over Time
+07. Reliability, Accountability & Risk Signals
+08. Overall Pattern & Future Readiness
 
-FORMATTING
-- Do not add emojis to headings.
-- Do not add markdown heading markers such as # or ##.
-- Do not add bullet symbols such as ⏩, ▶️, ➡️, -, *, or •.
-- Keep each heading on its own line.
-- Put the investigation content directly under its heading.
-- The frontend adds visual emojis and bullets after generation.
+SECTION-SPECIFIC INVESTIGATION REQUIREMENTS
+01. Identity & Self-Representation
+Examine how the subject represents itself publicly: identity, background, roles, stated credentials, capabilities, affiliations, cross-platform identity consistency, and differences between claims and available evidence. Distinguish self-description from independently established facts. Use this section's uniquely allocated public source only.
+
+02. Claims, Commitments & Intentions
+Examine explicit public claims, objectives, promises, commitments and declared values. Assess specificity, time-bounds, verifiability, and what evidence supports or does not support each material claim. Do not infer intention from vague promotional language. Use this section's uniquely allocated public source only.
+
+03. Actions & Demonstrated Track Record
+Examine observable actions, documented work, outputs, milestones, repeated activities and execution over time. Compare what the subject said it would do with what the selected public record shows it did, where the record permits that comparison. Do not convert posting frequency into achievement. Use this section's uniquely allocated public source only.
+
+04. Capability & Execution Evidence
+Examine demonstrated skills and expertise through actual work samples, products, projects, technical or operational outputs, and evidence of execution quality or consistency. Separate claimed capability from demonstrated capability. Do not infer competence from titles, polished websites, or tool mentions alone. Use this section's uniquely allocated public source only.
+
+05. Independent Validation & Relationships
+Examine independent mentions, references, documented collaborations, customer/user testimonials, reviews and external recognition. Assess whether the source is genuinely independent, what exactly it validates, and any conflicts or limitations. A self-published partner logo or testimonial is not automatically independent corroboration. Use this section's uniquely allocated public source only.
+
+06. Consistency & Evolution Over Time
+Examine dated historical and recent statements, commitments, decisions and activities. Identify substantiated continuity, progress, reversals, changed direction or unexplained shifts. Do not claim a trend from a single timestamp or compare undated records as if chronology were established. Use this section's uniquely allocated public source only.
+
+07. Reliability, Accountability & Risk Signals
+Examine documented disputes, failures, complaints, corrections, responses to problems, accountability, repeated unresolved issues and material contradictions. Do not turn absence of complaints into proof of reliability, or allegations into established facts. Attribute contested claims and explain their status. Use this section's uniquely allocated public source only.
+
+08. Overall Pattern & Future Readiness
+Synthesize only the findings already established in Sections 1–7. Explain the alignment or gap between representation, claims, actions, capability, validation, consistency and accountability. State demonstrated strengths, limitations, unresolved questions and observable indicators to watch. Do not collect or cite new sources. Do not introduce facts that were not established in Sections 1–7.
+
+CASE-SPECIFIC ANALYSIS — NO GENERIC FILLER
+- Name the actual subject, actual claim, actual action, actual output, actual relationship, actual date, or actual discrepancy wherever the evidence supplies it.
+- Explain why each finding matters in this case. Avoid empty phrases such as "strong online presence", "shows dedication", "demonstrates leadership", "has potential", "may indicate credibility", or "more research is needed" unless immediately tied to a concrete, cited observation and a clear limitation.
+- Do not pad sections with generic advice, broad industry commentary, personality labels, repeated summaries, or obvious descriptions of the website/profile.
+- Do not force a pattern, contradiction, risk, strength, or weakness. If the evidence does not establish one, say so precisely.
+- Keep direct observations, subject-authored claims, third-party statements, conversation context, and your interpretation clearly distinguishable.
+- Do not diagnose private psychology or infer hidden motives. Any mechanism-level interpretation must be plausible, narrow, and explicitly evidence-bounded.
+- Do not treat technical tokens such as URLs, HTML, platform names, page counts, source counts, or scraper metadata as behavioural evidence.
+- Use behavioralClusters only as leads; independently ground conclusions in the allocated source. Use crossEvidenceIntelligence only as supporting deterministic analysis and verify it against retained source records.
 
 SOURCE TRACEABILITY
 - sourceRegistry is the canonical traceability map.
-- Use ONLY source IDs that actually exist in sourceRegistry.
-- Every evidence-backed factual claim MUST include inline citations like [SOURCE_01].
-- Multiple sources use separate citations such as [SOURCE_01] [SOURCE_07].
-- Never write bare SOURCE_XX.
-- Never invent, renumber, merge, or modify source IDs.
-- Cite the smallest set of sources that directly supports the claim.
+- Use ONLY SOURCE_XX IDs that actually exist in sourceRegistry and belong to the NEW Loop 7 public investigation.
+- Every public-evidence factual claim in Sections 1–7 must carry an inline citation such as [SOURCE_01], using only that section's allocated source ID.
+- The same SOURCE_XX ID MUST NOT appear in more than one of Sections 1–7.
+- Never cite Direct Report source IDs as if newly collected. Never cite conversation statements with public source IDs.
+- Never write bare SOURCE_XX. Never invent, renumber, merge, or modify source IDs or URLs.
+- Cite the smallest directly supporting source set; under the exclusive-allocation rule, keep each source within its one assigned section.
 
-INVESTIGATION METHOD
-- Investigate patterns; do not merely summarize sources.
-- Start from observable evidence, then make the narrowest defensible inference.
-- Distinguish direct evidence from interpretation.
-- Look for repetition, contrasts, inconsistencies, evolution over time, and differences between platforms.
-- Prioritize behavioral evidence over technical tokens such as URLs, HTML, platform names, page counts, source counts, or boilerplate.
-- Technical-token frequency is NOT behavioral evidence.
-- Use behavioralClusters only as leads; independently ground conclusions in source evidence.
-- Use crossEvidenceIntelligence only as supporting deterministic analysis; verify its claims against the retained source records.
-- A contradiction requires two observable claims, choices, behaviors, or outcomes that genuinely conflict. Do not manufacture contradictions.
-- Do not diagnose private psychology. Any inferred mechanism must be framed as plausible and evidence-bounded.
-- State evidence gaps when the public record cannot establish a conclusion.
-
-SECTION REQUIREMENTS
-Investigation Summary
-- State the single strongest evidence-backed finding and why it matters.
-- Cite the supporting source(s).
-
-Behavioral Findings
-- Provide 2–5 distinct recurring behavioral patterns when supported.
-- Ground each pattern in specific evidence and citations.
-- Prefer behavior over generic topic labels.
-
-Hidden Mechanism
-- Explain the most plausible mechanism connecting the strongest observed behaviors.
-- Keep uncertainty explicit where evidence is indirect.
-
-Public Evidence
-- Identify the strongest concrete observations from retained public sources.
-- Use citations throughout.
-- Do not retell the website or profile as a general description.
-
-Cross Evidence
-- Compare evidence across website, LinkedIn, GitHub, article, profile, or other retained surfaces.
-- Identify corroboration, divergence, or genuine contradiction.
-
-Evidence Confidence
-- Separate confidence in observed facts from confidence in behavioral interpretation.
-- Use evidenceConfidence data when present.
-- Never claim certainty about an unseen psychological cause.
-
-Final Reflection
-- State the central contradiction or pattern in a concise, uncomfortable, evidence-backed way.
-- Introduce no new evidence.
-
-One Next Action
-- Give exactly one concrete action that tests or responds to the strongest evidence-backed pattern.
-- Do not give a list of advice.
+CONFIDENCE & LIMITATIONS
+- Distinguish confidence in an observed fact from confidence in an interpretation.
+- Use evidenceConfidence data when present, but do not let a numeric score substitute for explaining evidence quality.
+- Assess source relevance, specificity, recency, independence and corroboration limits.
+- Do not claim certainty about an unseen cause. Missing public information does not prove that an activity, capability, relationship or problem does not exist.
 
 USER-FACING REPORT LANGUAGE
-${outputLanguageName ? `Write all explanatory report content in ${outputLanguageName}. Keep the eight section heading lines above exactly in English because the frontend uses them as stable section identifiers.` : `Use the user's language for all explanatory report content. Keep the eight section heading lines above exactly in English because the frontend uses them as stable section identifiers.`}
+${outputLanguageName ? `Write all explanatory report content in ${outputLanguageName}. Keep the eight section heading lines above exactly as written in English because the frontend uses them as stable section identifiers.` : `Use the user's language for all explanatory report content. Keep the eight section heading lines above exactly as written in English because the frontend uses them as stable section identifiers.`}
 
-IMPORTANT
-- Legacy signal labels are leads, not authoritative conclusions.
-- Never present private conversation statements as public-source evidence or cite them with public source IDs.
-- When TruthLoop Package is present, use the user's own Loop 1–6 statements as case context and distinguish them from independently observed public evidence. Do not use Loop 1–6 assistant interpretations or profile cards as evidence.
-- When TruthLoop Package is absent, do not infer conversation-only facts; ground findings exclusively in the retained public evidence and state material evidence gaps.
-- Return the finished report only.
-
+FORMATTING
+- Return exactly the eight headings above, in the exact order, each on its own line.
+- Do not add markdown heading markers such as # or ##.
+- Do not add emojis to headings or bullet glyphs such as ⏩, ▶️, ➡️.
+- Put substantive investigation content directly under each heading.
+- Use concise, specific paragraphs or compact bullets only when they improve clarity; do not pad for length.
+- Return the finished report only. No preamble, process notes, source-allocation table, or postscript.
     `;
 }
 
@@ -2076,14 +2082,14 @@ let reply =
 
 if (loopLevel === 7) {
   const requiredLoop7Sections = [
-    "Investigation Summary",
-    "Behavioral Findings",
-    "Hidden Mechanism",
-    "Public Evidence",
-    "Cross Evidence",
-    "Evidence Confidence",
-    "Final Reflection",
-    "One Next Action"
+    "01. Identity & Self-Representation",
+    "02. Claims, Commitments & Intentions",
+    "03. Actions & Demonstrated Track Record",
+    "04. Capability & Execution Evidence",
+    "05. Independent Validation & Relationships",
+    "06. Consistency & Evolution Over Time",
+    "07. Reliability, Accountability & Risk Signals",
+    "08. Overall Pattern & Future Readiness"
   ];
 
   const findSectionHeading = (text, heading, fromIndex = 0) => {
