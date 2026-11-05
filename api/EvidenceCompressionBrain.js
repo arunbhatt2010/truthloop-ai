@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v20 — CLEAN REBUILD
+   EVIDENCE COMPRESSION BRAIN v21 — API SAMURAI LINKEDIN PACKAGE SUPPORT
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -45,7 +45,7 @@ const MAX_LINKEDIN_ARTICLES = 5;
 const MAX_X_POSTS = 3;
 const MAX_REDDIT_POSTS = 3;
 
-const PACKAGE_VERSION = "23.0";
+const PACKAGE_VERSION = "22.0";
 
 /* ---------------------------------------------------------
    BASIC HELPERS
@@ -688,13 +688,6 @@ async function loadEvidenceCompressionBrain({
     "website"
   );
 
-  const websiteScraperInput = Array.isArray(universalPackage?.websiteScraperEvidence?.sources)
-    ? universalPackage.websiteScraperEvidence.sources
-    : [];
-  const websiteScraperSourcesInput = websiteScraperInput
-    .filter(item => item && typeof item === "object")
-    .slice(0, 8);
-
   const linkedinEvidence =
     universalPackage?.linkedinEvidence &&
     typeof universalPackage.linkedinEvidence === "object"
@@ -785,29 +778,6 @@ async function loadEvidenceCompressionBrain({
     content: extractEvidenceText(source, 6000, 12)
   }));
 
-  const websiteScraperSources = websiteScraperSourcesInput.map(source => ({
-    sourceId: nextSourceId(),
-    sourceType: "website_scraper",
-    url: getUrl(source),
-    title: firstText(source?.title, source?.headline).slice(0, 220) || null,
-    date: getDate(source),
-    pageCategory: firstText(source?.pageCategory, "general_company_information"),
-    content: meaningfulText(
-      firstText(source?.markdown, source?.content, source?.text, source?.description),
-      6000,
-      12
-    ),
-    metadata: {
-      author: firstText(source?.author).slice(0, 120) || null,
-      language: firstText(source?.language).slice(0, 20) || null,
-      httpStatusCode: source?.httpStatusCode ?? null,
-      loadedAt: source?.loadedAt || null,
-      crawlDepth: source?.crawlDepth ?? null,
-      contentType: firstText(source?.contentType).slice(0, 100) || null
-    },
-    structuredData: Array.isArray(source?.structuredData) ? source.structuredData.slice(0, 8) : []
-  })).filter(source => source.url && (source.content || source.structuredData.length));
-
   console.log(
     "ECB_WEBSITE_SOURCE_AUDIT",
     websiteSources.map((source, index) => {
@@ -833,22 +803,28 @@ async function loadEvidenceCompressionBrain({
             linkedinEvidence?.sourceUrl ||
             ""
           ) || null,
+        entityType:
+          firstText(profileInput?.entityType, profileInput?.type).toLowerCase() || "person",
         name:
-          firstText(profileInput?.name).slice(0, 150) || null,
+          firstText(profileInput?.name, profileInput?.companyName, profileInput?.fullName).slice(0, 150) || null,
         headline:
           meaningfulText(profileInput?.headline, 600, 4),
         about:
           meaningfulText(
             firstText(
               profileInput?.about,
+              profileInput?.description,
+              profileInput?.overview,
               profileInput?.summary,
-              profileInput?.bio
+              profileInput?.bio,
+              profileInput?.tagline,
+              profileInput?.slogan
             ),
             2500,
             10
           ),
         location:
-          firstText(profileInput?.location).slice(0, 120) || null,
+          firstText(profileInput?.location, profileInput?.headquarters).slice(0, 120) || null,
         currentCompany:
           firstText(
             typeof profileInput?.currentCompany === "string"
@@ -856,10 +832,28 @@ async function loadEvidenceCompressionBrain({
               : profileInput?.currentCompany?.name ||
                 profileInput?.currentCompany?.companyName
           ).slice(0, 150) || null,
+        website:
+          firstText(profileInput?.website, profileInput?.websiteUrl).slice(0, 300) || null,
+        industry:
+          firstText(profileInput?.industry).slice(0, 160) || null,
+        companySize:
+          firstText(profileInput?.companySize, profileInput?.size, profileInput?.employeeRange).slice(0, 100) || null,
+        employeeCount:
+          profileInput?.employeeCount ?? null,
+        headquarters:
+          firstText(profileInput?.headquarters, profileInput?.location).slice(0, 160) || null,
+        founded:
+          profileInput?.founded ?? null,
+        companyType:
+          firstText(profileInput?.companyType).slice(0, 100) || null,
+        tagline:
+          firstText(profileInput?.tagline, profileInput?.slogan).slice(0, 500) || null,
+        slug:
+          firstText(profileInput?.slug, profileInput?.universalName).slice(0, 160) || null,
+        specialties:
+          Array.isArray(profileInput?.specialties) ? profileInput.specialties.slice(0, 30) : [],
         followersCount:
-          profileInput?.followersCount ??
-          linkedinEvidence?.followersCount ??
-          null,
+          profileInput?.followersCount ?? profileInput?.followers ?? linkedinEvidence?.followersCount ?? null,
         connectionsCount:
           profileInput?.connectionsCount ??
           linkedinEvidence?.connectionsCount ??
@@ -1032,7 +1026,6 @@ async function loadEvidenceCompressionBrain({
 
   const retainedEvidenceUnits = [
     ...websiteSources,
-    ...websiteScraperSources,
     ...linkedinPosts,
     ...linkedinArticles,
     ...(githubEvidence ? [githubEvidence] : []),
@@ -1147,16 +1140,6 @@ async function loadEvidenceCompressionBrain({
     });
   }
 
-  for (const source of websiteScraperSources) {
-    sourceRegistry.push({
-      sourceId: source.sourceId,
-      sourceType: source.sourceType,
-      title: source.title || source.pageCategory || "Website page",
-      url: source.url,
-      date: source.date || null
-    });
-  }
-
   if (profile) {
     sourceRegistry.push({
       sourceId: profile.sourceId,
@@ -1240,7 +1223,6 @@ async function loadEvidenceCompressionBrain({
       sourceRegistry,
 
       websiteSources,
-      websiteScraperSources,
 
       linkedinProfile: profile,
 
@@ -1268,7 +1250,6 @@ async function loadEvidenceCompressionBrain({
 
     evidenceCoverage: {
       websiteSourcesRetained: websiteSources.length,
-      websiteScraperPagesRetained: websiteScraperSources.length,
       linkedinProfileRetained: profile ? 1 : 0,
       linkedinPostsRetained: linkedinPosts.length,
       linkedinArticlesRetained: linkedinArticles.length,
@@ -1331,23 +1312,12 @@ async function loadEvidenceCompressionBrain({
   )
 }));
 
-const websiteScraper = websiteScraperSources.map(source => ({
-  sourceId: source.sourceId,
-  sourceType: source.sourceType,
-  url: source.url,
-  title: firstText(source.title).slice(0, 120) || null,
-  date: source.date || null,
-  pageCategory: source.pageCategory,
-  content: meaningfulText(source.content, contentBudget, 12),
-  metadata: source.metadata,
-  structuredData: source.structuredData
-}));
-
 const linkedinProfile = profile
   ? {
       sourceId: profile.sourceId,
       sourceType: profile.sourceType,
       profileUrl: profile.profileUrl,
+      entityType: profile.entityType || "person",
       name: firstText(profile.name).slice(0, 120) || null,
       headline: meaningfulText(
         profile.headline,
@@ -1360,7 +1330,18 @@ const linkedinProfile = profile
         8
       ),
       location: firstText(profile.location).slice(0, 80) || null,
-      currentCompany: firstText(profile.currentCompany).slice(0, 100) || null
+      currentCompany: firstText(profile.currentCompany).slice(0, 100) || null,
+      website: firstText(profile.website).slice(0, 240) || null,
+      industry: firstText(profile.industry).slice(0, 120) || null,
+      companySize: firstText(profile.companySize).slice(0, 80) || null,
+      employeeCount: profile.employeeCount ?? null,
+      headquarters: firstText(profile.headquarters).slice(0, 120) || null,
+      founded: profile.founded ?? null,
+      companyType: firstText(profile.companyType).slice(0, 80) || null,
+      tagline: meaningfulText(profile.tagline, 300, 3),
+      slug: firstText(profile.slug).slice(0, 120) || null,
+      specialties: Array.isArray(profile.specialties) ? profile.specialties.slice(0, 20) : [],
+      followersCount: profile.followersCount ?? null
     }
   : null;
 
@@ -1497,7 +1478,6 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
     const pkg = {
       packageType: "Loop7EvidencePackage",
       version: PACKAGE_VERSION,
-      socialDiscovery: universalPackage?.socialDiscovery || null,
       profileLink:
         normalizeUrl(
           universalPackage?.primarySource ||
@@ -1509,12 +1489,10 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
       sourceRegistry: compactSourceRegistry,
       sourceLinks: compactSourceLinks,
       evidenceUniverse: {
-  socialDiscovery: universalPackage?.socialDiscovery || null,
   sourceLinks: compactSourceLinks,
   sourceRegistry: compactSourceRegistry,
 
   websiteSources: website,
-  websiteScraperSources: websiteScraper,
   linkedinProfile,
   linkedinPosts: posts,
   linkedinArticles: articles,
@@ -1536,7 +1514,6 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
         universalPackage?.crossEvidenceIntelligence || null,
       evidenceCoverage: {
         websiteSourcesRetained: website.length,
-        websiteScraperPagesRetained: websiteScraper.length,
         linkedinProfileRetained: linkedinProfile ? 1 : 0,
         linkedinPostsRetained: posts.length,
         linkedinArticlesRetained: articles.length,
@@ -1566,7 +1543,6 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
     Math.max(
       1,
       websiteSources.length +
-      websiteScraperSources.length +
       linkedinPosts.length +
       linkedinArticles.length +
       (githubEvidence ? 1 : 0) +
@@ -1704,6 +1680,10 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
         linkedinProfile: finalPackage?.evidenceUniverse?.linkedinProfile
           ? {
               sourceId: finalPackage.evidenceUniverse.linkedinProfile.sourceId,
+              entityType: finalPackage.evidenceUniverse.linkedinProfile.entityType || "person",
+              companyWebsite: finalPackage.evidenceUniverse.linkedinProfile.website || null,
+              industry: finalPackage.evidenceUniverse.linkedinProfile.industry || null,
+              employeeCount: finalPackage.evidenceUniverse.linkedinProfile.employeeCount ?? null,
               headlineChars: String(finalPackage.evidenceUniverse.linkedinProfile.headline || "").length,
               aboutChars: String(finalPackage.evidenceUniverse.linkedinProfile.about || "").length,
               aboutPreview: String(finalPackage.evidenceUniverse.linkedinProfile.about || "").slice(0, 300)
