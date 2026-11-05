@@ -3061,6 +3061,14 @@ function captureEvidenceSourceRegistry(data){
           date: item.date || null
         }))
         .filter(item => item.sourceId || item.url);
+      const seenEvidenceKeys = new Set();
+      evidenceSourceRegistry = evidenceSourceRegistry.filter(item => {
+        const canonicalUrl = String(item.url || "").trim().toLowerCase().replace(/#.*$/, "").replace(/\/$/, "");
+        const key = canonicalUrl || String(item.sourceId || "").trim().toUpperCase();
+        if(!key || seenEvidenceKeys.has(key)) return false;
+        seenEvidenceKeys.add(key);
+        return true;
+      });
 
       console.log("FRONTEND_EVIDENCE_REGISTRY_COUNT", evidenceSourceRegistry.length);
       return evidenceSourceRegistry;
@@ -3133,14 +3141,14 @@ function renderLoop7ProcessingShell(profileLink){
           <div class="lp7-live-note" id="loop7ProcessingLiveNote">Mapping evidence into the eight report sections</div>
           <div class="lp7-section-list" id="loop7ProcessingSourceList" aria-live="polite">
             ${[
-              "Investigation Summary",
-              "Behavioral Findings",
-              "Hidden Mechanism",
-              "Public Evidence",
-              "Cross Evidence",
-              "Evidence Confidence",
-              "Final Reflection",
-              "One Next Action"
+              "01. Identity & Self-Representation",
+              "02. Claims, Commitments & Intentions",
+              "03. Actions & Demonstrated Track Record",
+              "04. Capability & Execution Evidence",
+              "05. Independent Validation & Relationships",
+              "06. Consistency & Evolution Over Time",
+              "07. Reliability, Accountability & Risk Signals",
+              "08. Overall Pattern & Future Readiness"
             ].map((heading,index)=>`<div class="lp7-report-section${index===0?' active':''}" data-report-section="${index}"><span class="lp7-report-icon">${index===0?'◉':'○'}</span><span>${heading}</span><span class="lp7-section-status">${index===0?'Analyzing':'Queued'}</span></div>`).join("")}
           </div>
           <div class="lp7-live-footnote">These are the report sections being assembled; findings appear only after the report is complete.</div>
@@ -3243,9 +3251,40 @@ function formatLoop7Cooldown(ms){
 function validateLoop7ReportReady(reportText){
   const raw = String(reportText || "").trim();
   if(raw.length < 250) throw new Error("Loop 7 returned an incomplete report.");
-  const expected = ["Investigation Summary","Behavioral Findings","Hidden Mechanism","Public Evidence","Cross Evidence","Evidence Confidence","Final Reflection","One Next Action"];
-  const missing = expected.filter(name => !new RegExp("(?:^|\\n)\\s*(?:#{1,6}\\s*)?(?:[📋🧩⚙🌐🔍📊💡🎯]\\s*)?" + name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + "\\s*(?=\\n|$)","m").test(raw));
+  const expected = [
+    "01. Identity & Self-Representation",
+    "02. Claims, Commitments & Intentions",
+    "03. Actions & Demonstrated Track Record",
+    "04. Capability & Execution Evidence",
+    "05. Independent Validation & Relationships",
+    "06. Consistency & Evolution Over Time",
+    "07. Reliability, Accountability & Risk Signals",
+    "08. Overall Pattern & Future Readiness"
+  ];
+  const missing = expected.filter(name => !new RegExp("(?:^|\\n)\\s*(?:#{1,6}\\s*)?" + name.replace(/[.*+?^${}()|[\\]\\]/g,"\\$&") + "\\s*(?=\\n|$)","m").test(raw));
   if(missing.length) throw new Error("Loop 7 report missing required sections: " + missing.join(", "));
+
+  // A public source may support only one of Sections 1–7. Section 8 is synthesis-only.
+  const sourceOwner = new Map();
+  for(let i=0;i<7;i++){
+    const heading = expected[i];
+    const start = raw.indexOf(heading);
+    const next = expected[i+1] ? raw.indexOf(expected[i+1], start + heading.length) : raw.length;
+    const sectionBody = raw.slice(start + heading.length, next < 0 ? raw.length : next);
+    const ids = [...new Set((sectionBody.match(/\[SOURCE_\d{1,4}\]/gi) || []).map(id => id.replace(/[\[\]]/g,"").toUpperCase()))];
+    for(const id of ids){
+      if(sourceOwner.has(id) && sourceOwner.get(id) !== heading){
+        throw new Error("Loop 7 reused " + id + " across sections; each public source must belong to one section only.");
+      }
+      sourceOwner.set(id, heading);
+    }
+  }
+  const sectionEightStart = raw.indexOf(expected[7]);
+  const sectionEightBody = raw.slice(sectionEightStart + expected[7].length);
+  if(/\[SOURCE_\d{1,4}\]/i.test(sectionEightBody)){
+    throw new Error("Loop 7 Section 8 must synthesize Sections 1–7 without introducing source citations.");
+  }
+
   const finding = selectPaywallFinding(raw);
   if(!finding || !finding.text || !Array.isArray(finding.ids) || !finding.ids.length){
     throw new Error("Loop 7 report completed without an extractable evidence-backed top finding.");
@@ -3756,17 +3795,17 @@ return `
         <div class="tl-desktop-faq-content">
           <p class="tl-desktop-faq-intro">Understand what the investigation examines, what your report includes, and what it costs.</p>
           <details><summary>What is TruthLoop AI?</summary><p>TruthLoop AI connects relevant public content across supported sources to identify patterns, connections, and potential contradictions. Not Answers. Patterns.</p></details>
-          <details><summary>What will my investigation report include?</summary><p>Your report has eight sections: Investigation Summary, Behavioral Findings, Hidden Mechanism, Public Evidence, Cross Evidence, Evidence Confidence, Final Reflection, and One Next Action.</p></details>
+          <details><summary>What will my investigation report include?</summary><p>Your report has eight sections: Identity & Self-Representation; Claims, Commitments & Intentions; Actions & Demonstrated Track Record; Capability & Execution Evidence; Independent Validation & Relationships; Consistency & Evolution Over Time; Reliability, Accountability & Risk Signals; and Overall Pattern & Future Readiness.</p></details>
           <details><summary>What kind of clarity can I gain?</summary><p>The report helps connect themes and inconsistencies across sources that may be difficult to notice by looking at one post or article alone. Findings are grounded in the available evidence.</p></details>
           <details><summary>What is the report based on?</summary><p>TruthLoop examines accessible public content from supported websites, LinkedIn, X, and GitHub, including relevant posts and articles it can retrieve.</p></details>
           <details><summary>Can I investigate an individual, company, or organization?</summary><p>Yes. The subject can be an individual, company, or organization. The key requirement is relevant public posts or articles—not whether the subject is a person or a business.</p></details>
           <details><summary>Does TruthLoop AI analyze business records?</summary><p>TruthLoop AI does not separately analyze structured business records. Company-related information published in relevant public posts, articles, and website content can be included in an investigation.</p></details>
           <details><summary>What if there are no relevant posts or articles?</summary><p>A meaningful report requires sufficient relevant public content to analyze. If qualifying content is unavailable or insufficient, a report will not be generated.</p></details>
-          <details><summary>How reliable are the findings?</summary><p>The report includes an Evidence Confidence assessment. A pattern is not automatic proof of intent or wrongdoing; source quality and corroborating evidence matter.</p></details>
+          <details><summary>How reliable are the findings?</summary><p>The report distinguishes public evidence, subject-authored claims, conversation context and interpretation. A pattern is not automatic proof of intent or wrongdoing; source quality and corroboration matter.</p></details>
           <details><summary>Do I need to sign up or connect an account?</summary><p>TruthLoop AI is designed around No Login, No Signup, No Tracking. See the current privacy notice for details about data handling.</p></details>
           <details><summary>How much does the full report cost?</summary><p>The current price is ₹499 in India and $9.99 USD internationally. The applicable price is shown before payment.</p></details>
           <details><summary>How long does an investigation take?</summary><p>Processing time depends on source accessibility, the amount of relevant content, and system processing. A fixed completion time is not guaranteed.</p></details>
-          <details><summary>What do I receive after payment?</summary><p>You unlock the full investigation report, including findings, public evidence references, cross-source analysis, Evidence Confidence, and One Next Action.</p></details>
+          <details><summary>What do I receive after payment?</summary><p>You unlock the full investigation report, including eight evidence-led sections, public source references, cross-source analysis, and a clear account of limitations.</p></details>
           <button type="button" class="tl-desktop-faq-cta" onclick="document.getElementById('loop7ProfileLink')?.focus();document.getElementById('loop7ProfileLink')?.scrollIntoView({behavior:'smooth',block:'center'});">START YOUR INVESTIGATION ↓</button>
         </div>
       </details>
@@ -4245,16 +4284,22 @@ function escapeHtml(value){
 }
 
 function cleanReportSectionText(text){
-    return String(text || "")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:📋\s*)?Investigation Summary\s*$/gim,"")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:🧩\s*)?Behavioral Findings\s*$/gim,"")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:⚙\s*)?Hidden Mechanism\s*$/gim,"")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:🌐\s*)?Public Evidence\s*$/gim,"")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:🔍\s*)?Cross Evidence\s*$/gim,"")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:📊\s*)?Evidence Confidence\s*$/gim,"")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:💡\s*)?Final Reflection\s*$/gim,"")
-        .replace(/^\s*(?:#{1,6}\s*)?(?:🎯\s*)?One Next Action\s*$/gim,"")
-        .trim();
+    const headings = [
+        "01. Identity & Self-Representation",
+        "02. Claims, Commitments & Intentions",
+        "03. Actions & Demonstrated Track Record",
+        "04. Capability & Execution Evidence",
+        "05. Independent Validation & Relationships",
+        "06. Consistency & Evolution Over Time",
+        "07. Reliability, Accountability & Risk Signals",
+        "08. Overall Pattern & Future Readiness"
+    ];
+    let value = String(text || "");
+    for(const heading of headings){
+        const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+        value = value.replace(new RegExp("^\\s*(?:#{1,6}\\s*)?" + escaped + "\\s*$","gim"), "");
+    }
+    return value.trim();
 }
 
 function getLoop7EvidenceSource(sourceId){
@@ -4272,9 +4317,13 @@ function formatLoop7SectionBody(text, sectionKey){
         .replace(/^\s*\d+[.)][ \t]*/gm, "");
 
     const bulletSections = new Set([
-        "Behavioral Findings",
-        "Public Evidence",
-        "Cross Evidence"
+        "01. Identity & Self-Representation",
+        "02. Claims, Commitments & Intentions",
+        "03. Actions & Demonstrated Track Record",
+        "04. Capability & Execution Evidence",
+        "05. Independent Validation & Relationships",
+        "06. Consistency & Evolution Over Time",
+        "07. Reliability, Accountability & Risk Signals"
     ]);
 
     if(bulletSections.has(sectionKey)){
@@ -4445,7 +4494,7 @@ function renderEvidenceSources(){
         </summary>
         <div style="color:#94a3b8;font-size:12px;margin:10px 0;">
           ${registry.length
-            ? `${registry.length} public source${registry.length === 1 ? "" : "s"} mapped to the investigation. Expand to inspect each source.`
+            ? `${registry.length} unique new Loop 7 public source${registry.length === 1 ? "" : "s"} mapped to this investigation. Earlier Direct Report sources and conversation findings are excluded.`
             : "No public source mapping was returned by the investigation response."
           }
         </div>
@@ -4459,208 +4508,97 @@ function renderEvidenceSources(){
 
 function renderLoop7Report(report){
     report = String(report || "")
-        .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi,
-            '<span class="truthHighlight">$1</span>')
+        .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
         .replace(/\r/g, "")
         .trim();
 
-    function getSection(icon){
     const sectionHeadings = [
-        "Investigation Summary",
-        "Behavioral Findings",
-        "Hidden Mechanism",
-        "Public Evidence",
-        "Cross Evidence",
-        "Evidence Confidence",
-        "Final Reflection",
-        "One Next Action"
+        "01. Identity & Self-Representation",
+        "02. Claims, Commitments & Intentions",
+        "03. Actions & Demonstrated Track Record",
+        "04. Capability & Execution Evidence",
+        "05. Independent Validation & Relationships",
+        "06. Consistency & Evolution Over Time",
+        "07. Reliability, Accountability & Risk Signals",
+        "08. Overall Pattern & Future Readiness"
     ];
-
     const headingMap = {
-        "📋": "Investigation Summary",
-        "🧩": "Behavioral Findings",
-        "⚙": "Hidden Mechanism",
-        "🌐": "Public Evidence",
-        "🔍": "Cross Evidence",
-        "📊": "Evidence Confidence",
-        "💡": "Final Reflection",
-        "🎯": "One Next Action"
+        "01": sectionHeadings[0], "02": sectionHeadings[1],
+        "03": sectionHeadings[2], "04": sectionHeadings[3],
+        "05": sectionHeadings[4], "06": sectionHeadings[5],
+        "07": sectionHeadings[6], "08": sectionHeadings[7]
     };
-
-    const heading = headingMap[icon];
-    if(!heading) return "";
-
-    /* Section boundaries must be whole lines, never inline phrases. */
-    const escapeRegExp = value =>
-        String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
+    const escapeRegExp = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const findHeading = (text, targetHeading, fromIndex = 0) => {
-        const escaped = escapeRegExp(targetHeading);
-        const regex = new RegExp(
-            `(?:^|\\n)[ \t]*(?:#{1,6}[ \t]*)?${escaped}[ \t]*(?=\\n|$)`,
-            "g"
-        );
+        const regex = new RegExp(`(?:^|\\n)[ \t]*(?:#{1,6}[ \t]*)?${escapeRegExp(targetHeading)}[ \t]*(?=\\n|$)`, "g");
         regex.lastIndex = Math.max(0, fromIndex);
         const match = regex.exec(text);
         if(!match) return -1;
         return match.index + (match[0].startsWith("\n") ? 1 : 0);
     };
-
-    const start = findHeading(report, heading, 0);
-    if(start === -1) return "";
-
-    let end = report.length;
-
-    for(const nextHeading of sectionHeadings){
-        if(nextHeading === heading) continue;
-
-        const pos = findHeading(
-            report,
-            nextHeading,
-            start + heading.length
-        );
-
-        if(pos !== -1 && pos < end){
-            end = pos;
+    const getSection = (number) => {
+        const heading = headingMap[number];
+        const start = findHeading(report, heading, 0);
+        if(start === -1) return "";
+        let end = report.length;
+        for(const nextHeading of sectionHeadings){
+            if(nextHeading === heading) continue;
+            const pos = findHeading(report, nextHeading, start + heading.length);
+            if(pos !== -1 && pos < end) end = pos;
         }
-    }
+        const body = cleanReportSectionText(report.slice(start + heading.length, end));
+        const displayText = formatLoop7SectionBody(body, heading);
+        return decorateLoop7Citations(displayText.replace(/#+\s*/g, "").replace(/\n/g, "<br>"));
+    };
 
-    let text = report
-        .slice(start + heading.length, end)
-        .trim();
-
-    text = cleanReportSectionText(text);
-
-    const displayText = formatLoop7SectionBody(text, heading);
-
-    return decorateLoop7Citations(
-        displayText
-            .replace(/#+\s*/g, "")
-            .replace(/\n/g, "<br>")
-    );
-  }
-
-    const summary = getSection("📋");
-    const findings = getSection("🧩");
-    const mechanism = getSection("⚙");
-    const publicEvidence = getSection("🌐");
-    const crossEvidence = getSection("🔍");
-    const confidence = getSection("📊");
-    const reflection = getSection("💡");
-    const action = getSection("🎯");
-
-    const sourceCount = Array.isArray(evidenceSourceRegistry)
-      ? evidenceSourceRegistry.length
-      : 0;
-
-    const sourceTypes = new Set(
-      (Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry : [])
-        .map(item => String(item?.sourceType || "").toLowerCase())
-        .filter(Boolean)
-    );
-
-    const primaryPatternMatch = String(summary || "")
-      .replace(/<br>/g," ")
-      .replace(/<[^>]+>/g,"")
-      .match(/Finding:\s*([^.!?]+[.!?])/i);
-
-    const primaryPattern = primaryPatternMatch
-      ? primaryPatternMatch[1].trim().slice(0,220)
-      : "Evidence-backed pattern identified";
+    const sections = sectionHeadings.map((heading, index) => ({
+        heading,
+        body: getSection(String(index + 1).padStart(2,"0")),
+        id: `loop7Section${index + 1}`
+    }));
+    const sourceRegistry = Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry : [];
+    const uniqueSources = new Map();
+    sourceRegistry.forEach(item => {
+        const url = String(item?.url || "").trim().toLowerCase().replace(/#.*$/, "").replace(/\/$/, "");
+        const id = String(item?.sourceId || "").trim().toUpperCase();
+        const key = url || id;
+        if(key && !uniqueSources.has(key)) uniqueSources.set(key, item);
+    });
+    const sourceCount = uniqueSources.size;
+    const sourceTypes = new Set([...uniqueSources.values()].map(item => String(item?.sourceType || "").toLowerCase()).filter(Boolean));
+    const summaryText = String(sections[0].body || "").replace(/<br>/g," ").replace(/<[^>]+>/g,"");
+    const primaryPatternMatch = summaryText.match(/(?:Finding|Key finding|Observed pattern)\s*:\s*([^.!?]+[.!?])/i);
+    const primaryPattern = primaryPatternMatch ? primaryPatternMatch[1].trim().slice(0,220) : "Evidence-led findings across the seven investigation dimensions";
 
     return `
       <div class="truthLoopReport">
-
         <div class="tlr-header">
           <div class="tlr-kicker">✓ Investigation Complete</div>
           <h1 class="tlr-title">🧠 TruthLoop Investigation</h1>
-          <p class="tlr-subtitle">Find what you're avoiding.</p>
+          <p class="tlr-subtitle">Not Answers. Patterns.</p>
         </div>
-
         <div class="tlr-verdict">
-          <div class="tlr-verdict-label">Primary Pattern</div>
+          <div class="tlr-verdict-label">Investigation Focus</div>
           <div class="tlr-verdict-title">${escapeHtml(primaryPattern)}</div>
-
           <div class="tlr-stat-grid">
-            <div class="tlr-stat">
-              <span class="tlr-stat-value">${sourceCount || "—"}</span>
-              <span class="tlr-stat-label">Public Sources</span>
-            </div>
-            <div class="tlr-stat">
-              <span class="tlr-stat-value">${sourceTypes.size || "—"}</span>
-              <span class="tlr-stat-label">Source Types</span>
-            </div>
-            <div class="tlr-stat">
-              <span class="tlr-stat-value">${sourceCount ? "✓" : "—"}</span>
-              <span class="tlr-stat-label">Evidence Mapped</span>
-            </div>
+            <div class="tlr-stat"><span class="tlr-stat-value">${sourceCount || "—"}</span><span class="tlr-stat-label">New Public Sources</span></div>
+            <div class="tlr-stat"><span class="tlr-stat-value">${sourceTypes.size || "—"}</span><span class="tlr-stat-label">Source Types</span></div>
+            <div class="tlr-stat"><span class="tlr-stat-value">${sourceCount ? "✓" : "—"}</span><span class="tlr-stat-label">Evidence Mapped</span></div>
           </div>
+          <p class="tlr-source-note">Only sources collected in this Loop 7 investigation are counted. Earlier Direct Report sources and Loop 1–6 conversation findings are reasoning context, not additional sources.</p>
         </div>
-
         <nav class="tlr-nav" aria-label="Investigation sections">
-          <a href="#investigationSummary">Summary</a>
-          <a href="#behavioralFindings">Pattern</a>
-          <a href="#hiddenMechanism">Mechanism</a>
-          ${publicEvidence ? `<a href="#publicEvidence">Evidence</a>` : ""}
-          <a href="#crossEvidence">Cross-check</a>
-          <a href="#evidenceConfidence">Confidence</a>
-          <a href="#oneNextAction">Action</a>
+          ${sections.map((section,index)=>`<a href="#${section.id}">Section ${index+1}</a>`).join("")}
         </nav>
-
-        <div id="investigationSummary">
-          <h2>📋 Investigation Summary</h2>
-          ${summary || '<p class="tlr-empty">No summary was returned.</p>'}
-        </div>
-
-        <div id="behavioralFindings">
-          <h2>🧩 Behavioral Findings</h2>
-          ${findings || '<p class="tlr-empty">No behavioral findings were returned.</p>'}
-        </div>
-
-        <div id="hiddenMechanism">
-          <h2>⚙ Hidden Mechanism</h2>
-          ${mechanism || '<p class="tlr-empty">No hidden mechanism was returned.</p>'}
-        </div>
-
-        ${publicEvidence ? `
-          <div id="publicEvidence">
-            <h2>🌐 Public Evidence</h2>
-            ${publicEvidence}
-          </div>
-        ` : ""}
-
-        <div id="crossEvidence">
-          <h2>🔍 Cross Evidence</h2>
-          ${crossEvidence || '<p class="tlr-empty">No cross-evidence assessment was returned.</p>'}
-        </div>
-
-        <div id="evidenceConfidence">
-          <h2>📊 Evidence Confidence</h2>
-          <div class="tlr-confidence">Evidence assessment</div>
-          ${confidence || '<p class="tlr-empty">No confidence assessment was returned.</p>'}
-        </div>
-
-        <div id="finalReflection">
-          <h2>💡 Final Reflection</h2>
-          ${reflection || '<p class="tlr-empty">No final reflection was returned.</p>'}
-        </div>
-
-        <div id="oneNextAction" class="tlr-action">
-          <h2>🎯 One Next Action</h2>
-          ${action || '<p class="tlr-empty">No next action was returned.</p>'}
-        </div>
-
+        ${sections.map((section,index)=>`
+          <section id="${section.id}" class="tlr-report-section">
+            <h2>${String(index+1).padStart(2,"0")}. ${escapeHtml(section.heading.replace(/^\d{2}\.\s*/,""))}</h2>
+            ${section.body || '<p class="tlr-empty">No section content was returned.</p>'}
+          </section>
+        `).join("")}
         ${renderEvidenceSources()}
-
-        <div style="margin-top:26px;text-align:center;">
-          <button id="downloadReportBtn">
-            📄 Download Report
-          </button>
-        </div>
-        <button type="button" id="tlDeeperInvestigationCTA" class="tl-deeper-investigation-cta">
-          Not satisfied yet, or want a deeper investigation? Tap here to continue.
-        </button>
-
+        <div style="margin-top:26px;text-align:center;"><button id="downloadReportBtn">📄 Download Report</button></div>
+        <button type="button" id="tlDeeperInvestigationCTA" class="tl-deeper-investigation-cta">Not satisfied yet, or want a deeper investigation? Tap here to continue.</button>
       </div>
     `;
 }
@@ -4888,41 +4826,25 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     </section>
   `;
 
+  const downloadSections = [
+    ["01. Identity & Self-Representation", "#loop7Section1"],
+    ["02. Claims, Commitments & Intentions", "#loop7Section2"],
+    ["03. Actions & Demonstrated Track Record", "#loop7Section3"],
+    ["04. Capability & Execution Evidence", "#loop7Section4"],
+    ["05. Independent Validation & Relationships", "#loop7Section5"],
+    ["06. Consistency & Evolution Over Time", "#loop7Section6"],
+    ["07. Reliability, Accountability & Risk Signals", "#loop7Section7"],
+    ["08. Overall Pattern & Future Readiness", "#loop7Section8"]
+  ];
   const downloadReport = `
     <div style="max-width:900px;margin:0 auto;">
-
-      <h2>Investigation Summary</h2>
-      ${getCleanSectionBody("#investigationSummary")}
-
-      <h2>Behavioral Findings</h2>
-      ${getCleanSectionBody("#behavioralFindings")}
-
-      <h2>Hidden Mechanism</h2>
-      ${getCleanSectionBody("#hiddenMechanism")}
-
-      ${
-        report.querySelector("#publicEvidence")
-          ? `
-            <h2>Public Evidence</h2>
-            ${getCleanSectionBody("#publicEvidence")}
-          `
-          : ""
-      }
-
-      <h2>Cross Evidence</h2>
-      ${getCleanSectionBody("#crossEvidence")}
-
-      <h2>Evidence Confidence</h2>
-      ${getCleanSectionBody("#evidenceConfidence")}
-
-      <h2>Final Reflection</h2>
-      ${getCleanSectionBody("#finalReflection")}
-
-      <h2>One Next Action</h2>
-      ${getCleanSectionBody("#oneNextAction")}
-
+      ${downloadSections.map(([heading,selector]) => `
+        <section style="margin:0 0 28px;">
+          <h2>${escapeHtml(heading)}</h2>
+          ${getCleanSectionBody(selector)}
+        </section>
+      `).join("")}
       ${evidenceReferenceSection}
-
       <p style="margin-top:30px;color:#777;font-size:12px;">
         Generated ${escapeHtml(generatedDate)} by TruthLoop AI.
       </p>
@@ -5099,6 +5021,29 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
       line-height: 1.5 !important;
     }
   }
+
+/* Loop 7 evidence-led eight-section report layout */
+.truthLoopReport .tlr-report-section{
+  margin:22px 0;
+  padding:20px;
+  border:1px solid rgba(148,163,184,.22);
+  border-left:3px solid #64748b;
+  border-radius:14px;
+  background:rgba(255,255,255,.018);
+  scroll-margin-top:76px;
+}
+.truthLoopReport .tlr-report-section h2{
+  margin:0 0 14px;
+  color:#e2e8f0;
+  font-size:18px;
+  line-height:1.4;
+}
+.truthLoopReport .tlr-source-note{
+  margin:12px 0 0;
+  color:#94a3b8;
+  font-size:12px;
+  line-height:1.6;
+}
 </style>
 
 </head>
@@ -5160,16 +5105,16 @@ function selectPaywallFinding(reportText){
   const raw = String(reportText || "");
   if(!raw.trim()) return null;
   const sectionPriority = {
-    "Cross Evidence":5,
-    "Behavioral Findings":4,
-    "Hidden Mechanism":3,
-    "Public Evidence":2,
-    "Investigation Summary":1,
-    "Final Reflection":1,
-    "Evidence Confidence":0,
-    "One Next Action":0
+    "07. Reliability, Accountability & Risk Signals":7,
+    "06. Consistency & Evolution Over Time":6,
+    "05. Independent Validation & Relationships":5,
+    "04. Capability & Execution Evidence":4,
+    "03. Actions & Demonstrated Track Record":3,
+    "02. Claims, Commitments & Intentions":2,
+    "01. Identity & Self-Representation":1,
+    "08. Overall Pattern & Future Readiness":0
   };
-  const headingPattern = /(?:^|\n)\s*(?:#{1,6}\s*)?(?:[📋🧩⚙🌐🔍📊💡🎯]\s*)?(Investigation Summary|Behavioral Findings|Hidden Mechanism|Public Evidence|Cross Evidence|Evidence Confidence|Final Reflection|One Next Action)\s*(?=\n|$)/g;
+  const headingPattern = /(?:^|\n)\s*(?:#{1,6}\s*)?(01\. Identity & Self-Representation|02\. Claims, Commitments & Intentions|03\. Actions & Demonstrated Track Record|04\. Capability & Execution Evidence|05\. Independent Validation & Relationships|06\. Consistency & Evolution Over Time|07\. Reliability, Accountability & Risk Signals|08\. Overall Pattern & Future Readiness)\s*(?=\n|$)/g;
   const headings = [];
   let hm;
   while((hm = headingPattern.exec(raw)) !== null) headings.push({name:hm[1], index:hm.index + (hm[0].startsWith("\n") ? 1 : 0), end:headingPattern.lastIndex});
