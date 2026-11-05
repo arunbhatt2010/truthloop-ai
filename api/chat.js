@@ -104,9 +104,12 @@ export default async function handler(req, res) {
       .trim()
       .slice(0, 18000);
     const hasPublicReportContext = publicReportContext.length > 0;
-    const reportContextInstruction = hasPublicReportContext
-      ? `PRE-GENERATED PUBLIC PROFILE INVESTIGATION REPORT (PRIMARY STARTING CONTEXT):\\n${publicReportContext}\\n\\nUse this report as the public-evidence foundation for this conversation. Ground profile-specific observations in its concrete findings and evidence references. Do not treat report interpretations as proven private motives. Clearly separate public observations, report hypotheses, and facts the user personally confirms. Do not invent missing evidence.`
-      : `PRE-GENERATED PUBLIC PROFILE INVESTIGATION REPORT: NOT PROVIDED IN THIS REQUEST. Do not pretend you have read a report, do not invent profile-specific findings, and do not claim public evidence supports a point. Keep observations limited to the actual conversation.`;
+    const reportContextInstruction = loopLevel === 7 ? "" : (hasPublicReportContext
+      ? `PRE-GENERATED PUBLIC PROFILE INVESTIGATION REPORT (PRIMARY STARTING CONTEXT):
+${publicReportContext}
+
+Use this report as the public-evidence foundation for this conversation. Ground profile-specific observations in its concrete findings and evidence references. Do not treat report interpretations as proven private motives. Clearly separate public observations, report hypotheses, and facts the user personally confirms. Do not invent missing evidence.`
+      : `PRE-GENERATED PUBLIC PROFILE INVESTIGATION REPORT: NOT PROVIDED IN THIS REQUEST. Do not pretend you have read a report, do not invent profile-specific findings, and do not claim public evidence supports a point. Keep observations limited to the actual conversation.`);
     console.log("PREGENERATED_PUBLIC_REPORT_CONTEXT", JSON.stringify({
       provided: hasPublicReportContext,
       chars: publicReportContext.length,
@@ -581,8 +584,6 @@ let investigationState = {
           currentCategory,
           profileLink,
           identityPackage,
-          // Guided Loop 7 receives the prior Direct Report through this
-          // single package route; Direct mode never receives a TruthLoop Package.
           ...(loopLevel === 7 && reportMode === "conversation" && hasPublicReportContext
             ? { publicInvestigationReportContext: publicReportContext }
             : {})
@@ -704,12 +705,12 @@ ROLE
 You are producing a specific, evidence-led investigation of this exact subject. This is not a generic personality analysis, generic company profile, motivational summary, or advice article. Every conclusion must arise from identifiable evidence in this case.
 
 THREE INPUTS IN GUIDED MODE — KEEP THEIR ROLES DISTINCT
-For guided/conversation mode, reason from all three inputs when they are actually present:
-1. EXISTING DIRECT PUBLIC-PROFILE REPORT: when present, it is carried inside truthLoopPackage.publicInvestigationReportContext. Use its findings as prior investigative context and as leads to verify, challenge, refine, or qualify. It is not a new source and its inherited source count is zero for this report.
-2. LOOP 1–6 CONVERSATION FINDINGS: carried in truthLoopPackage.messages, use the user's own statements, answers, examples, goals, and case context to understand what questions matter and to compare stated intent with public evidence. These are conversation-derived inputs, not public sources; they must never be counted as sources or cited with SOURCE_XX IDs. Do not treat prior assistant interpretations as facts.
-3. NEW LOOP 7 PUBLIC INVESTIGATION: carried in compressedEvidencePackage; this is the only source pool that may contribute to the seven section source count and public-evidence citations in this report.
+For guided/conversation mode, reason from all three inputs when they are actually present in the payload:
+1. EXISTING DIRECT PUBLIC-PROFILE REPORT: when present, it is carried inside truthLoopPackage.publicInvestigationReportContext. Use it as prior investigative context and as leads to verify, challenge, refine, or qualify. It is not a new source and its inherited source count is zero.
+2. LOOP 1–6 CONVERSATION FINDINGS: carried in truthLoopPackage.messages. Use the user's own statements, answers, examples, goals, and case context. These are conversation-derived inputs, not public sources; never count or cite them with SOURCE_XX IDs. Do not treat prior assistant interpretations as facts.
+3. NEW LOOP 7 PUBLIC INVESTIGATION: carried in compressedEvidencePackage; this is the only source pool that may contribute to the seven-section source count and public-evidence citations.
 
-The Loop 7 user payload must contain truthLoopPackage only once. The Direct Report context must not be sent as a separate parallel payload field. Do not claim that an existing Direct Report was supplied if truthLoopPackage.publicInvestigationReportContext is absent or empty. Do not invent or reconstruct missing conversation details. If one of the guided-mode inputs is unavailable, disclose the limitation only where it materially affects interpretation. In direct mode there is no Loop 1–6 conversation input and no TruthLoop Package; reason from the available public evidence only.
+The Loop 7 user payload must carry truthLoopPackage exactly once. Do not send the existing Direct Report as a separate parallel field or as a duplicate system-prompt context. Do not claim that a Direct Report was supplied if truthLoopPackage.publicInvestigationReportContext is absent or empty. In direct mode there is no Loop 1–6 conversation input and no TruthLoop Package; reason from the new public evidence only.
 
 SOURCE ALLOCATION — NON-NEGOTIABLE
 The report has seven evidence sections and must use seven independent public sources from the NEW Loop 7 investigation: one dedicated source allocation for each of Sections 1–7.
@@ -763,7 +764,7 @@ Examine dated historical and recent statements, commitments, decisions and activ
 Examine documented disputes, failures, complaints, corrections, responses to problems, accountability, repeated unresolved issues and material contradictions. Do not turn absence of complaints into proof of reliability, or allegations into established facts. Attribute contested claims and explain their status. Use this section's uniquely allocated public source only.
 
 08. Overall Pattern & Future Readiness
-Synthesize only the findings already established in Sections 1–7. Explain the alignment or gap between representation, claims, actions, capability, validation, consistency and accountability. State demonstrated strengths, limitations, unresolved questions and observable indicators to watch. Do not collect or cite new sources. Do not introduce facts that were not established in Sections 1–7.
+Synthesize only the findings already established in Sections 1–7. Explain the alignment or gap between representation, claims, actions, capability, validation, consistency and accountability. State demonstrated strengths, limitations, unresolved questions and observable indicators to watch. Do not collect or cite new sources. Do not introduce facts that were not established in Sections 1–7. At the end of this section, include a separate exact line: "Confidence Score: NN/100". Calibrate the 0–100 score to the strength, relevance, recency, independence and corroboration of the available NEW Loop 7 public evidence; do not score the person's character, and do not inflate the score to fill gaps. Briefly explain the main reason for the score in the surrounding prose.
 
 CASE-SPECIFIC ANALYSIS — NO GENERIC FILLER
 - Name the actual subject, actual claim, actual action, actual output, actual relationship, actual date, or actual discrepancy wherever the evidence supplies it.
