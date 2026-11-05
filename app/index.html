@@ -987,23 +987,23 @@ line-height:1.9;
 
 /* Section Colors */
 
-#investigationSummary{border-color:#3b82f6;}
-#behavioralFindings{border-color:#a855f7;}
-#hiddenMechanism{border-color:#f97316;}
-#publicEvidence{border-color:#22c55e;}
-#crossEvidence{border-color:#06b6d4;}
-#evidenceConfidence{border-color:#facc15;}
-#finalReflection{border-color:#ec4899;}
-#oneNextAction{border-color:#ef4444;}
+#identitySelfRepresentation{border-color:#3b82f6;}
+#claimsCommitmentsIntentions{border-color:#a855f7;}
+#actionsDemonstratedTrackRecord{border-color:#f97316;}
+#capabilityExecutionEvidence{border-color:#22c55e;}
+#independentValidationRelationships{border-color:#06b6d4;}
+#consistencyEvolutionOverTime{border-color:#facc15;}
+#reliabilityAccountabilityRiskSignals{border-color:#ec4899;}
+#overallPatternFutureReadiness{border-color:#ef4444;}
 
-#investigationSummary h2{color:#60a5fa;}
-#behavioralFindings h2{color:#c084fc;}
-#hiddenMechanism h2{color:#fb923c;}
-#publicEvidence h2{color:#4ade80;}
-#crossEvidence h2{color:#22d3ee;}
-#evidenceConfidence h2{color:#fde047;}
-#finalReflection h2{color:#f472b6;}
-#oneNextAction h2{color:#f87171;}
+#identitySelfRepresentation h2{color:#60a5fa;}
+#claimsCommitmentsIntentions h2{color:#c084fc;}
+#actionsDemonstratedTrackRecord h2{color:#fb923c;}
+#capabilityExecutionEvidence h2{color:#4ade80;}
+#independentValidationRelationships h2{color:#22d3ee;}
+#consistencyEvolutionOverTime h2{color:#fde047;}
+#reliabilityAccountabilityRiskSignals h2{color:#f472b6;}
+#overallPatternFutureReadiness h2{color:#f87171;}
 
 #downloadReportBtn{
     margin-top:28px;
@@ -1189,23 +1189,23 @@ line-height:1.9;
 }
 .truthLoopReport br{line-height:1.9;}
 
-#investigationSummary{border-color:#3b82f6;}
-#behavioralFindings{border-color:#a855f7;}
-#hiddenMechanism{border-color:#f97316;}
-#publicEvidence{border-color:#22c55e;}
-#crossEvidence{border-color:#06b6d4;}
-#evidenceConfidence{border-color:#facc15;}
-#finalReflection{border-color:#ec4899;}
-#oneNextAction{border-color:#ef4444;}
+#identitySelfRepresentation{border-color:#3b82f6;}
+#claimsCommitmentsIntentions{border-color:#a855f7;}
+#actionsDemonstratedTrackRecord{border-color:#f97316;}
+#capabilityExecutionEvidence{border-color:#22c55e;}
+#independentValidationRelationships{border-color:#06b6d4;}
+#consistencyEvolutionOverTime{border-color:#facc15;}
+#reliabilityAccountabilityRiskSignals{border-color:#ec4899;}
+#overallPatternFutureReadiness{border-color:#ef4444;}
 
-#investigationSummary h2{color:#60a5fa;}
-#behavioralFindings h2{color:#c084fc;}
-#hiddenMechanism h2{color:#fb923c;}
-#publicEvidence h2{color:#4ade80;}
-#crossEvidence h2{color:#22d3ee;}
-#evidenceConfidence h2{color:#fde047;}
-#finalReflection h2{color:#f472b6;}
-#oneNextAction h2{color:#f87171;}
+#identitySelfRepresentation h2{color:#60a5fa;}
+#claimsCommitmentsIntentions h2{color:#c084fc;}
+#actionsDemonstratedTrackRecord h2{color:#fb923c;}
+#capabilityExecutionEvidence h2{color:#4ade80;}
+#independentValidationRelationships h2{color:#22d3ee;}
+#consistencyEvolutionOverTime h2{color:#fde047;}
+#reliabilityAccountabilityRiskSignals h2{color:#f472b6;}
+#overallPatternFutureReadiness h2{color:#f87171;}
 
 .tlr-citation{
     display:inline-flex;
@@ -4423,14 +4423,14 @@ function renderEvidenceSources(){
 function renderLoop7Report(report){
     report = String(report || "").replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>').replace(/\r/g, "").trim();
     const sections = [
-      {heading:"01. Identity & Self-Representation", id:"investigationSummary", title:"01. Identity & Self-Representation", icon:"◉", fallback:"No identity and self-representation findings were returned."},
-      {heading:"02. Claims, Commitments & Intentions", id:"behavioralFindings", title:"02. Claims, Commitments & Intentions", icon:"◎", fallback:"No claims, commitments or intentions findings were returned."},
-      {heading:"03. Actions & Demonstrated Track Record", id:"hiddenMechanism", title:"03. Actions & Demonstrated Track Record", icon:"↗", fallback:"No actions or track-record findings were returned."},
-      {heading:"04. Capability & Execution Evidence", id:"publicEvidence", title:"04. Capability & Execution Evidence", icon:"▣", fallback:"No capability or execution findings were returned."},
-      {heading:"05. Independent Validation & Relationships", id:"crossEvidence", title:"05. Independent Validation & Relationships", icon:"◇", fallback:"No independent validation findings were returned."},
-      {heading:"06. Consistency & Evolution Over Time", id:"evidenceConfidence", title:"06. Consistency & Evolution Over Time", icon:"↻", fallback:"No consistency or evolution findings were returned."},
-      {heading:"07. Reliability, Accountability & Risk Signals", id:"finalReflection", title:"07. Reliability, Accountability & Risk Signals", icon:"⚑", fallback:"No reliability or risk findings were returned."},
-      {heading:"08. Overall Pattern & Future Readiness", id:"oneNextAction", title:"08. Overall Pattern & Future Readiness", icon:"◎", fallback:"No overall synthesis was returned."}
+      {heading:"01. Identity & Self-Representation", id:"identitySelfRepresentation", title:"01. Identity & Self-Representation", icon:"◉", fallback:"No identity and self-representation findings were returned."},
+      {heading:"02. Claims, Commitments & Intentions", id:"claimsCommitmentsIntentions", title:"02. Claims, Commitments & Intentions", icon:"◎", fallback:"No claims, commitments or intentions findings were returned."},
+      {heading:"03. Actions & Demonstrated Track Record", id:"actionsDemonstratedTrackRecord", title:"03. Actions & Demonstrated Track Record", icon:"↗", fallback:"No actions or track-record findings were returned."},
+      {heading:"04. Capability & Execution Evidence", id:"capabilityExecutionEvidence", title:"04. Capability & Execution Evidence", icon:"▣", fallback:"No capability or execution findings were returned."},
+      {heading:"05. Independent Validation & Relationships", id:"independentValidationRelationships", title:"05. Independent Validation & Relationships", icon:"◇", fallback:"No independent validation findings were returned."},
+      {heading:"06. Consistency & Evolution Over Time", id:"consistencyEvolutionOverTime", title:"06. Consistency & Evolution Over Time", icon:"↻", fallback:"No consistency or evolution findings were returned."},
+      {heading:"07. Reliability, Accountability & Risk Signals", id:"reliabilityAccountabilityRiskSignals", title:"07. Reliability, Accountability & Risk Signals", icon:"⚑", fallback:"No reliability or risk findings were returned."},
+      {heading:"08. Overall Pattern & Future Readiness", id:"overallPatternFutureReadiness", title:"08. Overall Pattern & Future Readiness", icon:"◎", fallback:"No overall synthesis was returned."}
     ];
     const escapeRegExp = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const findHeading = (text, heading, fromIndex=0) => {
@@ -4624,28 +4624,28 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     <div style="max-width:900px;margin:0 auto;">
 
       <h2>01. Identity & Self-Representation</h2>
-      ${getCleanSectionBody("#investigationSummary")}
+      ${getCleanSectionBody("#identitySelfRepresentation")}
 
       <h2>02. Claims, Commitments & Intentions</h2>
-      ${getCleanSectionBody("#behavioralFindings")}
+      ${getCleanSectionBody("#claimsCommitmentsIntentions")}
 
       <h2>03. Actions & Demonstrated Track Record</h2>
-      ${getCleanSectionBody("#hiddenMechanism")}
+      ${getCleanSectionBody("#actionsDemonstratedTrackRecord")}
 
       <h2>04. Capability & Execution Evidence</h2>
-      ${getCleanSectionBody("#publicEvidence")}
+      ${getCleanSectionBody("#capabilityExecutionEvidence")}
 
       <h2>05. Independent Validation & Relationships</h2>
-      ${getCleanSectionBody("#crossEvidence")}
+      ${getCleanSectionBody("#independentValidationRelationships")}
 
       <h2>06. Consistency & Evolution Over Time</h2>
-      ${getCleanSectionBody("#evidenceConfidence")}
+      ${getCleanSectionBody("#consistencyEvolutionOverTime")}
 
       <h2>07. Reliability, Accountability & Risk Signals</h2>
-      ${getCleanSectionBody("#finalReflection")}
+      ${getCleanSectionBody("#reliabilityAccountabilityRiskSignals")}
 
       <h2>08. Overall Pattern & Future Readiness</h2>
-      ${getCleanSectionBody("#oneNextAction")}
+      ${getCleanSectionBody("#overallPatternFutureReadiness")}
 
       ${evidenceReferenceSection}
 
