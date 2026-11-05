@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>    
 <html lang="en">    
 <head>    
@@ -3224,23 +3223,6 @@ function finishLoop7ReportSections(){
   if(note) note.textContent = "Report structure assembled — preparing your result";
 }
 
-const LOOP7_RETRY_COOLDOWN_MS = 30 * 60 * 1000;
-const LOOP7_RETRY_KEY_PREFIX = "truthloopLoop7RetryAfter_v1:";
-function getLoop7RetryKey(){
-  const mode = window.tlLoop7ReportMode === "direct" ? "direct" : "conversation";
-  const source = String(investigationSource || "").trim().toLowerCase();
-  return LOOP7_RETRY_KEY_PREFIX + mode + ":" + source;
-}
-function getLoop7RetryUntil(){
-  try { return Number(localStorage.getItem(getLoop7RetryKey()) || 0) || 0; }
-  catch(_) { return 0; }
-}
-function formatLoop7Cooldown(ms){
-  const seconds = Math.max(0, Math.ceil(ms / 1000));
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-  return `${minutes}m ${String(remainingSeconds).padStart(2,"0")}s`;
-}
 function validateLoop7ReportReady(reportText){
   const raw = String(reportText || "").trim();
   if(raw.length < 250) throw new Error("Loop 7 returned an incomplete report.");
@@ -3256,11 +3238,9 @@ function validateLoop7ReportReady(reportText){
   ];
   const missing = expected.filter(name => !new RegExp("(?:^|\\n)\\s*(?:#{1,6}\\s*)?" + name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + "\\s*(?=\\n|$)","m").test(raw));
   if(missing.length) throw new Error("Loop 7 report missing required sections: " + missing.join(", "));
-  const finding = selectPaywallFinding(raw);
-  if(!finding || !finding.text || !Array.isArray(finding.ids) || !finding.ids.length){
-    throw new Error("Loop 7 report completed without an extractable evidence-backed top finding.");
-  }
-  return finding;
+  // Paywall preview extraction is optional and must never determine report validity.
+  // renderPaywallFinding() already provides a safe fallback when no finding is extractable.
+  return true;
 }
 function showLoop7ProcessingError(error){
   stopLoop7ReportAnimation();
@@ -3275,43 +3255,16 @@ function showLoop7ProcessingError(error){
   latestTruthLoopReport = "";
   try { saveJourney(); } catch(_) {}
 
-  let retryUntil = getLoop7RetryUntil();
-  const cooldownActive = retryUntil > Date.now();
-  if(!cooldownActive && error?.code !== "LOOP7_RETRY_COOLDOWN_ACTIVE"){
-    retryUntil = Date.now() + LOOP7_RETRY_COOLDOWN_MS;
-    try { localStorage.setItem(getLoop7RetryKey(), String(retryUntil)); } catch(_) {}
-  }
-  if(error?.code === "LOOP7_RETRY_COOLDOWN_ACTIVE") retryUntil = getLoop7RetryUntil();
-
   box.innerHTML = `
     <div class="lp7-title">⚠️ We couldn't complete your investigation</div>
-    <div class="lp7-sub">Your report wasn't completed, so no findings or payment screen will be shown yet. Please come back after the recovery window while we restore the investigation service.</div>
-    <div id="loop7RetryCooldownMessage" role="status" style="margin-top:14px;padding:12px;border-radius:10px;background:rgba(255,255,255,.05);color:#e2e8f0;font-size:13px;line-height:1.5"></div>
-    <button id="loop7RetryBtn" type="button" disabled style="margin-top:12px;padding:12px 18px;border-radius:10px;cursor:not-allowed;opacity:.6;">Try Again in 30 minutes</button>
+    <div class="lp7-sub">Your report wasn't completed. Your investigation details are retained where available. You can try again now.</div>
+    <button id="loop7RetryBtn" type="button" style="margin-top:12px;padding:12px 18px;border-radius:10px;cursor:pointer;opacity:1;">Try Again →</button>
   `;
 
   const retry = document.getElementById("loop7RetryBtn");
-  const message = document.getElementById("loop7RetryCooldownMessage");
-  const updateCountdown = () => {
-    const remaining = Math.max(0, retryUntil - Date.now());
-    if(remaining > 0){
-      if(message) message.textContent = `Please try again in ${formatLoop7Cooldown(remaining)}. Your investigation details are retained where available.`;
-      if(retry){ retry.disabled = true; retry.style.cursor = "not-allowed"; retry.style.opacity = ".6"; retry.textContent = `Try Again in ${formatLoop7Cooldown(remaining)}`; }
-      return;
-    }
-    if(message) message.textContent = "You can try generating the report again now.";
-    if(retry){ retry.disabled = false; retry.style.cursor = "pointer"; retry.style.opacity = "1"; retry.textContent = "Try Again →"; }
-    if(window.tlLoop7CooldownTimer){ clearInterval(window.tlLoop7CooldownTimer); window.tlLoop7CooldownTimer = null; }
-  };
-  updateCountdown();
-  if(window.tlLoop7CooldownTimer) clearInterval(window.tlLoop7CooldownTimer);
-  window.tlLoop7CooldownTimer = setInterval(updateCountdown, 1000);
-
   if(retry){
     retry.onclick = () => {
-      if(isLoading || retry.disabled || getLoop7RetryUntil() > Date.now()) return;
-      try { localStorage.removeItem(getLoop7RetryKey()); } catch(_) {}
-      if(window.tlLoop7CooldownTimer){ clearInterval(window.tlLoop7CooldownTimer); window.tlLoop7CooldownTimer = null; }
+      if(isLoading) return;
       if(window.tlLoop7ReportMode === "direct"){
         startDirectLoop7Report(investigationSource);
         return;
@@ -3476,12 +3429,6 @@ function handleLoop7ProgressPayload(payload){
 
 async function fetchLoop7Investigation(profileLink, reportMode = "conversation"){
   const directMode = reportMode === "direct";
-  const retryUntil = getLoop7RetryUntil();
-  if(retryUntil > Date.now()){
-    const cooldownError = new Error("Loop 7 retry cooldown is active.");
-    cooldownError.code = "LOOP7_RETRY_COOLDOWN_ACTIVE";
-    throw cooldownError;
-  }
   const response = await fetch(API_URL,{
     method:"POST",
     headers:{
@@ -4972,8 +4919,25 @@ function selectPaywallFinding(reportText){
     }
   }
   if(!candidates.length) return null;
-  candidates.sort((a,b)=>b.score-a.score||b.ahaScore-a.ahaScore||b.ids.length-a.ids.length);
-  const chosen=candidates[0]; let text=chosen.text;
+
+  // Selection order: genuine Aha Moment -> closest Aha-like finding -> best
+  // evidence-backed finding. Preview selection must never affect report validity.
+  const genuineAhaCandidates=candidates.filter(item=>item.ahaScore>=5);
+  let chosen=null;
+  if(genuineAhaCandidates.length){
+    genuineAhaCandidates.sort((a,b)=>b.score-a.score||b.ahaScore-a.ahaScore||b.ids.length-a.ids.length);
+    chosen=genuineAhaCandidates[0];
+  }else{
+    const closestAhaCandidates=candidates.filter(item=>item.ahaScore>0);
+    if(closestAhaCandidates.length){
+      closestAhaCandidates.sort((a,b)=>b.ahaScore-a.ahaScore||b.score-a.score||b.ids.length-a.ids.length);
+      chosen=closestAhaCandidates[0];
+    }else{
+      candidates.sort((a,b)=>b.score-a.score||b.ids.length-a.ids.length);
+      chosen=candidates[0];
+    }
+  }
+  let text=chosen.text;
   if(text.length>360){const cut=text.slice(0,357),lastSpace=cut.lastIndexOf(" ");text=(lastSpace>250?cut.slice(0,lastSpace):cut)+"…";}
   return {text,ids:chosen.ids,section:chosen.section,aha:chosen.ahaScore>=5};
 }
