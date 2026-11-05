@@ -5107,19 +5107,6 @@ async function showPaywall(){
         image: "https://truthloop.in/truthloop-hook.jpg",
         prefill: {name:"", email:"", contact:""},
         theme: {color:"#ff7a00"},
-        // July 13 UPI Intent configuration; default payment methods remain available.
-        config: {
-          display: {
-            blocks: {
-              upi: {
-                name: "Pay using UPI",
-                instruments: [{method:"upi"}]
-              }
-            },
-            sequence: ["block.upi"],
-            preferences: {show_default_blocks:true}
-          }
-        },
         retry: {enabled:true, max_count:2},
         modal: {
           backdropclose:false,
