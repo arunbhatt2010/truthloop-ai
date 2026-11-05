@@ -5074,6 +5074,14 @@ const options={
       image: "https://truthloop.in/truthloop-hook.jpg",
       prefill:{name:"",email:"",contact:""},
       theme:{color:"#ff7a00"},
+      method: {    
+upi: true,    
+card: true,    
+netbanking: true,    
+wallet: true,    
+emi: false,    
+paylater: false    
+},
       retry:{enabled:true,max_count:2},
       modal:{backdropclose:false,escape:true,handleback:true, ondismiss:function(){
         track("razorpay_checkout_cancelled", {payment_method:"razorpay", currency:"INR", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
