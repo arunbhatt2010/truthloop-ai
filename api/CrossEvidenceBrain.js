@@ -665,7 +665,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl) {
     if (!token) return { success: false, reason: "Apify token environment variable is missing.", sources: [] };
     if (!WEBSITE_CRAWLER_TASK_ID) return { success: false, reason: "Website crawler task ID is missing.", sources: [] };
 
-    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=30&maxItems=8&maxTotalChargeUsd=0.05`;
+    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=60&maxItems=8&maxTotalChargeUsd=0.05`;
     const startedAt = Date.now();
     try {
         const response = await fetch(endpoint, {
