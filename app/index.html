@@ -4955,6 +4955,41 @@ function renderPaywallFinding(reportText){
 
 async function showPaywall(){
 
+  // TEMPORARY QA MODE: bypass payment only in this backed-up test build.
+  // Restore the backed-up production file after testing. Do not leave this public.
+  const testDirectMode = window.tlLoop7ReportMode === "direct";
+  loop7Unlocked = true;
+  paywallBox.style.display = "none";
+  if(nextBtn) nextBtn.style.display = "none";
+  outputBox.innerHTML = `
+    <div style="margin:16px 0;padding:12px 14px;border:1px solid #d97706;border-radius:10px;background:#fff7ed;color:#9a3412;font-weight:700;text-align:center;">
+      TEST MODE · PAYWALL BYPASSED · NO PAYMENT TAKEN
+    </div>
+  ` + (latestTruthLoopReport ? renderLoop7Report(latestTruthLoopReport) : `
+    <div style="padding:16px;border:1px solid #d97706;border-radius:10px;">
+      Test mode is active, but no generated report is available to render yet.
+    </div>
+  `);
+  const testArticleBlock = document.getElementById("articleBlock");
+  if(testArticleBlock) testArticleBlock.style.display = "block";
+  if(typeof window.truthLoopFroggySetStage === "function"){
+    window.truthLoopFroggySetStage("final_report", "test_paywall_bypassed");
+  }
+  if(typeof track === "function"){
+    track("test_paywall_bypassed", {
+      loop: 7,
+      report_mode: testDirectMode ? "direct" : "conversation"
+    });
+  }
+  if(typeof window.setTruthLoopMenuVisibility === "function"){
+    window.setTruthLoopMenuVisibility(true);
+  }
+  saveJourney();
+  requestAnimationFrame(() => outputBox.scrollIntoView({behavior:"smooth", block:"start"}));
+  return;
+
+
+
   // Never render a payment card using a guessed/default country.
   if(userCountryStatus === "pending"){
     await detectCountry();
@@ -5107,6 +5142,19 @@ async function showPaywall(){
         image: "https://truthloop.in/truthloop-hook.jpg",
         prefill: {name:"", email:"", contact:""},
         theme: {color:"#ff7a00"},
+        // July 13 UPI Intent configuration; default payment methods remain available.
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay using UPI",
+                instruments: [{method:"upi", flows:["intent"]}]
+              }
+            },
+            sequence: ["block.upi"],
+            preferences: {show_default_blocks:true}
+          }
+        },
         retry: {enabled:true, max_count:2},
         modal: {
           backdropclose:false,
