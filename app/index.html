@@ -4845,7 +4845,15 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   return true;
 }
+// LOOP 7 DOWNLOAD BUTTON CLICK HANDLER
+document.addEventListener("click", function(event) {
+  const button = event.target.closest("#downloadReportBtn");
 
+  if (!button) return;
+
+  event.preventDefault();
+  downloadTruthLoopReport();
+});
 /* LOOP 7 PAYWALL */
 
 function unlockLoop7Report(method){
