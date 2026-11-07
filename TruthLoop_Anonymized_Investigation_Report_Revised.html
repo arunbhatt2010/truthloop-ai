@@ -1,0 +1,207 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body{
+          background:#0f1115;
+          color:#f5f5f5;
+          font-family:Arial,sans-serif;
+          line-height:1.8;
+          padding:40px;
+        }
+        .truthLoopReport{
+          max-width:900px;
+          margin:auto;
+        }
+        .truthLoopReport h1,
+        .truthLoopReport h2{
+          color:#ff9d00;
+        }
+        .truthLoopReport p,
+        .truthLoopReport li{
+          color:#ddd;
+        }
+        .truthLoopReport hr{
+          border:0;
+          border-top:1px solid #333;
+        }
+        a{
+          color:#8ab4ff;
+        }
+      </style>
+      <title>TruthLoop Investigation Report</title>
+    
+<style id="truthloop-final-touch">
+  /* Final landing/investigation state controls */
+  #starterPatterns.is-hidden{
+    display:none !important;
+  }
+  #patternProfile:not(.tl-visible){
+    display:none !important;
+  }
+  #patternProfile.tl-visible{
+    display:block !important;
+    animation:tlProfileReveal .35s ease both;
+  }
+  #loopIndicator:not(.is-active){
+    display:none !important;
+  }
+  #loopIndicator.is-active{
+    display:inline-flex !important;
+    animation:tlIndicatorReveal .3s ease both;
+  }
+  .tl-analysis-state{
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(168,85,247,.18);
+    background:linear-gradient(145deg,rgba(168,85,247,.07),rgba(255,140,0,.04));
+    color:#a9b4c6;
+    font-size:13px;
+    line-height:1.5;
+    letter-spacing:.01em;
+    opacity:.95;
+  }
+  .tl-analysis-state.hidden{
+    display:none !important;
+  }
+  @keyframes tlProfileReveal{
+    from{opacity:0;transform:translateY(6px)}
+    to{opacity:1;transform:none}
+  }
+  @keyframes tlIndicatorReveal{
+    from{opacity:0;transform:translateY(4px) scale(.98)}
+    to{opacity:1;transform:none}
+  }
+</style>
+
+
+<style id="truthloop-profile-card-mobile-width-fix">
+  /* Targeted fix: keep Profile Card within the active Loop panel on narrow screens. */
+  #outputBox .tl-loop-panel-body #patternProfile,
+  #outputBox #patternProfile {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  #outputBox .tl-loop-panel-body #patternProfile > div,
+  #outputBox #patternProfile > div {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  @media (max-width: 760px) {
+    #outputBox .tl-loop-panel-body #patternProfile,
+    #outputBox #patternProfile {
+      padding: 14px !important;
+      border-radius: 16px !important;
+    }
+
+    #outputBox .tl-loop-panel-body #patternProfile > div:not(:first-child),
+    #outputBox #patternProfile > div:not(:first-child) {
+      font-size: 13.5px !important;
+      line-height: 1.5 !important;
+    }
+  }
+</style>
+
+</head>
+    <body>
+      
+    <div style="
+      max-width:900px;
+      margin:0 auto 40px;
+      padding-bottom:25px;
+      border-bottom:2px solid #333;
+      text-align:center;
+      font-family:Arial,sans-serif;
+    ">
+
+      <h1 style="margin-bottom:8px;">
+        🧠 TruthLoop Investigation Report
+      </h1>
+
+      <p style="color:#666;margin:0;">
+        Find what you're avoiding.
+      </p>
+      <p style="color:#aaa;font-size:12px;margin:10px 0 0;">Anonymized sample report — identifying company, client, campaign, partner, event and timeline details have been generalized.</p>
+
+      <div style="
+        margin-top:30px;
+        padding:18px;
+        background:#171a21;
+        border:1px solid #333;
+        border-radius:12px;
+        text-align:left;
+      ">
+
+        <h3 style="margin-top:0;color:#ff9d00;">
+          📂 Investigation Scope
+        </h3>
+
+        <p style="margin:8px 0;">
+          <b>Investigation Basis</b>
+        </p>
+
+        
+
+        <p style="margin:6px 0;">
+          ✓ Public Footprint Analysis
+        </p>
+
+        <p style="margin-top:12px;">
+          <b>Investigation Source</b><br>
+          https://example.com/
+        </p>
+
+        <p style="color:#999;font-size:13px;">
+          This investigation report is based on publicly available evidence from the investigation source above. No Loop 1–6 conversation was used.
+        </p>
+
+      </div>
+    </div>
+  
+      <div class="truthLoopReport">
+        
+    <div style="max-width:900px;margin:0 auto;">
+
+      <h2>01. Identity & Self-Representation</h2>
+      The Company presents itself as an advertising platform specializing in location-based marketing and performance advertising across multiple channels. The company claims to have originated under an earlier brand before later adopting its current identity, positioning this change as reflecting an expanded vision for location-based advertising capabilities. Their current representation emphasizes partnerships with an external technology partner and the integration of predictive AI technology into their advertising platform. The company maintains consistent branding across their website and LinkedIn presence, describing themselves as driving "in-store visits and other real business results" using observed real-world consumer behavior data.
+
+      <h2>02. Claims, Commitments & Intentions</h2>
+      The Company makes specific performance claims including a multiple-fold improvement in cost efficiency through their AI-predicted audience segments and promises a promise of substantially reduced wasted advertising spend with a claim of highly precise audience targeting. They commit to privacy protection, stating that a statement emphasizing that consumer privacy is a central priority and emphasizing their use of mobile advertising identifiers rather than personal names or email addresses. The company claims to have worked with third-party validation companies to ensure their data is among the most accurate available. They also position themselves as supporting diversity initiatives in the martech industry, though the evidence for this commitment is limited to a single 2018 blog post.
+
+      <h2>03. Actions & Demonstrated Track Record</h2>
+      The company has maintained consistent content production through their blog since at least 2017, publishing industry insights on retail trends, advertising strategies, and team member spotlights. They demonstrate ongoing platform development through LinkedIn posts about new features in their Ads Manager and retargeting solutions. The Company shows participation in industry events including industry marketing and advertising conferences. The company has established privacy compliance mechanisms including detailed opt-out procedures and state-specific privacy rights documentation.
+
+      <h2>04. Capability & Execution Evidence</h2>
+      The Company demonstrates technical capability through their detailed privacy policy documentation showing sophisticated data handling processes across multiple personal information categories. They showcase platform functionality through case studies, such as a retail campaign that reportedly generated tens of thousands of visits and exceeded its stated performance target. The company exhibits content production capability through regularly published industry analysis, including foot traffic data analysis for retail and QSR sectors. Their LinkedIn activity demonstrates consistent engagement with marketing professionals and industry events.
+
+      <h2>05. Independent Validation & Relationships</h2>
+      The Company displays client logos including several large consumer, retail, energy, and food-service brands on their website, suggesting established client relationships. They reference partnership with a national restaurant brand, with a public post quoting a senior client representative discussing positive results from the company's predictive audience solution. The company describes collaboration with an external media organization for a case study presented at an industry event. However, these validations are company-curated and lack independent third-party verification in the available evidence.
+
+      <h2>06. Consistency & Evolution Over Time</h2>
+      The Company has maintained consistent focus on location-based advertising since its earlier operating period, evolving from basic location targeting to incorporating AI and predictive analytics. Their content strategy has remained consistent across multiple years through the present, focusing on retail analytics, advertising insights, and team features. The company shows technological evolution through the integration of an external technology partner's predictive technology and the development of new features like automated retargeting solutions. Their privacy approach has remained consistent with continued emphasis on MAID-based identification rather than personal information.
+
+      <h2>07. Reliability, Accountability & Risk Signals</h2>
+      The Company demonstrates accountability through comprehensive privacy documentation, including detailed data handling practices, opt-out mechanisms, and state-specific privacy rights compliance. They show responsiveness to regulatory requirements with procedures addressing applicable regional and state privacy requirements. The company acknowledges data sharing practices in their privacy policy, disclosing categories of personal information shared with service providers. No evidence of disputes, complaints, or regulatory actions was found in the available sources. The company maintains transparency about their data collection and sharing practices, though the complexity of their privacy documentation may present comprehension challenges for some users.
+
+      <h2>08. Overall Pattern & Future Readiness</h2>
+      The Company demonstrates a consistent pattern as an established advertising technology company with sustained operation since 2009, evolving from basic location services to AI-powered predictive advertising. The company shows technical capability through platform development and case study evidence, though client validation remains primarily self-curated. Their privacy practices appear comprehensive and compliant with evolving regulations, suggesting preparedness for continued operation in a privacy-conscious landscape. The integration with an external technology partner indicates adaptation to AI trends, while their consistent industry engagement and content production suggest ongoing relevance in the advertising technology space. The main limitation is the lack of independent third-party validation of performance claims, with evidence primarily consisting of company-published content and curated client references.<br><br>Confidence Score: 68/100
+      <p style="margin-top:30px;color:#777;font-size:12px;">
+        Generated 6 November 2026 by TruthLoop AI.
+      </p>
+    </div>
+  
+      </div>
+    </body>
+    </html>
+  
