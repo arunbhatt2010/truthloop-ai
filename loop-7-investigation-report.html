@@ -15,7 +15,6 @@
 :root{--bg:#070b16;--panel:#0d1424;--panel2:#111a2d;--text:#eef2ff;--muted:#aab4c7;--line:#22304a;--accent:#9b5cff;--accent2:#5f8cff;--max:920px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:linear-gradient(180deg,#050812 0%,#08101d 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.75}a{color:#b99bff;text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:var(--max);margin:0 auto;padding:28px 20px 72px}.brand{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:42px}.brand strong{font-size:1.2rem}.brand span{color:var(--muted);font-size:.88rem}.hero{padding:34px 0 18px}.eyebrow{display:inline-block;padding:7px 11px;border:1px solid #39285e;border-radius:999px;color:#cdb9ff;background:#120d21;font-size:.78rem;text-transform:uppercase;letter-spacing:.11em}h1{font-size:clamp(2.25rem,5vw,4.4rem);line-height:1.08;letter-spacing:-.04em;margin:18px 0;max-width:850px}.lead{font-size:1.18rem;color:#cbd3e2;max-width:800px}article{font-size:1.02rem}h2{margin:56px 0 16px;font-size:1.9rem;line-height:1.2;letter-spacing:-.025em}h3{margin:28px 0 10px;font-size:1.18rem}p{margin:0 0 18px}ul{margin:0 0 20px 22px}li{margin:8px 0}.card{background:linear-gradient(180deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--line);border-radius:20px;padding:24px;margin:22px 0}.loop{display:grid;grid-template-columns:72px 1fr;gap:18px;align-items:start;background:rgba(13,20,36,.85);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}.num{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-weight:800}.loop h3{margin:0 0 6px}.note{border-left:3px solid var(--accent);padding:14px 18px;background:#0e1220;color:#c9d1df;border-radius:0 12px 12px 0;margin:24px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.grid .card{margin:0}.pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#15213a;border:1px solid #28385a;color:#d8e0f0;margin:3px 5px 3px 0;font-size:.86rem}.cta{margin-top:46px;padding:30px;border-radius:24px;background:linear-gradient(135deg,#1a1130,#101a35);border:1px solid #3a2a5f;text-align:center}.cta .button{display:inline-block;margin-top:12px;padding:12px 20px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-weight:700}.footer{border-top:1px solid var(--line);margin-top:58px;padding-top:22px;color:var(--muted);font-size:.88rem}.toc a{display:block;padding:6px 0}.small{font-size:.9rem;color:var(--muted)}
 
-.report-example{margin:28px 0}
 .report-example figure{
   margin:22px 0;
   padding:0;
@@ -64,7 +63,7 @@
 <a href="#start">Two Ways to Start</a>
 <a href="#sections">What the Report Examines</a>
 <a href="#evidence">Evidence, Cross-Source Analysis & Confidence</a>
-<a href="#example">See an Actual Example Report</a>
+<a href="#example">Open the Anonymized Example Report</a>
 <a href="#audience">Who Can Use It?</a>
 <a href="#limits">What TruthLoop Does — and Does Not Do</a>
 <a href="#different">What Makes It Different?</a>
@@ -112,18 +111,12 @@
 <h2 id="example">See an Actual TruthLoop Investigation Report</h2>
 <p>A description can explain the process. The report itself shows what the output looks like.</p>
 <p>The following anonymized example is based on an actual TruthLoop investigation. It demonstrates the current eight-section structure, evidence-based analysis, assessment of independent validation, and Confidence Score.</p>
-<div class="report-example">
-<figure>
-<img src="./truthloop-loop7-report-example-1.jpg" alt="Anonymized TruthLoop Investigation Report showing investigation scope and sections 1 to 5: identity, claims, track record, capability, and independent validation" loading="lazy">
-<figcaption>Example report — investigation scope and the first five sections of the current eight-section report.</figcaption>
-</figure>
-<figure>
-<img src="./truthloop-loop7-report-example-2.jpg" alt="Anonymized TruthLoop Investigation Report showing sections 3 to 8, overall pattern, and Confidence Score" loading="lazy">
-<figcaption>Example report — consistency over time, reliability and risk signals, overall pattern, and evidence confidence.</figcaption>
-</figure>
+<div class="card" style="margin:24px 0;padding:26px;text-align:center">
+<strong style="font-size:1.15rem">Open the Anonymized Example Report</strong>
+<p style="margin:12px 0;color:var(--muted)">View the actual generated TruthLoop investigation report, including all eight sections, evidence analysis, and the Confidence Score.</p>
+<a class="button" href="./TruthLoop_Anonymized_Investigation_Report_Revised.html" target="_blank" rel="noopener">View Example Investigation Report →</a>
+<p class="small" style="margin-top:14px">Identifying company, client, campaign, partner, event, and timeline details have been generalized.</p>
 </div>
-<div class="note"><strong>About this example:</strong> Identifying company, client, campaign, partner, event, and timeline details have been generalized. The example is intended to demonstrate the report format and analytical approach, not to identify or make a public judgment about the subject.</div>
-<p><a href="https://truthloop.in/example-public-profile-investigation.html">Open the example report page →</a></p>
 
 <h2 id="audience">Who Can Use a Public-Footprint Investigation?</h2>
 <p>It can add useful context wherever a decision depends partly on what a person or organization has publicly represented and demonstrated.</p>
