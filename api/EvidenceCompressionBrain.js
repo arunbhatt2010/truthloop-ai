@@ -23,9 +23,11 @@
    discovery. PCF and CEB are responsible for upstream filtration.
    ========================================================= */
 
-const MAX_TOTAL_PACKAGE_CHARS = 120000;
-const ECB_OUTPUT_LIMIT = 120000;
-const ECB_TRANSPORT_LIMIT = 120000;
+// Expanded for large public websites and multi-platform evidence packages.
+// These are character limits, not provider token/context guarantees.
+const MAX_TOTAL_PACKAGE_CHARS = 500000;
+const ECB_OUTPUT_LIMIT = 500000;
+const ECB_TRANSPORT_LIMIT = 500000;
 const MAX_INPUT_PACKAGE_CHARS = 10000000;
 const TARGET_PACKAGE_CHARS = 0.90;
 
