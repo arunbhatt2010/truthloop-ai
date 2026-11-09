@@ -4963,8 +4963,8 @@ function renderPaywallFinding(reportText){
 }
 
 async function showPaywall(){
-//  unlockLoop7Report("test");
- // return;
+  unlockLoop7Report("test");
+  return;
   // Never render a payment card using a guessed/default country.
   if(userCountryStatus === "pending"){
     await detectCountry();
