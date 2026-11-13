@@ -816,7 +816,7 @@ async function loadEvidenceCompressionBrain({
   console.log("ECB_WEBSITE_SCRAPER_AUDIT", JSON.stringify({
     available: websiteScraperInput.length,
     retained: websiteScraperSources.length,
-    topicCollectionStatus,
+    topicCollectionStatus: websiteTopicCollectionStatus,
     pages: websiteScraperSources.map(({sourceId, title, url, pageCategory, collectionPurpose, topicKey, topicRelevanceScore, topicEvidenceStatus, content}) => ({
       sourceId, title, url, pageCategory, collectionPurpose, topicKey, topicRelevanceScore, topicEvidenceStatus, contentChars: String(content || "").length
     }))
