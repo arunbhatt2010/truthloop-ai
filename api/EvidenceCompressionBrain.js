@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v20 — CLEAN REBUILD
+   EVIDENCE COMPRESSION BRAIN v21 — TOPIC CONTRACT + CLUSTERING OPTIMIZATION
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -45,7 +45,13 @@ const MAX_LINKEDIN_ARTICLES = Number.POSITIVE_INFINITY;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
 const MAX_REDDIT_POSTS = Number.POSITIVE_INFINITY;
 
-const PACKAGE_VERSION = "23.0";
+const PACKAGE_VERSION = "23.0"; // Shared CEB/ECB package contract; intentionally unchanged.
+const REQUIRED_WEBSITE_TOPIC_KEYS = [
+  "buyer_evidence",
+  "execution_repeatability",
+  "capital_efficiency_signals",
+  "investor_founder_track_record"
+];
 
 /* ---------------------------------------------------------
    BASIC HELPERS
@@ -621,6 +627,7 @@ async function loadEvidenceCompressionBrain({
   truthLoopPackage = {},
   publicEvidencePackage = {}
 } = {}) {
+  const ecbStartedAt = Date.now();
   console.log("ECB_START");
 
   const universalPackage =
@@ -686,9 +693,21 @@ async function loadEvidenceCompressionBrain({
   const websiteScraperInput = Array.isArray(universalPackage?.websiteScraperEvidence?.sources)
     ? universalPackage.websiteScraperEvidence.sources
     : [];
-  const websiteTopicCollectionStatus = universalPackage?.websiteScraperEvidence?.topicCollectionStatus && typeof universalPackage.websiteScraperEvidence.topicCollectionStatus === "object"
+  const incomingWebsiteTopicStatus = universalPackage?.websiteScraperEvidence?.topicCollectionStatus && typeof universalPackage.websiteScraperEvidence.topicCollectionStatus === "object"
     ? universalPackage.websiteScraperEvidence.topicCollectionStatus
     : {};
+  // Preserve the exact upstream status records; do not fabricate "collected"
+  // or "not_found" results when CEB did not provide a topic assessment.
+  const websiteTopicCollectionStatus = { ...incomingWebsiteTopicStatus };
+  const missingWebsiteTopicKeys = REQUIRED_WEBSITE_TOPIC_KEYS.filter(
+    key => !Object.prototype.hasOwnProperty.call(websiteTopicCollectionStatus, key)
+  );
+  console.log("ECB_TOPIC_COLLECTION_CONTRACT", JSON.stringify({
+    expectedKeys: REQUIRED_WEBSITE_TOPIC_KEYS,
+    receivedKeys: Object.keys(websiteTopicCollectionStatus),
+    missingKeys: missingWebsiteTopicKeys,
+    scraperSourcesReceived: websiteScraperInput.length
+  }));
 
   const websiteSourcesInput = selectSources(
     websiteInput,
@@ -1054,19 +1073,32 @@ async function loadEvidenceCompressionBrain({
     ...(redditProfile ? [redditProfile] : []), ...redditPosts
   ];
 
-  const behavioralClusters = behavioralClusterRules
+  const clusteringStartedAt = Date.now();
+  const escapeRegexText = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const compiledBehavioralRules = behavioralClusterRules.map(rule => ({
+    name: rule.name,
+    terms: rule.terms.map(term => ({
+      term,
+      regex: new RegExp(`\\b${escapeRegexText(term)}\\b`, "i")
+    }))
+  }));
+  // Convert each retained evidence unit to lowercase text once, not once per rule.
+  const clusteringSources = retainedEvidenceUnits.map(source => ({
+    source,
+    searchableText: rawEvidenceText(source).toLowerCase()
+  }));
+
+  const behavioralClusters = compiledBehavioralRules
     .map(rule => {
       const matches = [];
-      for (const source of retainedEvidenceUnits) {
-        const text = rawEvidenceText(source).toLowerCase();
-        const matchedTerms = rule.terms.filter(term => {
-          const escaped = String(term).replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
-          return new RegExp(`\\b${escaped}\\b`, "i").test(text);
-        });
+      for (const entry of clusteringSources) {
+        const matchedTerms = rule.terms
+          .filter(item => item.regex.test(entry.searchableText))
+          .map(item => item.term);
         if (matchedTerms.length) {
           matches.push({
-            sourceId: source.sourceId || null,
-            url: getUrl(source),
+            sourceId: entry.source.sourceId || null,
+            url: getUrl(entry.source),
             matchedTerms: matchedTerms.slice(0, 4)
           });
         }
@@ -1089,6 +1121,13 @@ async function loadEvidenceCompressionBrain({
     })
     .filter(Boolean)
     .sort((a, b) => b.matchCount - a.matchCount);
+
+  console.log("ECB_BEHAVIORAL_CLUSTERING_TIMING", JSON.stringify({
+    durationMs: Date.now() - clusteringStartedAt,
+    evidenceUnits: retainedEvidenceUnits.length,
+    rules: compiledBehavioralRules.length,
+    clusters: behavioralClusters.length
+  }));
 
   const datedEvidenceCount = retainedEvidenceUnits.filter(source =>
     !!getDate(source)
@@ -1815,7 +1854,12 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       evidenceSourcesRetained: sourceRegistry.length,
       meaningfulCompression: true,
       destructiveCharacterCompaction: false,
-      linksModified: false
+      linksModified: false,
+      topicStatusKeysRetained: Object.keys(finalPackage?.evidenceUniverse?.websiteTopicCollectionStatus || {}),
+      missingRequiredTopicStatusKeys: REQUIRED_WEBSITE_TOPIC_KEYS.filter(key =>
+        !Object.prototype.hasOwnProperty.call(finalPackage?.evidenceUniverse?.websiteTopicCollectionStatus || {}, key)
+      ),
+      durationMs: Date.now() - ecbStartedAt
     })
   );
 
