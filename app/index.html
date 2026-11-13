@@ -3462,29 +3462,39 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
     const candidate = String(rawPayload || "").trim();
     if(!candidate || candidate === "[DONE]") return;
 
+    let payload;
     try{
-      const payload = JSON.parse(candidate);
-      handleLoop7ProgressPayload(payload);
-
-      // Surface the server's actual Loop 7 error instead of replacing it with
-      // the generic "stream ended without a final response payload" message.
-      if(payload && payload.type === "error") {
-        const message = String(payload.message || "Loop 7 server reported an error.").trim();
-        const detail = String(payload.error || "").trim();
-        const stage = String(payload.stage || payload.phase || "").trim();
-        serverStreamError = new Error(
-          message +
-          (stage ? ` [stage: ${stage}]` : "") +
-          (detail && detail !== message ? ` — ${detail}` : "")
-        );
-        return;
-      }
-
-      if(payload && (payload.reply || payload.final === true || payload.type === "final")) {
-        finalPayload = payload;
-      }
+      payload = JSON.parse(candidate);
     }catch(error){
       // Non-JSON SSE data frames (for example [DONE]) are not report payloads.
+      return;
+    }
+
+    // Capture the final report BEFORE running optional progress/UI updates.
+    // A progress-handler exception must never discard a valid final payload.
+    if(payload && (payload.reply || payload.final === true || payload.type === "final")) {
+      finalPayload = payload;
+    }
+
+    // Surface the server's actual Loop 7 error instead of replacing it with
+    // the generic "stream ended without a final response payload" message.
+    if(payload && payload.type === "error") {
+      const message = String(payload.message || "Loop 7 server reported an error.").trim();
+      const detail = String(payload.error || "").trim();
+      const stage = String(payload.stage || payload.phase || "").trim();
+      serverStreamError = new Error(
+        message +
+        (stage ? ` [stage: ${stage}]` : "") +
+        (detail && detail !== message ? ` — ${detail}` : "")
+      );
+    }
+
+    // Progress rendering is best-effort. Keep its failure separate from
+    // report parsing so the final API response remains available to the caller.
+    try{
+      handleLoop7ProgressPayload(payload);
+    }catch(error){
+      console.warn("LOOP7_PROGRESS_UPDATE_ERROR", error);
     }
   };
 
