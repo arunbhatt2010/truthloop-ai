@@ -3224,22 +3224,12 @@ function finishLoop7ReportSections(){
 }
 
 function validateLoop7ReportReady(reportText){
+  // The API's non-empty report text is authoritative. Do not reject it because
+  // headings, punctuation, Markdown, section labels, or display formatting differ.
+  // Section recognition is best-effort in renderLoop7Report(); missing boundaries
+  // must never cause already-returned investigation content to be discarded.
   const raw = String(reportText || "").trim();
-  if(raw.length < 250) throw new Error("Loop 7 returned an incomplete report.");
-  const expected = [
-    "01. Identity & Self-Representation",
-    "02. Claims, Commitments & Intentions",
-    "03. Actions & Demonstrated Track Record",
-    "04. Capability & Execution Evidence",
-    "05. Independent Validation & Relationships",
-    "06. Consistency & Evolution Over Time",
-    "07. Reliability, Accountability & Risk Signals",
-    "08. Overall Pattern & Future Readiness"
-  ];
-  const missing = expected.filter(name => !new RegExp("(?:^|\\n)\\s*(?:#{1,6}\\s*)?" + name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + "\\s*(?=\\n|$)","m").test(raw));
-  if(missing.length) throw new Error("Loop 7 report missing required sections: " + missing.join(", "));
-  // Paywall preview extraction is optional and must never determine report validity.
-  // renderPaywallFinding() already provides a safe fallback when no finding is extractable.
+  if(!raw) throw new Error("Loop 7 API returned an empty report payload.");
   return true;
 }
 function showLoop7ProcessingError(error){
@@ -4421,53 +4411,126 @@ function renderEvidenceSources(){
     `;
 }
 
+function normalizeLoop7HeadingLine(line){
+  return String(line || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/^\s*(?:#{1,6}\s*)?/, "")
+    .replace(/[>*_`~]/g, "")
+    .replace(/^[^A-Za-z0-9]+/, "")
+    .replace(/^\s*(?:section|part)\s*/i, "")
+    .replace(/^\s*(?:0?[1-8])\s*(?:[.)\-:|–—]\s*|\s+)/i, "")
+    .replace(/^[^A-Za-z0-9]+/, "")
+    .replace(/[^A-Za-z0-9]+/g, " ")
+    .toLowerCase()
+    .trim();
+}
+
+function parseLoop7ReportSections(reportText, sections){
+  const source = String(reportText || "").replace(/\r/g, "");
+  const lines = source.split("\n");
+  const normalizedTitles = sections.map(item => normalizeLoop7HeadingLine(item.heading));
+  const matches = [];
+
+  lines.forEach((line, lineIndex) => {
+    const normalizedLine = normalizeLoop7HeadingLine(line);
+    if(!normalizedLine) return;
+    const sectionIndex = normalizedTitles.findIndex(title =>
+      normalizedLine === title || normalizedLine.startsWith(title + " ")
+    );
+    if(sectionIndex >= 0){
+      matches.push({sectionIndex, lineIndex});
+    }
+  });
+
+  const bodies = sections.map(() => "");
+  matches.forEach((match, matchIndex) => {
+    const nextLine = matchIndex + 1 < matches.length
+      ? matches[matchIndex + 1].lineIndex
+      : lines.length;
+    const body = lines.slice(match.lineIndex + 1, nextLine).join("\n").trim();
+    if(body){
+      bodies[match.sectionIndex] = [bodies[match.sectionIndex], body]
+        .filter(Boolean)
+        .join("\n\n");
+    }
+  });
+
+  const preface = matches.length
+    ? lines.slice(0, matches[0].lineIndex).join("\n").trim()
+    : "";
+
+  return {
+    bodies,
+    preface,
+    hasRecognizedHeadings: matches.length > 0,
+    recognizedSectionCount: new Set(matches.map(item => item.sectionIndex)).size
+  };
+}
+
 function renderLoop7Report(report){
-    report = String(report || "").replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>').replace(/\r/g, "").trim();
-    const sections = [
-      {heading:"01. Identity & Self-Representation", id:"identitySelfRepresentation", title:"01. Identity & Self-Representation", icon:"◉", fallback:"No identity and self-representation findings were returned."},
-      {heading:"02. Claims, Commitments & Intentions", id:"claimsCommitmentsIntentions", title:"02. Claims, Commitments & Intentions", icon:"◎", fallback:"No claims, commitments or intentions findings were returned."},
-      {heading:"03. Actions & Demonstrated Track Record", id:"actionsDemonstratedTrackRecord", title:"03. Actions & Demonstrated Track Record", icon:"↗", fallback:"No actions or track-record findings were returned."},
-      {heading:"04. Capability & Execution Evidence", id:"capabilityExecutionEvidence", title:"04. Capability & Execution Evidence", icon:"▣", fallback:"No capability or execution findings were returned."},
-      {heading:"05. Independent Validation & Relationships", id:"independentValidationRelationships", title:"05. Independent Validation & Relationships", icon:"◇", fallback:"No independent validation findings were returned."},
-      {heading:"06. Consistency & Evolution Over Time", id:"consistencyEvolutionOverTime", title:"06. Consistency & Evolution Over Time", icon:"↻", fallback:"No consistency or evolution findings were returned."},
-      {heading:"07. Reliability, Accountability & Risk Signals", id:"reliabilityAccountabilityRiskSignals", title:"07. Reliability, Accountability & Risk Signals", icon:"⚑", fallback:"No reliability or risk findings were returned."},
-      {heading:"08. Overall Pattern & Future Readiness", id:"overallPatternFutureReadiness", title:"08. Overall Pattern & Future Readiness", icon:"◎", fallback:"No overall synthesis was returned."}
-    ];
-    const escapeRegExp = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const findHeading = (text, heading, fromIndex=0) => {
-      const re = new RegExp("(?:^|\\n)[ \\t]*(?:#{1,6}[ \\t]*)?" + escapeRegExp(heading) + "[ \\t]*(?=\\n|$)", "g");
-      re.lastIndex = Math.max(0, fromIndex);
-      const match = re.exec(text);
-      return match ? match.index + (match[0].startsWith("\n") ? 1 : 0) : -1;
-    };
-    const bodies = sections.map((section, index) => {
-      const start = findHeading(report, section.heading);
-      if(start < 0) return "";
-      const next = sections.slice(index+1).map(s => findHeading(report, s.heading, start+section.heading.length)).filter(pos => pos >= 0);
-      let body = cleanReportSectionText(report.slice(start+section.heading.length, next.length ? Math.min(...next) : report.length));
-      body = body.replace(/^\s*(?:[-*•▪▸→▶️➡️⏩])[ \t]*/gm, "").replace(/^\s*\d+[.)][ \t]*/gm, "");
-      return decorateLoop7Citations(body.replace(/#+\s*/g, "").replace(/\n/g, "<br>"));
-    });
-    const sourceCount = Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry.length : 0;
-    const sourceTypes = new Set((Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry : []).map(item => String(item?.sourceType || "").toLowerCase()).filter(Boolean));
-    const primaryText = String(bodies[0] || "").replace(/<br>/g," ").replace(/<[^>]+>/g,"");
-    const primaryPatternMatch = primaryText.match(/(?:Finding|Pattern):\s*([^.!?]+[.!?])/i);
-    const primaryPattern = primaryPatternMatch ? primaryPatternMatch[1].trim().slice(0,220) : "Evidence-backed identity and representation pattern";
-    const scoreMatch = report.match(/(?:overall\s+)?confidence\s+score\s*[:—-]\s*(\d{1,3})(?:\s*\/\s*100|\s*%|\s+out\s+of\s+100)?/i);
-    const confidenceScore = scoreMatch ? Math.max(0,Math.min(100,Number(scoreMatch[1]))) : null;
-    const confidenceMarkup = `<div class="tlr-confidence" style="margin-top:14px;padding:12px 14px;border:1px solid rgba(168,85,247,.28);border-radius:12px;background:rgba(168,85,247,.08);"><div style="font-size:10px;letter-spacing:1px;font-weight:900;color:#c4b5fd;">OVERALL CONFIDENCE SCORE</div><div style="font-size:26px;font-weight:900;color:#f8fafc;margin-top:4px;">${confidenceScore === null ? "Not stated" : `${confidenceScore}/100`}</div><div style="font-size:11px;color:#cbd5e1;margin-top:4px;">${confidenceScore === null ? "The report did not return a numeric score; review the stated evidence limitations." : "A calibrated assessment of the available evidence, not a measure of personal worth or certainty."}</div></div>`;
-    const nav = sections.map((section,index) => `<a href="#${section.id}">Section ${String(index+1).padStart(2,"0")}</a>`).join("");
+  const rawReport = String(report || "").trim();
+  const sections = [
+    {heading:"01. Identity & Self-Representation", id:"identitySelfRepresentation", title:"01. Identity & Self-Representation", icon:"◉", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."},
+    {heading:"02. Claims, Commitments & Intentions", id:"claimsCommitmentsIntentions", title:"02. Claims, Commitments & Intentions", icon:"◎", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."},
+    {heading:"03. Actions & Demonstrated Track Record", id:"actionsDemonstratedTrackRecord", title:"03. Actions & Demonstrated Track Record", icon:"↗", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."},
+    {heading:"04. Capability & Execution Evidence", id:"capabilityExecutionEvidence", title:"04. Capability & Execution Evidence", icon:"▣", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."},
+    {heading:"05. Independent Validation & Relationships", id:"independentValidationRelationships", title:"05. Independent Validation & Relationships", icon:"◇", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."},
+    {heading:"06. Consistency & Evolution Over Time", id:"consistencyEvolutionOverTime", title:"06. Consistency & Evolution Over Time", icon:"↻", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."},
+    {heading:"07. Reliability, Accountability & Risk Signals", id:"reliabilityAccountabilityRiskSignals", title:"07. Reliability, Accountability & Risk Signals", icon:"⚑", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."},
+    {heading:"08. Overall Pattern & Future Readiness", id:"overallPatternFutureReadiness", title:"08. Overall Pattern & Future Readiness", icon:"◎", fallback:"This section was not separately labeled in the returned report. No finding has been invented by the display layer."}
+  ];
+
+  const parsed = parseLoop7ReportSections(rawReport, sections);
+  const toSafeHtml = value => decorateLoop7Citations(
+    escapeHtml(String(value || ""))
+      .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\n/g, "<br>")
+  );
+
+  const bodies = parsed.bodies.map(body => toSafeHtml(body));
+  const sourceCount = Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry.length : 0;
+  const sourceTypes = new Set((Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry : []).map(item => String(item?.sourceType || "").toLowerCase()).filter(Boolean));
+  const primaryText = (parsed.bodies.find(body => body.trim()) || rawReport)
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const primaryPatternMatch = primaryText.match(/(?:Finding|Pattern):\s*([^.!?]+[.!?])/i);
+  const primaryPattern = primaryPatternMatch
+    ? primaryPatternMatch[1].trim().slice(0,220)
+    : "Review the evidence-led findings below";
+  const scoreMatch = rawReport.match(/(?:overall\s+)?confidence\s+score\s*[:—-]\s*(\d{1,3})(?:\s*\/\s*100|\s*%|\s+out\s+of\s+100)?/i);
+  const confidenceScore = scoreMatch ? Math.max(0,Math.min(100,Number(scoreMatch[1]))) : null;
+  const confidenceMarkup = `<div class="tlr-confidence" style="margin-top:14px;padding:12px 14px;border:1px solid rgba(168,85,247,.28);border-radius:12px;background:rgba(168,85,247,.08);"><div style="font-size:10px;letter-spacing:1px;font-weight:900;color:#c4b5fd;">OVERALL CONFIDENCE SCORE</div><div style="font-size:26px;font-weight:900;color:#f8fafc;margin-top:4px;">${confidenceScore === null ? "Not stated" : `${confidenceScore}/100`}</div><div style="font-size:11px;color:#cbd5e1;margin-top:4px;">${confidenceScore === null ? "The report did not return a numeric score; review the stated evidence limitations." : "A calibrated assessment of the available evidence, not a measure of personal worth or certainty."}</div></div>`;
+
+  let reportBodyHtml = "";
+  if(!parsed.hasRecognizedHeadings){
+    // Preserve and display the complete backend response rather than rejecting it
+    // or silently rendering eight empty cards when section labels vary.
+    reportBodyHtml = `<section id="tlr-unstructured-report" class="tlr-report-section"><h2>Investigation Report</h2><p class="tlr-empty">The report text was received. Its section boundaries were not recognized by the display layer, so the original response is shown intact below.</p><div>${toSafeHtml(rawReport)}</div></section>`;
+  }else{
+    const prefaceHtml = parsed.preface
+      ? `<div class="tlr-report-preface" style="margin:16px 0;padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#e2e8f0;line-height:1.65;">${toSafeHtml(parsed.preface)}</div>`
+      : "";
     const sectionHtml = sections.map((section,index) => `<section id="${section.id}" class="tlr-report-section"><h2>${section.icon} ${section.title}</h2>${bodies[index] || `<p class="tlr-empty">${section.fallback}</p>`}</section>`).join("");
-    return `
-      <div class="truthLoopReport">
-        <div class="tlr-header"><div class="tlr-kicker">✓ Investigation Complete</div><h1 class="tlr-title">🧠 TruthLoop Investigation</h1><p class="tlr-subtitle">Not Answers. Patterns.</p></div>
-        <div class="tlr-verdict"><div class="tlr-verdict-label">Overall Pattern</div><div class="tlr-verdict-title">${escapeHtml(primaryPattern)}</div>${confidenceMarkup}<div class="tlr-stat-grid"><div class="tlr-stat"><span class="tlr-stat-value">${sourceCount || "—"}</span><span class="tlr-stat-label">Public Sources</span></div><div class="tlr-stat"><span class="tlr-stat-value">${sourceTypes.size || "—"}</span><span class="tlr-stat-label">Source Types</span></div><div class="tlr-stat"><span class="tlr-stat-value">${sourceCount ? "✓" : "—"}</span><span class="tlr-stat-label">Evidence Mapped</span></div></div></div>
-        <nav class="tlr-nav" aria-label="Investigation sections">${nav}</nav>
-        ${sectionHtml}
-        ${renderEvidenceSources()}
-        <div style="margin-top:26px;text-align:center;"><button id="downloadReportBtn">📄 Download Report</button></div>
-        <button type="button" id="tlDeeperInvestigationCTA" class="tl-deeper-investigation-cta">Not satisfied yet, or want a deeper investigation? Tap here to continue.</button>
-      </div>`;
+    reportBodyHtml = prefaceHtml + sectionHtml;
+  }
+
+  const nav = parsed.hasRecognizedHeadings
+    ? `<nav class="tlr-nav" aria-label="Investigation sections">${sections.map((section,index) => `<a href="#${section.id}">Section ${String(index+1).padStart(2,"0")}</a>`).join("")}</nav>`
+    : "";
+
+  return `
+    <div class="truthLoopReport">
+      <div class="tlr-header"><div class="tlr-kicker">✓ Investigation Complete</div><h1 class="tlr-title">🧠 TruthLoop Investigation</h1><p class="tlr-subtitle">Not Answers. Patterns.</p></div>
+      <div class="tlr-verdict"><div class="tlr-verdict-label">Overall Pattern</div><div class="tlr-verdict-title">${escapeHtml(primaryPattern)}</div>${confidenceMarkup}<div class="tlr-stat-grid"><div class="tlr-stat"><span class="tlr-stat-value">${sourceCount || "—"}</span><span class="tlr-stat-label">Public Sources</span></div><div class="tlr-stat"><span class="tlr-stat-value">${sourceTypes.size || "—"}</span><span class="tlr-stat-label">Source Types</span></div><div class="tlr-stat"><span class="tlr-stat-value">${sourceCount ? "✓" : "—"}</span><span class="tlr-stat-label">Evidence Mapped</span></div></div></div>
+      ${nav}
+      ${reportBodyHtml}
+      ${renderEvidenceSources()}
+      <div style="margin-top:26px;text-align:center;"><button id="downloadReportBtn">📄 Download Report</button></div>
+      <button type="button" id="tlDeeperInvestigationCTA" class="tl-deeper-investigation-cta">Not satisfied yet, or want a deeper investigation? Tap here to continue.</button>
+    </div>`;
 }
 
 function showShareCard(text){
@@ -4621,6 +4684,11 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     </section>
   `;
 
+  const unstructuredReportText = document.getElementById("tlr-unstructured-report");
+  const unstructuredReportHtml = unstructuredReportText
+    ? `<section style="margin-top:24px;"><h2>Investigation Report (original response)</h2>${unstructuredReportText.innerHTML.replace(/<h2[^>]*>[\s\S]*?<\/h2>/i, "")}</section>`
+    : "";
+
   const downloadReport = `
     <div style="max-width:900px;margin:0 auto;">
 
@@ -4648,6 +4716,7 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
       <h2>08. Overall Pattern & Future Readiness</h2>
       ${getCleanSectionBody("#overallPatternFutureReadiness")}
 
+      ${unstructuredReportHtml}
       ${evidenceReferenceSection}
 
       <p style="margin-top:30px;color:#777;font-size:12px;">
