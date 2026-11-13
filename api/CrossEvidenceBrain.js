@@ -718,33 +718,80 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl) {
         }).filter(source => source.url && (source.content || source.description || source.structuredData.length));
 
         // Four topic-specific slots are selected from the same 12-page crawl.
-        // The crawler is not asked to invent pages: only pages actually returned
-        // by Apify and directly matching the topic signals can fill these slots.
+        // A page is marked "collected" only when its content contains a
+        // topic-specific evidence signal. Contextual pages are retained as
+        // "weak_match" so Loop 7 can use them cautiously without treating
+        // page discovery as proof.
         const topicDefinitions = [
-            { key: "buyer_evidence", label: "Buyer Evidence", re: /customer|client|case[\s-]?stud(?:y|ies)|testimonial|review|partner|integration|buyer|user story|customer story/i },
-            { key: "execution_repeatability", label: "Execution Repeatability", re: /changelog|release|milestone|delivery|operations?|workflow|implementation|deployment|shipping|engineering|product update/i },
-            { key: "capital_efficiency_signals", label: "Capital Efficiency Signals", re: /financial|revenue|pricing|business model|unit economics|cac|cost|funding|investor update|annual report|accounts/i },
-            { key: "investor_founder_track_record", label: "Investor / Founder Track Record", re: /founder|leadership|team|management|portfolio|investment|investor|previous venture|past venture|exit|about us/i }
+            {
+                key: "buyer_evidence",
+                label: "Buyer Evidence",
+                strong: /customer stor(?:y|ies)|case[\s-]?stud(?:y|ies)|testimonial|client reference|customer review|buyer review|customer quote|named customer|customer success/i,
+                contextual: /customer|client|buyer|partner|integration|merchant|user|adoption/i
+            },
+            {
+                key: "execution_repeatability",
+                label: "Execution Repeatability",
+                strong: /changelog|release notes?|product releases?|delivery milestones?|deployment history|implementation process|operating procedures?|operational workflow|engineering updates?|version history|shipped repeatedly/i,
+                contextual: /operations?|workflow|implementation|deployment|engineering|product update|milestone|delivery|process|launch/i
+            },
+            {
+                key: "capital_efficiency_signals",
+                label: "Capital Efficiency Signals",
+                strong: /unit economics|customer acquisition cost|\bcac\b|burn rate|cash runway|audited financial|annual report|financial results|revenue growth|gross margin|operating margin|capital efficiency|cost per customer|funding raised/i,
+                contextual: /financial|revenue|pricing|business model|funding|investor relations|annual accounts|profit|cash flow|margin/i
+            },
+            {
+                key: "investor_founder_track_record",
+                label: "Investor / Founder Track Record",
+                strong: /previous ventures?|prior startups?|founder histor(?:y|ies)|founder biography|investment portfolio|portfolio companies|previous investments?|past investments?|successful exits?|acquisition exits?|previously founded|founded before/i,
+                contextual: /founder|leadership|team|management|portfolio|investment|investor|about us|director|board/i
+            }
         ];
+
         const scoreTopic = (source, definition) => {
             const url = String(source.url || "").toLowerCase();
             const title = String(source.title || "").toLowerCase();
-            const body = String(source.content || "").slice(0, 5000).toLowerCase();
+            const body = String(source.content || "").toLowerCase();
+            const structured = Array.isArray(source.structuredData)
+                ? JSON.stringify(source.structuredData).toLowerCase()
+                : "";
+            const searchableBody = `${body} ${structured}`;
+            const strongInBody = definition.strong.test(searchableBody);
+            const strongInTitleOrUrl = definition.strong.test(`${title} ${url}`);
+            const contextInBody = definition.contextual.test(searchableBody);
+            const contextInTitleOrUrl = definition.contextual.test(`${title} ${url}`);
+
+            // Strong evidence language in page content carries most weight.
+            // A URL/title-only hit can never qualify as verified collection.
             let score = 0;
-            if (definition.re.test(url)) score += 5;
-            if (definition.re.test(title)) score += 4;
-            if (definition.re.test(body)) score += 4;
-            return score;
+            if (strongInBody) score += 8;
+            if (strongInTitleOrUrl) score += 3;
+            if (contextInBody) score += 2;
+            if (contextInTitleOrUrl) score += 1;
+
+            const evidenceSignals = [];
+            if (strongInBody) evidenceSignals.push("strong_content_signal");
+            if (strongInTitleOrUrl) evidenceSignals.push("specific_page_title_or_url");
+            if (contextInBody) evidenceSignals.push("contextual_content_signal");
+            if (contextInTitleOrUrl) evidenceSignals.push("contextual_title_or_url");
+
+            const status = strongInBody ? "collected" : (score >= 2 ? "weak_match" : "not_found");
+            return { score, status, evidenceSignals };
         };
+
         const usedUrls = new Set();
         const targetedSources = [];
         const topicCollectionStatus = {};
         for (const definition of topicDefinitions) {
             const ranked = rawSources
                 .filter(source => !usedUrls.has(source.url))
-                .map(source => ({ source, score: scoreTopic(source, definition) }))
-                .filter(item => item.score >= 4)
-                .sort((a, b) => b.score - a.score);
+                .map(source => ({ source, ...scoreTopic(source, definition) }))
+                .filter(item => item.status !== "not_found")
+                .sort((a, b) => {
+                    const statusWeight = (item) => item.status === "collected" ? 1000 : 0;
+                    return (statusWeight(b) + b.score) - (statusWeight(a) + a.score);
+                });
             const match = ranked[0];
             if (match) {
                 usedUrls.add(match.source.url);
@@ -753,13 +800,30 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl) {
                     collectionPurpose: "topic_targeted",
                     topicKey: definition.key,
                     topicLabel: definition.label,
-                    topicRelevanceScore: match.score
+                    topicRelevanceScore: match.score,
+                    topicEvidenceStatus: match.status,
+                    topicEvidenceSignals: match.evidenceSignals
                 });
-                topicCollectionStatus[definition.key] = { status: "collected", url: match.source.url, title: match.source.title || null };
+                topicCollectionStatus[definition.key] = {
+                    status: match.status,
+                    url: match.source.url,
+                    title: match.source.title || null,
+                    relevanceScore: match.score,
+                    evidenceSignals: match.evidenceSignals,
+                    reason: match.status === "collected"
+                        ? "Topic-specific evidence signal found in page content."
+                        : "Related page found, but direct topic-specific evidence was not established."
+                };
             } else {
-                topicCollectionStatus[definition.key] = { status: "not_found", reason: "No directly relevant page was returned in the available website crawl." };
+                topicCollectionStatus[definition.key] = {
+                    status: "not_found",
+                    relevanceScore: 0,
+                    evidenceSignals: [],
+                    reason: "No relevant page with topic-specific or contextual content was returned in the available website crawl."
+                };
             }
         }
+
         const generalSources = rawSources
             .filter(source => !usedUrls.has(source.url))
             .slice(0, 8)
