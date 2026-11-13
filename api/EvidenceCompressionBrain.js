@@ -806,6 +806,8 @@ async function loadEvidenceCompressionBrain({
     topicKey: source?.topicKey || null,
     topicLabel: source?.topicLabel || null,
     topicRelevanceScore: Number.isFinite(Number(source?.topicRelevanceScore)) ? Number(source.topicRelevanceScore) : null,
+    topicEvidenceStatus: source?.topicEvidenceStatus || null,
+    topicEvidenceSignals: Array.isArray(source?.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
     content: extractEvidenceText(source, 6000, 12),
     metadata: source?.metadata ?? null,
     structuredData: source?.structuredData ?? source?.jsonLd ?? null
@@ -814,8 +816,9 @@ async function loadEvidenceCompressionBrain({
   console.log("ECB_WEBSITE_SCRAPER_AUDIT", JSON.stringify({
     available: websiteScraperInput.length,
     retained: websiteScraperSources.length,
-    pages: websiteScraperSources.map(({sourceId, title, url, pageCategory, content}) => ({
-      sourceId, title, url, pageCategory, contentChars: String(content || "").length
+    topicCollectionStatus,
+    pages: websiteScraperSources.map(({sourceId, title, url, pageCategory, collectionPurpose, topicKey, topicRelevanceScore, topicEvidenceStatus, content}) => ({
+      sourceId, title, url, pageCategory, collectionPurpose, topicKey, topicRelevanceScore, topicEvidenceStatus, contentChars: String(content || "").length
     }))
   }));
 
@@ -1155,7 +1158,13 @@ async function loadEvidenceCompressionBrain({
       title: source.title || "Website source",
       url: source.url,
       date: source.date || null,
-      pageCategory: source.pageCategory || null
+      pageCategory: source.pageCategory || null,
+      collectionPurpose: source.collectionPurpose || null,
+      topicKey: source.topicKey || null,
+      topicLabel: source.topicLabel || null,
+      topicRelevanceScore: source.topicRelevanceScore ?? null,
+      topicEvidenceStatus: source.topicEvidenceStatus || null,
+      topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : []
     });
   }
 
@@ -1318,7 +1327,14 @@ async function loadEvidenceCompressionBrain({
       sourceType: source.sourceType,
       title: firstText(source.title).slice(0, 44) || null,
       url: source.url || null,
-      date: source.date || null
+      date: source.date || null,
+      pageCategory: source.pageCategory || null,
+      collectionPurpose: source.collectionPurpose || null,
+      topicKey: source.topicKey || null,
+      topicLabel: source.topicLabel || null,
+      topicRelevanceScore: source.topicRelevanceScore ?? null,
+      topicEvidenceStatus: source.topicEvidenceStatus || null,
+      topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : []
     }));
 
     const website = websiteSources.map(source => ({
@@ -1348,6 +1364,8 @@ const websiteScraper = websiteScraperSources.map(source => ({
   topicKey: source.topicKey || null,
   topicLabel: source.topicLabel || null,
   topicRelevanceScore: Number.isFinite(Number(source.topicRelevanceScore)) ? Number(source.topicRelevanceScore) : null,
+  topicEvidenceStatus: source.topicEvidenceStatus || null,
+  topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
   content: meaningfulText(
     extractEvidenceText(source, contentBudget, 12),
     contentBudget,
