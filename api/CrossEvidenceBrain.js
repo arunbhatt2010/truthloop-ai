@@ -1,5 +1,5 @@
 /* ============================================================
-   CROSS EVIDENCE BRAIN v26 — PARALLEL EVIDENCE COLLECTION + UNIVERSAL PACKAGE
+   CROSS EVIDENCE BRAIN v27 — ASYNC APIFY DELIVERY + PARALLEL EVIDENCE COLLECTION
    TruthLoop AI
 
    RESPONSIBILITY
@@ -38,13 +38,11 @@ const APIFY_TIMEOUT_SECONDS = 60;
 const APIFY_MAX_TOTAL_CHARGE_USD = "0.05";
 const X_APIFY_ACTOR_ID = process.env.APIFY_X_ACTOR_ID || "simple.actor~x-profile-posts";
 const REDDIT_APIFY_ACTOR_ID = process.env.APIFY_REDDIT_ACTOR_ID || "scrapers_lat~reddit-user-scraper";
-const UNUSED_SIGNAL_MODEL = "unused";
 
 const ENABLE_LINKEDIN_APIFY = true;
 
 const ENABLE_X = true;
 const ENABLE_REDDIT = false;
-const ENABLE_OTHER_SOCIAL = false;
 
 const SOURCE_CACHE = new Map();
 
@@ -628,11 +626,10 @@ function buildWebsiteCrawlerInput(targetUrl) {
         maxCrawlPages: 12,
         onlyCrawlPagesModifiedSince: "",
         customHttpHeaders: {},
-        // Moderate parallelism: overlap page requests without changing the
-        // 12-page crawl cap or any evidence-selection rules.
-        initialConcurrency: 3,
-        maxConcurrency: 5,
-        requestTimeoutSecs: 60,
+        // Preserve the previously tested production crawler settings.
+        initialConcurrency: 2,
+        maxConcurrency: 4,
+        requestTimeoutSecs: 180,
         minFileDownloadSpeedKBps: 128,
         maxRequestRetries: 1,
         maxSessionRotations: 2,
@@ -667,26 +664,248 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl) {
     if (!token) return { success: false, reason: "Apify token environment variable is missing.", sources: [] };
     if (!WEBSITE_CRAWLER_TASK_ID) return { success: false, reason: "Website crawler task ID is missing.", sources: [] };
 
-    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=180&maxItems=12&maxTotalChargeUsd=0.05`;
     const startedAt = Date.now();
+    const runTimeoutSeconds = 180;
+    const maxRunWaitMs = runTimeoutSeconds * 1000;
+    const pollIntervalMs = 4000;
+    const retryableStatuses = new Set([429, 500, 502, 503, 504]);
+    const taskBase = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}`;
+    const headers = {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+    };
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    // The start request is intentionally NOT blindly retried: a gateway error
+    // can happen after Apify has accepted the run, and repeating POST could
+    // create a duplicate billable crawl. All later GET requests are retryable.
     try {
-        const response = await fetch(endpoint, {
+        const startUrl = `${taskBase}/runs?timeout=${runTimeoutSeconds}&maxItems=12&maxTotalChargeUsd=0.05`;
+        const startResponse = await fetch(startUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
+            headers,
             body: JSON.stringify(buildWebsiteCrawlerInput(normalizedUrl))
         });
-        const raw = await response.text();
-        if (!response.ok) {
-            console.warn("CEB_WEBSITE_APIFY_HTTP_ERROR", JSON.stringify({ status: response.status, body: raw.slice(0, 500) }));
-            return { success: false, reason: `Apify website task HTTP ${response.status}`, sources: [] };
+        const startBody = await startResponse.text();
+        if (!startResponse.ok) {
+            console.warn("CEB_WEBSITE_APIFY_START_ERROR", JSON.stringify({
+                status: startResponse.status,
+                body: startBody.slice(0, 500),
+                retryStartedRun: false,
+                reason: "Start POST is not repeated automatically to avoid duplicate runs."
+            }));
+            return {
+                success: false,
+                reason: `Apify website task start HTTP ${startResponse.status}`,
+                sources: []
+            };
         }
-        let rows;
-        try { rows = raw.trim() ? JSON.parse(raw) : []; }
-        catch { return { success: false, reason: "Apify website task returned invalid JSON.", sources: [] }; }
+
+        let startPayload;
+        try { startPayload = startBody.trim() ? JSON.parse(startBody) : {}; }
+        catch {
+            return { success: false, reason: "Apify website task start returned invalid JSON.", sources: [] };
+        }
+
+        const startedRun = startPayload?.data || startPayload;
+        const runId = startedRun?.id || startedRun?.runId || null;
+        let datasetId = startedRun?.defaultDatasetId || null;
+        if (!runId) {
+            console.warn("CEB_WEBSITE_APIFY_START_MISSING_RUN_ID", JSON.stringify({
+                responseKeys: Object.keys(startedRun || {})
+            }));
+            return { success: false, reason: "Apify website task start response did not include a run ID.", sources: [] };
+        }
+
+        console.log("CEB_WEBSITE_APIFY_RUN_STARTED", JSON.stringify({
+            runId,
+            datasetId,
+            taskId: WEBSITE_CRAWLER_TASK_ID,
+            runTimeoutSeconds,
+            maxItems: 12,
+            maxTotalChargeUsd: 0.05
+        }));
+
+        const readApifyJson = async (url, label, maxRetries = 3) => {
+            let lastFailure = null;
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, {
+                        method: "GET",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    const raw = await response.text();
+                    if (!response.ok) {
+                        lastFailure = {
+                            status: response.status,
+                            reason: `Apify ${label} HTTP ${response.status}`,
+                            body: raw.slice(0, 500)
+                        };
+                        console.warn("CEB_WEBSITE_APIFY_READ_RETRY", JSON.stringify({
+                            label,
+                            attempt,
+                            maxRetries,
+                            status: response.status,
+                            retryable: retryableStatuses.has(response.status)
+                        }));
+                        if (!retryableStatuses.has(response.status) || attempt === maxRetries) {
+                            return { success: false, ...lastFailure };
+                        }
+                    } else {
+                        try {
+                            return { success: true, data: raw.trim() ? JSON.parse(raw) : null };
+                        } catch {
+                            lastFailure = {
+                                status: response.status,
+                                reason: `Apify ${label} returned invalid JSON.`,
+                                body: raw.slice(0, 500)
+                            };
+                            if (attempt === maxRetries) return { success: false, ...lastFailure };
+                        }
+                    }
+                } catch (error) {
+                    lastFailure = {
+                        status: null,
+                        reason: `Apify ${label} network error: ${String(error?.message || error).slice(0, 300)}`
+                    };
+                    console.warn("CEB_WEBSITE_APIFY_READ_NETWORK_RETRY", JSON.stringify({
+                        label,
+                        attempt,
+                        maxRetries,
+                        reason: lastFailure.reason
+                    }));
+                    if (attempt === maxRetries) return { success: false, ...lastFailure };
+                }
+                await sleep(Math.min(1000 * attempt, 3000));
+            }
+            return { success: false, ...(lastFailure || { reason: `Apify ${label} failed.` }) };
+        };
+
+        // Poll the same run ID. Never start another crawl because a status or
+        // dataset GET temporarily returned 502/503/504.
+        const deadline = Date.now() + maxRunWaitMs;
+        let runStatus = "UNKNOWN";
+        let consecutivePollFailures = 0;
+        let finalRunData = startedRun;
+
+        while (Date.now() < deadline) {
+            const statusResult = await readApifyJson(
+                `https://api.apify.com/v2/actor-runs/${encodeURIComponent(runId)}`,
+                "run status",
+                3
+            );
+
+            if (!statusResult.success) {
+                consecutivePollFailures += 1;
+                if (consecutivePollFailures >= 6) {
+                    return {
+                        success: false,
+                        reason: statusResult.reason || "Apify run status could not be retrieved after retries.",
+                        sources: [],
+                        runId
+                    };
+                }
+                await sleep(Math.min(pollIntervalMs * consecutivePollFailures, 12000));
+                continue;
+            }
+
+            consecutivePollFailures = 0;
+            finalRunData = statusResult.data?.data || statusResult.data || {};
+            runStatus = String(finalRunData?.status || "UNKNOWN").toUpperCase();
+            datasetId = finalRunData?.defaultDatasetId || datasetId;
+
+            console.log("CEB_WEBSITE_APIFY_RUN_STATUS", JSON.stringify({
+                runId,
+                status: runStatus,
+                elapsedMs: Date.now() - startedAt
+            }));
+
+            if (runStatus === "SUCCEEDED") break;
+            if (["FAILED", "ABORTED", "TIMED-OUT"].includes(runStatus)) {
+                console.warn("CEB_WEBSITE_APIFY_RUN_TERMINAL_FAILURE", JSON.stringify({
+                    runId,
+                    status: runStatus,
+                    statusMessage: finalRunData?.statusMessage || null,
+                    elapsedMs: Date.now() - startedAt
+                }));
+                return {
+                    success: false,
+                    reason: `Apify website task run finished with status ${runStatus}.`,
+                    sources: [],
+                    runId,
+                    runStatus
+                };
+            }
+
+            await sleep(Math.min(pollIntervalMs, Math.max(250, deadline - Date.now())));
+        }
+
+        // One final status read closes the small race where the Actor finishes
+        // just after the last scheduled poll but before the local deadline check.
+        if (runStatus !== "SUCCEEDED") {
+            const finalStatusResult = await readApifyJson(
+                `https://api.apify.com/v2/actor-runs/${encodeURIComponent(runId)}`,
+                "final run status",
+                2
+            );
+            if (finalStatusResult.success) {
+                finalRunData = finalStatusResult.data?.data || finalStatusResult.data || {};
+                runStatus = String(finalRunData?.status || runStatus).toUpperCase();
+                datasetId = finalRunData?.defaultDatasetId || datasetId;
+            }
+        }
+
+        if (runStatus !== "SUCCEEDED") {
+            console.warn("CEB_WEBSITE_APIFY_RUN_WAIT_EXCEEDED", JSON.stringify({
+                runId,
+                lastStatus: runStatus,
+                waitLimitMs: maxRunWaitMs,
+                elapsedMs: Date.now() - startedAt
+            }));
+            return {
+                success: false,
+                reason: `Apify website task did not finish within ${runTimeoutSeconds} seconds (last status: ${runStatus}).`,
+                sources: [],
+                runId,
+                runStatus
+            };
+        }
+
+        if (!datasetId) {
+            return {
+                success: false,
+                reason: "Apify website task succeeded but no default dataset ID was returned.",
+                sources: [],
+                runId,
+                runStatus
+            };
+        }
+
+        const datasetResult = await readApifyJson(
+            `https://api.apify.com/v2/datasets/${encodeURIComponent(datasetId)}/items?format=json&limit=12`,
+            "dataset items",
+            4
+        );
+        if (!datasetResult.success) {
+            return {
+                success: false,
+                reason: datasetResult.reason || "Apify website dataset could not be retrieved.",
+                sources: [],
+                runId,
+                runStatus
+            };
+        }
+
+        let rows = datasetResult.data;
         if (!Array.isArray(rows)) rows = rows?.items || rows?.data || [];
+        if (!Array.isArray(rows)) rows = [];
+
+        console.log("CEB_WEBSITE_APIFY_DATASET_RECEIVED", JSON.stringify({
+            runId,
+            datasetId,
+            rows: rows.length,
+            elapsedMs: Date.now() - startedAt
+        }));
 
         const rawSources = rows.filter(row => row && typeof row === "object").slice(0, 12).map((row, index) => {
             const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
@@ -2475,396 +2694,12 @@ async function buildSignalSignals({
         signalConfidence
     };
 
-    /* ============================================================
-       DEEP SIGNAL MATRIX
-       ------------------------------------------------------------
-       Exactly 10 signal families x 10 members.
-       These are RAW, evidence-grounded intelligence units.
-       No compression. No master-signal merging.
-       ECB remains the downstream compression stage.
-       ============================================================ */
-
-    const buildDeepSignalMember = ({
-        family,
-        member,
-        finding,
-        basis,
-        urls = [],
-        confidence = 0.84,
-        data = {}
-    } = {}) => ({
-        signalId: `${String(family || "signal").toUpperCase()}_${String(member || "00").padStart(2, "0")}`,
-        family,
-        member,
-        finding: clean(finding || "Evidence is insufficient to establish this signal."),
-        basis: clean(basis || "No direct supporting basis was retained."),
-        supportingSourceUrls: unique(urls).slice(0, 8),
-        confidence: Math.max(0.75, Math.min(0.98, Number(Number(confidence).toFixed(2)))),
-        ...data
-    });
-
-    const dateSortedAll = datedUnits
-        .slice()
-        .sort((a, b) => a.time - b.time);
-
-    const latestWebsiteUnit = websiteSources
-        .filter(item => item.time > 0)
-        .sort((a, b) => b.time - a.time)[0] || null;
-
-    const latestLinkedInUnit = [
-        ...linkedinPostSources,
-        ...linkedinArticleSources
-    ]
-        .filter(item => item.time > 0)
-        .sort((a, b) => b.time - a.time)[0] || null;
-
-    const latestWebsiteAge = latestWebsiteUnit ? daysSince(latestWebsiteUnit.source) : null;
-    const latestLinkedInAge = latestLinkedInUnit ? daysSince(latestLinkedInUnit.source) : null;
-
-    const actionLexicon = [
-        "build", "built", "ship", "shipped", "shipping", "launch", "launched",
-        "release", "released", "publish", "published", "sell", "sold",
-        "experiment", "tested", "validate", "validated", "commit", "commits",
-        "deploy", "deployed", "customer", "customers", "client", "clients"
-    ];
-
-    const analysisLexicon = [
-        "analyze", "analysis", "pattern", "patterns", "framework", "frameworks",
-        "awareness", "understand", "understanding", "psychology", "why",
-        "procrastination", "avoidance", "reflection"
-    ];
-
-    const identityLexicon = [
-        "identity", "expert", "expertise", "founder", "creator", "builder",
-        "teacher", "developer", "engineer", "coach"
-    ];
-
-    const avoidanceLexicon = [
-        "avoidance", "procrastination", "overthinking", "planning", "stuck",
-        "delay", "fear", "uncertainty", "perfection", "perfectionism"
-    ];
-
-    const audienceRows = [
-        ["founders", ["founder", "founders", "startup", "business"]],
-        ["creators", ["creator", "creators", "content", "audience"]],
-        ["professionals", ["professional", "career", "work"]],
-        ["clients", ["client", "clients", "customer", "customers"]],
-        ["behavioral seekers", ["behavior", "procrastination", "avoidance", "overthinking"]],
-        ["technical builders", ["developer", "engineering", "software", "code"]],
-        ["product users", ["product", "app", "service", "users"]],
-        ["sales-oriented audience", ["sales", "revenue", "leads", "conversion"]],
-        ["self-development audience", ["awareness", "clarity", "growth", "habit"]],
-        ["mixed audience", ["business", "behavior", "technology", "product"]]
-    ];
-
-    const positioningRows = [
-        ["core promise", "revealing the pattern behind the problem/question"],
-        ["problem framing", "public messaging frames behavior as an underlying mechanism rather than surface symptoms"],
-        ["solution framing", "the product is positioned as a behavioral clarity / discovery system"],
-        ["differentiation", "content emphasizes hidden patterns and uncomfortable truths"],
-        ["authority signal", "repeated explanatory language establishes domain knowledge"],
-        ["identity signal", "public evidence presents a builder/analyst identity"],
-        ["audience promise", "messaging targets people experiencing stuckness, avoidance or execution friction"],
-        ["commercial framing", "product/service language is present in the public footprint"],
-        ["narrative continuity", "core behavioral themes recur across source groups"],
-        ["positioning gap", "public evidence does not independently prove product outcomes or traction"]
-    ];
-
-    const topicFallbacks = [
-        "Topic concentration could not be strongly established from the retained corpus.",
-        "Topic diversity is limited by the retained evidence set.",
-        "Topic evolution is not independently established without dated topic changes.",
-        "New topic emergence is not independently established from the retained corpus.",
-        "Dropped-topic behavior cannot be established from the retained sample alone.",
-        "Problem emphasis is visible only where repeated problem language occurs.",
-        "Solution emphasis is visible only where repeated solution language occurs.",
-        "Cross-platform topic repetition requires the same topic family in at least two source groups.",
-        "Topic concentration should not be treated as behavioral proof by itself.",
-        "The strongest topic signal is the highest-frequency topic family in retained evidence."
-    ];
-
-    const behaviorSpecs = [
-        ["avoidance-language", avoidanceLexicon, "Avoidance-related language frequency in the retained public corpus."],
-        ["execution-language", actionLexicon, "Execution/action language frequency in the retained public corpus."],
-        ["analysis-language", analysisLexicon, "Analysis/reflection language frequency in the retained public corpus."],
-        ["analysis-action-balance", [], "Relative concentration of analysis/reflection language versus action/execution language."],
-        ["planning-language", ["planning", "plan", "prepare", "preparing"], "Planning/preparation language frequency."],
-        ["identity-language", identityLexicon, "Identity/professional-role language frequency."],
-        ["question-framing", ["why", "how", "what", "should"], "Question/problem-framing language frequency."],
-        ["validation-language", ["validation", "validate", "proof", "evidence", "trust"], "Validation/evidence language frequency."],
-        ["repetition-signal", ["pattern", "repeat", "again", "recurring", "loop"], "Repeated-cycle vocabulary frequency."],
-        ["behavioral-theme-presence", ["behavior", "behavioral", "psychology", "avoidance", "procrastination"], "Presence of behavioral/psychological language." ]
-    ];
-
-    const families = {};
-
-    families.topicSignals = topicRows.slice(0, 10).map((row, index) =>
-        buildDeepSignalMember({
-            family: "topic",
-            member: index + 1,
-            finding: index < topicRows.length
-                ? `${row.topic} is one of the strongest recurring public topic families, with ${row.total} observed term matches.`
-                : topicFallbacks[index],
-            basis: index < topicRows.length
-                ? `Website=${row.website}, LinkedIn=${row.linkedin}, GitHub=${row.github} term-family matches.`
-                : topicFallbacks[index],
-            urls: unique([
-                ...(row?.website ? websiteUrls : []),
-                ...(row?.linkedin ? linkedinUrls : []),
-                ...(row?.github ? githubUrls : [])
-            ]),
-            confidence: index < topicRows.length ? (row.total >= 5 ? 0.94 : 0.88) : 0.78,
-            data: { metric: index < topicRows.length ? row.total : 0 }
-        })
-    );
-
-    while (families.topicSignals.length < 10) {
-        const index = families.topicSignals.length + 1;
-        families.topicSignals.push(
-            buildDeepSignalMember({
-                family: "topic",
-                member: index,
-                finding: topicFallbacks[(index - 1) % topicFallbacks.length],
-                basis: "Retained public evidence does not establish an additional independent topic signal.",
-                urls: supportUrls,
-                confidence: 0.78
-            })
-        );
-    }
-
-    const behaviorSignalsDeep = behaviorSpecs.map(([name, terms, description], index) => {
-        if (name === "analysis-action-balance") {
-            const ratio = actionCount > 0 ? Number((analysisCount / actionCount).toFixed(2)) : null;
-            return buildDeepSignalMember({
-                family: "behavior",
-                member: index + 1,
-                finding: actionCount > 0
-                    ? `Retained public language contains ${analysisCount} analysis/reflection matches versus ${actionCount} action/execution matches (ratio ${ratio}).`
-                    : `Retained public language contains ${analysisCount} analysis/reflection matches and no detected action/execution term matches.`,
-                basis: "Deterministic keyword-family comparison; this is language evidence, not proof of real-world outcomes.",
-                urls: supportUrls,
-                confidence: 0.86,
-                data: { analysisCount, actionCount, ratio }
-            });
-        }
-        const count = countTerms(combinedText, terms);
-        return buildDeepSignalMember({
-            family: "behavior",
-            member: index + 1,
-            finding: `${description} Observed ${count} term match(es) across retained public evidence.`,
-            basis: `Counted against a deterministic vocabulary across website, LinkedIn and GitHub text.`,
-            urls: supportUrls,
-            confidence: count >= 5 ? 0.92 : count > 0 ? 0.86 : 0.78,
-            data: { matchCount: count }
-        });
-    });
-
-    families.behaviorSignals = behaviorSignalsDeep;
-
-    const timeFindings = [
-        latestWebsiteUnit
-            ? `Latest dated website evidence is ${latestWebsiteUnit.date} (${latestWebsiteAge} day(s) old).`
-            : "No usable dated website item is available in the retained evidence.",
-        latestLinkedInUnit
-            ? `Latest dated LinkedIn evidence is ${latestLinkedInUnit.date} (${latestLinkedInAge} day(s) old).`
-            : "No usable dated LinkedIn item is available in the retained evidence.",
-        datedUnits.length
-            ? `The retained dated corpus spans approximately ${spanDays} day(s).`
-            : "A dated evidence span cannot be established.",
-        datedPosts.length >= 2
-            ? `Largest observed gap between adjacent retained LinkedIn posts is ${maxGap} day(s).`
-            : "At least two dated LinkedIn posts are required to measure an inter-post gap.",
-        latestWebsiteUnit && latestLinkedInUnit
-            ? `Newest website and LinkedIn items differ by approximately ${Math.abs(Math.floor((latestWebsiteUnit.time - latestLinkedInUnit.time) / 86400000))} day(s).`
-            : "Cross-platform recency lag cannot be established from the dated subset.",
-        dateSortedAll.length ? `Dated evidence count is ${dateSortedAll.length} unit(s).` : "No dated evidence unit was retained.",
-        undatedUnits.length ? `${undatedUnits.length} retained unit(s) lack a usable publication timestamp.` : "All retained evidence units expose a usable timestamp.",
-        latestWebsiteUnit ? "Website recency is directly observable from retained timestamps." : "Website recency is not directly observable.",
-        latestLinkedInUnit ? "LinkedIn recency is directly observable from retained timestamps." : "LinkedIn recency is not directly observable.",
-        datedUnits.length >= 3 ? "The retained evidence provides enough dated points to inspect temporal sequencing." : "Temporal sequencing is limited by the number of dated points."
-    ];
-
-    families.timeSignals = timeFindings.map((finding, index) =>
-        buildDeepSignalMember({
-            family: "time",
-            member: index + 1,
-            finding,
-            basis: "Derived from retained publication timestamps only; no unobserved inactivity is inferred.",
-            urls: supportUrls,
-            confidence: datedUnits.length >= 3 ? 0.94 : 0.80
-        })
-    );
-
-    const executionFindings = [
-        `Action/execution vocabulary matches: ${actionCount}.`,
-        `Analysis/reflection vocabulary matches: ${analysisCount}.`,
-        actionCount > analysisCount ? "Execution language currently exceeds analysis/reflection language in the retained corpus." : "Analysis/reflection language currently equals or exceeds execution language in the retained corpus.",
-        `Explicit shipping/publishing/building terms observed: ${countTerms(combinedText, ["ship", "shipping", "publish", "published", "build", "building"])}.`, 
-        `Explicit validation/testing terms observed: ${countTerms(combinedText, ["validate", "validated", "test", "tested", "experiment"])}.`, 
-        `Commercial execution terms observed: ${countTerms(combinedText, ["customer", "customers", "client", "clients", "sales", "revenue"])}.`, 
-        githubSource ? "GitHub provides an independent technical artifact for execution-related corroboration." : "No GitHub artifact is available for execution corroboration.",
-        linkedinPosts.length ? `LinkedIn contributes ${linkedinPosts.length} retained post item(s) to the execution picture.` : "No LinkedIn post items are retained.",
-        websiteItems.length ? `Website contributes ${websiteItems.length} retained item(s) to the execution picture.` : "No website items are retained.",
-        "Execution language is treated as observable public language, not automatic proof of completed real-world outcomes."
-    ];
-
-    families.executionSignals = executionFindings.map((finding, index) =>
-        buildDeepSignalMember({
-            family: "execution",
-            member: index + 1,
-            finding,
-            basis: "Derived from deterministic action, validation, commercial and source-presence measures in retained evidence.",
-            urls: supportUrls,
-            confidence: 0.86
-        })
-    );
-
-    families.audienceSignals = audienceRows.map(([audience, terms], index) => {
-        const count = countTerms(combinedText, terms);
-        return buildDeepSignalMember({
-            family: "audience",
-            member: index + 1,
-            finding: count > 0
-                ? `Public evidence contains ${count} vocabulary match(es) associated with ${audience}.`
-                : `Audience focus on ${audience} is not independently established by the retained vocabulary.`,
-            basis: "Deterministic audience-language observation; not a claim about actual audience composition.",
-            urls: supportUrls,
-            confidence: count >= 5 ? 0.91 : count > 0 ? 0.84 : 0.78,
-            data: { matchCount: count }
-        });
-    });
-
-    families.positioningSignals = positioningRows.map(([member, fixedFinding], index) => {
-        const count = index < 4 ? countTerms(combinedText, [["pattern", "patterns", "avoidance", "procrastination", "behavior"][index]].flat()) : 0;
-        return buildDeepSignalMember({
-            family: "positioning",
-            member: index + 1,
-            finding: index === 9
-                ? fixedFinding
-                : `${fixedFinding}. Observable supporting language count: ${count}.`,
-            basis: index === 9
-                ? "Positioning gap is limited to what the retained public evidence can verify; no traction claim is inferred."
-                : "Derived from recurring public positioning language across the retained corpus.",
-            urls: supportUrls,
-            confidence: index === 9 ? 0.89 : 0.86
-        });
-    });
-
-    const githubFindings = [
-        githubSource ? "A public GitHub repository/profile artifact is directly present." : "GitHub evidence is absent from the retained investigation set.",
-        githubSource ? `GitHub action/build vocabulary matches: ${countTerms(githubText, actionLexicon)}.` : "GitHub build-language count cannot be established.",
-        githubSource ? `GitHub analysis/framework vocabulary matches: ${countTerms(githubText, analysisLexicon)}.` : "GitHub analysis-language count cannot be established.",
-        githubSource ? `GitHub identity/role vocabulary matches: ${countTerms(githubText, identityLexicon)}.` : "GitHub identity-language count cannot be established.",
-        githubSource ? `GitHub behavioral/avoidance vocabulary matches: ${countTerms(githubText, avoidanceLexicon)}.` : "GitHub behavioral-language count cannot be established.",
-        githubSource ? `GitHub technical/product language matches: ${countTerms(githubText, ["software", "code", "repository", "repo", "application", "app", "product"])}.` : "GitHub technical/product language count cannot be established.",
-        githubSource ? "GitHub currently provides text-level evidence, not a commit-history time series." : "No GitHub time series is available.",
-        githubSource ? "Repository description/visible text can corroborate product identity and build intent." : "Product-build corroboration from GitHub is unavailable.",
-        githubSource ? "GitHub evidence can corroborate themes seen elsewhere when the same concepts recur." : "GitHub cross-source corroboration is unavailable.",
-        githubSource ? "GitHub should be interpreted as technical/public artifact evidence, not proof of user adoption or traction." : "No GitHub artifact is available for outcome inference."
-    ];
-
-    families.githubSignals = githubFindings.map((finding, index) =>
-        buildDeepSignalMember({
-            family: "github",
-            member: index + 1,
-            finding,
-            basis: githubSource ? "Derived directly from the retained GitHub source object." : "GitHub source object is not present.",
-            urls: githubUrls,
-            confidence: githubSource ? 0.91 : 0.78
-        })
-    );
-
-    const strongestCross = crossSourceSignals.slice().sort((a, b) => b.confidence - a.confidence)[0];
-    const strongestContra = contradictions.slice().sort((a, b) => b.confidence - a.confidence)[0];
-    const sharedTopicFamilies = topicRows.filter(row => [row.website, row.linkedin, row.github, row.x, row.reddit].filter(value => value > 0).length >= 2);
-    const crossFindings = [
-        strongestCross ? strongestCross.signal : "No strong cross-source signal was deterministically established.",
-        `Independent source groups represented: ${sourceGroups}.`,
-        sharedTopicFamilies.slice(0, 5).map(row => `${row.topic} (${[row.website > 0 ? "Website" : "", row.linkedin > 0 ? "LinkedIn" : "", row.github > 0 ? "GitHub" : "", row.x > 0 ? "X" : "", row.reddit > 0 ? "Reddit" : ""].filter(Boolean).join(" + ")})`).join("; ") || "No topic family is currently shared across two retained public source groups.",
-        topicRows.filter(row => row.website > 0 && row.linkedin > 0).slice(0, 3).map(row => row.topic).join(", ") || "No topic family is currently shared by website and LinkedIn.",
-        topicRows.filter(row => row.linkedin > 0 && row.github > 0).slice(0, 3).map(row => row.topic).join(", ") || "No topic family is currently shared by LinkedIn and GitHub.",
-        topicRows.filter(row => row.website > 0 && row.github > 0).slice(0, 3).map(row => row.topic).join(", ") || "No topic family is currently shared by website and GitHub.",
-        strongestContra ? strongestContra.signal : "No evidence-backed contradiction was deterministically established.",
-        websiteExecution && linkedinPlanning ? "Website execution language and LinkedIn planning/research language create a language-level tension." : "No deterministic website-vs-LinkedIn execution/planning tension was found.",
-        outcomeCount > 0 ? `Outcome/traction vocabulary appears ${outcomeCount} time(s), but values are not inferred.` : "No direct outcome/traction vocabulary was detected.",
-        `Dated evidence units available for cross-source comparison: ${datedUnits.length}.`,
-        "Cross-source findings are corroboration/tension signals, not automatic proof of private motives."
-    ];
-
-    families.crossEvidenceSignals = crossFindings.map((finding, index) =>
-        buildDeepSignalMember({
-            family: "cross-evidence",
-            member: index + 1,
-            finding,
-            basis: "Derived from independent source-group comparison across retained public evidence.",
-            urls: supportUrls,
-            confidence: 0.87
-        })
-    );
-
-    const contradictionFindings = [
-        strongestContra ? strongestContra.signal : "No strong contradiction was established.",
-        websiteNoAdvice && linkedinAdvisory ? "Website no-advice positioning conflicts with advisory language on LinkedIn." : "No no-advice versus advisory-language conflict was detected.",
-        websiteExecution && linkedinPlanning ? "Execution-oriented website language and planning/research-oriented LinkedIn language create a public language tension." : "No deterministic execution-versus-planning language tension was detected.",
-        outcomeCount === 0 ? "Lack of direct outcome vocabulary remains an evidence gap, not a contradiction." : "Outcome vocabulary exists, but values remain unverified.",
-        datedUnits.length < 3 ? "Sparse timestamps limit contradiction testing across time." : "The dated corpus permits some temporal contradiction testing.",
-        githubSource ? "GitHub exists as an independent technical artifact that can corroborate or challenge narrative claims." : "No GitHub artifact exists to challenge the narrative.",
-        linkedinPosts.length ? "LinkedIn post history provides a direct public activity comparison point." : "No LinkedIn post history is available for comparison.",
-        websiteItems.length ? "Website publication history provides a direct public activity comparison point." : "No website publication history is available for comparison.",
-        sourceGroups >= 3 ? "Three public source groups allow broader contradiction testing than a single-channel investigation." : "Fewer than three source groups constrain contradiction testing.",
-        "A contradiction is only treated as established when two observable claims/actions genuinely conflict."
-    ];
-
-    families.contradictionSignals = contradictionFindings.map((finding, index) =>
-        buildDeepSignalMember({
-            family: "contradiction",
-            member: index + 1,
-            finding,
-            basis: "Contradiction discipline: observable conflict is required; absence or uncertainty is labelled as an evidence gap instead.",
-            urls: supportUrls,
-            confidence: strongestContra ? 0.91 : 0.82
-        })
-    );
-
-    const investigationFindings = [
-        strongestTemporal ? strongestTemporal.signal : "No dominant temporal signal was established.",
-        strongestGap ? strongestGap.signal : "No dominant evidence gap was established.",
-        strongestCross ? strongestCross.signal : "No dominant cross-source consistency signal was established.",
-        strongestContra ? strongestContra.signal : "No dominant contradiction was established.",
-        topicRows[0] ? `Most dominant topic family: ${topicRows[0].topic}.` : "No dominant topic family established.",
-        `Source breadth currently covers ${sourceGroups} public source group(s).`,
-        `Dated evidence currently covers ${datedUnits.length} unit(s).`,
-        `Retained evidence currently contains ${websiteItems.length} website item(s), ${linkedinPosts.length} LinkedIn post(s), ${linkedinArticles.length} LinkedIn article(s), ${githubSource ? 1 : 0} GitHub artifact(s), ${xPostSources.length} X post(s), and ${redditPostSources.length} Reddit post(s).`,
-        "The strongest defensible investigation lead must be traceable to observable public evidence.",
-        "Private motive remains a hypothesis unless public evidence directly corroborates the inferred mechanism."
-    ];
-
-    families.investigationSignalsDeep = investigationFindings.map((finding, index) =>
-        buildDeepSignalMember({
-            family: "investigation",
-            member: index + 1,
-            finding,
-            basis: "Investigation-priority lead derived from the strongest deterministic signals generated above.",
-            urls: supportUrls,
-            confidence: 0.89
-        })
-    );
-
-    const deepSignalFamilies = {
-        topic: families.topicSignals,
-        behavior: families.behaviorSignals,
-        time: families.timeSignals,
-        execution: families.executionSignals,
-        audience: families.audienceSignals,
-        positioning: families.positioningSignals,
-        github: families.githubSignals,
-        "cross-evidence": families.crossEvidenceSignals,
-        contradiction: families.contradictionSignals,
-        investigation: families.investigationSignalsDeep
-    };
-
-    const deepSignalCount = Object.values(deepSignalFamilies)
-        .reduce((sum, family) => sum + family.length, 0);
+    /*
+     * The former 10-family x 10-member deep-signal matrix was not exported in
+     * UniversalPublicEvidencePackage; its transport field was explicitly
+     * disabled. Remove that unused synthetic matrix generation while keeping
+     * evidence-derived contradictions and source-reliability intelligence.
+     */
 
     /* ---------------------------------------------------------
        SOURCE RELIABILITY + CONTRADICTION INTELLIGENCE
@@ -2951,9 +2786,6 @@ async function buildSignalSignals({
                 ...gapSignals,
                 ...(secondarySignalPackage.gapSignals || [])
             ].slice(0, 30),
-            deepSignalFamilies,
-            deepSignalCount,
-            deepSignalFamilyCount: Object.keys(deepSignalFamilies).length,
             signalConfidence:
                 Math.max(
                     signalConfidence,
@@ -3397,38 +3229,6 @@ function buildUniversalPackage({
     const compressedXEvidence = compressSocialEvidence(xEvidence, "x");
     const compressedRedditEvidence = compressSocialEvidence(redditEvidence, "reddit");
 
-    /*
-     * SIGNALS ARE NOT COMPRESSED HERE.
-     * Evidence Compression Brain (ECB) is the downstream compression stage.
-     * Keep the complete deep signal matrix intact for downstream analysis.
-     */
-    const compressedSignals =
-        signalResult?.signals || {
-            identity: {},
-            positioning: [],
-            niches: [],
-            expertiseSignals: [],
-            audienceSignals: [],
-            businessSignals: [],
-            creatorSignals: [],
-            topics: [],
-            recurringTopics: [],
-            behavioralSignals: [],
-            contradictions: [],
-            crossSourceSignals: [],
-            activitySignals: [],
-            temporalSignals: [],
-            consistencySignals: [],
-            executionSignals: [],
-            gapSignals: [],
-            githubSignals: [],
-            investigationSignals: [],
-            deepSignalFamilies: {},
-            deepSignalCount: 0,
-            deepSignalFamilyCount: 0,
-            signalConfidence: 0
-        };
-
     const websiteSourceUrls =
     websiteSources
       .map(source =>
@@ -3482,8 +3282,7 @@ function buildUniversalPackage({
             xPosts: compressedXEvidence?.posts?.length || 0,
             redditProfile: !!compressedRedditEvidence,
             redditPosts: compressedRedditEvidence?.posts?.length || 0,
-            signalSignals:
-                Object.keys(compressedSignals || {}).length
+            crossEvidenceIntelligence: !!signalResult?.crossEvidenceIntelligence
         })
     );
 
@@ -3572,27 +3371,6 @@ function buildUniversalPackage({
         sourceLinks:
             [...new Set(allSourceUrls)],
 
-        /*
-         * Signal is attached as intelligence only.
-         * Raw evidence remains outside Signal's output and above.
-         */
-     /*   signalSignals:
-    compressedSignals || {
-        identity: {},
-        positioning: [],
-        niches: [],
-        expertiseSignals: [],
-        audienceSignals: [],
-        businessSignals: [],
-        creatorSignals: [],
-        topics: [],
-        recurringTopics: [],
-        behavioralSignals: [],
-        contradictions: [],
-        crossSourceSignals: [],
-        signalConfidence: 0
-    },
-    */
         crossEvidenceIntelligence:
             crossEvidenceIntelligence || {
                 contradiction: {
@@ -4072,16 +3850,7 @@ console.log(
             signalStatus:
                 signalResult?.status || "unknown",
 
-            signalSignals:
-                Object.keys(
-                    universalPackage.signalSignals || {}
-                ).length,
-
-            deepSignalFamilies:
-                universalPackage.signalSignals?.deepSignalFamilyCount || 0,
-
-            deepSignalCount:
-                universalPackage.signalSignals?.deepSignalCount || 0
+            crossEvidenceIntelligence: !!universalPackage.crossEvidenceIntelligence
         })
     );
 
