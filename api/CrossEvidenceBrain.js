@@ -1,5 +1,5 @@
 /* ============================================================
-   CROSS EVIDENCE BRAIN v25 — API SAMURAI + WEBSITE SCRAPER + UNIVERSAL PACKAGE
+   CROSS EVIDENCE BRAIN v26 — PARALLEL EVIDENCE COLLECTION + UNIVERSAL PACKAGE
    TruthLoop AI
 
    RESPONSIBILITY
@@ -628,8 +628,10 @@ function buildWebsiteCrawlerInput(targetUrl) {
         maxCrawlPages: 12,
         onlyCrawlPagesModifiedSince: "",
         customHttpHeaders: {},
-        initialConcurrency: 2,
-        maxConcurrency: 4,
+        // Moderate parallelism: overlap page requests without changing the
+        // 12-page crawl cap or any evidence-selection rules.
+        initialConcurrency: 3,
+        maxConcurrency: 5,
         requestTimeoutSecs: 60,
         minFileDownloadSpeedKBps: 128,
         maxRequestRetries: 1,
@@ -3690,9 +3692,9 @@ console.log(
 
     /*
      * PUBLIC EVIDENCE ROUTING
-     * LinkedIn, X and Reddit each have at most one bounded Actor call.
-     * X and Reddit calls run in parallel; website/GitHub paths remain
-     * separate and the existing LinkedIn route is preserved.
+     * Each source keeps its existing bounded fetch and spend cap.
+     * Website, LinkedIn, X, Reddit and GitHub requests are dispatched in
+     * parallel wherever URL discovery makes them independent.
      */
 
     let websiteSources = [];
@@ -3708,27 +3710,55 @@ console.log(
     let redditUrl = "";
 
     const primaryPlatform = detectPlatform(primaryUrl);
+    const evidenceCollectionStartedAt = Date.now();
+
+    // Each independent external fetch is timed and isolated. A failed social
+    // source must not cancel the website crawl or other successful sources.
+    const runTimedEvidenceTask = async (taskName, taskFn, fallbackValue) => {
+        const taskStartedAt = Date.now();
+        try {
+            const result = await taskFn();
+            console.log("CEB_EVIDENCE_TASK_TIMING", JSON.stringify({
+                task: taskName,
+                durationMs: Date.now() - taskStartedAt,
+                success: result?.success === true,
+                sourceCount: Array.isArray(result?.sources) ? result.sources.length : undefined,
+                postCount: Array.isArray(result?.source?.posts) ? result.source.posts.length : undefined,
+                cached: result?.cached === true
+            }));
+            return result;
+        } catch (error) {
+            console.warn("CEB_EVIDENCE_TASK_ERROR", JSON.stringify({
+                task: taskName,
+                durationMs: Date.now() - taskStartedAt,
+                error: String(error?.message || error).slice(0, 500)
+            }));
+            return fallbackValue;
+        }
+    };
+
+    let websiteScraperPromise = Promise.resolve({
+        success: false,
+        reason: "Website crawler not applicable to this source type.",
+        sources: []
+    });
+    let linkedinPromise = Promise.resolve(null);
+    let githubPromise = Promise.resolve(null);
+    let xPromise = Promise.resolve(null);
+    let redditPromise = Promise.resolve(null);
 
     if (primaryPlatform === "linkedin") {
-
-        /*
-         * Primary source itself is LinkedIn.
-         * Use this URL for the single Apify call.
-         */
+        // Direct LinkedIn investigation: only the LinkedIn actor is required.
         linkedinUrl = primaryUrl;
-
     } else if (primaryPlatform === "x" || primaryPlatform === "reddit") {
-        // Direct social-profile investigations should route straight to their Actor,
-        // not waste time treating a social profile as a website crawl.
+        // Direct social investigations bypass website crawling entirely.
         if (primaryPlatform === "x") xUrl = primaryUrl;
         if (primaryPlatform === "reddit") redditUrl = primaryUrl;
-
     } else {
-
         /*
-         * Primary source is a website.
-         * Reuse website evidence already collected by DFB/PCF.
-         * Only fetch website evidence if nothing was supplied.
+         * Website source: use upstream PCF sources when supplied. Start the
+         * additive Apify crawl immediately; it is independent of the social
+         * URL discovery below and can run while PCF fallback/discovery occurs.
          */
         const suppliedWebsiteSources =
             Array.isArray(footprintPackage?.websiteEvidence?.sources)
@@ -3737,167 +3767,96 @@ console.log(
                     ? footprintPackage.sources
                     : [];
 
+        websiteScraperPromise = runTimedEvidenceTask(
+            "website_apify_crawler",
+            () => fetchWebsiteEvidenceFromApifyTask(primaryUrl),
+            { success: false, reason: "Website Apify task failed.", sources: [] }
+        );
+
         if (suppliedWebsiteSources.length > 0) {
-
             websiteSources = suppliedWebsiteSources;
-
         } else {
-
-            const websiteResult =
-                await fetchWebsiteEvidence(
-                    primaryUrl
-                );
-
-            if (websiteResult?.success) {
-                websiteSources =
-                    websiteResult.sources || [];
-            }
+            const websiteResult = await runTimedEvidenceTask(
+                "website_pcf_fallback",
+                () => fetchWebsiteEvidence(primaryUrl),
+                { success: false, reason: "PCF fallback failed.", sources: [] }
+            );
+            if (websiteResult?.success) websiteSources = websiteResult.sources || [];
         }
 
-        /*
-         * ADDITIVE WEBSITE INTELLIGENCE COLLECTION.
-         * PCF remains untouched. Apify Task adds non-article website pages.
-         */
-        const websiteScraperResult = await fetchWebsiteEvidenceFromApifyTask(primaryUrl);
-        if (websiteScraperResult?.success) {
-            const existingWebsiteUrls = new Set(websiteSources
-                .map(source => normalizeUrl(source?.url || source?.sourceUrl || source?.permalink || ""))
-                .filter(Boolean));
-            websiteScraperSources = (websiteScraperResult.sources || [])
-                .filter(source => {
-                    const url = normalizeUrl(source?.url || source?.sourceUrl || "");
-                    if (!url || existingWebsiteUrls.has(url)) return false;
-                    existingWebsiteUrls.add(url);
-                    return true;
-                });
-            websiteTopicCollectionStatus = websiteScraperResult.topicCollectionStatus || {};
-        } else {
-            console.warn("CEB_WEBSITE_APIFY_SKIPPED_OR_FAILED", websiteScraperResult?.reason || "No additional website pages returned.");
-        }
-
-        /*
-         * Discover LinkedIn URL only.
-         * Discovery itself performs NO API call.
-         */
+        // Discover social URLs from the already available footprint/PCF data.
+        // This discovery does not depend on the additive Apify page results;
+        // that was also true in the previous implementation.
         const nestedLinkedInUrls = collectLinkedInUrls(footprintPackage);
         const sourceLinkedInUrls = collectLinkedInUrls(websiteSources);
-
         const discoveredLinks = [
-            ...(Array.isArray(footprintPackage?.discoveredLinks)
-                ? footprintPackage.discoveredLinks
-                : []),
-            ...(Array.isArray(footprintPackage?.profileLinks)
-                ? footprintPackage.profileLinks
-                : []),
-            ...(Array.isArray(footprintPackage?.sourceCandidates)
-                ? footprintPackage.sourceCandidates
-                : []),
+            ...(Array.isArray(footprintPackage?.discoveredLinks) ? footprintPackage.discoveredLinks : []),
+            ...(Array.isArray(footprintPackage?.profileLinks) ? footprintPackage.profileLinks : []),
+            ...(Array.isArray(footprintPackage?.sourceCandidates) ? footprintPackage.sourceCandidates : []),
             ...nestedLinkedInUrls,
             ...sourceLinkedInUrls
         ];
+        const discoveredSocialLinks = Array.isArray(footprintPackage?.discoveredSocialLinks)
+            ? footprintPackage.discoveredSocialLinks
+            : [];
 
-        const discoveredSocialLinks =
-            Array.isArray(footprintPackage?.discoveredSocialLinks)
-                ? footprintPackage.discoveredSocialLinks
-                : [];
+        linkedinUrl = findLinkedInUrl({
+            requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks
+        });
+        githubUrl = findGitHubUrl({
+            requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks
+        });
+        xUrl = findPlatformProfileUrl("x", {
+            requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks
+        });
+        redditUrl = findPlatformProfileUrl("reddit", {
+            requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks
+        });
 
-        linkedinUrl =
-            findLinkedInUrl({
-                requestedLinks,
-                websiteSources,
-                discoveredLinks,
-                discoveredSocialLinks
-            });
-
-        githubUrl =
-            findGitHubUrl({
-                requestedLinks,
-                websiteSources,
-                discoveredLinks,
-                discoveredSocialLinks
-            });
-        xUrl = findPlatformProfileUrl("x", { requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks });
-        redditUrl = findPlatformProfileUrl("reddit", { requestedLinks, websiteSources, discoveredLinks, discoveredSocialLinks });
-
-        console.log(
-            "CEB_PUBLIC_LINK_DISCOVERY",
-            JSON.stringify({
-                requestedLinks: requestedLinks.length,
-                websiteSources: websiteSources.length,
-                discoveredLinks: discoveredLinks.length,
-                discoveredSocialLinks: discoveredSocialLinks.length,
-                nestedLinkedInUrls: nestedLinkedInUrls.length,
-                sourceLinkedInUrls: sourceLinkedInUrls.length,
-                linkedinUrl: linkedinUrl || null,
-                linkedinTargetUrlSelected: !!linkedinUrl,
-                linkedinTargetType: linkedinUrl ? (isLinkedInCompanyUrl(linkedinUrl) ? "company" : "person") : null,
-                apifyCallWillRun: !!(linkedinUrl && ENABLE_LINKEDIN_APIFY),
-                githubUrl: githubUrl || null,
-                xUrl: xUrl || null,
-                redditUrl: redditUrl || null
-            })
-        );
+        console.log("CEB_PUBLIC_LINK_DISCOVERY", JSON.stringify({
+            requestedLinks: requestedLinks.length,
+            websiteSources: websiteSources.length,
+            discoveredLinks: discoveredLinks.length,
+            discoveredSocialLinks: discoveredSocialLinks.length,
+            nestedLinkedInUrls: nestedLinkedInUrls.length,
+            sourceLinkedInUrls: sourceLinkedInUrls.length,
+            linkedinUrl: linkedinUrl || null,
+            linkedinTargetUrlSelected: !!linkedinUrl,
+            linkedinTargetType: linkedinUrl ? (isLinkedInCompanyUrl(linkedinUrl) ? "company" : "person") : null,
+            apifyCallWillRun: !!(linkedinUrl && ENABLE_LINKEDIN_APIFY),
+            githubUrl: githubUrl || null,
+            xUrl: xUrl || null,
+            redditUrl: redditUrl || null
+        }));
     }
 
-    /*
-     * Reuse an already-fetched GitHub package when supplied by the
-     * upstream footprint package. Otherwise fetch the public profile
-     * directly — never through Apify.
-     */
+    // Reuse supplied GitHub evidence; otherwise fetch it independently.
     const suppliedGithubEvidence =
         footprintPackage?.githubEvidence ||
         footprintPackage?.github ||
         footprintPackage?.githubProfile ||
         null;
-
     if (suppliedGithubEvidence) {
         githubEvidence = suppliedGithubEvidence;
-        githubUrl =
-            githubUrl ||
-            normalizeUrl(
-                suppliedGithubEvidence?.sourceUrl ||
-                suppliedGithubEvidence?.profileUrl ||
-                suppliedGithubEvidence?.url ||
-                ""
-            );
-    } else if (githubUrl) {
-        const githubResult =
-            await fetchGitHubDirect(githubUrl);
-
-        if (githubResult?.success && githubResult?.source) {
-            githubEvidence = githubResult.source;
-        }
+        githubUrl = githubUrl || normalizeUrl(
+            suppliedGithubEvidence?.sourceUrl ||
+            suppliedGithubEvidence?.profileUrl ||
+            suppliedGithubEvidence?.url || ""
+        );
     }
 
-    /* ------------------------------------------------------------
-       LINKEDIN APIFY COLLECTION
-       One API Samurai Actor call supports either a company page or a person profile.
-       It normalizes profile/About, posts and articles for the Universal Package.
-       ------------------------------------------------------------ */
-
-    if (
-        linkedinUrl &&
-        ENABLE_LINKEDIN_APIFY
-    ) {
-        console.log(
-            "CEB_LINKEDIN_APIFY_DISPATCH",
-            JSON.stringify({
-                actorId: APIFY_ACTOR_ID,
-                linkedinUrl,
-                enabled: ENABLE_LINKEDIN_APIFY
-            })
+    // Dispatch every independent source call before awaiting any of them.
+    if (linkedinUrl && ENABLE_LINKEDIN_APIFY) {
+        console.log("CEB_LINKEDIN_APIFY_DISPATCH", JSON.stringify({
+            actorId: APIFY_ACTOR_ID,
+            linkedinUrl,
+            enabled: ENABLE_LINKEDIN_APIFY
+        }));
+        linkedinPromise = runTimedEvidenceTask(
+            "linkedin_apify",
+            () => fetchLinkedInFromApify(linkedinUrl),
+            { success: false, reason: "LinkedIn Apify task failed.", source: null }
         );
-
-        const apifyResult = await fetchLinkedInFromApify(linkedinUrl);
-
-        if (apifyResult?.success && apifyResult?.source) {
-            linkedinSource = apifyResult.source;
-        } else if (apifyResult?.reason) {
-            console.error(
-                "CEB_LINKEDIN_APIFY_SOURCE_UNAVAILABLE",
-                apifyResult.reason
-            );
-        }
     } else if (!linkedinUrl) {
         console.warn(
             "CEB_LINKEDIN_APIFY_SKIPPED_NO_PROFILE_URL",
@@ -3905,31 +3864,98 @@ console.log(
         );
     }
 
-    // X + Reddit: run concurrently to reduce Loop 7 latency; each Actor keeps its own spend cap.
-    const socialTasks = [];
+    if (!suppliedGithubEvidence && githubUrl) {
+        githubPromise = runTimedEvidenceTask(
+            "github_direct",
+            () => fetchGitHubDirect(githubUrl),
+            { success: false, reason: "GitHub fetch failed.", source: null }
+        );
+    }
     if (ENABLE_X && xUrl) {
-        socialTasks.push(fetchSocialProfileAndPostsFromApify("x", xUrl)
-            .then(result => ({ platform: "x", result })));
+        xPromise = runTimedEvidenceTask(
+            "x_apify",
+            () => fetchSocialProfileAndPostsFromApify("x", xUrl),
+            { success: false, reason: "X Apify task failed.", source: null }
+        );
     }
     if (ENABLE_REDDIT && redditUrl) {
-        socialTasks.push(fetchSocialProfileAndPostsFromApify("reddit", redditUrl)
-            .then(result => ({ platform: "reddit", result })));
+        redditPromise = runTimedEvidenceTask(
+            "reddit_apify",
+            () => fetchSocialProfileAndPostsFromApify("reddit", redditUrl),
+            { success: false, reason: "Reddit Apify task failed.", source: null }
+        );
     }
-    const socialResults = await Promise.all(socialTasks);
-    for (const { platform, result } of socialResults) {
-        if (result?.success && result?.source) {
-            if (platform === "x") xEvidence = result.source;
-            if (platform === "reddit") redditEvidence = result.source;
-        } else {
-            console.warn(`CEB_${platform.toUpperCase()}_APIFY_UNAVAILABLE`, result?.reason || "No social evidence returned.");
-        }
+
+    console.log("CEB_PARALLEL_COLLECTION_DISPATCH", JSON.stringify({
+        websiteApify: primaryPlatform !== "linkedin" && primaryPlatform !== "x" && primaryPlatform !== "reddit",
+        linkedin: !!(linkedinUrl && ENABLE_LINKEDIN_APIFY),
+        github: !!(!suppliedGithubEvidence && githubUrl),
+        x: !!(ENABLE_X && xUrl),
+        reddit: !!(ENABLE_REDDIT && redditUrl)
+    }));
+
+    const [websiteScraperResult, linkedinResult, githubResult, xResult, redditResult] =
+        await Promise.all([
+            websiteScraperPromise,
+            linkedinPromise,
+            githubPromise,
+            xPromise,
+            redditPromise
+        ]);
+
+    if (websiteScraperResult?.success) {
+        const existingWebsiteUrls = new Set(websiteSources
+            .map(source => normalizeUrl(source?.url || source?.sourceUrl || source?.permalink || ""))
+            .filter(Boolean));
+        websiteScraperSources = (websiteScraperResult.sources || []).filter(source => {
+            const url = normalizeUrl(source?.url || source?.sourceUrl || "");
+            if (!url || existingWebsiteUrls.has(url)) return false;
+            existingWebsiteUrls.add(url);
+            return true;
+        });
+        websiteTopicCollectionStatus = websiteScraperResult.topicCollectionStatus || {};
+    } else if (primaryPlatform !== "linkedin" && primaryPlatform !== "x" && primaryPlatform !== "reddit") {
+        console.warn("CEB_WEBSITE_APIFY_SKIPPED_OR_FAILED", websiteScraperResult?.reason || "No additional website pages returned.");
     }
+
+    if (linkedinResult?.success && linkedinResult?.source) {
+        linkedinSource = linkedinResult.source;
+    } else if (linkedinUrl && linkedinResult?.reason) {
+        console.error("CEB_LINKEDIN_APIFY_SOURCE_UNAVAILABLE", linkedinResult.reason);
+    }
+
+    if (!githubEvidence && githubResult?.success && githubResult?.source) {
+        githubEvidence = githubResult.source;
+    } else if (!githubEvidence && githubUrl && githubResult?.reason) {
+        console.warn("CEB_GITHUB_SOURCE_UNAVAILABLE", githubResult.reason);
+    }
+
+    if (xResult?.success && xResult?.source) xEvidence = xResult.source;
+    else if (xUrl && xResult?.reason) console.warn("CEB_X_APIFY_UNAVAILABLE", xResult.reason);
+
+    if (redditResult?.success && redditResult?.source) redditEvidence = redditResult.source;
+    else if (redditUrl && redditResult?.reason) console.warn("CEB_REDDIT_APIFY_UNAVAILABLE", redditResult.reason);
+
+    console.log("CEB_EVIDENCE_COLLECTION_COMPLETE", JSON.stringify({
+        durationMs: Date.now() - evidenceCollectionStartedAt,
+        websiteSources: websiteSources.length,
+        websiteScraperSources: websiteScraperSources.length,
+        linkedin: !!linkedinSource,
+        linkedinPosts: linkedinSource?.posts?.length || 0,
+        github: !!githubEvidence,
+        x: !!xEvidence,
+        xPosts: xEvidence?.posts?.length || 0,
+        reddit: !!redditEvidence,
+        redditPosts: redditEvidence?.posts?.length || 0,
+        topicCollectionStatusKeys: Object.keys(websiteTopicCollectionStatus || {})
+    }));
 
     /*
      * Signal gets the SAME collected evidence.
      *
      * No filtering/ranking occurs before this call.
      */
+    const signalBuildStartedAt = Date.now();
     const signalResult =
         await buildSignalSignals({
             websiteEvidence:
@@ -3941,11 +3967,18 @@ console.log(
             xEvidence,
             redditEvidence
         });
+    console.log("CEB_SIGNAL_BUILD_TIMING", JSON.stringify({
+        durationMs: Date.now() - signalBuildStartedAt,
+        websiteEvidence: websiteSources.length + websiteScraperSources.length,
+        linkedinPosts: linkedinSource?.posts?.length || 0,
+        xPosts: xEvidence?.posts?.length || 0
+    }));
 
     /*
      * Universal Package = POSTMASTER.
      * It simply carries the evidence + Signal signals.
      */
+    const universalPackageStartedAt = Date.now();
     const universalPackage =
         buildUniversalPackage({
             primaryUrl,
@@ -3959,6 +3992,12 @@ console.log(
             signalResult,
             crossEvidenceIntelligence: signalResult?.crossEvidenceIntelligence || null
         });
+    console.log("CEB_UNIVERSAL_PACKAGE_BUILD_TIMING", JSON.stringify({
+        durationMs: Date.now() - universalPackageStartedAt,
+        websiteSources: websiteSources.length,
+        websiteScraperSources: websiteScraperSources.length,
+        topicStatusKeys: Object.keys(websiteTopicCollectionStatus || {}).length
+    }));
 
     const sourcesSucceeded =
         websiteSources.length +
