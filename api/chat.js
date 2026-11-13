@@ -948,13 +948,13 @@ Use these labels naturally within the existing eight sections when they improve 
 Do not force every label into every section. Do not add a new report heading or create a finding merely to populate a label.
 
 USER-FACING REPORT LANGUAGE
-${outputLanguageName ? `Write all explanatory report content in ${outputLanguageName}. Keep the eight section heading lines above exactly as written in English because the frontend uses them as stable section identifiers.` : `Use the user's language for all explanatory report content. Keep the eight section heading lines above exactly as written in English because the frontend uses them as stable section identifiers.`}
+${outputLanguageName ? `Write all explanatory report content in ${outputLanguageName}. Keep the eight canonical section titles in English as part of TruthLoop's own report structure; they are not client-side formatting instructions.` : `Use the user's language for all explanatory report content. Keep the eight canonical section titles in English as part of TruthLoop's own report structure; they are not client-side formatting instructions.`}
 
 FORMATTING
-- Return exactly the eight headings above, in the exact order, each on its own line.
-- Do not add markdown heading markers such as # or ##.
-- Do not add emojis to headings or bullet glyphs such as ⏩, ▶️, ➡️.
-- Put substantive investigation content directly under each heading.
+- Include the eight canonical section titles above in their listed order. Each title must remain recognizable, but harmless presentation formatting such as Markdown heading markers, bold text, or a leading section label is permitted.
+- Do not rename, remove, split, reorder, or add report sections.
+- Do not add emojis to the canonical section titles.
+- Put substantive investigation content directly under the relevant section title.
 - Use concise, specific paragraphs or compact bullets only when they improve clarity; do not pad for length.
 - Return the finished report only. No preamble, process notes, source-allocation table, or postscript.
     `;
@@ -2227,125 +2227,25 @@ let reply =
 
 
 /* ==========================================
-   LOOP 7 REPORT FORMAT
-   Backend returns plain-text section headings only.
-   Frontend owns all emoji/bullet presentation.
+   LOOP 7 REPORT PAYLOAD
+   The backend owns report content and the eight-section TruthLoop schema.
+   Client presentation must not decide whether a non-empty report is valid.
+   Keep completeness/format checks diagnostic only; never trigger a retry or
+   rewrite report content merely to satisfy a frontend parser.
 ========================================== */
-
-/* ==========================================
-   LOOP 7 COMPLETE-REPORT GUARD
-   Retry once only when the report is
-   missing/truncating any required section.
-   Evidence payload + SOURCE_XX system unchanged.
-========================================== */
-
 if (loopLevel === 7) {
-  const requiredLoop7Sections = [
-    "01. Identity & Self-Representation",
-    "02. Claims, Commitments & Intentions",
-    "03. Actions & Demonstrated Track Record",
-    "04. Capability & Execution Evidence",
-    "05. Independent Validation & Relationships",
-    "06. Consistency & Evolution Over Time",
-    "07. Reliability, Accountability & Risk Signals",
-    "08. Overall Pattern & Future Readiness"
-  ];
-
-  const findSectionHeading = (text, heading, fromIndex = 0) => {
-    const escaped = String(heading).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(
-      `(?:^|\\n)[ \\t]*(?:#{1,6}[ \\t]*)?${escaped}[ \\t]*(?=\\n|$)`,
-      "g"
-    );
-    regex.lastIndex = Math.max(0, fromIndex);
-    const match = regex.exec(String(text || ""));
-    if (!match) return -1;
-    return match.index + (match[0].startsWith("\n") ? 1 : 0);
-  };
-
-  const getLoop7SectionBodies = (value = "") => {
-    const source = String(value || "").replace(/\r/g, "");
-    if (!source.trim()) return [];
-
-    return requiredLoop7Sections.map((heading, index) => {
-      const start = findSectionHeading(source, heading, 0);
-      if (start < 0) return { heading, body: "" };
-
-      const nextStarts = requiredLoop7Sections
-        .slice(index + 1)
-        .map(nextHeading =>
-          findSectionHeading(source, nextHeading, start + heading.length)
-        )
-        .filter(position => position >= 0);
-
-      const end = nextStarts.length
-        ? Math.min(...nextStarts)
-        : source.length;
-
-      return {
-        heading,
-        body: source
-          .slice(start + heading.length, end)
-          .replace(/<[^>]*>/g, " ")
-          .replace(/\s+/g, " ")
-          .trim()
-      };
-    });
-  };
-
-  const reportIsComplete = value => {
-  const sections = getLoop7SectionBodies(value);
-
-  const emptyOnly = new Set([
-    "",
-    "no data",
-    "not available",
-    "not provided",
-    "none",
-    "n/a",
-    "insufficient information"
-  ]);
-
-  return (
-    sections.length === requiredLoop7Sections.length &&
-    sections.every(({ body }) =>
-      body.length >= 60 &&
-      !emptyOnly.has(body.toLowerCase())
-    )
+  console.log(
+    "LOOP7_REPORT_PAYLOAD",
+    JSON.stringify({
+      nonEmpty: !!String(reply || "").trim(),
+      replyChars: String(reply || "").length,
+      expectedSections: 8,
+      sourceRegistryCount: Array.isArray(loop7EvidenceSourceIndexCompact)
+        ? loop7EvidenceSourceIndexCompact.length
+        : 0
+    })
   );
-};
-
-console.log(
-  "LOOP7_REPORT_COMPLETENESS",
-  JSON.stringify({
-    complete: reportIsComplete(reply),
-    replyChars: String(reply || "").length,
-    requiredSections: requiredLoop7Sections.length
-  })
-);
-
-/*
-  Investigation gate disabled.
-  Loop 7 report is returned from the selected provider.
-  Completeness remains diagnostic only.
-*/
-const loop7GatePassed = true;
-
-console.log(
-  "LOOP7_REPORT_SINGLE_CALL_GATE",
-  JSON.stringify({
-    passed: loop7GatePassed,
-    retryAttempted: false,
-    gateDisabled: true
-  })
-);
-
-console.log(
-  "LOOP7_FINAL_REPORTING",
-  JSON.stringify({
-    replyChars: reply?.length || 0
-  })
-);
+}
 
 }
     /* =========================
