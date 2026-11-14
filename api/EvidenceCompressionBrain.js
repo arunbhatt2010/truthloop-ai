@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v21 — TOPIC CONTRACT + CLUSTERING OPTIMIZATION
+   EVIDENCE COMPRESSION BRAIN v21 — INDEPENDENT SOURCE METADATA PRESERVATION
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -45,13 +45,7 @@ const MAX_LINKEDIN_ARTICLES = Number.POSITIVE_INFINITY;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
 const MAX_REDDIT_POSTS = Number.POSITIVE_INFINITY;
 
-const PACKAGE_VERSION = "23.0"; // Shared CEB/ECB package contract; intentionally unchanged.
-const REQUIRED_WEBSITE_TOPIC_KEYS = [
-  "buyer_evidence",
-  "execution_repeatability",
-  "capital_efficiency_signals",
-  "investor_founder_track_record"
-];
+const PACKAGE_VERSION = "23.0";
 
 /* ---------------------------------------------------------
    BASIC HELPERS
@@ -627,7 +621,6 @@ async function loadEvidenceCompressionBrain({
   truthLoopPackage = {},
   publicEvidencePackage = {}
 } = {}) {
-  const ecbStartedAt = Date.now();
   console.log("ECB_START");
 
   const universalPackage =
@@ -693,21 +686,9 @@ async function loadEvidenceCompressionBrain({
   const websiteScraperInput = Array.isArray(universalPackage?.websiteScraperEvidence?.sources)
     ? universalPackage.websiteScraperEvidence.sources
     : [];
-  const incomingWebsiteTopicStatus = universalPackage?.websiteScraperEvidence?.topicCollectionStatus && typeof universalPackage.websiteScraperEvidence.topicCollectionStatus === "object"
+  const websiteTopicCollectionStatus = universalPackage?.websiteScraperEvidence?.topicCollectionStatus && typeof universalPackage.websiteScraperEvidence.topicCollectionStatus === "object"
     ? universalPackage.websiteScraperEvidence.topicCollectionStatus
     : {};
-  // Preserve the exact upstream status records; do not fabricate "collected"
-  // or "not_found" results when CEB did not provide a topic assessment.
-  const websiteTopicCollectionStatus = { ...incomingWebsiteTopicStatus };
-  const missingWebsiteTopicKeys = REQUIRED_WEBSITE_TOPIC_KEYS.filter(
-    key => !Object.prototype.hasOwnProperty.call(websiteTopicCollectionStatus, key)
-  );
-  console.log("ECB_TOPIC_COLLECTION_CONTRACT", JSON.stringify({
-    expectedKeys: REQUIRED_WEBSITE_TOPIC_KEYS,
-    receivedKeys: Object.keys(websiteTopicCollectionStatus),
-    missingKeys: missingWebsiteTopicKeys,
-    scraperSourcesReceived: websiteScraperInput.length
-  }));
 
   const websiteSourcesInput = selectSources(
     websiteInput,
@@ -827,6 +808,8 @@ async function loadEvidenceCompressionBrain({
     topicRelevanceScore: Number.isFinite(Number(source?.topicRelevanceScore)) ? Number(source.topicRelevanceScore) : null,
     topicEvidenceStatus: source?.topicEvidenceStatus || null,
     topicEvidenceSignals: Array.isArray(source?.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
+    sourceDomain: source?.sourceDomain || null,
+    sourceIndependence: source?.sourceIndependence || null,
     content: extractEvidenceText(source, 6000, 12),
     metadata: source?.metadata ?? null,
     structuredData: source?.structuredData ?? source?.jsonLd ?? null
@@ -1073,32 +1056,19 @@ async function loadEvidenceCompressionBrain({
     ...(redditProfile ? [redditProfile] : []), ...redditPosts
   ];
 
-  const clusteringStartedAt = Date.now();
-  const escapeRegexText = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const compiledBehavioralRules = behavioralClusterRules.map(rule => ({
-    name: rule.name,
-    terms: rule.terms.map(term => ({
-      term,
-      regex: new RegExp(`\\b${escapeRegexText(term)}\\b`, "i")
-    }))
-  }));
-  // Convert each retained evidence unit to lowercase text once, not once per rule.
-  const clusteringSources = retainedEvidenceUnits.map(source => ({
-    source,
-    searchableText: rawEvidenceText(source).toLowerCase()
-  }));
-
-  const behavioralClusters = compiledBehavioralRules
+  const behavioralClusters = behavioralClusterRules
     .map(rule => {
       const matches = [];
-      for (const entry of clusteringSources) {
-        const matchedTerms = rule.terms
-          .filter(item => item.regex.test(entry.searchableText))
-          .map(item => item.term);
+      for (const source of retainedEvidenceUnits) {
+        const text = rawEvidenceText(source).toLowerCase();
+        const matchedTerms = rule.terms.filter(term => {
+          const escaped = String(term).replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
+          return new RegExp(`\\b${escaped}\\b`, "i").test(text);
+        });
         if (matchedTerms.length) {
           matches.push({
-            sourceId: entry.source.sourceId || null,
-            url: getUrl(entry.source),
+            sourceId: source.sourceId || null,
+            url: getUrl(source),
             matchedTerms: matchedTerms.slice(0, 4)
           });
         }
@@ -1121,13 +1091,6 @@ async function loadEvidenceCompressionBrain({
     })
     .filter(Boolean)
     .sort((a, b) => b.matchCount - a.matchCount);
-
-  console.log("ECB_BEHAVIORAL_CLUSTERING_TIMING", JSON.stringify({
-    durationMs: Date.now() - clusteringStartedAt,
-    evidenceUnits: retainedEvidenceUnits.length,
-    rules: compiledBehavioralRules.length,
-    clusters: behavioralClusters.length
-  }));
 
   const datedEvidenceCount = retainedEvidenceUnits.filter(source =>
     !!getDate(source)
@@ -1203,7 +1166,9 @@ async function loadEvidenceCompressionBrain({
       topicLabel: source.topicLabel || null,
       topicRelevanceScore: source.topicRelevanceScore ?? null,
       topicEvidenceStatus: source.topicEvidenceStatus || null,
-      topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : []
+      topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
+      sourceDomain: source.sourceDomain || null,
+      sourceIndependence: source.sourceIndependence || null
     });
   }
 
@@ -1373,7 +1338,9 @@ async function loadEvidenceCompressionBrain({
       topicLabel: source.topicLabel || null,
       topicRelevanceScore: source.topicRelevanceScore ?? null,
       topicEvidenceStatus: source.topicEvidenceStatus || null,
-      topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : []
+      topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
+      sourceDomain: source.sourceDomain || null,
+      sourceIndependence: source.sourceIndependence || null
     }));
 
     const website = websiteSources.map(source => ({
@@ -1405,6 +1372,8 @@ const websiteScraper = websiteScraperSources.map(source => ({
   topicRelevanceScore: Number.isFinite(Number(source.topicRelevanceScore)) ? Number(source.topicRelevanceScore) : null,
   topicEvidenceStatus: source.topicEvidenceStatus || null,
   topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
+  sourceDomain: source.sourceDomain || null,
+  sourceIndependence: source.sourceIndependence || null,
   content: meaningfulText(
     extractEvidenceText(source, contentBudget, 12),
     contentBudget,
@@ -1854,12 +1823,7 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       evidenceSourcesRetained: sourceRegistry.length,
       meaningfulCompression: true,
       destructiveCharacterCompaction: false,
-      linksModified: false,
-      topicStatusKeysRetained: Object.keys(finalPackage?.evidenceUniverse?.websiteTopicCollectionStatus || {}),
-      missingRequiredTopicStatusKeys: REQUIRED_WEBSITE_TOPIC_KEYS.filter(key =>
-        !Object.prototype.hasOwnProperty.call(finalPackage?.evidenceUniverse?.websiteTopicCollectionStatus || {}, key)
-      ),
-      durationMs: Date.now() - ecbStartedAt
+      linksModified: false
     })
   );
 
