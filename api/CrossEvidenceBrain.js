@@ -48,7 +48,8 @@ const WEBSITE_CRAWLER_MAX_PAGES = 8;
 const WEBSITE_CRAWLER_MAX_RESULTS = 8;
 const WEBSITE_CRAWLER_REQUEST_TIMEOUT_SECONDS = 180;
 const WEBSITE_CRAWLER_SYNC_TIMEOUT_SECONDS = 180;
-const WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD = "0.02";
+const WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD = "0.04";
+const WEBSITE_CRAWLER_MEMORY_MB = 2048;
 
 const ENABLE_LINKEDIN_APIFY = true;
 const ENABLE_X = true;
@@ -611,7 +612,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
     // maxCrawlPages/maxResults cap the crawl/output. maxTotalChargeUsd is the
     // run-level charge ceiling; maxItems is intentionally omitted because it
     // is only a billing cap for pay-per-result Actors, not a page limit.
-    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=${WEBSITE_CRAWLER_SYNC_TIMEOUT_SECONDS}&maxTotalChargeUsd=${WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD}`;
+    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=${WEBSITE_CRAWLER_SYNC_TIMEOUT_SECONDS}&memory=${WEBSITE_CRAWLER_MEMORY_MB}&maxTotalChargeUsd=${WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD}`;
     const startedAt = Date.now();
     try {
         const response = await fetch(endpoint, {
@@ -643,6 +644,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
                 maxCrawlPages: WEBSITE_CRAWLER_MAX_PAGES,
                 maxResults: WEBSITE_CRAWLER_MAX_RESULTS,
                 maxTotalChargeUsd: WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD,
+                memoryMb: WEBSITE_CRAWLER_MEMORY_MB,
                 runId,
                 apiMessage: apiMessage || null,
                 responseBody: raw.slice(0, 1600)
@@ -807,6 +809,8 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
             taskId: WEBSITE_CRAWLER_TASK_ID,
             pagesReturned: rawSources.length,
             maxAdditionalPages: WEBSITE_CRAWLER_MAX_PAGES,
+            memoryMb: WEBSITE_CRAWLER_MEMORY_MB,
+            maxTotalChargeUsd: WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD,
             externalSeedCount: Math.max(0, crawlerSeedUrls.length - 1),
             generalPagesSelected: generalSources.length,
             topicPagesSelected: targetedSources.length,
