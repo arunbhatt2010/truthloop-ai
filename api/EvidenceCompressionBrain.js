@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v24 — PCF 30 WEBSITE PAGES + LINKEDIN POSTS ONLY
+   EVIDENCE COMPRESSION BRAIN v27 — PCF 15L + ADDITIONAL PLATFORMS 1L
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -25,9 +25,10 @@
 
 // Expanded for large public websites and multi-platform evidence packages.
 // These are character limits, not provider token/context guarantees.
-const MAX_TOTAL_PACKAGE_CHARS = 500000;
-const ECB_OUTPUT_LIMIT = 500000;
-const ECB_TRANSPORT_LIMIT = 500000;
+const MAX_TOTAL_PACKAGE_CHARS = 1600000;
+const ECB_OUTPUT_LIMIT = 1600000;
+const ECB_TRANSPORT_LIMIT = 1600000;
+const MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS = 100000;
 const MAX_INPUT_PACKAGE_CHARS = 10000000;
 
 /*
@@ -44,7 +45,7 @@ const MAX_LINKEDIN_ARTICLES = 0;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
 const MAX_REDDIT_POSTS = 0;
 
-const PACKAGE_VERSION = "25.0";
+const PACKAGE_VERSION = "27.0";
 
 /* ---------------------------------------------------------
    BASIC HELPERS
@@ -201,6 +202,91 @@ const meaningfulText = (value, maxChars = 700, maxSentences = 5) => {
     .join(" ")
     .slice(0, maxChars)
     .trim();
+};
+
+/* ---------------------------------------------------------
+   PCF WEBSITE EVIDENCE CAP
+   Preserve all PCF website text up to 1.5M characters. Above that,
+   select complete high-value evidence sentences globally, ensuring
+   at least one best segment per non-empty source.
+--------------------------------------------------------- */
+const MAX_PCF_WEBSITE_CONTENT_CHARS = 1500000;
+
+const scoreWebsiteEvidenceSegment = (text, index, total) => {
+  let score = 1;
+  const rules = [
+    [/\b(revenue|turnover|profit|funding|valuation|investment|financial|\bUSD\b|\bINR\b)\b/i, 12],
+    [/\b(customer|client|case study|contract|deployment|users served|customers served)\b/i, 11],
+    [/\b(partner|partnership|investor|acquisition|subsidiary|ownership|founder|leadership|board)\b/i, 10],
+    [/\b(product|platform|service|technology|patent|proprietary|solution|business model)\b/i, 9],
+    [/\b(launched|built|delivered|implemented|completed|achieved|generated|served|deployed|certified)\b/i, 8],
+    [/\b(risk|dispute|lawsuit|litigation|complaint|penalty|breach|failure|delay|recall|controversy|inconsistent|contradict)\b/i, 12],
+    [/\b(not|never|no longer|ceased|terminated|declined|loss|debt|default|warning|limitation|unable)\b/i, 8],
+    [/\b\d+(?:[.,]\d+)?\s?(?:%|million|billion|crore|lakh|thousand|k|m|bn)?\b/i, 5],
+    [/\b(202[0-9]|19[89][0-9])\b/, 3],
+    [/\b(according to|reported|announced|disclosed|claimed|published|as of|since|between)\b/i, 3]
+  ];
+  for (const [regex, weight] of rules) if (regex.test(text)) score += weight;
+  if (index === 0 || index === total - 1) score += 1;
+  return score;
+};
+
+const selectWebsiteEvidenceWithinCap = (sources, maxChars = MAX_PCF_WEBSITE_CONTENT_CHARS) => {
+  const originals = sources.map(source => String(source?.content || ""));
+  const originalChars = originals.reduce((sum, value) => sum + value.length, 0);
+  if (originalChars <= maxChars) return { sources, originalChars, selectedChars: originalChars, omittedChars: 0, capApplied: false };
+
+  const records = originals.map((content, sourceIndex) => {
+    const sentences = content.match(/[^.!?\n]+[.!?]?/g) || (content ? [content] : []);
+    return sentences.map((raw, index) => ({ text: raw.trim(), sourceIndex, index, score: scoreWebsiteEvidenceSegment(raw, index, sentences.length) })).filter(item => item.text);
+  });
+  const selected = records.map(() => new Set());
+  let used = 0;
+  const addSegment = item => {
+    if (!item || selected[item.sourceIndex].has(item.index)) return;
+    const cost = item.text.length + (selected[item.sourceIndex].size ? 1 : 0);
+    if (cost > maxChars - used) return;
+    selected[item.sourceIndex].add(item.index);
+    used += cost;
+  };
+
+  // First pass: guarantee source representation and evidence-category diversity.
+  const categoryPatterns = [
+    /\b(revenue|turnover|profit|funding|valuation|investment|financial|\bUSD\b|\bINR\b|₹|\$)\b/i,
+    /\b(customer|client|case study|contract|deployment|users served|customers served)\b/i,
+    /\b(partner|partnership|investor|acquisition|subsidiary|ownership|founder|leadership|board)\b/i,
+    /\b(product|platform|service|technology|patent|proprietary|solution|business model)\b/i,
+    /\b(launched|built|delivered|implemented|completed|achieved|generated|served|deployed|certified)\b/i,
+    /\b(risk|dispute|lawsuit|litigation|complaint|penalty|breach|failure|delay|recall|controversy|inconsistent|contradict)\b/i,
+    /\b(not|never|no longer|ceased|terminated|declined|loss|debt|default|warning|limitation|unable)\b/i,
+    /\b(202[0-9]|19[89][0-9])\b/
+  ];
+  for (let sourceIndex = 0; sourceIndex < records.length; sourceIndex++) {
+    const sourceSegments = records[sourceIndex];
+    const best = [...sourceSegments].sort((a, b) => b.score - a.score || a.index - b.index)[0];
+    addSegment(best);
+    for (const pattern of categoryPatterns) {
+      const categoryBest = sourceSegments
+        .filter(item => pattern.test(item.text))
+        .sort((a, b) => b.score - a.score || a.index - b.index)[0];
+      addSegment(categoryBest);
+    }
+  }
+
+  // Second pass: fill remaining capacity by criticality and relevance.
+  const candidates = records.flat().filter(item => !selected[item.sourceIndex].has(item.index))
+    .sort((a, b) => b.score - a.score || a.sourceIndex - b.sourceIndex || a.index - b.index);
+  for (const item of candidates) {
+    const itemCost = item.text.length + (selected[item.sourceIndex].size ? 1 : 0);
+    if (itemCost > maxChars - used) continue;
+    selected[item.sourceIndex].add(item.index); used += itemCost;
+  }
+  const output = sources.map((source, sourceIndex) => ({
+    ...source,
+    content: records[sourceIndex].filter(item => selected[sourceIndex].has(item.index)).sort((a, b) => a.index - b.index).map(item => item.text).join(" ")
+  }));
+  const selectedChars = output.reduce((sum, source) => sum + String(source.content || "").length, 0);
+  return { sources: output, originalChars, selectedChars, omittedChars: Math.max(0, originalChars - selectedChars), capApplied: true };
 };
 
 /* ---------------------------------------------------------
@@ -790,7 +876,7 @@ async function loadEvidenceCompressionBrain({
     url: getUrl(source),
     title: firstText(source?.title, source?.headline).slice(0, 220) || null,
     date: getDate(source),
-    content: extractEvidenceText(source, 6000, 60),
+    content: rawEvidenceText(source),
     pageCategory: source?.pageCategory || source?.category || null,
     collectionPurpose: source?.collectionPurpose || null,
     topicKey: source?.topicKey || null,
@@ -802,6 +888,19 @@ async function loadEvidenceCompressionBrain({
     sourceIndependence: source?.sourceIndependence || null,
     metadata: source?.metadata ?? null,
     structuredData: source?.structuredData ?? source?.jsonLd ?? null
+  }));
+
+  const pcfWebsiteSelection = selectWebsiteEvidenceWithinCap(websiteSources);
+  websiteSources.splice(0, websiteSources.length, ...pcfWebsiteSelection.sources);
+  console.log("ECB_PCF_WEBSITE_CAP_AUDIT", JSON.stringify({
+    rule: "PCF website text <= 1.5M chars: preserve all; above 1.5M: adaptive critical-evidence selection",
+    maxChars: MAX_PCF_WEBSITE_CONTENT_CHARS,
+    originalChars: pcfWebsiteSelection.originalChars,
+    selectedChars: pcfWebsiteSelection.selectedChars,
+    omittedChars: pcfWebsiteSelection.omittedChars,
+    capApplied: pcfWebsiteSelection.capApplied,
+    sourceCount: websiteSources.length,
+    sourcesWithContent: websiteSources.filter(source => String(source.content || "").length > 0).length
   }));
 
   const websiteScraperSources = websiteScraperSourcesInput.map(source => ({
@@ -1365,11 +1464,9 @@ async function loadEvidenceCompressionBrain({
   url: getUrl(source),
   title: firstText(source.title, source.headline).slice(0, 64) || null,
   date: getDate(source),
-  content: meaningfulText(
-    extractEvidenceText(source, budgetFor("pcfWebsite"), 60),
-    budgetFor("pcfWebsite"),
-    60
-  ),
+  // PCF website evidence has already passed the global 1.5M selection.
+  // Do not apply a second per-page reduction during package rebuilding.
+  content: String(source.content || ""),
   evidenceStream: source.evidenceStream || "pcf_website",
   pageCategory: source.pageCategory || null,
   collectionPurpose: source.collectionPurpose || null,
@@ -1626,13 +1723,16 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
   const preCompressionPackageSize = finalSize;
 
   /*
-   * Do not compress toward a percentage of the input. The 500,000-character
-   * limit is the only normal compression trigger. When it is breached, each
-   * evidence family receives its own proportional text budget; page counts
-   * and source identities remain independent and are never merged.
+   * v27 budget contract:
+   * - PCF website text is independently selected up to 1,500,000 chars.
+   * - All non-PCF evidence text streams share an additional 100,000-char cap.
+   * - The complete serialized Loop 7 package must remain <= 1,600,000 chars.
+   *
+   * PCF website text is deliberately excluded from the secondary family
+   * compression scale. Rebuilds preserve the already-selected PCF website
+   * content unchanged; only additional evidence streams are reduced.
    */
   const evidenceFamilies = {
-    pcfWebsite: websiteSources,
     cebWebsiteScraper: websiteScraperSources,
     linkedinPosts,
     linkedinArticles,
@@ -1643,31 +1743,38 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
     key,
     items.reduce((sum, item) => sum + rawEvidenceText(item).length, 0)
   ]));
-  const totalEvidenceTextChars = Object.values(familyTextChars).reduce((sum, count) => sum + count, 0);
-  const metadataReserve = 24000 + (profile ? 3000 : 0);
-  const compressionTargetChars = Math.max(12000, MAX_TOTAL_PACKAGE_CHARS - metadataReserve);
+  const profileAndGithubDescriptionChars =
+    String(profile?.headline || "").length + String(profile?.about || "").length +
+    String(xProfile?.headline || "").length + String(xProfile?.about || "").length +
+    String(githubEvidence?.description || "").length;
+  const totalAdditionalEvidenceTextChars =
+    Object.values(familyTextChars).reduce((sum, count) => sum + count, 0) + profileAndGithubDescriptionChars;
 
-  const makeFamilyBudgets = scale => Object.fromEntries(Object.entries(evidenceFamilies).map(([key, items]) => {
+  const makeAdditionalFamilyBudgets = scale => Object.fromEntries(Object.entries(evidenceFamilies).map(([key, items]) => {
     const totalChars = familyTextChars[key] || 0;
-    if (!items.length || !totalChars) return [key, 1200];
-    const proportionalFamilyChars = Math.max(1200, Math.floor(totalChars * scale));
-    return [key, Math.max(700, Math.floor(proportionalFamilyChars / items.length))];
+    if (!items.length || !totalChars) return [key, 1];
+    const familyBudget = Math.floor(totalChars * scale);
+    return [key, Math.max(1, Math.floor(familyBudget / items.length))];
   }));
 
   const dynamicTargetChars = MAX_TOTAL_PACKAGE_CHARS;
-  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
-    const initialScale = totalEvidenceTextChars > 0
-      ? Math.min(0.95, compressionTargetChars / totalEvidenceTextChars)
-      : 0.75;
-    finalPackage = rebuildAtBudget(makeFamilyBudgets(initialScale), 2200, 0);
-    finalSize = packageSize(finalPackage);
-  }
+  const additionalBudgetScale = totalAdditionalEvidenceTextChars > 0
+    ? Math.min(1, MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS / totalAdditionalEvidenceTextChars)
+    : 1;
+  const needsAdditionalBudgeting = totalAdditionalEvidenceTextChars > MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS;
 
-  // Retry only if the hard cap is still exceeded; keep every source record and
-  // further reduce content within each distinct evidence stream.
-  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
-    finalPackage = rebuildAtBudget(makeFamilyBudgets(Math.max(0.08, (totalEvidenceTextChars ? (compressionTargetChars / totalEvidenceTextChars) * 0.72 : 0.35))), 1500, 0);
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting) {
+    let scale = additionalBudgetScale;
+    finalPackage = rebuildAtBudget(makeAdditionalFamilyBudgets(scale), Math.max(1, Math.floor(2200 * scale)), 0);
     finalSize = packageSize(finalPackage);
+
+    // If package metadata/registries push the serialized package over 1.6M,
+    // reduce only the non-PCF evidence families. PCF website text stays intact.
+    for (let attempt = 0; finalSize > MAX_TOTAL_PACKAGE_CHARS && attempt < 8; attempt += 1) {
+      scale *= 0.72;
+      finalPackage = rebuildAtBudget(makeAdditionalFamilyBudgets(scale), Math.max(1, Math.floor(1500 * scale)), 0);
+      finalSize = packageSize(finalPackage);
+    }
   }
 
   /* Remove duplicate sourceLinks only when they are the cause of an overage. */
@@ -1679,23 +1786,17 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
     finalSize = packageSize(finalPackage);
   }
 
-  /*
-   * Final structural safeguard. We do not return null here. If the
-   * explicit metadata duplication itself causes an overage, remove
-   * only the nested duplicate registry (top-level registry remains,
-   * which is the form chat.js consumes).
-   */
+  /* Remove only the nested duplicate registry; keep the canonical top-level registry. */
   if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
     const copy = JSON.parse(JSON.stringify(finalPackage));
-    if (copy?.evidenceUniverse) {
-      copy.evidenceUniverse.sourceRegistry = undefined;
-    }
+    if (copy?.evidenceUniverse) copy.evidenceUniverse.sourceRegistry = undefined;
     finalPackage = copy;
     finalSize = packageSize(finalPackage);
   }
 
   if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
-    finalPackage = rebuildAtBudget(1200, 700, 0);
+    // Last evidence-preserving reduction: PCF website content remains intact.
+    finalPackage = rebuildAtBudget(makeAdditionalFamilyBudgets(0.0001), 1, 0);
     finalPackage.sourceLinks = undefined;
     if (finalPackage.evidenceUniverse) {
       finalPackage.evidenceUniverse.sourceLinks = [];
@@ -1704,7 +1805,20 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
     finalSize = packageSize(finalPackage);
   }
 
-if (finalSize > ECB_TRANSPORT_LIMIT) {
+  const finalEvidenceUniverse = finalPackage?.evidenceUniverse || {};
+  const additionalPlatformContentChars =
+    (Array.isArray(finalEvidenceUniverse.websiteScraperSources) ? finalEvidenceUniverse.websiteScraperSources : []).reduce((sum, item) => sum + String(item.content || "").length, 0) +
+    (Array.isArray(finalEvidenceUniverse.linkedinPosts) ? finalEvidenceUniverse.linkedinPosts : []).reduce((sum, item) => sum + String(item.content || "").length, 0) +
+    (Array.isArray(finalEvidenceUniverse.linkedinArticles) ? finalEvidenceUniverse.linkedinArticles : []).reduce((sum, item) => sum + String(item.content || "").length, 0) +
+    String(finalEvidenceUniverse.githubEvidence?.description || "").length +
+    String(finalEvidenceUniverse.githubEvidence?.content || "").length +
+    (Array.isArray(finalEvidenceUniverse.xPosts) ? finalEvidenceUniverse.xPosts : []).reduce((sum, item) => sum + String(item.content || "").length, 0) +
+    String(finalEvidenceUniverse.linkedinProfile?.headline || "").length +
+    String(finalEvidenceUniverse.linkedinProfile?.about || "").length +
+    String(finalEvidenceUniverse.xProfile?.headline || "").length +
+    String(finalEvidenceUniverse.xProfile?.about || "").length;
+
+if (finalSize > ECB_TRANSPORT_LIMIT || additionalPlatformContentChars > MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS) {
     /*
      * Fail closed only as a genuinely impossible structural case,
      * after all meaningful evidence-preserving reductions. This is
@@ -1715,6 +1829,8 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       JSON.stringify({
         finalSize,
         maxAllowed: ECB_TRANSPORT_LIMIT,
+        additionalPlatformContentChars,
+        maxAdditionalPlatformContentChars: MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS,
         destructiveCharacterCompaction: false
       })
     );
@@ -1722,7 +1838,7 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
     return {
       success: false,
       reason:
-        `Meaningful ECB package exceeds the active OpenRouter evidence transport budget after evidence-preserving reduction.`,
+        `ECB package exceeds the 1.6M total-package or 100K additional-platform evidence budget after evidence-preserving reduction.`,
       loop7Package: null,
       compressionStats: {
         originalChars: originalUniversalSize,
@@ -1827,7 +1943,7 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       originalChars: originalUniversalSize,
       finalChars: finalSize,
       targetChars: dynamicTargetChars,
-      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS,
+      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting,
       hardCapExceededAfterCompression: finalSize > MAX_TOTAL_PACKAGE_CHARS,
       maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
       websiteSources: websiteSources.length,
@@ -1869,7 +1985,15 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       compressedChars: finalSize,
       targetChars: dynamicTargetChars,
       maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
-      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS,
+      maxPcfWebsiteContentChars: MAX_PCF_WEBSITE_CONTENT_CHARS,
+      maxAdditionalPlatformContentChars: MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS,
+      additionalPlatformContentChars,
+      maxTotalPackageChars: MAX_TOTAL_PACKAGE_CHARS,
+      pcfWebsiteOriginalChars: pcfWebsiteSelection.originalChars,
+      pcfWebsiteSelectedChars: pcfWebsiteSelection.selectedChars,
+      pcfWebsiteOmittedChars: pcfWebsiteSelection.omittedChars,
+      pcfWebsiteCapApplied: pcfWebsiteSelection.capApplied,
+      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting,
       hardCapExceededAfterCompression: finalSize > MAX_TOTAL_PACKAGE_CHARS,
       websiteSources: websiteSources.length,
       websiteScraperSources: websiteScraperSources.length,
