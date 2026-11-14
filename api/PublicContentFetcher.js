@@ -22,17 +22,20 @@
 const DEFAULT_TIMEOUT_MS = 12000;
 
 const MAX_VISIBLE_TEXT = 50000;
-const MAX_LINKS = 100;
+const MAX_LINKS = 250;
 const MAX_SOCIAL_LINKS = 60;
 const MAX_HEADINGS = 60;
 const MAX_POSTS = 10;
 const MAX_ARTICLES = 40;
 const MAX_EVIDENCE = 250;
 
-const MAX_SOURCES = 10;
-const MAX_SITEMAP_URLS = 50;
-const MAX_SITEMAPS = 3;
-const MAX_CONTENT_LINKS = 25;
+const MAX_SOURCES = 30;
+// Allow retries after unavailable pages so one or two fetch failures do not
+// consume the complete 30-page evidence allowance.
+const MAX_FETCH_ATTEMPTS = 45;
+const MAX_SITEMAP_URLS = 200;
+const MAX_SITEMAPS = 10;
+const MAX_CONTENT_LINKS = 100;
 const PLATFORM_PATTERNS = [
     ["linkedin", /linkedin\.com/i],
     ["github", /github\.com/i],
@@ -672,8 +675,9 @@ async function discoverSitemapUrls(rootUrl = "") {
 
 
 
-const MAX_WEBSITE_POST_CANDIDATES = 20;
-const MAX_WEBSITE_POSTS = 10;
+const MAX_WEBSITE_POST_CANDIDATES = 120;
+// The root page is retained separately; select up to 29 additional targeted pages.
+const MAX_WEBSITE_POSTS = MAX_SOURCES - 1;
 const WEBSITE_POST_MIN_CHARS = 500;
 const WEBSITE_POST_MAX_CHARS = 50000;
 
@@ -858,7 +862,8 @@ function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
 
     const rootSource = deduped.find(source => {
         const sourceUrl = normalizeUrl(source?.sourceUrl || source?.canonicalUrl || "");
-        return sourceUrl && rootNormalized && sourceUrl === rootNormalized;
+        const status = Number(source?.status || 0);
+        return sourceUrl && rootNormalized && sourceUrl === rootNormalized && status >= 200 && status < 300;
     }) || null;
 
     // Only website content candidates are filtered here. Social-platform links
@@ -900,7 +905,7 @@ function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
 
     const selectedPosts = compressedCandidates
         .sort((a, b) => b.meaningfulScore - a.meaningfulScore || a.index - b.index)
-        .slice(0, MAX_WEBSITE_POSTS)
+        .slice(0, Math.max(0, MAX_SOURCES - (rootSource ? 1 : 0)))
         .map(item => item.source);
 
     // Keep the original root source intact so its social/platform links remain exactly where PCF found them.
@@ -1222,7 +1227,7 @@ export async function acquirePublicContent({
         queue.unshift(requestedUrl);
     }
 
-    while (queue.length > 0 && sources.length < MAX_SOURCES) {
+    while (queue.length > 0 && sources.length < MAX_FETCH_ATTEMPTS) {
         const rawUrl = queue.shift();
         const url = normalizeUrl(rawUrl, rootUrl);
 
@@ -1311,7 +1316,7 @@ export async function acquirePublicContent({
         }
     }
 
-    const finalSources = dedupeSources(sources).slice(0, MAX_SOURCES);
+    const finalSources = dedupeSources(sources).slice(0, MAX_FETCH_ATTEMPTS);
 
     const filteredEvidence = filterWebsiteEvidenceSources(
         finalSources,
@@ -1324,6 +1329,8 @@ export async function acquirePublicContent({
             originalSourceCount: filteredEvidence.originalSourceCount,
             websitePostCandidateCount: filteredEvidence.websitePostCandidateCount,
             websitePostSelectedCount: filteredEvidence.websitePostSelectedCount,
+            targetWebsitePageCount: MAX_SOURCES,
+            maxFetchAttempts: MAX_FETCH_ATTEMPTS,
             filteredSourceCount: filteredEvidence.filteredSourceCount,
             filteredOutSourceCount: filteredEvidence.filteredOutSourceCount,
             filteredSourceUrls: filteredEvidence.filteredSourceUrls
@@ -1338,6 +1345,8 @@ export async function acquirePublicContent({
         filteredSourceCount: filteredEvidence.filteredSourceCount,
         websitePostCandidateCount: filteredEvidence.websitePostCandidateCount,
         websitePostSelectedCount: filteredEvidence.websitePostSelectedCount,
+        targetWebsitePageCount: MAX_SOURCES,
+        maxFetchAttempts: MAX_FETCH_ATTEMPTS,
         filteredOutSourceCount: filteredEvidence.filteredOutSourceCount,
         discoveredSitemaps: [...discoveredSitemaps].slice(0, MAX_SITEMAPS),
         // Social links remain untouched on their original source objects.
