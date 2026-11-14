@@ -2188,6 +2188,20 @@ if (loopLevel === 7) {
     let finishReason = null;
     let usage = null;
     let streamChunkCount = 0;
+    const rawFrameSamples = [];
+    const chunkShapeSamples = [];
+
+    const appendText = (value) => {
+      if (typeof value === "string") {
+        streamedContent += value;
+      } else if (Array.isArray(value)) {
+        for (const part of value) {
+          if (typeof part === "string") streamedContent += part;
+          else if (typeof part?.text === "string") streamedContent += part.text;
+          else if (typeof part?.content === "string") streamedContent += part.content;
+        }
+      }
+    };
 
     const processSseFrame = (frame) => {
       const dataLines = frame
@@ -2199,20 +2213,41 @@ if (loopLevel === 7) {
       const data = dataLines.join("\n");
       if (!data || data === "[DONE]") return;
 
+      if (rawFrameSamples.length < 3) {
+        rawFrameSamples.push(data.slice(0, 1800));
+      }
+
       let chunk;
       try {
         chunk = JSON.parse(data);
-      } catch (_) {
+      } catch (parseError) {
+        if (chunkShapeSamples.length < 3) {
+          chunkShapeSamples.push({ parseError: String(parseError?.message || parseError), raw: data.slice(0, 500) });
+        }
         return;
       }
 
       streamChunkCount += 1;
       const choice = chunk?.choices?.[0];
       const delta = choice?.delta || {};
+      const message = choice?.message || {};
 
-      if (delta.role) streamedRole = delta.role;
-      if (typeof delta.content === "string") streamedContent += delta.content;
-      if (typeof choice?.message?.content === "string") streamedContent += choice.message.content;
+      if (chunkShapeSamples.length < 3) {
+        chunkShapeSamples.push({
+          topLevelKeys: Object.keys(chunk || {}),
+          choiceKeys: Object.keys(choice || {}),
+          deltaKeys: Object.keys(delta || {}),
+          messageKeys: Object.keys(message || {}),
+          object: JSON.stringify(chunk).slice(0, 1800)
+        });
+      }
+
+      if (delta.role || message.role) streamedRole = delta.role || message.role;
+      appendText(delta.content);
+      appendText(message.content);
+      appendText(choice?.text);
+      appendText(chunk?.output_text);
+
       if (choice?.finish_reason) finishReason = choice.finish_reason;
       if (chunk?.usage) usage = chunk.usage;
     };
@@ -2243,11 +2278,45 @@ if (loopLevel === 7) {
         chunks: streamChunkCount,
         replyChars: streamedContent.length,
         finishReason,
-        usage
+        usage,
+        rawFrameSamples,
+        chunkShapeSamples
       })
     );
   } else {
     providerData = await response.json();
+  }
+
+  if (
+    loopLevel === 7 &&
+    selectedLoop7Provider === "velona" &&
+    !String(providerData?.choices?.[0]?.message?.content || "").trim()
+  ) {
+    console.error(
+      "LOOP7_VELONA_EMPTY_STREAM_BLOCKED",
+      JSON.stringify({
+        reason: "Provider returned HTTP success but no extractable report text.",
+        contentType: response.headers?.get("content-type") || null
+      })
+    );
+
+    if (loop7StreamStarted) {
+      sendLoop7Progress({
+        type: "error",
+        phase: "report",
+        message: "Velona returned an empty response. Your evidence is preserved; please retry after the provider response is fixed.",
+        error: "VELONA_EMPTY_STREAM",
+        stage: "LOOP7_STREAM_PARSE"
+      });
+      endLoop7ProgressStream();
+      return;
+    }
+
+    return res.status(502).json({
+      reply: "",
+      error: "VELONA_EMPTY_STREAM",
+      stage: "LOOP7_STREAM_PARSE"
+    });
   }
 
   console.log(
