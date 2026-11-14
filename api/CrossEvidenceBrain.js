@@ -1322,10 +1322,144 @@ function extractMetaTag(html = "", nameOrProperty = "") {
     return "";
 }
 
+async function fetchGitHubDirect(url = "") {
+    const normalizedUrl = normalizeUrl(url);
+
+    if (
+        !normalizedUrl ||
+        detectPlatform(normalizedUrl) !== "github"
+    ) {
+        return {
+            success: false,
+            reason: "A valid GitHub public URL is required.",
+            source: null
+        };
+    }
+
+    const cached = SOURCE_CACHE.get(`github:${normalizedUrl}`);
+    if (cached) {
+        return {
+            success: true,
+            source: cached,
+            cached: true
+        };
+    }
+
+    console.log(
+        "GITHUB_DIRECT_FETCH_START",
+        JSON.stringify({ url: normalizedUrl })
+    );
+
+    try {
+        const response = await fetch(
+            normalizedUrl,
+            {
+                method: "GET",
+                headers: {
+                    "User-Agent": "TruthLoopAI/1.0 public-evidence",
+                    "Accept": "text/html,application/xhtml+xml"
+                }
+            }
+        );
+
+        const html = await response.text();
+
+        console.log(
+            "GITHUB_DIRECT_FETCH_STATUS",
+            response.status
+        );
+
+        if (!response.ok) {
+            return {
+                success: false,
+                reason: `GitHub direct fetch failed (${response.status}).`,
+                source: null
+            };
+        }
+
+        const title =
+            extractMetaTag(html, "og:title") ||
+            ((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || "")
+                .replace(/\s+/g, " ")
+                .trim();
+
+        const description =
+            extractMetaTag(html, "og:description") ||
+            extractMetaTag(html, "description");
+
+        const visibleText =
+            htmlToVisibleText(html);
+
+        const socialLinks = [
+            normalizedUrl
+        ];
+
+        const source = {
+            sourceUrl: normalizedUrl,
+            canonicalUrl: normalizedUrl,
+            sourcePlatform: "github",
+            platform: "github",
+            sourceHost: "github.com",
+            status: response.status,
+            fetchStatus: "success",
+
+            title: title || "GitHub Profile",
+            description,
+
+            visibleText,
+            contentLength: visibleText.length,
+
+            socialLinks,
+            socialProfiles: [normalizedUrl],
+
+            githubMetadata: {
+                profileUrl: normalizedUrl,
+                title: title || null,
+                description: description || null,
+                visibleText
+            }
+        };
+
+        SOURCE_CACHE.set(
+            `github:${normalizedUrl}`,
+            source
+        );
+
+        console.log(
+            "GITHUB_DIRECT_FETCH_COMPLETE",
+            JSON.stringify({
+                url: normalizedUrl,
+                title: source.title,
+                visibleTextChars: visibleText.length
+            })
+        );
+
+        return {
+            success: true,
+            source
+        };
+
+    } catch (error) {
+        console.error(
+            "GITHUB_DIRECT_FETCH_FAILED",
+            error?.message
+        );
+
+        return {
+            success: false,
+            reason:
+                error?.message ||
+                "GitHub direct fetch failed.",
+            source: null
+        };
+    }
+}
+
+
 /* ------------------------------------------------------------
-   GITHUB COLLECTION IS PCF-OWNED
-   CEB only passes through GitHub evidence already supplied by PCF.
-   No second fetch or scraper is dispatched here.
+   GITHUB DIRECT COLLECTION
+   No Apify. Reuse upstream evidence when supplied; otherwise make
+   one bounded direct public-profile GET from CEB.
    ------------------------------------------------------------ */
 
 /* ------------------------------------------------------------
@@ -3802,8 +3936,9 @@ console.log(
     }
 
     /*
-     * GitHub is PCF-owned. CEB may pass through only the GitHub evidence
-     * already collected by PCF; it never performs a second GitHub fetch.
+     * Reuse GitHub evidence supplied upstream when available.
+     * Otherwise fetch the discovered public GitHub URL directly.
+     * This path does not use Apify.
      */
     const suppliedGithubEvidence =
         footprintPackage?.githubEvidence ||
@@ -3821,14 +3956,22 @@ console.log(
                 suppliedGithubEvidence?.url ||
                 ""
             );
-        console.log("CEB_GITHUB_PCF_PASSTHROUGH", JSON.stringify({ available: true, url: githubUrl || null }));
+        console.log("CEB_GITHUB_UPSTREAM_PASSTHROUGH", JSON.stringify({ available: true, url: githubUrl || null }));
+    } else if (githubUrl) {
+        const githubResult = await fetchGitHubDirect(githubUrl);
+
+        if (githubResult?.success && githubResult?.source) {
+            githubEvidence = githubResult.source;
+        } else {
+            githubEvidence = null;
+            console.warn("CEB_GITHUB_DIRECT_SOURCE_UNAVAILABLE", JSON.stringify({
+                url: githubUrl,
+                reason: githubResult?.reason || "No GitHub evidence returned."
+            }));
+        }
     } else {
         githubEvidence = null;
-        if (githubUrl) {
-            console.warn("CEB_GITHUB_PCF_SOURCE_UNAVAILABLE", JSON.stringify({ discoveredUrl: githubUrl, action: "no_duplicate_fetch_dispatched" }));
-        } else {
-            console.log("CEB_GITHUB_PCF_PASSTHROUGH", JSON.stringify({ available: false, url: null }));
-        }
+        console.log("CEB_GITHUB_DIRECT_FETCH_SKIPPED", JSON.stringify({ reason: "No public GitHub URL discovered." }));
     }
 
     /* ------------------------------------------------------------
