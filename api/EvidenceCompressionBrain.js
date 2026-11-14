@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v22 — SEPARATE SOURCE STREAMS + HARD-CAP-ONLY COMPRESSION
+   EVIDENCE COMPRESSION BRAIN v23 — 8 PAGE SCRAPER STREAM + LINKEDIN POSTS ONLY
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -37,10 +37,10 @@ const MAX_INPUT_PACKAGE_CHARS = 10000000;
  * Meaningful text compression is allowed; silent source dropping is not.
  */
 const MAX_WEBSITE_SOURCES = Number.POSITIVE_INFINITY;
-const MAX_WEBSITE_SCRAPER_SOURCES = 24;
-const MAX_LINKEDIN_POSTS = Number.POSITIVE_INFINITY;
+const MAX_WEBSITE_SCRAPER_SOURCES = 8;
+const MAX_LINKEDIN_POSTS = 10;
 const MIN_LINKEDIN_POSTS = 1;
-const MAX_LINKEDIN_ARTICLES = Number.POSITIVE_INFINITY;
+const MAX_LINKEDIN_ARTICLES = 0;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
 const MAX_REDDIT_POSTS = 0;
 
@@ -712,14 +712,8 @@ async function loadEvidenceCompressionBrain({
       ? linkedinEvidence.source
       : {};
 
-  const profileInput =
-    linkedinEvidence?.profile &&
-    typeof linkedinEvidence.profile === "object"
-      ? linkedinEvidence.profile
-      : linkedinSource?.linkedinProfile &&
-        typeof linkedinSource.linkedinProfile === "object"
-        ? linkedinSource.linkedinProfile
-        : null;
+  // LinkedIn profile details are intentionally not part of this evidence contract.
+  const profileInput = null;
 
   const postsInput =
     Array.isArray(linkedinEvidence?.posts)
@@ -728,12 +722,8 @@ async function loadEvidenceCompressionBrain({
         ? linkedinSource.posts
         : [];
 
-  const articlesInput =
-    Array.isArray(linkedinEvidence?.articles)
-      ? linkedinEvidence.articles
-      : Array.isArray(linkedinSource?.articles)
-        ? linkedinSource.articles
-        : [];
+  // LinkedIn articles are excluded; the requested evidence is the latest posts only.
+  const articlesInput = [];
 
   const githubInput =
     universalPackage?.githubEvidence &&
@@ -776,9 +766,9 @@ async function loadEvidenceCompressionBrain({
       websiteScraperMaxAllowed: MAX_WEBSITE_SCRAPER_SOURCES,
       linkedinPostsAvailable: postsInput.length,
       linkedinPostsSelected: linkedinPostsInput.length,
-      linkedinArticlesAvailable: articlesInput.length,
-      linkedinArticlesSelected: linkedinArticlesInput.length,
-      linkedinProfileSelected: !!profileInput,
+      linkedinArticlesAvailable: 0,
+      linkedinArticlesSelected: 0,
+      linkedinProfileSelected: false,
       githubSelected: !!githubInput,
       xProfileSelected: !!xInput, xPostsSelected: xPostsInput.length,
       redditProfileSelected: false, redditPostsSelected: 0, redditCollection: "disabled"
@@ -926,10 +916,7 @@ async function loadEvidenceCompressionBrain({
     sourceId: nextSourceId(),
     sourceType: "linkedin_post",
     id: getId(item),
-    url:
-      getUrl(item) ||
-      normalizeUrl(linkedinSource?.sourceUrl || "") ||
-      null,
+    url: getUrl(item) || null,
     date: getDate(item),
     title:
       firstText(item?.title, item?.headline).slice(0, 180) || null,
@@ -957,10 +944,7 @@ async function loadEvidenceCompressionBrain({
     sourceId: nextSourceId(),
     sourceType: "linkedin_article",
     id: getId(item),
-    url:
-      getUrl(item) ||
-      normalizeUrl(linkedinSource?.sourceUrl || "") ||
-      null,
+    url: getUrl(item) || null,
     date: getDate(item),
     title:
       firstText(item?.title, item?.headline).slice(0, 200) || null,
