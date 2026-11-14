@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v23 — 8 PAGE SCRAPER STREAM + LINKEDIN POSTS ONLY
+   EVIDENCE COMPRESSION BRAIN v24 — PCF 30 WEBSITE PAGES + LINKEDIN POSTS ONLY
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -37,14 +37,14 @@ const MAX_INPUT_PACKAGE_CHARS = 10000000;
  * Meaningful text compression is allowed; silent source dropping is not.
  */
 const MAX_WEBSITE_SOURCES = Number.POSITIVE_INFINITY;
-const MAX_WEBSITE_SCRAPER_SOURCES = 8;
+const MAX_WEBSITE_SCRAPER_SOURCES = Number.POSITIVE_INFINITY; // Legacy stream retained for compatibility; CEB website crawler is disabled.
 const MAX_LINKEDIN_POSTS = 10;
 const MIN_LINKEDIN_POSTS = 1;
 const MAX_LINKEDIN_ARTICLES = 0;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
 const MAX_REDDIT_POSTS = 0;
 
-const PACKAGE_VERSION = "24.0";
+const PACKAGE_VERSION = "25.0";
 
 /* ---------------------------------------------------------
    BASIC HELPERS
@@ -644,34 +644,6 @@ async function loadEvidenceCompressionBrain({
       reason: "No public evidence",
       loop7Package: null
     };
-  }
-
-  // CEB completion manifest is mandatory: ECB must never compress a partial Actor package.
-  const actorCompletion = universalPackage?.actorCompletion || publicEvidencePackage?.actorCompletion;
-  if (!actorCompletion || actorCompletion.complete !== true) {
-    console.error("ECB_ACTOR_COMPLETION_GATE_FAILED", JSON.stringify({
-      manifestPresent: !!actorCompletion,
-      complete: actorCompletion?.complete ?? false,
-      website: actorCompletion?.website?.status || "UNKNOWN",
-      linkedin: actorCompletion?.linkedin?.status || "UNKNOWN",
-      x: actorCompletion?.x?.status || "UNKNOWN"
-    }));
-    return {
-      success: false,
-      reason: "Apify Actor completion is not verified. ECB rejected the incomplete evidence package.",
-      loop7Package: null
-    };
-  }
-  for (const [name, actor] of Object.entries(actorCompletion)) {
-    if (!actor || typeof actor !== "object" || actor.required !== true) continue;
-    if (actor.status !== "SUCCEEDED" || actor.datasetRetrieved !== true) {
-      console.error("ECB_REQUIRED_ACTOR_NOT_COMPLETE", JSON.stringify({ name, status: actor.status, datasetRetrieved: actor.datasetRetrieved }));
-      return {
-        success: false,
-        reason: `Required Apify Actor ${name} has not completed and returned its dataset.`,
-        loop7Package: null
-      };
-    }
   }
 
   if (originalUniversalSize > MAX_INPUT_PACKAGE_CHARS) {
