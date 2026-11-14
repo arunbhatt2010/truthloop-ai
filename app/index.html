@@ -6607,5 +6607,27 @@ async function startLinkedInOAuth() {
 })();
 </script>
 
+<!--
+TRUTHLOOP TEMPORARY MOBILE DEBUGGER
+To enable: remove the two outer HTML comment delimiters around this block.
+To disable again: restore those two delimiters.
+This does not alter report, SSE, payment, or application logic while commented.
+
+TRUTHLOOP_TEMP_ERUDA_DEBUGGER_START
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  (function () {
+    if (window.eruda) {
+      window.eruda.init();
+      window.eruda.show();
+      console.info("TRUTHLOOP_ERUDA_DEBUGGER_READY");
+    } else {
+      console.error("TRUTHLOOP_ERUDA_LOAD_FAILED");
+    }
+  })();
+</script>
+TRUTHLOOP_TEMP_ERUDA_DEBUGGER_END
+-->
+
 </body>    
   </html>
