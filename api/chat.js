@@ -18,38 +18,8 @@ export default async function handler(req, res) {
 
   let loop7StreamStarted = false;
   let wantsLoop7Progress = false;
-  let sendLoop7Progress = () => false;
-  let endLoop7ProgressStream = () => Promise.resolve(false);
-  let loop7HeartbeatTimer = null;
-  let loop7ClientDisconnected = false;
-  let loop7SseWriteCount = 0;
-  let loop7SseBytesWritten = 0;
-  let loop7SseLastWriteError = null;
-
-  // A disconnected browser must never be mistaken for a successfully delivered
-  // final report. Keep these listeners outside the main try so every stage is covered.
-  if (req && typeof req.on === "function") {
-    req.on("aborted", () => {
-      loop7ClientDisconnected = true;
-      console.warn("LOOP7_CLIENT_REQUEST_ABORTED");
-    });
-  }
-  if (res && typeof res.on === "function") {
-    res.on("close", () => {
-      if (!res.writableFinished) {
-        loop7ClientDisconnected = true;
-        console.warn("LOOP7_SSE_CLIENT_DISCONNECTED", JSON.stringify({
-          writes: loop7SseWriteCount,
-          bytesWritten: loop7SseBytesWritten,
-          streamStarted: loop7StreamStarted
-        }));
-      }
-    });
-    res.on("error", error => {
-      loop7SseLastWriteError = String(error?.message || error);
-      console.error("LOOP7_RESPONSE_STREAM_ERROR", loop7SseLastWriteError);
-    });
-  }
+  let sendLoop7Progress = () => {};
+  let endLoop7ProgressStream = () => {};
 
   // Values needed by the outer crash guard must live outside the try block.
   // Otherwise the catch block cannot access try-scoped let/const bindings.
@@ -560,72 +530,14 @@ let investigationState = {
     wantsLoop7Progress = loopLevel === 7 && progress === true;
 
     sendLoop7Progress = (payload = {}) => {
-      if (!wantsLoop7Progress || !loop7StreamStarted) return false;
-      if (loop7ClientDisconnected || res.destroyed || res.writableEnded) {
-        console.warn("LOOP7_SSE_WRITE_SKIPPED", JSON.stringify({
-          reason: loop7ClientDisconnected ? "client_disconnected" :
-            res.destroyed ? "response_destroyed" : "response_ended",
-          type: payload?.type || null,
-          phase: payload?.phase || null
-        }));
-        return false;
-      }
-
-      let frame;
+      if (!wantsLoop7Progress || !loop7StreamStarted) return;
       try {
-        frame = `data: ${JSON.stringify(payload)}\n\n`;
-      } catch (error) {
-        loop7SseLastWriteError = `serialize: ${String(error?.message || error)}`;
-        console.error("LOOP7_SSE_SERIALIZE_FAILED", loop7SseLastWriteError);
-        return false;
-      }
-
-      try {
-        const byteLength = Buffer.byteLength(frame, "utf8");
-        const accepted = res.write(frame, error => {
-          if (error) {
-            loop7SseLastWriteError = String(error?.message || error);
-            console.error("LOOP7_SSE_FRAME_WRITE_CALLBACK_ERROR", JSON.stringify({
-              type: payload?.type || null,
-              phase: payload?.phase || null,
-              error: loop7SseLastWriteError
-            }));
-          }
-        });
-        loop7SseWriteCount += 1;
-        loop7SseBytesWritten += byteLength;
-        console.log("LOOP7_SSE_FRAME_WRITE", JSON.stringify({
-          type: payload?.type || null,
-          phase: payload?.phase || null,
-          bytes: byteLength,
-          writeAccepted: accepted,
-          backpressure: !accepted,
-          writeCount: loop7SseWriteCount
-        }));
-        // write() === false means Node is applying backpressure, not that the
-        // frame failed. Node retains the frame and flushes it after drain.
-        return true;
-      } catch (error) {
-        loop7SseLastWriteError = String(error?.message || error);
-        console.error("LOOP7_SSE_FRAME_WRITE_FAILED", JSON.stringify({
-          type: payload?.type || null,
-          phase: payload?.phase || null,
-          error: loop7SseLastWriteError
-        }));
-        return false;
-      }
+        res.write(`data: ${JSON.stringify(payload)}\n\n`);
+      } catch {}
     };
 
     const startLoop7ProgressStream = () => {
       if (!wantsLoop7Progress || loop7StreamStarted) return;
-      if (loop7ClientDisconnected || res.destroyed || res.writableEnded) {
-        console.warn("LOOP7_SSE_START_SKIPPED", JSON.stringify({
-          clientDisconnected: loop7ClientDisconnected,
-          responseDestroyed: !!res.destroyed,
-          responseEnded: !!res.writableEnded
-        }));
-        return;
-      }
       res.statusCode = 200;
       res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
       res.setHeader("Cache-Control", "no-cache, no-transform");
@@ -638,60 +550,12 @@ let investigationState = {
         phase: "case",
         message: "Loop 1–6 case context secured."
       });
-
-      // Keep mobile browsers/proxies from treating a quiet long-running
-      // investigation as a dead connection. SSE comments are ignored by the UI parser.
-      loop7HeartbeatTimer = setInterval(() => {
-        if (!loop7StreamStarted || loop7ClientDisconnected || res.destroyed || res.writableEnded) {
-          if (loop7HeartbeatTimer) clearInterval(loop7HeartbeatTimer);
-          loop7HeartbeatTimer = null;
-          return;
-        }
-        try {
-          const accepted = res.write(`: keep-alive ${Date.now()}\n\n`);
-          loop7SseBytesWritten += Buffer.byteLength(`: keep-alive ${Date.now()}\n\n`, "utf8");
-          console.log("LOOP7_SSE_HEARTBEAT", JSON.stringify({ writeAccepted: accepted }));
-        } catch (error) {
-          loop7SseLastWriteError = String(error?.message || error);
-          console.error("LOOP7_SSE_HEARTBEAT_FAILED", loop7SseLastWriteError);
-          if (loop7HeartbeatTimer) clearInterval(loop7HeartbeatTimer);
-          loop7HeartbeatTimer = null;
-        }
-      }, 15000);
-      if (typeof loop7HeartbeatTimer?.unref === "function") loop7HeartbeatTimer.unref();
     };
 
     endLoop7ProgressStream = () => {
-      if (loop7HeartbeatTimer) clearInterval(loop7HeartbeatTimer);
-      loop7HeartbeatTimer = null;
-      if (!loop7StreamStarted) return Promise.resolve(false);
+      if (!loop7StreamStarted) return;
+      try { res.end(); } catch {}
       loop7StreamStarted = false;
-      return new Promise(resolve => {
-        try {
-          if (res.writableEnded || res.destroyed) {
-            console.warn("LOOP7_SSE_END_SKIPPED", JSON.stringify({
-              writableEnded: !!res.writableEnded,
-              destroyed: !!res.destroyed,
-              clientDisconnected: loop7ClientDisconnected
-            }));
-            resolve(false);
-            return;
-          }
-          res.end(() => {
-            console.log("LOOP7_SSE_RESPONSE_FINISHED", JSON.stringify({
-              writableFinished: !!res.writableFinished,
-              writes: loop7SseWriteCount,
-              bytesWritten: loop7SseBytesWritten,
-              lastWriteError: loop7SseLastWriteError
-            }));
-            resolve(!!res.writableFinished);
-          });
-        } catch (error) {
-          loop7SseLastWriteError = String(error?.message || error);
-          console.error("LOOP7_SSE_END_FAILED", loop7SseLastWriteError);
-          resolve(false);
-        }
-      });
     };
 
     /* ==========================================
@@ -831,6 +695,62 @@ let investigationState = {
           throw new Error("ECB_CONTRACT_ERROR: ECB produced an empty sourceRegistry.");
         }
 
+        // Matching ECB v26 handoff contract: PCF website evidence is measured
+        // by extracted content characters only (not metadata or other platforms).
+        // ECB preserves 100% up to 1.5M chars and adaptively selects <=1.5M above it.
+        // This audit deliberately does not slice, re-compress, or mutate the package.
+        const loop7PcfWebsiteSources = Array.isArray(loop7Package?.evidenceUniverse?.websiteSources)
+          ? loop7Package.evidenceUniverse.websiteSources
+          : [];
+        const loop7PcfWebsiteSelectedChars = loop7PcfWebsiteSources.reduce(
+          (sum, source) => sum + String(source?.content || "").length,
+          0
+        );
+        const loop7PcfWebsiteStats = compressedEvidencePackage?.compressionStats || {};
+        const loop7PcfWebsiteOriginalChars = Number(loop7PcfWebsiteStats.pcfWebsiteOriginalChars || 0);
+        const loop7PcfWebsiteOmittedChars = Number(loop7PcfWebsiteStats.pcfWebsiteOmittedChars || 0);
+        const loop7PcfWebsiteCap = 1500000;
+        const loop7AdditionalPlatformCap = 100000;
+        const loop7AdditionalPlatformChars =
+          (Array.isArray(loop7Package?.evidenceUniverse?.websiteScraperSources) ? loop7Package.evidenceUniverse.websiteScraperSources : []).reduce((sum, source) => sum + String(source?.content || "").length, 0) +
+          (Array.isArray(loop7Package?.evidenceUniverse?.linkedinPosts) ? loop7Package.evidenceUniverse.linkedinPosts : []).reduce((sum, source) => sum + String(source?.content || "").length, 0) +
+          (Array.isArray(loop7Package?.evidenceUniverse?.linkedinArticles) ? loop7Package.evidenceUniverse.linkedinArticles : []).reduce((sum, source) => sum + String(source?.content || "").length, 0) +
+          String(loop7Package?.evidenceUniverse?.githubEvidence?.description || "").length +
+          String(loop7Package?.evidenceUniverse?.githubEvidence?.content || "").length +
+          (Array.isArray(loop7Package?.evidenceUniverse?.xPosts) ? loop7Package.evidenceUniverse.xPosts : []).reduce((sum, source) => sum + String(source?.content || "").length, 0) +
+          String(loop7Package?.evidenceUniverse?.linkedinProfile?.headline || "").length +
+          String(loop7Package?.evidenceUniverse?.linkedinProfile?.about || "").length +
+          String(loop7Package?.evidenceUniverse?.xProfile?.headline || "").length +
+          String(loop7Package?.evidenceUniverse?.xProfile?.about || "").length;
+        const loop7PackageChars = JSON.stringify(loop7Package).length;
+        const loop7TotalPackageCap = 1600000;
+        const loop7PcfWebsiteStatsMismatch =
+          Number.isFinite(Number(loop7PcfWebsiteStats.pcfWebsiteSelectedChars)) &&
+          Number(loop7PcfWebsiteStats.pcfWebsiteSelectedChars) !== loop7PcfWebsiteSelectedChars;
+
+        console.log("LOOP7_CHAT_EVIDENCE_DELIVERY_AUDIT", JSON.stringify({
+          ecbVersion: loop7Package.version || null,
+          websiteSourceCount: loop7PcfWebsiteSources.length,
+          originalWebsiteContentChars: loop7PcfWebsiteOriginalChars,
+          selectedWebsiteContentChars: loop7PcfWebsiteSelectedChars,
+          omittedWebsiteContentChars: loop7PcfWebsiteOmittedChars,
+          maxWebsiteContentChars: loop7PcfWebsiteCap,
+          additionalPlatformContentChars: loop7AdditionalPlatformChars,
+          maxAdditionalPlatformContentChars: loop7AdditionalPlatformCap,
+          packageChars: loop7PackageChars,
+          maxTotalPackageChars: loop7TotalPackageCap,
+          capApplied: !!loop7PcfWebsiteStats.pcfWebsiteCapApplied,
+          selectionStatsMismatch: loop7PcfWebsiteStatsMismatch,
+          policy: loop7PcfWebsiteOriginalChars <= loop7PcfWebsiteCap
+            ? "PRESERVE_ALL_UP_TO_1_5M"
+            : "ADAPTIVE_SELECTION_UP_TO_1_5M",
+          handoff: "UNCHANGED_NO_CHAT_SIDE_TRUNCATION"
+        }));
+
+        if (loop7PcfWebsiteSelectedChars > loop7PcfWebsiteCap || loop7AdditionalPlatformChars > loop7AdditionalPlatformCap || loop7PackageChars > loop7TotalPackageCap || loop7PcfWebsiteStatsMismatch) {
+          throw new Error("ECB_CHAT_HANDOFF_CONTRACT_ERROR: PCF website, additional-platform, total-package budget, or selection audit contract was exceeded.");
+        }
+
         console.log("LOOP7_ECB_OUTPUT_AUDIT", JSON.stringify({
           packageType: loop7Package.packageType,
           version: loop7Package.version || null,
@@ -845,7 +765,11 @@ let investigationState = {
             ? loop7Package.evidenceUniverse.linkedinPosts.length : 0,
           linkedinArticles: Array.isArray(loop7Package.evidenceUniverse.linkedinArticles)
             ? loop7Package.evidenceUniverse.linkedinArticles.length : 0,
-          compressedChars: compressedEvidencePackage.compressionStats?.compressedChars ?? null
+          compressedChars: compressedEvidencePackage.compressionStats?.compressedChars ?? null,
+          pcfWebsiteOriginalChars: compressedEvidencePackage.compressionStats?.pcfWebsiteOriginalChars ?? null,
+          pcfWebsiteSelectedChars: compressedEvidencePackage.compressionStats?.pcfWebsiteSelectedChars ?? null,
+          pcfWebsiteOmittedChars: compressedEvidencePackage.compressionStats?.pcfWebsiteOmittedChars ?? null,
+          pcfWebsiteCapApplied: compressedEvidencePackage.compressionStats?.pcfWebsiteCapApplied ?? null
         }));
 
         if (wantsLoop7Progress) {
@@ -2831,14 +2755,10 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 }
-    console.log("FINAL_PROVIDER_RESPONSE_META", JSON.stringify({
-      status: response?.status ?? null,
-      statusText: response?.statusText ?? null,
-      ok: response?.ok ?? null,
-      provider: selectedLoop7Provider || null,
-      normalizedReplyChars: String(reply || "").length,
-      loopLevel
-    }));
+    console.log(
+  "FINAL_RESPONSE",
+  JSON.stringify(response, null, 2)
+);
 console.log("FINAL RETURN REACHED");
 
 const finalEvidenceRegistry =
@@ -2999,35 +2919,19 @@ const finalPayload = {
 };
 
 if (loop7StreamStarted) {
-  const finalFrameWritten = sendLoop7Progress({
+  sendLoop7Progress({
     type: "final",
     final: true,
     ...finalPayload
   });
-
-  console.log("LOOP7_FINAL_STREAM_WRITE_RESULT", JSON.stringify({
-    finalFrameWritten,
-    replyChars: String(finalPayload.reply || "").length,
-    evidenceRegistryCount: Array.isArray(finalPayload.evidenceRegistry)
-      ? finalPayload.evidenceRegistry.length : 0,
-    clientDisconnected: loop7ClientDisconnected,
-    responseDestroyed: !!res.destroyed,
-    responseWritableEnded: !!res.writableEnded,
-    writeCount: loop7SseWriteCount,
-    bytesWritten: loop7SseBytesWritten,
-    lastWriteError: loop7SseLastWriteError
-  }));
-
-  const streamFinished = await endLoop7ProgressStream();
-  console.log("LOOP7_FINAL_STREAM_COMPLETED", JSON.stringify({
-    finalFrameWritten,
-    streamFinished,
-    writableFinished: !!res.writableFinished,
-    clientDisconnected: loop7ClientDisconnected,
-    writeCount: loop7SseWriteCount,
-    bytesWritten: loop7SseBytesWritten,
-    lastWriteError: loop7SseLastWriteError
-  }));
+  console.log(
+   "LOOP7_FINAL_STREAM_SENT",
+   JSON.stringify({
+      final:true,
+      replyChars:(finalPayload.reply || "").length
+   })
+);
+  endLoop7ProgressStream();
   return;
 }
 
