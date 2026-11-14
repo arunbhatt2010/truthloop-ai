@@ -631,7 +631,7 @@ function buildWebsiteCrawlerInput(targetUrls) {
         customHttpHeaders: {},
         initialConcurrency: 2,
         maxConcurrency: 4,
-        requestTimeoutSecs: 60,
+        requestTimeoutSecs: 180,
         minFileDownloadSpeedKBps: 128,
         maxRequestRetries: 1,
         maxSessionRotations: 2,
@@ -723,7 +723,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
     if (!token) return { success: false, reason: "Apify token environment variable is missing.", sources: [] };
     if (!WEBSITE_CRAWLER_TASK_ID) return { success: false, reason: "Website crawler task ID is missing.", sources: [] };
 
-    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=180&maxItems=24&maxTotalChargeUsd=0.05`;
+    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=180&maxItems=24&maxTotalChargeUsd=0.06`;
     const startedAt = Date.now();
     try {
         const response = await fetch(endpoint, {
@@ -753,7 +753,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
                 taskId: WEBSITE_CRAWLER_TASK_ID,
                 seedCount: crawlerSeedUrls.length,
                 maxItems: 24,
-                maxTotalChargeUsd: "0.05",
+                maxTotalChargeUsd: "0.06",
                 runId,
                 apiMessage: apiMessage || null,
                 responseBody: raw.slice(0, 1600)
