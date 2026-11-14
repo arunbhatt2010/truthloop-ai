@@ -662,6 +662,42 @@ async function loadEvidenceCompressionBrain({
     };
   }
 
+  // Fail-closed lifecycle gate: ECB accepts only a CEB package whose every
+  // dispatched Apify Actor reached a terminal success state and whose dataset
+  // was retrieved. Legacy/incomplete packages are rejected, never compressed.
+  const completion = universalPackage?.collectionCompletion;
+  const completionValid = !!(
+    completion &&
+    completion.version === "1.0" &&
+    completion.allRequiredComplete === true &&
+    completion.datasetsRetrieved === true &&
+    Array.isArray(completion.requiredActors) &&
+    Array.isArray(completion.completedActors) &&
+    Array.isArray(completion.failedActors) &&
+    completion.failedActors.length === 0 &&
+    completion.requiredActors.length === completion.completedActors.length &&
+    completion.completedActors.every(item => item && item.status === "SUCCEEDED" && item.datasetRetrieved === true) &&
+    completion.requiredActors.every(name => completion.completedActors.some(item =>
+      item.actor === name || (name === "x_posts" && item.actor === "x_posts")
+    ))
+  );
+  if (!completionValid) {
+    console.error("ECB_ACTOR_COMPLETION_GATE_REJECTED", JSON.stringify({
+      hasManifest: !!completion,
+      allRequiredComplete: completion?.allRequiredComplete ?? false,
+      datasetsRetrieved: completion?.datasetsRetrieved ?? false,
+      requiredActors: completion?.requiredActors?.length || 0,
+      completedActors: completion?.completedActors?.length || 0,
+      failedActors: completion?.failedActors?.length || 0
+    }));
+    return {
+      success: false,
+      reason: "Apify collection is incomplete or unverified. ECB will not create a final package until every required Actor has succeeded and its dataset has been retrieved.",
+      loop7Package: null,
+      collectionCompletion: completion || null
+    };
+  }
+
   const validation = validateUniversalPackage(universalPackage);
   if (!validation.valid) {
     console.error("ECB_VALIDATE_FAILED", validation.reason);
@@ -1861,8 +1897,11 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
 
   void truthLoopPackage;
 
+  finalPackage.collectionCompletion = completion;
+
   return {
     success: true,
+    collectionCompletion: completion,
     loop7Package: finalPackage,
     compressionStats: {
       originalChars: originalUniversalSize,
