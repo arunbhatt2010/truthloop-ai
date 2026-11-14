@@ -1,11 +1,11 @@
 /* ============================================================
-   CROSS EVIDENCE BRAIN v28 — PCF-OWNED GITHUB + REDDIT DISABLED + 24-PAGE WEBSITE SCRAPER
+   CROSS EVIDENCE BRAIN v30 — 8 PAGE WEBSITE STREAM + LINKEDIN POSTS ONLY
    TruthLoop AI
 
    RESPONSIBILITY
    --------------
    1. Get website evidence from PublicContentFetcher.
-   2. Fetch LinkedIn when a person-profile URL is available.
+   2. Fetch only the latest LinkedIn posts from a public person/company page URL; do not scrape profile details.
    3. Fetch X when its public profile URL is found. Reddit collection is disabled.
    4. Preserve all collected evidence in one Universal Public
       Evidence Package with canonical URLs and timestamps.
@@ -33,16 +33,25 @@ import {
     buildPublicContentPackage
 } from "./PublicContentFetcher.js";
 
-const APIFY_ACTOR_ID = "apisamurai~linkedin-scraper";
-const APIFY_TIMEOUT_SECONDS = 60;
-const APIFY_MAX_TOTAL_CHARGE_USD = "0.05";
+const APIFY_TIMEOUT_SECONDS = 60; // LinkedIn and X only; website timeout is configured separately.
+const LINKEDIN_PROFILE_POSTS_ACTOR_ID = process.env.APIFY_LINKEDIN_PROFILE_POSTS_ACTOR_ID || "apimaestro~linkedin-profile-posts";
+const LINKEDIN_COMPANY_POSTS_ACTOR_ID = process.env.APIFY_LINKEDIN_COMPANY_POSTS_ACTOR_ID || "apimaestro~linkedin-company-posts";
+const LINKEDIN_MAX_TOTAL_CHARGE_USD = "0.05"; // 10 post results at $5/1,000; no profile row is requested.
 const X_APIFY_ACTOR_ID = process.env.APIFY_X_ACTOR_ID || "simple.actor~x-profile-posts";
-const UNUSED_SIGNAL_MODEL = "unused";
+
+// LinkedIn collection limit: latest 10 post records only; profile details and articles are excluded.
+const LINKEDIN_MAX_ACTIVITY_ITEMS = 10;
+const LINKEDIN_DATASET_RESPONSE_LIMIT = 10;
+
+// Website Content Crawler limits. The cost cap is independent from page/result caps.
+const WEBSITE_CRAWLER_MAX_PAGES = 8;
+const WEBSITE_CRAWLER_MAX_RESULTS = 8;
+const WEBSITE_CRAWLER_REQUEST_TIMEOUT_SECONDS = 180;
+const WEBSITE_CRAWLER_SYNC_TIMEOUT_SECONDS = 180;
+const WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD = "0.02";
 
 const ENABLE_LINKEDIN_APIFY = true;
-
 const ENABLE_X = true;
-const ENABLE_OTHER_SOCIAL = false;
 
 const SOURCE_CACHE = new Map();
 
@@ -432,14 +441,8 @@ function compressUniversalSource(source = {}) {
     );
 }
 
-function compressUniversalSignals(signals = {}) {
-    return compressUniversalContent(
-        signals,
-        UNIVERSAL_SIGNAL_TEXT_MAX_CHARS
-    );
-}
 
-function selectLatestLinkedInItem(items = [], type = "post") {
+function selectLatestLinkedInActivityItems(items = [], limit = 10) {
     const list = Array.isArray(items) ? items.filter(Boolean) : [];
 
     const getTime = item => {
@@ -450,87 +453,24 @@ function selectLatestLinkedInItem(items = [], type = "post") {
             item?.createdAt ||
             item?.timestamp ||
             "";
-
         const time = Date.parse(String(raw));
         return Number.isFinite(time) ? time : 0;
     };
 
-    const filtered =
-        type === "article"
-            ? list.filter(item =>
-                String(item?.postType || "").toLowerCase() === "article" ||
-                !!safeText(item?.headline) ||
-                !!safeText(item?.articleUrl)
-            )
-            : list.filter(item =>
-                String(item?.postType || "").toLowerCase() !== "article"
-            );
-
-    return [...filtered].sort((a, b) => {
-        const tb = getTime(b);
-        const ta = getTime(a);
-
-        if (tb !== ta) return tb - ta;
-
-        const bText =
-            safeText(b?.text).length +
-            safeText(b?.content).length +
-            safeText(b?.headline).length;
-
-        const aText =
-            safeText(a?.text).length +
-            safeText(a?.content).length +
-            safeText(a?.headline).length;
-
-        return bText - aText;
-    })[0] || null;
-}
-
-
-function selectLatestLinkedInItems(items = [], type = "post", limit = 10) {
-    const list = Array.isArray(items) ? items.filter(Boolean) : [];
-
-    const getTime = item => {
-        const raw =
-            item?.datePublished ||
-            item?.publishedAt ||
-            item?.date ||
-            item?.createdAt ||
-            item?.timestamp ||
-            "";
-
-        const time = Date.parse(String(raw));
-        return Number.isFinite(time) ? time : 0;
-    };
-
-    const filtered =
-        type === "article"
-            ? list.filter(item =>
-                String(item?.postType || "").toLowerCase() === "article" ||
-                !!safeText(item?.headline) ||
-                !!safeText(item?.articleUrl)
-            )
-            : list.filter(item =>
-                String(item?.postType || "").toLowerCase() !== "article"
-            );
-
-    return [...filtered]
+    return [...list]
         .sort((a, b) => {
             const tb = getTime(b);
             const ta = getTime(a);
-
             if (tb !== ta) return tb - ta;
 
             const bText =
                 safeText(b?.text).length +
                 safeText(b?.content).length +
                 safeText(b?.headline).length;
-
             const aText =
                 safeText(a?.text).length +
                 safeText(a?.content).length +
                 safeText(a?.headline).length;
-
             return bText - aText;
         })
         .slice(0, Math.max(0, Number(limit) || 0));
@@ -622,16 +562,16 @@ function buildWebsiteCrawlerInput(targetUrls) {
         storeSkippedUrls: false,
         summarize: false,
         useLlmsTxt: false,
-        useSitemaps: true,
+        useSitemaps: false,
         includeUrlGlobs: [],
         excludeUrlGlobs: [],
         maxCrawlDepth: 2,
-        maxCrawlPages: 24,
+        maxCrawlPages: WEBSITE_CRAWLER_MAX_PAGES,
         onlyCrawlPagesModifiedSince: "",
         customHttpHeaders: {},
         initialConcurrency: 2,
         maxConcurrency: 4,
-        requestTimeoutSecs: 180,
+        requestTimeoutSecs: WEBSITE_CRAWLER_REQUEST_TIMEOUT_SECONDS,
         minFileDownloadSpeedKBps: 128,
         maxRequestRetries: 1,
         maxSessionRotations: 2,
@@ -642,76 +582,21 @@ function buildWebsiteCrawlerInput(targetUrls) {
         pageFunction: "",
         keepElementsCssSelector: "",
         htmlTransformer: "readableText",
-        maxResults: 24
+        maxResults: WEBSITE_CRAWLER_MAX_RESULTS
     };
 }
 
 function classifyWebsitePage(url = "", title = "") {
     const value = `${url} ${title}`.toLowerCase();
-
-    // Independent evidence categories are deliberately identified before
-    // generic company-site categories. Classification is metadata only;
-    // it does not imply that a source is authentic or independently verified.
-    if (/nseindia|bseindia|mca\.gov|sebi\.gov|roc\b|stock-exchange|exchange-filings|regulatory|annual-report|annualreports|investor-presentation|financial-results|quarterly-results/.test(value)) return "stock_exchange_regulatory_and_financial";
-    if (/glassdoor|ambitionbox|indeed|kununu|comparably|employee-review|employer-review|workplace-review/.test(value)) return "employee_and_former_employee_perspectives";
-    if (/trustpilot|mouthshut|consumercomplaints|complaint|bbb\.org|g2\.com|capterra|clutch\.co|productreview|customer-review|client-review/.test(value)) return "customer_reviews_and_complaints";
-    if (/case-study|case_study|customer-story|client-story|success-story|customer-success|client-results/.test(value)) return "independent_client_case_studies";
-    if (/github\.com/.test(value)) return "github_and_technical_artifacts";
-    if (/investor|financial|revenue|profit|balance-sheet|cash-flow|earnings|dividend|filing|prospectus|credit-rating/.test(value)) return "independent_financial_documents";
-    if (/press|news|media|journal|publication|interview|third-party/.test(value)) return "independent_third_party_sources";
-
-    if (/about|founder|leadership|team|management/.test(value)) return "company_and_leadership";
-    if (/product|service|solution|feature|platform/.test(value)) return "products_and_services";
-    if (/customer|client|testimonial/.test(value)) return "company_published_customer_material";
-    if (/pricing|plan|price|billing/.test(value)) return "pricing_and_business_model";
-    if (/partner|affiliate|integration/.test(value)) return "partnerships";
-    if (/career|jobs|hiring/.test(value)) return "careers_and_hiring";
-    if (/delivery|operation|workflow/.test(value)) return "operations";
+    if (/about|founder|leadership|team|management|who-we-are/.test(value)) return "identity_and_leadership";
+    if (/product|service|solution|feature|platform|technology/.test(value)) return "products_and_services";
+    if (/customer|client|case-study|case_study|testimonial|project|results/.test(value)) return "customers_and_delivery";
+    if (/pricing|plan|price|billing|subscription/.test(value)) return "business_model_and_pricing";
+    if (/partner|affiliate|integration|ecosystem|certification/.test(value)) return "partnerships_and_ecosystem";
+    if (/news|updates|press|blog|announcement|launch|milestone|award/.test(value)) return "company_updates_and_track_record";
+    if (/career|jobs|hiring|operations|workflow|process|culture|employees/.test(value)) return "operations_and_people";
+    if (/privacy|terms|security|compliance|governance|investor|financial|legal/.test(value)) return "governance_and_trust";
     return "general_company_information";
-}
-
-// Extract only explicit, public outbound URLs already present in collected
-// website evidence. These become additional crawler seeds; no URL is guessed.
-function collectExternalEvidenceSeeds(sources = [], primaryUrl = "") {
-    const primaryHost = (() => {
-        try { return new URL(primaryUrl).hostname.replace(/^www\./i, "").toLowerCase(); }
-        catch { return ""; }
-    })();
-    const candidates = [];
-    const add = value => {
-        if (typeof value !== "string") return;
-        const matches = value.match(/https?:\/\/[^\s"'<>\\)\]}]+/gi) || [];
-        for (const match of matches) candidates.push(match.replace(/[),.;]+$/g, ""));
-        if (/^https?:\/\//i.test(value.trim())) candidates.push(value.trim());
-    };
-    const walk = (value, depth = 0) => {
-        if (depth > 5 || value == null) return;
-        if (typeof value === "string") { add(value); return; }
-        if (Array.isArray(value)) { for (const item of value) walk(item, depth + 1); return; }
-        if (typeof value === "object") {
-            for (const [key, child] of Object.entries(value)) {
-                if (/url|link|href|markdown|content|text|visibletext|description/i.test(key)) walk(child, depth + 1);
-            }
-        }
-    };
-    for (const source of Array.isArray(sources) ? sources : []) walk(source);
-
-    const seen = new Set();
-    const seeds = [];
-    for (const raw of candidates) {
-        const url = normalizeUrl(raw);
-        if (!url || seen.has(url)) continue;
-        let host = "";
-        try { host = new URL(url).hostname.replace(/^www\./i, "").toLowerCase(); } catch {}
-        if (!host || host === primaryHost || host.endsWith(`.${primaryHost}`)) continue;
-        // Keep likely evidence destinations; social networks are handled by
-        // their dedicated collectors and are not duplicated here.
-        if (/linkedin\.com|facebook\.com|instagram\.com|(^|\.)x\.com|twitter\.com|youtube\.com|reddit\.com|github\.com|gitlab\.com|bitbucket\.org/i.test(host)) continue;
-        seen.add(url);
-        seeds.push(url);
-        if (seeds.length >= 12) break;
-    }
-    return seeds;
 }
 
 async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls = []) {
@@ -723,7 +608,10 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
     if (!token) return { success: false, reason: "Apify token environment variable is missing.", sources: [] };
     if (!WEBSITE_CRAWLER_TASK_ID) return { success: false, reason: "Website crawler task ID is missing.", sources: [] };
 
-    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=180&maxItems=24&maxTotalChargeUsd=0.06`;
+    // maxCrawlPages/maxResults cap the crawl/output. maxTotalChargeUsd is the
+    // run-level charge ceiling; maxItems is intentionally omitted because it
+    // is only a billing cap for pay-per-result Actors, not a page limit.
+    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=${WEBSITE_CRAWLER_SYNC_TIMEOUT_SECONDS}&maxTotalChargeUsd=${WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD}`;
     const startedAt = Date.now();
     try {
         const response = await fetch(endpoint, {
@@ -752,8 +640,9 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
                 statusText: response.statusText || null,
                 taskId: WEBSITE_CRAWLER_TASK_ID,
                 seedCount: crawlerSeedUrls.length,
-                maxItems: 24,
-                maxTotalChargeUsd: "0.06",
+                maxCrawlPages: WEBSITE_CRAWLER_MAX_PAGES,
+                maxResults: WEBSITE_CRAWLER_MAX_RESULTS,
+                maxTotalChargeUsd: WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD,
                 runId,
                 apiMessage: apiMessage || null,
                 responseBody: raw.slice(0, 1600)
@@ -765,7 +654,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
         catch { return { success: false, reason: "Apify website task returned invalid JSON.", sources: [] }; }
         if (!Array.isArray(rows)) rows = rows?.items || rows?.data || [];
 
-        const rawSources = rows.filter(row => row && typeof row === "object").slice(0, 24).map((row, index) => {
+        const rawSources = rows.filter(row => row && typeof row === "object").slice(0, WEBSITE_CRAWLER_MAX_RESULTS).map((row, index) => {
             const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
             const crawl = row.crawl && typeof row.crawl === "object" ? row.crawl : {};
             const url = normalizeUrl(row.url || crawl.loadedUrl || metadata.canonicalUrl || normalizedUrl);
@@ -804,42 +693,30 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
         // "weak_match" so Loop 7 can use them cautiously without treating
         // page discovery as proof.
         const topicDefinitions = [
-            {
-                key: "independent_third_party_sources",
-                label: "Independent Third-Party Sources",
-                strong: /independent review|third-party report|external assessment|independent coverage|media interview|industry publication|analyst report|partner directory|certification registry/i,
-                contextual: /news|media|press|publication|interview|review|directory|certification|partner/i
-            },
-            {
-                key: "stock_exchange_regulatory_records",
-                label: "Stock Exchange / Regulatory Records",
-                strong: /exchange filing|annual report|quarterly results|financial results|shareholding pattern|corporate announcement|board meeting outcome|regulatory filing|sebi|nse|bse|mca|cin|director identification|auditor report/i,
-                contextual: /investor|stock exchange|regulatory|filing|annual report|financial results|corporate governance|shareholder|dividend/i
-            },
-            {
-                key: "independent_client_case_studies",
-                label: "Independent Client Case Studies",
-                strong: /published by the client|client-published|customer-published|independent case study|named customer|measurable outcome|before and after|implementation results|customer success story/i,
-                contextual: /case study|case-study|customer story|client story|implementation|customer|client|results|outcomes/i
-            },
-            {
-                key: "customer_reviews_complaints",
-                label: "Customer Reviews / Complaints",
-                strong: /verified purchase|verified review|customer complaint|consumer complaint|resolved complaint|unresolved complaint|customer rating|reviewed by customers|service complaint/i,
-                contextual: /trustpilot|mouthshut|consumercomplaints|g2|capterra|clutch|bbb|customer review|complaint|rating/i
-            },
-            {
-                key: "employee_former_employee_perspectives",
-                label: "Employee / Former Employee Perspectives",
-                strong: /current employee|former employee|employee review|workplace review|interview experience|management review|work culture|salary review|attrition/i,
-                contextual: /glassdoor|ambitionbox|indeed|kununu|employee|former employee|workplace|career|salary|culture/i
-            },
-            {
-                key: "independent_financial_documents",
-                label: "Independent Financial Documents",
-                strong: /audited financial statements|auditor opinion|balance sheet|profit and loss|cash flow statement|revenue breakdown|segment results|debt rating|credit rating|annual financial statements/i,
-                contextual: /financial statement|auditor|annual report|revenue|profit|cash flow|balance sheet|credit rating|financial results|dividend/i
-            }
+            { key: "identity_and_leadership", label: "Identity and Leadership",
+              strong: /founder|co-founder|leadership|management team|our team|who we are|company overview/i,
+              contextual: /about|leadership|team|management|mission|vision/i },
+            { key: "products_and_services", label: "Products and Services",
+              strong: /product features|service offering|platform capabilities|solution overview|product documentation/i,
+              contextual: /product|service|solution|platform|features|technology/i },
+            { key: "customers_and_delivery", label: "Customers and Delivery",
+              strong: /case study|customer story|client story|implementation results|measurable outcome|customer testimonial/i,
+              contextual: /customer|client|case-study|testimonial|project|delivery|results/i },
+            { key: "business_model_and_pricing", label: "Business Model and Pricing",
+              strong: /pricing plans|subscription plans|rate card|billing terms|commercial model/i,
+              contextual: /pricing|plans|price|billing|subscription|revenue model/i },
+            { key: "partnerships_and_ecosystem", label: "Partnerships and Ecosystem",
+              strong: /technology partner|strategic partnership|integration partner|partner directory|certification/i,
+              contextual: /partner|partnership|affiliate|integration|ecosystem|certification/i },
+            { key: "company_updates_and_track_record", label: "Company Updates and Track Record",
+              strong: /company announcement|product launch|milestone|award|press release|business update/i,
+              contextual: /news|updates|press|blog|announcement|launch|milestone|award/i },
+            { key: "operations_and_people", label: "Operations and People",
+              strong: /careers|open positions|hiring|delivery process|operating model|work culture/i,
+              contextual: /career|jobs|hiring|operations|workflow|process|culture|employees/i },
+            { key: "governance_and_trust", label: "Governance and Trust",
+              strong: /privacy policy|terms of service|security practices|compliance|annual report|audited financial/i,
+              contextual: /privacy|terms|security|compliance|governance|investor|financial|legal/i }
         ];
 
         const scoreTopic = (source, definition) => {
@@ -919,7 +796,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
 
         const generalSources = rawSources
             .filter(source => !usedUrls.has(source.url))
-            .slice(0, Math.max(0, 24 - targetedSources.length))
+            .slice(0, Math.max(0, WEBSITE_CRAWLER_MAX_RESULTS - targetedSources.length))
             .map(source => ({ ...source, collectionPurpose: "general_website" }));
         const sources = [...generalSources, ...targetedSources].map((source, index) => ({
             ...source,
@@ -929,7 +806,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
         console.log("CEB_WEBSITE_APIFY_RESULT", JSON.stringify({
             taskId: WEBSITE_CRAWLER_TASK_ID,
             pagesReturned: rawSources.length,
-            maxAdditionalPages: 24,
+            maxAdditionalPages: WEBSITE_CRAWLER_MAX_PAGES,
             externalSeedCount: Math.max(0, crawlerSeedUrls.length - 1),
             generalPagesSelected: generalSources.length,
             topicPagesSelected: targetedSources.length,
@@ -1282,44 +1159,6 @@ async function fetchSocialProfileAndPostsFromApify(platform, url = "") {
     }
 }
 
-function htmlToVisibleText(html = "") {
-    if (typeof html !== "string") return "";
-
-    return html
-        .replace(/<script[\s\S]*?<\/script>/gi, " ")
-        .replace(/<style[\s\S]*?<\/style>/gi, " ")
-        .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
-        .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/&nbsp;/gi, " ")
-        .replace(/&amp;/gi, "&")
-        .replace(/&quot;/gi, '"')
-        .replace(/&#39;/gi, "'")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-function extractMetaTag(html = "", nameOrProperty = "") {
-    const key = String(nameOrProperty || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-    const patterns = [
-        new RegExp(
-            `<meta[^>]+(?:name|property)=["']${key}["'][^>]+content=["']([^"']*)["'][^>]*>`,
-            "i"
-        ),
-        new RegExp(
-            `<meta[^>]+content=["']([^"']*)["'][^>]+(?:name|property)=["']${key}["'][^>]*>`,
-            "i"
-        )
-    ];
-
-    for (const pattern of patterns) {
-        const match = html.match(pattern);
-        if (match?.[1]) return safeText(match[1]);
-    }
-
-    return "";
-}
 
 /* ------------------------------------------------------------
    GITHUB COLLECTION IS PCF-OWNED
@@ -1328,9 +1167,9 @@ function extractMetaTag(html = "", nameOrProperty = "") {
    ------------------------------------------------------------ */
 
 /* ------------------------------------------------------------
-   APIFY — API SAMURAI UNIVERSAL LINKEDIN COLLECTOR
-   Supports public company pages (/company/) and person profiles (/in/).
-   Normalizes profile/company About, posts and articles into one source.
+   APIFY — LINKEDIN POSTS-ONLY COLLECTORS
+   Uses dedicated public post Actors for person and company pages.
+   No LinkedIn profile details or articles are collected.
    ------------------------------------------------------------ */
 
 async function fetchLinkedInFromApify(url = "") {
@@ -1349,31 +1188,42 @@ async function fetchLinkedInFromApify(url = "") {
     }
 
     const isCompanyTarget = isLinkedInCompanyUrl(normalizedUrl);
-    const actorInput = {
-        profileUrls: isCompanyTarget ? [] : [normalizedUrl],
-        companyUrls: isCompanyTarget ? [normalizedUrl] : [],
-        postUrls: [],
-        includePosts: true,
-        maxPostsPerProfile: 20
-    };
+    const actorId = isCompanyTarget
+        ? LINKEDIN_COMPANY_POSTS_ACTOR_ID
+        : LINKEDIN_PROFILE_POSTS_ACTOR_ID;
+    const handle = (() => {
+        try {
+            const parts = new URL(normalizedUrl).pathname.split("/").filter(Boolean);
+            const marker = isCompanyTarget ? "company" : "in";
+            const index = parts.findIndex(part => part.toLowerCase() === marker);
+            return index >= 0 ? parts[index + 1] || "" : "";
+        } catch { return ""; }
+    })();
+
+    if (!handle) {
+        return { success: false, reason: "Could not extract LinkedIn profile/company identifier.", source: null };
+    }
+
+    // Dedicated post-only Actors: no LinkedIn profile-details Actor is called.
+    const actorInput = isCompanyTarget
+        ? { company_name: normalizedUrl, limit: LINKEDIN_MAX_ACTIVITY_ITEMS, sort: "recent" }
+        : { username: handle, total_posts: LINKEDIN_MAX_ACTIVITY_ITEMS };
 
     const endpoint =
         "https://api.apify.com/v2/acts/" +
-        encodeURIComponent(APIFY_ACTOR_ID) +
+        encodeURIComponent(actorId) +
         "/run-sync-get-dataset-items" +
         `?timeout=${APIFY_TIMEOUT_SECONDS}` +
-        "&maxItems=100" +
-        `&maxTotalChargeUsd=${APIFY_MAX_TOTAL_CHARGE_USD}`;
+        `&limit=${LINKEDIN_DATASET_RESPONSE_LIMIT}` +
+        `&maxTotalChargeUsd=${LINKEDIN_MAX_TOTAL_CHARGE_USD}`;
 
-    console.log("APIFY_LINKEDIN_CALL_START", JSON.stringify({
-        actorId: APIFY_ACTOR_ID,
-        targetType: isCompanyTarget ? "company" : "person",
-        linkedinUrl: normalizedUrl,
+    console.log("APIFY_LINKEDIN_POSTS_ONLY_CALL_START", JSON.stringify({
+        actorId,
+        targetType: isCompanyTarget ? "company_posts_only" : "profile_posts_only",
+        targetUrl: normalizedUrl,
         inputKeys: Object.keys(actorInput),
-        maxPostsPerProfile: actorInput.maxPostsPerProfile,
-        maxItems: 100,
-        timeoutSeconds: APIFY_TIMEOUT_SECONDS,
-        maxTotalChargeUsd: APIFY_MAX_TOTAL_CHARGE_USD,
+        maxPosts: LINKEDIN_MAX_ACTIVITY_ITEMS,
+        maxTotalChargeUsd: LINKEDIN_MAX_TOTAL_CHARGE_USD,
         ts: Date.now()
     }));
 
@@ -1387,28 +1237,33 @@ async function fetchLinkedInFromApify(url = "") {
             body: JSON.stringify(actorInput)
         });
         const rawBody = await response.text();
-        console.log("APIFY_LINKEDIN_CALL_STATUS", response.status);
 
         if (!response.ok) {
             let errorPayload = null;
             try { errorPayload = JSON.parse(rawBody); } catch {}
             const errorMessage = errorPayload?.error?.message || errorPayload?.message || rawBody.slice(0, 800) || "Unknown Apify error.";
-            console.error("APIFY_LINKEDIN_CALL_ERROR", JSON.stringify({ status: response.status, actorId: APIFY_ACTOR_ID, message: errorMessage }));
-            return { success: false, reason: `API Samurai LinkedIn request failed (${response.status}): ${errorMessage}`, source: null };
+            console.error("APIFY_LINKEDIN_POSTS_ONLY_CALL_ERROR", JSON.stringify({
+                status: response.status, actorId, message: errorMessage
+            }));
+            return { success: false, reason: `LinkedIn posts-only request failed (${response.status}): ${errorMessage}`, source: null };
         }
 
         let payload;
         try { payload = JSON.parse(rawBody); }
-        catch (parseError) {
-            return { success: false, reason: `API Samurai returned invalid JSON: ${parseError?.message || "parse failed"}`, source: null };
+        catch (error) {
+            return { success: false, reason: `LinkedIn posts Actor returned invalid JSON: ${error?.message || "parse failed"}`, source: null };
         }
 
-        const rows = Array.isArray(payload)
-            ? payload.filter(row => row && typeof row === "object")
-            : Array.isArray(payload?.items)
-                ? payload.items.filter(row => row && typeof row === "object")
-                : payload && typeof payload === "object" ? [payload] : [];
-
+        const unwrapRows = value => {
+            if (Array.isArray(value)) return value;
+            if (!value || typeof value !== "object") return [];
+            for (const key of ["items", "results", "records", "posts", "data"]) {
+                if (Array.isArray(value[key])) return value[key];
+            }
+            if (value.data && typeof value.data === "object") return unwrapRows(value.data);
+            return [value];
+        };
+        const rows = unwrapRows(payload);
         const firstText = (...values) => {
             for (const value of values) {
                 if (typeof value === "string" && value.trim()) return value.trim();
@@ -1416,163 +1271,96 @@ async function fetchLinkedInFromApify(url = "") {
             }
             return "";
         };
-        const typeOf = row => firstText(row?.type, row?.rowType, row?.contentType, row?.postType).toLowerCase();
-        const dateOf = row => row?.postedAt || row?.publishedAt || row?.datePublished || row?.publishedDate || row?.date || row?.createdAt || row?.timestamp || null;
-        const urlOf = row => row?.url || row?.postUrl || row?.articleUrl || row?.activityUrl || row?.originalUrl || row?.linkedinUrl || row?.sourceUrl || row?.link || null;
-        const textOf = row => firstText(row?.text, row?.content, row?.articleText, row?.postText, row?.description, row?.body, row?.summary);
-        const titleOf = row => firstText(row?.title, row?.headline, row?.articleTitle, row?.documentTitle);
-        const isArticleRow = row => {
-            const type = typeOf(row);
-            const candidateUrl = String(urlOf(row) || "");
-            return type.includes("article") || !!row?.articleUrl || /\/pulse\//i.test(candidateUrl);
-        };
-
-        const targetRow = rows.find(row => {
-            const type = typeOf(row);
-            return isCompanyTarget
-                ? type === "company" || !!row?.companyType || !!row?.employeeCount || !!row?.universalName
-                : type === "profile" || type === "person" || !!row?.fullName || !!row?.firstName;
-        }) || rows[0] || {};
-
-        const nestedPosts = [
-            ...(Array.isArray(targetRow?.recentPosts) ? targetRow.recentPosts : []),
-            ...(Array.isArray(targetRow?.posts) ? targetRow.posts : []),
-            ...(Array.isArray(targetRow?.latestPosts) ? targetRow.latestPosts : [])
-        ];
-        const nestedArticles = [
-            ...(Array.isArray(targetRow?.articles) ? targetRow.articles : []),
-            ...(Array.isArray(targetRow?.recentArticles) ? targetRow.recentArticles : [])
-        ];
-        const explicitActivityRows = rows.filter(row => {
-            const type = typeOf(row);
-            return type === "post" || type.includes("article") || !!row?.postUrl || !!row?.articleUrl;
-        });
-        const activityRows = [...nestedPosts, ...nestedArticles, ...explicitActivityRows]
-            .filter(row => row && typeof row === "object");
-
+        const posts = [];
         const seen = new Set();
-        const uniqueRows = activityRows.filter(row => {
-            const itemUrl = String(urlOf(row) || "").trim();
-            const itemText = textOf(row);
-            const title = titleOf(row);
-            if (!itemUrl || (!itemText && !title)) return false;
-            const key = itemUrl.toLowerCase();
-            if (seen.has(key)) return false;
+
+        for (const row of rows) {
+            if (!row || typeof row !== "object") continue;
+            const nested = row.post && typeof row.post === "object" ? row.post : row;
+            const postUrlRaw = firstText(
+                nested.url, nested.postUrl, nested.post_url, nested.activityUrl,
+                nested.linkedinUrl, nested.link, nested.permalink
+            );
+            const postUrl = normalizeUrl(postUrlRaw) || postUrlRaw;
+            const text = firstText(
+                nested.text, nested.content, nested.postText, nested.description,
+                nested.body, nested.summary, nested.commentary
+            );
+            const title = firstText(nested.title, nested.headline);
+            if (!postUrl || (!text && !title)) continue;
+            const key = postUrl.toLowerCase();
+            if (seen.has(key)) continue;
             seen.add(key);
-            return true;
-        });
 
-        const normalizeActivity = (row, kind) => {
-            const itemUrl = normalizeUrl(String(urlOf(row) || "")) || String(urlOf(row) || "");
-            const text = textOf(row);
-            const title = titleOf(row);
-            const publishedAt = dateOf(row);
-            return {
-                ...row,
-                postType: kind,
+            const publishedAt = nested.postedAt || nested.publishedAt || nested.datePublished ||
+                nested.publishedDate || nested.date || nested.createdAt || nested.timestamp || null;
+            posts.push({
+                ...nested,
+                postType: "post",
                 title: title || null,
-                ...(kind === "article" ? { headline: title || null, articleUrl: itemUrl } : {}),
-                text: text || title || "",
-                content: text || title || "",
-                date: publishedAt || null,
-                datePublished: publishedAt || null,
-                publishedAt: publishedAt || null,
-                postedAt: publishedAt || null,
-                url: itemUrl,
-                sourceUrl: itemUrl,
-                postUrl: kind === "post" ? itemUrl : (row?.postUrl || null),
-                sourceName: firstText(row?.sourceName, row?.authorName, row?.author?.name, targetRow?.name, targetRow?.fullName) || null
-            };
+                text: text || title,
+                content: text || title,
+                date: publishedAt,
+                publishedAt,
+                url: postUrl,
+                sourceUrl: postUrl,
+                postUrl,
+                likes: nested.likes ?? nested.likeCount ?? nested.reactionCount ?? null,
+                comments: nested.comments ?? nested.commentCount ?? nested.commentsCount ?? null,
+                sourcePlatform: "linkedin"
+            });
+        }
+
+        const parseTime = value => {
+            if (value == null || value === "") return 0;
+            if (typeof value === "number" || /^\d{10,13}$/.test(String(value))) {
+                const number = Number(value);
+                const millis = number < 1e12 ? number * 1000 : number;
+                return Number.isFinite(millis) ? millis : 0;
+            }
+            const parsed = Date.parse(String(value));
+            return Number.isFinite(parsed) ? parsed : 0;
         };
-
-        const allPosts = uniqueRows.filter(row => !isArticleRow(row)).map(row => normalizeActivity(row, "post"));
-        const allArticles = uniqueRows.filter(isArticleRow).map(row => normalizeActivity(row, "article"));
-        const posts = selectLatestLinkedInItems(allPosts, "post", 20);
-        const articles = selectLatestLinkedInItems(allArticles, "article", 20);
-
-        const targetUrl = normalizeUrl(String(urlOf(targetRow) || targetRow?.profileUrl || targetRow?.companyUrl || normalizedUrl)) || normalizedUrl;
-        const about = firstText(targetRow?.about, targetRow?.description, targetRow?.overview, targetRow?.summary, targetRow?.bio, targetRow?.slogan, targetRow?.tagline);
-        const profileName = firstText(targetRow?.name, targetRow?.fullName, targetRow?.companyName, targetRow?.firstName);
-        const profile = {
-            ...targetRow,
-            entityType: isCompanyTarget ? "company" : "person",
-            profileUrl: targetUrl,
-            linkedinUrl: targetUrl,
-            companyUrl: isCompanyTarget ? targetUrl : (targetRow?.companyUrl || null),
-            name: profileName || null,
-            fullName: firstText(targetRow?.fullName, profileName) || null,
-            headline: firstText(targetRow?.headline, targetRow?.tagline, targetRow?.slogan) || null,
-            about: about || null,
-            description: about || null,
-            currentCompany: firstText(targetRow?.currentCompany, targetRow?.company) || null,
-            location: firstText(targetRow?.location, targetRow?.headquarters) || null,
-            followersCount: targetRow?.followersCount ?? targetRow?.followers ?? null,
-            connectionsCount: targetRow?.connectionsCount ?? targetRow?.connections ?? null,
-            website: firstText(targetRow?.website, targetRow?.websiteUrl) || null,
-            industry: firstText(targetRow?.industry) || null,
-            companySize: firstText(targetRow?.size, targetRow?.companySize, targetRow?.employeeRange) || null,
-            employeeCount: targetRow?.employeeCount ?? null,
-            headquarters: firstText(targetRow?.headquarters, targetRow?.location) || null,
-            founded: targetRow?.founded ?? null,
-            specialties: Array.isArray(targetRow?.specialties) ? targetRow.specialties : [],
-            companyType: firstText(targetRow?.companyType) || null,
-            tagline: firstText(targetRow?.tagline, targetRow?.slogan) || null,
-            slug: firstText(targetRow?.slug, targetRow?.universalName) || null
-        };
-
-        const visibleText = [
-            profile.name ? `Name: ${profile.name}` : "",
-            profile.headline ? `Headline: ${profile.headline}` : "",
-            profile.about ? `About: ${profile.about}` : "",
-            profile.industry ? `Industry: ${profile.industry}` : "",
-            profile.companySize ? `Company size: ${profile.companySize}` : "",
-            profile.employeeCount != null ? `Employees: ${profile.employeeCount}` : "",
-            profile.headquarters ? `Headquarters: ${profile.headquarters}` : "",
-            ...posts.map(row => textOf(row)),
-            ...articles.map(row => [titleOf(row), textOf(row)].filter(Boolean).join("\n"))
-        ].filter(Boolean).join("\n");
+        const latestPosts = posts
+            .sort((a, b) => parseTime(b.date) - parseTime(a.date))
+            .slice(0, LINKEDIN_MAX_ACTIVITY_ITEMS);
 
         const source = {
-            sourceUrl: targetUrl,
-            canonicalUrl: targetUrl,
+            sourceUrl: normalizedUrl, // locator used to request public posts; not a profile evidence record
+            canonicalUrl: normalizedUrl,
             sourcePlatform: "linkedin",
             platform: "linkedin",
             sourceHost: "www.linkedin.com",
-            status: 200,
-            fetchStatus: "success",
-            title: profile.name || profile.headline || "LinkedIn Public Page",
-            description: about || profile.headline || "",
-            visibleText,
-            contentLength: visibleText.length,
-            socialLinks: [targetUrl],
-            socialProfiles: [targetUrl],
-            linkedinProfile: profile,
-            profile,
-            posts,
-            articles,
-            apifyData: rows
+            status: latestPosts.length ? 200 : 204,
+            fetchStatus: latestPosts.length ? "success" : "empty",
+            title: "LinkedIn Public Posts",
+            description: "",
+            visibleText: latestPosts.map(post => post.text).filter(Boolean).join("\n"),
+            contentLength: latestPosts.reduce((sum, post) => sum + String(post.text || "").length, 0),
+            socialLinks: [],
+            socialProfiles: [],
+            linkedinProfile: null,
+            profile: null,
+            posts: latestPosts,
+            articles: []
         };
-        SOURCE_CACHE.set(normalizedUrl, source);
-        SOURCE_CACHE.set(targetUrl, source);
 
-        console.log("APIFY_LINKEDIN_RESULT_COUNTS", JSON.stringify({
-            actorId: APIFY_ACTOR_ID,
-            targetType: profile.entityType,
-            targetUrl,
-            rawRows: rows.length,
-            validUniqueItems: uniqueRows.length,
-            postsAvailable: allPosts.length,
-            articlesAvailable: allArticles.length,
-            postsSelectedForAnalysis: posts.length,
-            articlesSelectedForAnalysis: articles.length,
-            profileAboutChars: String(profile.about || "").length,
-            companyEmployeeCount: profile.employeeCount,
-            elapsedTargetSeconds: APIFY_TIMEOUT_SECONDS
+        SOURCE_CACHE.set(normalizedUrl, source);
+        console.log("APIFY_LINKEDIN_POSTS_ONLY_RESULT", JSON.stringify({
+            actorId,
+            targetType: isCompanyTarget ? "company" : "person",
+            rowsReturned: rows.length,
+            postsRetained: latestPosts.length,
+            profileRowsRequested: 0,
+            articlesRetained: 0,
+            maxTotalChargeUsd: LINKEDIN_MAX_TOTAL_CHARGE_USD
         }));
-        return { success: true, source };
+        return latestPosts.length
+            ? { success: true, source }
+            : { success: false, reason: "LinkedIn posts Actor returned no usable posts.", source: null };
     } catch (error) {
-        console.error("APIFY_LINKEDIN_CALL_FAILED", error?.message || "Unknown error");
-        return { success: false, reason: error?.message || "API Samurai LinkedIn fetch failed.", source: null };
+        console.error("APIFY_LINKEDIN_POSTS_ONLY_CALL_FAILED", error?.message || "Unknown error");
+        return { success: false, reason: error?.message || "LinkedIn posts-only fetch failed.", source: null };
     }
 }
 
@@ -1809,12 +1597,7 @@ async function buildSignalSignals({
     ];
 
     const websiteUrls = unique(websiteSources.map(item => item.url));
-    const linkedinUrls = unique([
-        linkedin?.sourceUrl,
-        linkedin?.linkedinProfile?.profileUrl,
-        ...linkedinPostSources.map(item => item.url),
-        ...linkedinArticleSources.map(item => item.url)
-    ]);
+    const linkedinUrls = unique(linkedinPostSources.map(item => item.url));
     const githubUrls = githubSource?.url ? [githubSource.url] : [];
     const xUrls = unique([xProfileSource?.url, ...xPostSources.map(item => item.url)]);
     const redditUrls = unique([redditProfileSource?.url, ...redditPostSources.map(item => item.url)]);
@@ -1823,13 +1606,7 @@ async function buildSignalSignals({
     ]);
 
     const websiteText = websiteSources.map(item => item.text).join(" ");
-    const linkedinText = [
-        normalizeText(linkedin?.linkedinProfile?.name),
-        normalizeText(linkedin?.linkedinProfile?.headline),
-        normalizeText(linkedin?.linkedinProfile?.about),
-        ...linkedinPostSources.map(item => item.text),
-        ...linkedinArticleSources.map(item => item.text)
-    ].filter(Boolean).join(" ");
+    const linkedinText = linkedinPostSources.map(item => item.text).filter(Boolean).join(" ");
     const githubText = githubSource?.text || "";
     const xText = [xProfileSource?.text, ...xPostSources.map(item => item.text)].filter(Boolean).join(" ");
     const redditText = [redditProfileSource?.text, ...redditPostSources.map(item => item.text)].filter(Boolean).join(" ");
@@ -2945,7 +2722,7 @@ async function buildSignalSignals({
                     investigationSignals.length,
                 websiteItems: websiteItems.length,
                 linkedinPosts: linkedinPosts.length,
-                linkedinArticles: linkedinArticles.length,
+                linkedinArticles: 0,
                 githubPresent: !!github
             }
         }
@@ -3266,43 +3043,16 @@ function buildUniversalPackage({
             compressUniversalSource(source)
         );
 
-    const linkedInProfile =
-        linkedinSource?.linkedinProfile ||
-        null;
+    const linkedInProfile = null;
 
-    const latestLinkedInPosts =
-        selectLatestLinkedInItems(
-            linkedinSource?.posts || [],
-            "post",
-            9
-        );
+    // LinkedIn posts were sorted newest-first and capped to 10 items
+    // before signal extraction. Preserve that exact bounded set here.
+    const linkedinPosts = Array.isArray(linkedinSource?.posts)
+        ? linkedinSource.posts
+        : [];
+    const linkedinArticles = [];
 
-    const latestLinkedInArticles =
-        selectLatestLinkedInItems(
-            linkedinSource?.articles || [],
-            "article",
-            1
-        );
-
-    const linkedinPosts =
-        latestLinkedInPosts;
-
-    const linkedinArticles =
-        latestLinkedInArticles;
-
-    const compressedLinkedinProfile =
-        linkedinSource?.linkedinProfile &&
-        typeof linkedinSource.linkedinProfile === "object"
-            ? {
-                ...linkedinSource.linkedinProfile,
-                about:
-                    meaningfulCompressText(
-                        linkedinSource.linkedinProfile.about || "",
-                        UNIVERSAL_ABOUT_MAX_CHARS,
-                        "about"
-                    )
-            }
-            : null;
+    const compressedLinkedinProfile = null;
 
     const compressedLinkedinSource =
         linkedinSource
@@ -3398,7 +3148,6 @@ function buildUniversalPackage({
 
     const allSourceUrls = [
         ...websiteSourceUrls,
-        compressedLinkedinSource?.linkedinProfile?.profileUrl,
         ...linkedinPosts.map(item =>
             item?.url ||
             item?.postUrl ||
@@ -3445,7 +3194,7 @@ function buildUniversalPackage({
     /*
      * CARRY FORWARD RETAINED EVIDENCE.
      * Website sources come from PCF.
-     * LinkedIn posts/articles are carried up to 10 each.
+     * Only the latest 10 LinkedIn posts are carried; no profile or article evidence is collected.
      * No evidence content is discarded here beyond the explicit
      * existing 10-item transport boundary.
      * CONTENT compression only.
@@ -3717,9 +3466,9 @@ console.log(
          * ADDITIVE WEBSITE INTELLIGENCE COLLECTION.
          * PCF remains untouched. Apify Task adds non-article website pages.
          */
-        const externalEvidenceSeeds = collectExternalEvidenceSeeds(websiteSources, primaryUrl);
-        console.log("CEB_EXTERNAL_EVIDENCE_SEEDS", JSON.stringify({ count: externalEvidenceSeeds.length, hosts: externalEvidenceSeeds.map(url => { try { return new URL(url).hostname; } catch { return ""; } }) }));
-        const websiteScraperResult = await fetchWebsiteEvidenceFromApifyTask(primaryUrl, externalEvidenceSeeds);
+        // Independent CEB crawl: starts from the target website only.
+        // PCF-collected URLs/evidence are never passed into this scraper.
+        const websiteScraperResult = await fetchWebsiteEvidenceFromApifyTask(primaryUrl);
         if (websiteScraperResult?.success) {
             const existingWebsiteUrls = new Set(websiteSources
                 .map(source => normalizeUrl(source?.url || source?.sourceUrl || source?.permalink || ""))
@@ -3842,7 +3591,7 @@ console.log(
         console.log(
             "CEB_LINKEDIN_APIFY_DISPATCH",
             JSON.stringify({
-                actorId: APIFY_ACTOR_ID,
+                actorId: isLinkedInCompanyUrl(linkedinUrl) ? LINKEDIN_COMPANY_POSTS_ACTOR_ID : LINKEDIN_PROFILE_POSTS_ACTOR_ID,
                 linkedinUrl,
                 enabled: ENABLE_LINKEDIN_APIFY
             })
