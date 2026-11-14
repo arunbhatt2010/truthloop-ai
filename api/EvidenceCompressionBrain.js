@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v21 — INDEPENDENT SOURCE METADATA PRESERVATION
+   EVIDENCE COMPRESSION BRAIN v22 — SEPARATE SOURCE STREAMS + HARD-CAP-ONLY COMPRESSION
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -29,7 +29,6 @@ const MAX_TOTAL_PACKAGE_CHARS = 500000;
 const ECB_OUTPUT_LIMIT = 500000;
 const ECB_TRANSPORT_LIMIT = 500000;
 const MAX_INPUT_PACKAGE_CHARS = 10000000;
-const TARGET_PACKAGE_CHARS = 0.90;
 
 /*
  * Loop 7 transport boundary:
@@ -38,14 +37,14 @@ const TARGET_PACKAGE_CHARS = 0.90;
  * Meaningful text compression is allowed; silent source dropping is not.
  */
 const MAX_WEBSITE_SOURCES = Number.POSITIVE_INFINITY;
-const MAX_WEBSITE_SCRAPER_SOURCES = Number.POSITIVE_INFINITY;
+const MAX_WEBSITE_SCRAPER_SOURCES = 24;
 const MAX_LINKEDIN_POSTS = Number.POSITIVE_INFINITY;
 const MIN_LINKEDIN_POSTS = 1;
 const MAX_LINKEDIN_ARTICLES = Number.POSITIVE_INFINITY;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
-const MAX_REDDIT_POSTS = Number.POSITIVE_INFINITY;
+const MAX_REDDIT_POSTS = 0;
 
-const PACKAGE_VERSION = "23.0";
+const PACKAGE_VERSION = "24.0";
 
 /* ---------------------------------------------------------
    BASIC HELPERS
@@ -547,7 +546,7 @@ const buildGithubEvidence = source => {
       500,
       3
     ),
-    content: extractEvidenceText(source, 6000, 12)
+    content: extractEvidenceText(source, 6000, 60)
   };
 
   if (source?.owner) {
@@ -743,9 +742,10 @@ async function loadEvidenceCompressionBrain({
       : null;
 
   const xInput = universalPackage?.xEvidence && typeof universalPackage.xEvidence === "object" ? universalPackage.xEvidence : null;
-  const redditInput = universalPackage?.redditEvidence && typeof universalPackage.redditEvidence === "object" ? universalPackage.redditEvidence : null;
+  // Reddit is not part of the active CEB/ECB source contract.
+  const redditInput = null;
   const xPostsInput = (Array.isArray(xInput?.posts) ? xInput.posts : Array.isArray(xInput?.recentPosts) ? xInput.recentPosts : []);
-  const redditPostsInput = (Array.isArray(redditInput?.posts) ? redditInput.posts : Array.isArray(redditInput?.recentPosts) ? redditInput.recentPosts : []);
+  const redditPostsInput = [];
 
   const linkedinPostsInput = selectLinkedInItems(
     postsInput,
@@ -757,6 +757,15 @@ async function loadEvidenceCompressionBrain({
     MAX_LINKEDIN_ARTICLES
   );
 
+  console.log("ECB_SOURCE_STREAM_INPUT_AUDIT", JSON.stringify({
+    pcfWebsite: { available: websiteInput.length, selected: websiteSourcesInput.length },
+    cebWebsiteScraper: { available: websiteScraperInput.length, selected: websiteScraperSourcesInput.length, maxAllowed: MAX_WEBSITE_SCRAPER_SOURCES },
+    githubPCF: { available: !!universalPackage?.githubEvidence, selected: !!universalPackage?.githubEvidence },
+    linkedin: { profileAvailable: !!profileInput, postsAvailable: postsInput.length, articlesAvailable: articlesInput.length },
+    x: { profileAvailable: !!xInput, postsAvailable: xPostsInput.length },
+    reddit: { enabled: false, accepted: false }
+  }));
+
   console.log(
     "ECB_SELECTION_AUDIT",
     JSON.stringify({
@@ -764,6 +773,7 @@ async function loadEvidenceCompressionBrain({
       websiteSelected: websiteSourcesInput.length,
       websiteScraperAvailable: websiteScraperInput.length,
       websiteScraperSelected: websiteScraperSourcesInput.length,
+      websiteScraperMaxAllowed: MAX_WEBSITE_SCRAPER_SOURCES,
       linkedinPostsAvailable: postsInput.length,
       linkedinPostsSelected: linkedinPostsInput.length,
       linkedinArticlesAvailable: articlesInput.length,
@@ -771,7 +781,7 @@ async function loadEvidenceCompressionBrain({
       linkedinProfileSelected: !!profileInput,
       githubSelected: !!githubInput,
       xProfileSelected: !!xInput, xPostsSelected: xPostsInput.length,
-      redditProfileSelected: !!redditInput, redditPostsSelected: redditPostsInput.length
+      redditProfileSelected: false, redditPostsSelected: 0, redditCollection: "disabled"
     })
   );
 
@@ -786,11 +796,20 @@ async function loadEvidenceCompressionBrain({
   const websiteSources = websiteSourcesInput.map(source => ({
     sourceId: nextSourceId(),
     sourceType: "website",
+    evidenceStream: "pcf_website",
     url: getUrl(source),
     title: firstText(source?.title, source?.headline).slice(0, 220) || null,
     date: getDate(source),
-    content: extractEvidenceText(source, 6000, 12),
+    content: extractEvidenceText(source, 6000, 60),
     pageCategory: source?.pageCategory || source?.category || null,
+    collectionPurpose: source?.collectionPurpose || null,
+    topicKey: source?.topicKey || null,
+    topicLabel: source?.topicLabel || null,
+    topicRelevanceScore: Number.isFinite(Number(source?.topicRelevanceScore)) ? Number(source.topicRelevanceScore) : null,
+    topicEvidenceStatus: source?.topicEvidenceStatus || null,
+    topicEvidenceSignals: Array.isArray(source?.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
+    sourceDomain: source?.sourceDomain || (() => { try { return new URL(getUrl(source)).hostname; } catch { return null; } })(),
+    sourceIndependence: source?.sourceIndependence || null,
     metadata: source?.metadata ?? null,
     structuredData: source?.structuredData ?? source?.jsonLd ?? null
   }));
@@ -798,6 +817,7 @@ async function loadEvidenceCompressionBrain({
   const websiteScraperSources = websiteScraperSourcesInput.map(source => ({
     sourceId: nextSourceId(),
     sourceType: "website_scraper",
+    evidenceStream: "ceb_website_scraper",
     url: getUrl(source),
     title: firstText(source?.title, source?.headline, source?.name).slice(0, 220) || null,
     date: getDate(source),
@@ -810,7 +830,7 @@ async function loadEvidenceCompressionBrain({
     topicEvidenceSignals: Array.isArray(source?.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
     sourceDomain: source?.sourceDomain || null,
     sourceIndependence: source?.sourceIndependence || null,
-    content: extractEvidenceText(source, 6000, 12),
+    content: extractEvidenceText(source, 6000, 60),
     metadata: source?.metadata ?? null,
     structuredData: source?.structuredData ?? source?.jsonLd ?? null
   }));
@@ -914,7 +934,7 @@ async function loadEvidenceCompressionBrain({
     title:
       firstText(item?.title, item?.headline).slice(0, 180) || null,
     content:
-      extractEvidenceText(item, 6000, 12),
+      extractEvidenceText(item, 6000, 60),
     likes: item?.likes ?? null,
     comments: item?.comments ?? null
   }));
@@ -945,7 +965,7 @@ async function loadEvidenceCompressionBrain({
     title:
       firstText(item?.title, item?.headline).slice(0, 200) || null,
     content:
-      extractEvidenceText(item, 6000, 12),
+      extractEvidenceText(item, 6000, 60),
     likes: item?.likes ?? null,
     comments: item?.comments ?? null
   }));
@@ -991,7 +1011,7 @@ async function loadEvidenceCompressionBrain({
     url: getUrl(item),
     date: getDate(item) || item?.createdAt || item?.created_at || null,
     title: firstText(item?.title, item?.headline, item?.text).slice(0, 180) || null,
-    content: extractEvidenceText(item, 5000, 10),
+    content: extractEvidenceText(item, 5000, 50),
     platform
   })).filter(item => item.url || item.content);
   const xPosts = buildSocialPosts(xPostsInput, "x");
@@ -1157,6 +1177,7 @@ async function loadEvidenceCompressionBrain({
     sourceRegistry.push({
       sourceId: source.sourceId,
       sourceType: source.sourceType,
+      evidenceStream: source.evidenceStream || (source.sourceType === "website_scraper" ? "ceb_website_scraper" : "pcf_website"),
       title: source.title || "Website source",
       url: source.url,
       date: source.date || null,
@@ -1284,7 +1305,9 @@ async function loadEvidenceCompressionBrain({
 
     evidenceCoverage: {
       websiteSourcesRetained: websiteSources.length,
+      pcfWebsiteSourcesRetained: websiteSources.length,
       websiteScraperSourcesRetained: websiteScraperSources.length,
+      cebWebsiteScraperSourcesRetained: websiteScraperSources.length,
       linkedinProfileRetained: profile ? 1 : 0,
       linkedinPostsRetained: linkedinPosts.length,
       linkedinArticlesRetained: linkedinArticles.length,
@@ -1317,6 +1340,14 @@ async function loadEvidenceCompressionBrain({
   const packageSize = pkg => JSON.stringify(pkg).length;
 
   const rebuildAtBudget = (contentBudget, profileBudget, signalBudget) => {
+    const budgetFor = key => {
+      if (contentBudget && typeof contentBudget === "object") {
+        const value = Number(contentBudget[key]);
+        return Number.isFinite(value) && value > 0 ? Math.floor(value) : 1200;
+      }
+      const value = Number(contentBudget);
+      return Number.isFinite(value) && value > 0 ? Math.floor(value) : 1200;
+    };
     /*
      * Final ECB output stays evidence-first:
      * sourceRegistry remains the canonical locator layer.
@@ -1329,6 +1360,7 @@ async function loadEvidenceCompressionBrain({
     const compactSourceRegistry = sourceRegistry.map(source => ({
       sourceId: source.sourceId,
       sourceType: source.sourceType,
+      evidenceStream: source.evidenceStream || (source.sourceType === "website_scraper" ? "ceb_website_scraper" : "pcf_website"),
       title: firstText(source.title).slice(0, 44) || null,
       url: source.url || null,
       date: source.date || null,
@@ -1350,11 +1382,20 @@ async function loadEvidenceCompressionBrain({
   title: firstText(source.title, source.headline).slice(0, 64) || null,
   date: getDate(source),
   content: meaningfulText(
-    extractEvidenceText(source, contentBudget, 12),
-    contentBudget,
-    12
+    extractEvidenceText(source, budgetFor("pcfWebsite"), 60),
+    budgetFor("pcfWebsite"),
+    60
   ),
+  evidenceStream: source.evidenceStream || "pcf_website",
   pageCategory: source.pageCategory || null,
+  collectionPurpose: source.collectionPurpose || null,
+  topicKey: source.topicKey || null,
+  topicLabel: source.topicLabel || null,
+  topicRelevanceScore: source.topicRelevanceScore ?? null,
+  topicEvidenceStatus: source.topicEvidenceStatus || null,
+  topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
+  sourceDomain: source.sourceDomain || null,
+  sourceIndependence: source.sourceIndependence || null,
   metadata: source.metadata ?? null,
   structuredData: source.structuredData ?? null
 }));
@@ -1362,6 +1403,7 @@ async function loadEvidenceCompressionBrain({
 const websiteScraper = websiteScraperSources.map(source => ({
   sourceId: source.sourceId,
   sourceType: source.sourceType,
+  evidenceStream: source.evidenceStream || "ceb_website_scraper",
   url: getUrl(source),
   title: firstText(source.title, source.headline).slice(0, 220) || null,
   date: getDate(source),
@@ -1375,9 +1417,9 @@ const websiteScraper = websiteScraperSources.map(source => ({
   sourceDomain: source.sourceDomain || null,
   sourceIndependence: source.sourceIndependence || null,
   content: meaningfulText(
-    extractEvidenceText(source, contentBudget, 12),
-    contentBudget,
-    12
+    extractEvidenceText(source, budgetFor("cebWebsiteScraper"), 60),
+    budgetFor("cebWebsiteScraper"),
+    60
   ),
   metadata: source.metadata ?? null,
   structuredData: source.structuredData ?? null
@@ -1411,9 +1453,9 @@ const posts = linkedinPosts.map(post => ({
   date: getDate(post),
   title: firstText(post.title, post.headline).slice(0, 100) || null,
   content: meaningfulText(
-    extractEvidenceText(post, contentBudget, 12),
-    contentBudget,
-    12
+    extractEvidenceText(post, budgetFor("linkedinPosts"), 60),
+    budgetFor("linkedinPosts"),
+    60
   )
 }));
 
@@ -1424,9 +1466,9 @@ const articles = linkedinArticles.map(article => ({
   date: getDate(article),
   title: firstText(article.title, article.headline).slice(0, 100) || null,
   content: meaningfulText(
-    extractEvidenceText(article, contentBudget, 12),
-    contentBudget,
-    12
+    extractEvidenceText(article, budgetFor("linkedinArticles"), 60),
+    budgetFor("linkedinArticles"),
+    60
   )
 }));
 
@@ -1444,9 +1486,9 @@ const github = githubEvidence
         6
       ),
       content: meaningfulText(
-        extractEvidenceText(githubEvidence, contentBudget, 12),
-        contentBudget,
-        12
+        extractEvidenceText(githubEvidence, budgetFor("github"), 60),
+        budgetFor("github"),
+        60
       )
     }
   : null;
@@ -1475,9 +1517,9 @@ const buildSocialPostCompact = (posts, platform, limit) =>
     date: getDate(post),
     title: firstText(post.title, post.headline, post.text).slice(0, 180) || null,
     content: meaningfulText(
-      extractEvidenceText(post, contentBudget, 10),
-      contentBudget,
-      10
+      extractEvidenceText(post, budgetFor(platform === "x" ? "xPosts" : "redditPosts"), 50),
+      budgetFor(platform === "x" ? "xPosts" : "redditPosts"),
+      50
     )
   })).filter(post => post.url || post.content);
 
@@ -1575,7 +1617,9 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
         universalPackage?.crossEvidenceIntelligence || null,
       evidenceCoverage: {
         websiteSourcesRetained: website.length,
+        pcfWebsiteSourcesRetained: website.length,
         websiteScraperSourcesRetained: websiteScraper.length,
+        cebWebsiteScraperSourcesRetained: websiteScraper.length,
         linkedinProfileRetained: linkedinProfile ? 1 : 0,
         linkedinPostsRetained: posts.length,
         linkedinArticlesRetained: articles.length,
@@ -1595,70 +1639,50 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
   };
 
   let finalSize = packageSize(finalPackage);
+  const preCompressionPackageSize = finalSize;
 
   /*
-   * OpenRouter / DeepSeek-V3.1 has a much larger context window than the
-   * historical Groq transport budget. Preserve roughly 90% of the actual
-   * Universal Package evidence instead of forcing everything into 9.5k.
+   * Do not compress toward a percentage of the input. The 500,000-character
+   * limit is the only normal compression trigger. When it is breached, each
+   * evidence family receives its own proportional text budget; page counts
+   * and source identities remain independent and are never merged.
    */
-  const evidenceItemCount =
-    Math.max(
-      1,
-      websiteSources.length +
-      websiteScraperSources.length +
-      linkedinPosts.length +
-      linkedinArticles.length +
-      (githubEvidence ? 1 : 0) +
-      (xProfile ? 1 : 0) + xPosts.length +
-      (redditProfile ? 1 : 0) + redditPosts.length
-    );
+  const evidenceFamilies = {
+    pcfWebsite: websiteSources,
+    cebWebsiteScraper: websiteScraperSources,
+    linkedinPosts,
+    linkedinArticles,
+    github: githubEvidence ? [githubEvidence] : [],
+    xPosts
+  };
+  const familyTextChars = Object.fromEntries(Object.entries(evidenceFamilies).map(([key, items]) => [
+    key,
+    items.reduce((sum, item) => sum + rawEvidenceText(item).length, 0)
+  ]));
+  const totalEvidenceTextChars = Object.values(familyTextChars).reduce((sum, count) => sum + count, 0);
+  const metadataReserve = 24000 + (profile ? 3000 : 0);
+  const compressionTargetChars = Math.max(12000, MAX_TOTAL_PACKAGE_CHARS - metadataReserve);
 
-  const dynamicTargetChars = Math.max(
-    12000,
-    Math.min(
-      MAX_TOTAL_PACKAGE_CHARS,
-      Math.floor(originalUniversalSize * 0.90)
-    )
-  );
+  const makeFamilyBudgets = scale => Object.fromEntries(Object.entries(evidenceFamilies).map(([key, items]) => {
+    const totalChars = familyTextChars[key] || 0;
+    if (!items.length || !totalChars) return [key, 1200];
+    const proportionalFamilyChars = Math.max(1200, Math.floor(totalChars * scale));
+    return [key, Math.max(700, Math.floor(proportionalFamilyChars / items.length))];
+  }));
 
-  const metadataReserve = 5000 + (profile ? 2200 : 0);
-
-  if (finalSize > dynamicTargetChars) {
-    const perEvidenceBudget = Math.max(
-      900,
-      Math.floor(
-        Math.max(10000, dynamicTargetChars - metadataReserve) /
-        evidenceItemCount
-      )
-    );
-
-    finalPackage = rebuildAtBudget(
-      perEvidenceBudget,
-      1500,
-      0
-    );
+  const dynamicTargetChars = MAX_TOTAL_PACKAGE_CHARS;
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    const initialScale = totalEvidenceTextChars > 0
+      ? Math.min(0.95, compressionTargetChars / totalEvidenceTextChars)
+      : 0.75;
+    finalPackage = rebuildAtBudget(makeFamilyBudgets(initialScale), 2200, 0);
     finalSize = packageSize(finalPackage);
   }
 
-  /*
-   * Second pass only if the 90% target is still exceeded.
-   * This remains evidence-first: fewer complete sentences, never tiny
-   * character-fragment slicing.
-   */
-  if (finalSize > dynamicTargetChars) {
-    const perEvidenceBudget = Math.max(
-      700,
-      Math.floor(
-        Math.max(10000, dynamicTargetChars - metadataReserve) /
-        evidenceItemCount
-      ) * 0.75
-    );
-
-    finalPackage = rebuildAtBudget(
-      Math.floor(perEvidenceBudget),
-      1200,
-      0
-    );
+  // Retry only if the hard cap is still exceeded; keep every source record and
+  // further reduce content within each distinct evidence stream.
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS) {
+    finalPackage = rebuildAtBudget(makeFamilyBudgets(Math.max(0.08, (totalEvidenceTextChars ? (compressionTargetChars / totalEvidenceTextChars) * 0.72 : 0.35))), 1500, 0);
     finalSize = packageSize(finalPackage);
   }
 
@@ -1731,6 +1755,17 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       {
         finalSize,
         sourceRegistryCount: finalPackage?.sourceRegistry?.length || 0,
+        sourceStreamCounts: {
+          pcfWebsite: finalPackage?.evidenceUniverse?.websiteSources?.length || 0,
+          cebWebsiteScraper: finalPackage?.evidenceUniverse?.websiteScraperSources?.length || 0,
+          githubPCF: finalPackage?.evidenceUniverse?.githubEvidence ? 1 : 0,
+          linkedinProfile: finalPackage?.evidenceUniverse?.linkedinProfile ? 1 : 0,
+          linkedinPosts: finalPackage?.evidenceUniverse?.linkedinPosts?.length || 0,
+          linkedinArticles: finalPackage?.evidenceUniverse?.linkedinArticles?.length || 0,
+          xProfile: finalPackage?.evidenceUniverse?.xProfile ? 1 : 0,
+          xPosts: finalPackage?.evidenceUniverse?.xPosts?.length || 0,
+          reddit: 0
+        },
         websiteScraperSources: Array.isArray(finalPackage?.evidenceUniverse?.websiteScraperSources)
           ? finalPackage.evidenceUniverse.websiteScraperSources.map(source => ({
               sourceId: source.sourceId,
@@ -1808,9 +1843,21 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       originalChars: originalUniversalSize,
       finalChars: finalSize,
       targetChars: dynamicTargetChars,
+      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS,
+      hardCapExceededAfterCompression: finalSize > MAX_TOTAL_PACKAGE_CHARS,
       maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
       websiteSources: websiteSources.length,
+      pcfWebsiteSources: websiteSources.length,
       websiteScraperSources: websiteScraperSources.length,
+      cebWebsiteScraperSources: websiteScraperSources.length,
+      sourceContentCharsByStream: {
+        pcfWebsite: websiteSources.reduce((sum, source) => sum + String(source.content || "").length, 0),
+        cebWebsiteScraper: websiteScraperSources.reduce((sum, source) => sum + String(source.content || "").length, 0),
+        githubPCF: String(githubEvidence?.content || "").length,
+        linkedinPosts: linkedinPosts.reduce((sum, source) => sum + String(source.content || "").length, 0),
+        linkedinArticles: linkedinArticles.reduce((sum, source) => sum + String(source.content || "").length, 0),
+        xPosts: xPosts.reduce((sum, source) => sum + String(source.content || "").length, 0)
+      },
       linkedinPosts: linkedinPosts.length,
       linkedinArticles: linkedinArticles.length,
       profile: !!profile,
@@ -1821,7 +1868,8 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       redditPosts: redditPosts.length,
       urlsRetained: sourceRegistry.length,
       evidenceSourcesRetained: sourceRegistry.length,
-      meaningfulCompression: true,
+      meaningfulCompression: finalSize < preCompressionPackageSize,
+      hardCapOnlyCompression: true,
       destructiveCharacterCompaction: false,
       linksModified: false
     })
@@ -1837,6 +1885,8 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       compressedChars: finalSize,
       targetChars: dynamicTargetChars,
       maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
+      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS,
+      hardCapExceededAfterCompression: finalSize > MAX_TOTAL_PACKAGE_CHARS,
       websiteSources: websiteSources.length,
       websiteScraperSources: websiteScraperSources.length,
       linkedInPosts: linkedinPosts.length,
@@ -1853,7 +1903,8 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
       linkedinProfiles: profile ? 1 : 0,
       urlsRetained: sourceRegistry.length,
       evidenceSourcesRetained: sourceRegistry.length,
-      meaningfulCompression: true,
+      meaningfulCompression: finalSize < preCompressionPackageSize,
+      hardCapOnlyCompression: true,
       destructiveCharacterCompaction: false,
       linksModified: false
     }
