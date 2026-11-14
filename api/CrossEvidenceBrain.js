@@ -56,6 +56,75 @@ const ENABLE_X = true;
 
 const SOURCE_CACHE = new Map();
 
+
+// Apify lifecycle gate: never treat a request timeout as Actor completion.
+// Every dispatched run is polled to a terminal state before its dataset is read.
+const APIFY_POLL_INTERVAL_MS = 2000;
+const APIFY_RUN_TIMEOUT_MS = 240000;
+const APIFY_TERMINAL_STATES = new Set(["SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"]);
+
+async function runApifyActorAndGetDatasetItems({ actorId = "", taskId = "", input = {}, token = "", maxTotalChargeUsd = "", memoryMb = null, timeoutMs = APIFY_RUN_TIMEOUT_MS, maxItems = null } = {}) {
+    if (!token || (!actorId && !taskId)) return { success: false, status: "NOT_STARTED", reason: "Missing Apify token or Actor identifier.", items: [], runId: null };
+    const base = "https://api.apify.com/v2";
+    const encodedId = encodeURIComponent(taskId || actorId);
+    const startPath = taskId ? `/actor-tasks/${encodedId}/runs` : `/acts/${encodedId}/runs`;
+    const query = new URLSearchParams();
+    if (maxTotalChargeUsd) query.set("maxTotalChargeUsd", String(maxTotalChargeUsd));
+    if (memoryMb) query.set("memory", String(memoryMb));
+    const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+    let runId = null;
+    let lastStatus = "UNKNOWN";
+    const startedAt = Date.now();
+    try {
+        const startResponse = await fetch(`${base}${startPath}${query.toString() ? `?${query}` : ""}`, { method: "POST", headers, body: JSON.stringify(input) });
+        const startText = await startResponse.text();
+        let startPayload = {};
+        try { startPayload = startText ? JSON.parse(startText) : {}; } catch {}
+        const run = startPayload?.data || startPayload;
+        runId = run?.id || run?.runId || null;
+        lastStatus = String(run?.status || "UNKNOWN").toUpperCase();
+        if (!startResponse.ok || !runId) {
+            return { success: false, status: lastStatus, reason: `Apify run start failed (${startResponse.status}): ${startText.slice(0, 700)}`, items: [], runId };
+        }
+        console.log("CEB_APIFY_RUN_STARTED", JSON.stringify({ actorId: actorId || null, taskId: taskId || null, runId, status: lastStatus }));
+        while (!APIFY_TERMINAL_STATES.has(lastStatus)) {
+            if (Date.now() - startedAt >= timeoutMs) {
+                try { await fetch(`${base}/actor-runs/${encodeURIComponent(runId)}/abort`, { method: "POST", headers }); } catch (abortError) {
+                    console.error("CEB_APIFY_ABORT_REQUEST_FAILED", JSON.stringify({ runId, message: abortError?.message || String(abortError) }));
+                }
+                return { success: false, status: "LOCAL_TIMEOUT", reason: `Apify run ${runId} did not reach a terminal state within ${Math.round(timeoutMs / 1000)} seconds; abort requested.`, items: [], runId };
+            }
+            await new Promise(resolve => setTimeout(resolve, APIFY_POLL_INTERVAL_MS));
+            const statusResponse = await fetch(`${base}/actor-runs/${encodeURIComponent(runId)}`, { method: "GET", headers: { Authorization: `Bearer ${token}` } });
+            const statusText = await statusResponse.text();
+            let statusPayload = {};
+            try { statusPayload = statusText ? JSON.parse(statusText) : {}; } catch {}
+            if (!statusResponse.ok) return { success: false, status: "STATUS_CHECK_FAILED", reason: `Apify status check failed (${statusResponse.status}): ${statusText.slice(0, 500)}`, items: [], runId };
+            lastStatus = String(statusPayload?.data?.status || statusPayload?.status || "UNKNOWN").toUpperCase();
+            if (!lastStatus || lastStatus === "UNKNOWN") return { success: false, status: lastStatus, reason: `Apify returned an unrecognized status for run ${runId}.`, items: [], runId };
+        }
+        if (lastStatus !== "SUCCEEDED") return { success: false, status: lastStatus, reason: `Apify run ${runId} ended with status ${lastStatus}.`, items: [], runId };
+        const datasetId = run?.defaultDatasetId || (await (async () => {
+            const finalResponse = await fetch(`${base}/actor-runs/${encodeURIComponent(runId)}`, { headers: { Authorization: `Bearer ${token}` } });
+            const finalText = await finalResponse.text();
+            let finalPayload = {}; try { finalPayload = finalText ? JSON.parse(finalText) : {}; } catch {}
+            return finalPayload?.data?.defaultDatasetId || null;
+        })());
+        if (!datasetId) return { success: false, status: lastStatus, reason: `Apify run ${runId} succeeded but returned no defaultDatasetId.`, items: [], runId };
+        const datasetQuery = new URLSearchParams({ clean: "true", format: "json" });
+        if (Number.isFinite(Number(maxItems)) && Number(maxItems) > 0) datasetQuery.set("limit", String(maxItems));
+        const datasetResponse = await fetch(`${base}/datasets/${encodeURIComponent(datasetId)}/items?${datasetQuery}`, { headers: { Authorization: `Bearer ${token}` } });
+        const datasetText = await datasetResponse.text();
+        if (!datasetResponse.ok) return { success: false, status: "DATASET_FETCH_FAILED", reason: `Apify dataset fetch failed (${datasetResponse.status}): ${datasetText.slice(0, 500)}`, items: [], runId, datasetId };
+        let items; try { items = datasetText ? JSON.parse(datasetText) : []; } catch { return { success: false, status: "INVALID_DATASET_JSON", reason: "Apify dataset returned invalid JSON.", items: [], runId, datasetId }; }
+        if (!Array.isArray(items)) items = items?.items || items?.data || [];
+        console.log("CEB_APIFY_RUN_COMPLETED", JSON.stringify({ actorId: actorId || null, taskId: taskId || null, runId, status: lastStatus, datasetId, itemCount: items.length, durationMs: Date.now() - startedAt }));
+        return { success: true, status: lastStatus, items, runId, datasetId };
+    } catch (error) {
+        return { success: false, status: "REQUEST_ERROR", reason: error?.message || "Apify lifecycle request failed.", items: [], runId };
+    }
+}
+
 /* ------------------------------------------------------------
    BASIC URL HELPERS
    ------------------------------------------------------------ */
@@ -531,7 +600,7 @@ const WEBSITE_CRAWLER_TASK_ID =
     process.env.APIFY_WEBSITE_CRAWLER_TASK_ID ||
     "susurrant_topiary~website-content-crawler-task";
 
-function buildWebsiteCrawlerInput(targetUrls) {
+function buildWebsiteCrawlerInput(targetUrls, excludedUrls = []) {
     const seeds = [...new Set((Array.isArray(targetUrls) ? targetUrls : [targetUrls])
         .map(normalizeUrl).filter(Boolean))].slice(0, 13);
     return {
@@ -565,7 +634,10 @@ function buildWebsiteCrawlerInput(targetUrls) {
         useLlmsTxt: false,
         useSitemaps: false,
         includeUrlGlobs: [],
-        excludeUrlGlobs: [],
+        // Exclude PCF pages before crawl dispatch so the crawler does not spend
+        // requests re-fetching already-collected evidence.
+        excludeUrlGlobs: [...new Set((Array.isArray(excludedUrls) ? excludedUrls : [])
+            .map(normalizeUrl).filter(Boolean))].map(url => `${url}*`),
         maxCrawlDepth: 2,
         maxCrawlPages: WEBSITE_CRAWLER_MAX_PAGES,
         onlyCrawlPagesModifiedSince: "",
@@ -600,7 +672,7 @@ function classifyWebsitePage(url = "", title = "") {
     return "general_company_information";
 }
 
-async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls = []) {
+async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls = [], excludedUrls = []) {
     const normalizedUrl = normalizeUrl(targetUrl);
     const crawlerSeedUrls = [normalizedUrl, ...(Array.isArray(additionalSeedUrls) ? additionalSeedUrls : [])]
         .map(normalizeUrl).filter(Boolean).filter((url, index, all) => all.indexOf(url) === index).slice(0, 13);
@@ -609,53 +681,22 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
     if (!token) return { success: false, reason: "Apify token environment variable is missing.", sources: [] };
     if (!WEBSITE_CRAWLER_TASK_ID) return { success: false, reason: "Website crawler task ID is missing.", sources: [] };
 
-    // maxCrawlPages/maxResults cap the crawl/output. maxTotalChargeUsd is the
-    // run-level charge ceiling; maxItems is intentionally omitted because it
-    // is only a billing cap for pay-per-result Actors, not a page limit.
-    const endpoint = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(WEBSITE_CRAWLER_TASK_ID)}/run-sync-get-dataset-items?timeout=${WEBSITE_CRAWLER_SYNC_TIMEOUT_SECONDS}&memory=${WEBSITE_CRAWLER_MEMORY_MB}&maxTotalChargeUsd=${WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD}`;
     const startedAt = Date.now();
     try {
-        const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(buildWebsiteCrawlerInput(crawlerSeedUrls))
+        const actorRun = await runApifyActorAndGetDatasetItems({
+            taskId: WEBSITE_CRAWLER_TASK_ID,
+            token,
+            input: buildWebsiteCrawlerInput(crawlerSeedUrls, excludedUrls),
+            maxTotalChargeUsd: WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD,
+            memoryMb: WEBSITE_CRAWLER_MEMORY_MB,
+            timeoutMs: APIFY_RUN_TIMEOUT_MS,
+            maxItems: WEBSITE_CRAWLER_MAX_RESULTS
         });
-        const raw = await response.text();
-        if (!response.ok) {
-            let errorPayload = null;
-            try { errorPayload = raw.trim() ? JSON.parse(raw) : null; } catch {}
-            const apiMessage = [
-                errorPayload?.error?.message,
-                errorPayload?.error?.type,
-                errorPayload?.message,
-                errorPayload?.statusMessage,
-                errorPayload?.data?.statusMessage,
-                errorPayload?.data?.errorMessage
-            ].filter(value => typeof value === "string" && value.trim()).join(" | ");
-            const runId = errorPayload?.data?.id || errorPayload?.id || errorPayload?.runId || response.headers?.get?.("x-apify-run-id") || null;
-            console.error("CEB_WEBSITE_APIFY_HTTP_ERROR", JSON.stringify({
-                status: response.status,
-                statusText: response.statusText || null,
-                taskId: WEBSITE_CRAWLER_TASK_ID,
-                seedCount: crawlerSeedUrls.length,
-                maxCrawlPages: WEBSITE_CRAWLER_MAX_PAGES,
-                maxResults: WEBSITE_CRAWLER_MAX_RESULTS,
-                maxTotalChargeUsd: WEBSITE_CRAWLER_MAX_TOTAL_CHARGE_USD,
-                memoryMb: WEBSITE_CRAWLER_MEMORY_MB,
-                runId,
-                apiMessage: apiMessage || null,
-                responseBody: raw.slice(0, 1600)
-            }));
-            return { success: false, reason: `Apify website task HTTP ${response.status}${apiMessage ? `: ${apiMessage}` : ""}`, sources: [], runId };
+        if (!actorRun.success) {
+            console.error("CEB_WEBSITE_APIFY_RUN_INCOMPLETE", JSON.stringify({ status: actorRun.status, runId: actorRun.runId || null, reason: actorRun.reason }));
+            return { success: false, reason: actorRun.reason, status: actorRun.status, runId: actorRun.runId || null, sources: [] };
         }
-        let rows;
-        try { rows = raw.trim() ? JSON.parse(raw) : []; }
-        catch { return { success: false, reason: "Apify website task returned invalid JSON.", sources: [] }; }
-        if (!Array.isArray(rows)) rows = rows?.items || rows?.data || [];
-
+        const rows = actorRun.items;
         const rawSources = rows.filter(row => row && typeof row === "object").slice(0, WEBSITE_CRAWLER_MAX_RESULTS).map((row, index) => {
             const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
             const crawl = row.crawl && typeof row.crawl === "object" ? row.crawl : {};
@@ -817,7 +858,7 @@ async function fetchWebsiteEvidenceFromApifyTask(targetUrl, additionalSeedUrls =
             topicCollectionStatus,
             durationMs: Date.now() - startedAt
         }));
-        return { success: sources.length > 0, sourceUrl: normalizedUrl, sources, topicCollectionStatus, durationMs: Date.now() - startedAt };
+        return { success: sources.length > 0, sourceUrl: normalizedUrl, sources, topicCollectionStatus, runId: actorRun.runId, runStatus: actorRun.status, durationMs: Date.now() - startedAt };
     } catch (error) {
         console.error("CEB_WEBSITE_APIFY_FAILED", error?.message || String(error));
         return { success: false, reason: error?.message || "Apify website crawl failed.", sources: [] };
@@ -947,7 +988,6 @@ async function fetchSocialProfileAndPostsFromApify(platform, url = "") {
 
     // Actor spend caps are run options (query parameters), not input fields.
     const maxCost = "0.01";
-    const endpoint = `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/run-sync-get-dataset-items?timeout=${APIFY_TIMEOUT_SECONDS}&maxItems=10&maxTotalChargeUsd=${maxCost}`;
 
     // X Actor schema: one public profile URL and up to three recent posts.
     const input = {
@@ -967,27 +1007,13 @@ async function fetchSocialProfileAndPostsFromApify(platform, url = "") {
     }));
 
     try {
-        const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(input)
-        });
-        const raw = await response.text();
-        if (!response.ok) {
-            const reason = `Apify ${platform} request failed (${response.status}): ${raw.slice(0, 500)}`;
-            console.error("APIFY_SOCIAL_CALL_FAILED", JSON.stringify({ platform, status: response.status, reason }));
-            return { success: false, reason, source: null };
+        const actorRun = await runApifyActorAndGetDatasetItems({ actorId, token, input, maxTotalChargeUsd: maxCost, timeoutMs: APIFY_RUN_TIMEOUT_MS, maxItems: 10 });
+        if (!actorRun.success) {
+            const reason = actorRun.reason || `Apify ${platform} Actor did not complete.`;
+            console.error("APIFY_SOCIAL_CALL_FAILED", JSON.stringify({ platform, status: actorRun.status, runId: actorRun.runId || null, reason }));
+            return { success: false, reason, status: actorRun.status, runId: actorRun.runId || null, source: null };
         }
-
-        let data;
-        try {
-            data = JSON.parse(raw);
-        } catch {
-            return { success: false, reason: `Invalid ${platform} Actor JSON.`, source: null };
-        }
+        const data = actorRun.items;
 
         // Apify's sync dataset endpoint normally returns an array. Accept common
         // wrappers too, so an Actor changing its envelope does not silently erase posts.
@@ -1156,7 +1182,7 @@ async function fetchSocialProfileAndPostsFromApify(platform, url = "") {
             firstRowKeys: Object.keys(rows[0] || {}).slice(0, 30),
             durationMs: Date.now() - socialStartedAt
         }));
-        return { success: true, source };
+        return { success: true, source, runId: actorRun.runId, status: actorRun.status };
     } catch (error) {
         console.error("APIFY_SOCIAL_CALL_FAILED", JSON.stringify({ platform, actorId, error: error?.message || String(error) }));
         return { success: false, reason: error?.message || `${platform} Actor failed.`, source: null };
@@ -1213,13 +1239,6 @@ async function fetchLinkedInFromApify(url = "") {
         ? { company_name: normalizedUrl, limit: LINKEDIN_MAX_ACTIVITY_ITEMS, sort: "recent" }
         : { username: handle, total_posts: LINKEDIN_MAX_ACTIVITY_ITEMS };
 
-    const endpoint =
-        "https://api.apify.com/v2/acts/" +
-        encodeURIComponent(actorId) +
-        "/run-sync-get-dataset-items" +
-        `?timeout=${APIFY_TIMEOUT_SECONDS}` +
-        `&limit=${LINKEDIN_DATASET_RESPONSE_LIMIT}` +
-        `&maxTotalChargeUsd=${LINKEDIN_MAX_TOTAL_CHARGE_USD}`;
 
     console.log("APIFY_LINKEDIN_POSTS_ONLY_CALL_START", JSON.stringify({
         actorId,
@@ -1232,31 +1251,13 @@ async function fetchLinkedInFromApify(url = "") {
     }));
 
     try {
-        const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${apiToken}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(actorInput)
-        });
-        const rawBody = await response.text();
-
-        if (!response.ok) {
-            let errorPayload = null;
-            try { errorPayload = JSON.parse(rawBody); } catch {}
-            const errorMessage = errorPayload?.error?.message || errorPayload?.message || rawBody.slice(0, 800) || "Unknown Apify error.";
-            console.error("APIFY_LINKEDIN_POSTS_ONLY_CALL_ERROR", JSON.stringify({
-                status: response.status, actorId, message: errorMessage
-            }));
-            return { success: false, reason: `LinkedIn posts-only request failed (${response.status}): ${errorMessage}`, source: null };
+        const actorRun = await runApifyActorAndGetDatasetItems({ actorId, token: apiToken, input: actorInput, maxTotalChargeUsd: LINKEDIN_MAX_TOTAL_CHARGE_USD, timeoutMs: APIFY_RUN_TIMEOUT_MS, maxItems: LINKEDIN_DATASET_RESPONSE_LIMIT });
+        if (!actorRun.success) {
+            const errorMessage = actorRun.reason || "LinkedIn posts Actor did not complete.";
+            console.error("APIFY_LINKEDIN_POSTS_ONLY_CALL_ERROR", JSON.stringify({ actorId, status: actorRun.status, runId: actorRun.runId || null, message: errorMessage }));
+            return { success: false, reason: errorMessage, status: actorRun.status, runId: actorRun.runId || null, source: null };
         }
-
-        let payload;
-        try { payload = JSON.parse(rawBody); }
-        catch (error) {
-            return { success: false, reason: `LinkedIn posts Actor returned invalid JSON: ${error?.message || "parse failed"}`, source: null };
-        }
+        const payload = actorRun.items;
 
         const unwrapRows = value => {
             if (Array.isArray(value)) return value;
@@ -1360,7 +1361,7 @@ async function fetchLinkedInFromApify(url = "") {
             maxTotalChargeUsd: LINKEDIN_MAX_TOTAL_CHARGE_USD
         }));
         return latestPosts.length
-            ? { success: true, source }
+            ? { success: true, source, runId: actorRun.runId, status: actorRun.status }
             : { success: false, reason: "LinkedIn posts Actor returned no usable posts.", source: null };
     } catch (error) {
         console.error("APIFY_LINKEDIN_POSTS_ONLY_CALL_FAILED", error?.message || "Unknown error");
@@ -3420,6 +3421,7 @@ console.log(
     let redditUrl = "";
 
     const primaryPlatform = detectPlatform(primaryUrl);
+    const actorCompletion = { required: [], completed: [], failed: [] };
 
     if (primaryPlatform === "linkedin") {
 
@@ -3472,7 +3474,13 @@ console.log(
          */
         // Independent CEB crawl: starts from the target website only.
         // PCF-collected URLs/evidence are never passed into this scraper.
-        const websiteScraperResult = await fetchWebsiteEvidenceFromApifyTask(primaryUrl);
+        const pcfWebsiteUrls = websiteSources
+            .map(source => normalizeUrl(source?.url || source?.sourceUrl || source?.permalink || source?.canonicalUrl || ""))
+            .filter(Boolean);
+        const websiteScraperResult = await fetchWebsiteEvidenceFromApifyTask(primaryUrl, [], pcfWebsiteUrls);
+        actorCompletion.required.push("website_crawler");
+        if (websiteScraperResult?.success) actorCompletion.completed.push({ actor: "website_crawler", runId: websiteScraperResult.runId || null, status: websiteScraperResult.runStatus || "SUCCEEDED", datasetRetrieved: true, itemCount: websiteScraperResult.sources?.length || 0 });
+        else actorCompletion.failed.push({ actor: "website_crawler", runId: websiteScraperResult?.runId || null, status: websiteScraperResult?.status || "FAILED", reason: websiteScraperResult?.reason || "No dataset returned." });
         if (websiteScraperResult?.success) {
             const existingWebsiteUrls = new Set(websiteSources
                 .map(source => normalizeUrl(source?.url || source?.sourceUrl || source?.permalink || ""))
@@ -3602,6 +3610,9 @@ console.log(
         );
 
         const apifyResult = await fetchLinkedInFromApify(linkedinUrl);
+        actorCompletion.required.push("linkedin_posts");
+        if (apifyResult?.success && apifyResult?.source) actorCompletion.completed.push({ actor: "linkedin_posts", runId: apifyResult.runId || null, status: apifyResult.status || "SUCCEEDED", datasetRetrieved: true, itemCount: apifyResult.source.posts?.length || 0 });
+        else actorCompletion.failed.push({ actor: "linkedin_posts", runId: apifyResult?.runId || null, status: apifyResult?.status || "FAILED", reason: apifyResult?.reason || "No usable LinkedIn posts returned." });
 
         if (apifyResult?.success && apifyResult?.source) {
             linkedinSource = apifyResult.source;
@@ -3621,6 +3632,7 @@ console.log(
     // X is the only social Actor collector configured in CEB. Reddit is disabled.
     const socialTasks = [];
     if (ENABLE_X && xUrl) {
+        actorCompletion.required.push("x_posts");
         socialTasks.push(fetchSocialProfileAndPostsFromApify("x", xUrl)
             .then(result => ({ platform: "x", result })));
     }
@@ -3629,9 +3641,27 @@ console.log(
         if (result?.success && result?.source) {
             if (platform === "x") xEvidence = result.source;
             if (platform === "reddit") redditEvidence = result.source;
+            if (result?.success) actorCompletion.completed.push({ actor: `${platform}_posts`, runId: result.runId || null, status: result.status || "SUCCEEDED", datasetRetrieved: true, itemCount: result.source?.posts?.length || 0 });
         } else {
+            actorCompletion.failed.push({ actor: `${platform}_posts`, runId: result?.runId || null, status: result?.status || "FAILED", reason: result?.reason || "No social evidence returned." });
             console.warn(`CEB_${platform.toUpperCase()}_APIFY_UNAVAILABLE`, result?.reason || "No social evidence returned.");
         }
+    }
+
+    if (actorCompletion.failed.length > 0) {
+        console.error("CEB_ACTOR_COMPLETION_GATE_FAILED", JSON.stringify(actorCompletion));
+        return {
+            success: false,
+            packageType: "CrossEvidencePackage",
+            sourcesProcessed: actorCompletion.required.length,
+            sourcesSucceeded: actorCompletion.completed.length,
+            sourcesFailed: actorCompletion.failed.length,
+            confidenceScore: 0,
+            errors: actorCompletion.failed.map(item => `${item.actor}: ${item.reason}`),
+            actorCompletion: { ...actorCompletion, allRequiredComplete: false },
+            universalPackage: null,
+            crossEvidencePackage: null
+        };
     }
 
     /*
@@ -3668,6 +3698,16 @@ console.log(
             signalResult,
             crossEvidenceIntelligence: signalResult?.crossEvidenceIntelligence || null
         });
+
+    universalPackage.collectionCompletion = {
+        version: "1.0",
+        allRequiredComplete: actorCompletion.failed.length === 0 && actorCompletion.required.length === actorCompletion.completed.length,
+        requiredActors: actorCompletion.required.slice(),
+        completedActors: actorCompletion.completed.slice(),
+        failedActors: actorCompletion.failed.slice(),
+        datasetsRetrieved: actorCompletion.completed.every(item => item.datasetRetrieved === true),
+        completedAt: new Date().toISOString()
+    };
 
     const sourcesSucceeded =
         websiteSources.length +
@@ -3780,6 +3820,7 @@ console.log(
             sourcesSucceeded > 0 ? 100 : 0,
 
         errors: [],
+        actorCompletion: universalPackage.collectionCompletion,
 
         universalPackage,
 
