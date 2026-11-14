@@ -3319,9 +3319,11 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
   track("direct_report_started", {report_mode: "direct", source_type: "public_profile_or_website"});
   beginLoop7Processing(profileLink);
 
+  let directFinalReplyReceived = false;
   try{
     const data = await fetchLoop7Investigation(profileLink, "direct");
     latestTruthLoopReport = data.reply || JSON.stringify(data);
+    directFinalReplyReceived = !!(data && typeof data.reply === "string" && data.reply.trim());
     if(typeof latestTruthLoopReport === "string" && latestTruthLoopReport.trim()){
       document.body.classList.remove("tl-report-not-ready");
     }
@@ -3340,7 +3342,7 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
       setLoop7ProcessingStep("report", "done");
       finishLoop7ReportSections();
       if(!loop7Unlocked && !TL_TEMPORARY_TEST_BYPASS){
-        showPaywall();
+        await showPaywall();
       }else{
         outputBox.innerHTML = renderLoop7Report(data.reply);
         reflectionInput.classList.add("tl-post-report-input");
@@ -3357,7 +3359,56 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
     }
   }catch(error){
     console.error("DIRECT_LOOP7_ERROR", error);
-    showLoop7ProcessingError(error);
+
+    // Do not turn a received final report into an investigation failure merely
+    // because a later frontend helper or report-rendering step throws.
+    if(directFinalReplyReceived && String(latestTruthLoopReport || "").trim()){
+      console.warn("DIRECT_LOOP7_FINAL_REPORT_PRESERVED", {
+        replyChars: String(latestTruthLoopReport).length,
+        error
+      });
+      try { stopLoop7ReportAnimation(); } catch(stopError) {
+        console.warn("DIRECT_LOOP7_PROGRESS_STOP_ERROR", stopError);
+      }
+
+      if(!loop7Unlocked && !TL_TEMPORARY_TEST_BYPASS){
+        // Keep the existing access/paywall decision unchanged. Await it so a
+        // rendering rejection is handled by this same report-preserving catch.
+        try{
+          await showPaywall();
+        }catch(recoveryError){
+          console.error("DIRECT_LOOP7_PAYWALL_RECOVERY_ERROR", recoveryError);
+        }
+      }
+      if(loop7Unlocked || TL_TEMPORARY_TEST_BYPASS){
+        const alreadyRendered = outputBox?.querySelector?.(".truthLoopReport");
+        if(!alreadyRendered && outputBox){
+          try{
+            outputBox.innerHTML = renderLoop7Report(latestTruthLoopReport);
+          }catch(renderError){
+            console.error("DIRECT_LOOP7_RECOVERY_RENDER_ERROR", renderError);
+            const escapedReport = String(latestTruthLoopReport).replace(/[&<>"']/g, char => ({
+              "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;"
+            }[char]));
+            outputBox.innerHTML = `<div class="truthLoopReport"><div class="tlr-header"><div class="tlr-kicker">✓ Investigation Complete</div><h1 class="tlr-title">🧠 TruthLoop Investigation</h1><p class="tlr-subtitle">Not Answers. Patterns.</p></div><section class="tlr-report-section"><h2>Investigation Report</h2><p class="tlr-empty">The complete report was received. The formatted view encountered a display error, so the original report is shown intact.</p><div>${escapedReport.replace(/\r?\n/g, "<br>")}</div></section></div>`;
+          }
+        }
+        try{
+          if(reflectionInput){
+            reflectionInput.classList.add("tl-post-report-input");
+            reflectionInput.style.display = "block";
+            reflectionInput.placeholder = "What do you think about this report?";
+          }
+          const composer = document.getElementById("tlReflectionComposer");
+          if(composer) composer.style.display = "block";
+          if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
+        }catch(recoveryUiError){
+          console.warn("DIRECT_LOOP7_POST_REPORT_UI_RECOVERY_ERROR", recoveryUiError);
+        }
+      }
+    }else{
+      showLoop7ProcessingError(error);
+    }
   }finally{
     isLoading = false;
     const currentButton = document.getElementById("tlDirectReportBtn");
@@ -3445,10 +3496,73 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   const contentType = (response.headers.get("content-type") || "").toLowerCase();
 
   if(!response.body || !contentType.includes("text/event-stream")){
-    const data = await response.json();
-    handleLoop7ProgressPayload(data);
-    if(data && (data.reply || data.final === true || data.type === "final")) return data;
-    throw new Error("Loop 7 API returned no final report payload.");
+    // Some mobile/browser/network paths may expose the completed response as
+    // text without a readable streaming body or with a changed content-type.
+    // Read that body once and accept either the normal JSON response or SSE text.
+    const rawResponse = await response.text();
+    let recoveredFinalPayload = null;
+    let recoveredServerError = null;
+
+    const consumeFallbackPayload = candidate => {
+      const value = String(candidate || "").trim();
+      if(!value || value === "[DONE]") return;
+      let payload;
+      try{ payload = JSON.parse(value); }
+      catch(_){ return; }
+
+      if(payload && (payload.reply || payload.final === true || payload.type === "final")){
+        recoveredFinalPayload = payload;
+      }
+      if(payload && payload.type === "error"){
+        const message = String(payload.message || "Loop 7 server reported an error.").trim();
+        const detail = String(payload.error || "").trim();
+        const stage = String(payload.stage || payload.phase || "").trim();
+        recoveredServerError = new Error(
+          message +
+          (stage ? ` [stage: ${stage}]` : "") +
+          (detail && detail !== message ? ` — ${detail}` : "")
+        );
+      }
+      try{ handleLoop7ProgressPayload(payload); }
+      catch(progressError){ console.warn("LOOP7_PROGRESS_UPDATE_ERROR", progressError); }
+    };
+
+    // First support an ordinary JSON response body.
+    let rawBodyWasJson = false;
+    try{
+      const jsonPayload = JSON.parse(rawResponse);
+      rawBodyWasJson = true;
+      consumeFallbackPayload(JSON.stringify(jsonPayload));
+    }catch(parseError){
+      if(rawBodyWasJson) console.warn("LOOP7_RESPONSE_FALLBACK_PARSE_ERROR", parseError);
+    }
+
+    // If it was not JSON, parse the complete body as SSE frames. This also
+    // handles a final event without a trailing blank-line terminator.
+    if(!rawBodyWasJson && !recoveredFinalPayload && !recoveredServerError){
+      String(rawResponse || "").split(/\r?\n\r?\n/).forEach(frame => {
+        const dataLines = [];
+        const plainLines = [];
+        String(frame || "").split(/\r?\n/).forEach(line => {
+          if(!line || line.startsWith(":")) return;
+          if(line.startsWith("data:")){
+            dataLines.push(line.slice(5).replace(/^ /, ""));
+            return;
+          }
+          if(!/^(event|id|retry):/.test(line) && line.trim()) plainLines.push(line.trim());
+        });
+        if(dataLines.length) consumeFallbackPayload(dataLines.join("\n"));
+        else plainLines.forEach(consumeFallbackPayload);
+      });
+    }
+
+    if(recoveredFinalPayload) return recoveredFinalPayload;
+    if(recoveredServerError) throw recoveredServerError;
+    throw new Error(
+      "Loop 7 API returned no final report payload from the non-streaming fallback." +
+      (contentType ? ` Content-Type: ${contentType}.` : " Content-Type was not provided.") +
+      (rawResponse ? ` Response preview: ${String(rawResponse).slice(0,220)}` : " Response body was empty.")
+    );
   }
 
   const reader = response.body.getReader();
@@ -6607,7 +6721,7 @@ async function startLinkedInOAuth() {
 })();
 </script>
 
-
+<!--
 TRUTHLOOP TEMPORARY MOBILE DEBUGGER
 To enable: remove the two outer HTML comment delimiters around this block.
 To disable again: restore those two delimiters.
@@ -6627,7 +6741,7 @@ TRUTHLOOP_TEMP_ERUDA_DEBUGGER_START
   })();
 </script>
 TRUTHLOOP_TEMP_ERUDA_DEBUGGER_END
-
+-->
 
 </body>    
   </html>
