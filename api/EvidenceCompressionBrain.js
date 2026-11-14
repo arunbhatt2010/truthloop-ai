@@ -646,6 +646,34 @@ async function loadEvidenceCompressionBrain({
     };
   }
 
+  // CEB completion manifest is mandatory: ECB must never compress a partial Actor package.
+  const actorCompletion = universalPackage?.actorCompletion || publicEvidencePackage?.actorCompletion;
+  if (!actorCompletion || actorCompletion.complete !== true) {
+    console.error("ECB_ACTOR_COMPLETION_GATE_FAILED", JSON.stringify({
+      manifestPresent: !!actorCompletion,
+      complete: actorCompletion?.complete ?? false,
+      website: actorCompletion?.website?.status || "UNKNOWN",
+      linkedin: actorCompletion?.linkedin?.status || "UNKNOWN",
+      x: actorCompletion?.x?.status || "UNKNOWN"
+    }));
+    return {
+      success: false,
+      reason: "Apify Actor completion is not verified. ECB rejected the incomplete evidence package.",
+      loop7Package: null
+    };
+  }
+  for (const [name, actor] of Object.entries(actorCompletion)) {
+    if (!actor || typeof actor !== "object" || actor.required !== true) continue;
+    if (actor.status !== "SUCCEEDED" || actor.datasetRetrieved !== true) {
+      console.error("ECB_REQUIRED_ACTOR_NOT_COMPLETE", JSON.stringify({ name, status: actor.status, datasetRetrieved: actor.datasetRetrieved }));
+      return {
+        success: false,
+        reason: `Required Apify Actor ${name} has not completed and returned its dataset.`,
+        loop7Package: null
+      };
+    }
+  }
+
   if (originalUniversalSize > MAX_INPUT_PACKAGE_CHARS) {
     console.error(
       "ECB_INPUT_BUDGET_EXCEEDED",
@@ -659,42 +687,6 @@ async function loadEvidenceCompressionBrain({
       success: false,
       reason: "Universal public evidence package exceeds the 10,000,000-character input budget.",
       loop7Package: null
-    };
-  }
-
-  // Fail-closed lifecycle gate: ECB accepts only a CEB package whose every
-  // dispatched Apify Actor reached a terminal success state and whose dataset
-  // was retrieved. Legacy/incomplete packages are rejected, never compressed.
-  const completion = universalPackage?.collectionCompletion;
-  const completionValid = !!(
-    completion &&
-    completion.version === "1.0" &&
-    completion.allRequiredComplete === true &&
-    completion.datasetsRetrieved === true &&
-    Array.isArray(completion.requiredActors) &&
-    Array.isArray(completion.completedActors) &&
-    Array.isArray(completion.failedActors) &&
-    completion.failedActors.length === 0 &&
-    completion.requiredActors.length === completion.completedActors.length &&
-    completion.completedActors.every(item => item && item.status === "SUCCEEDED" && item.datasetRetrieved === true) &&
-    completion.requiredActors.every(name => completion.completedActors.some(item =>
-      item.actor === name || (name === "x_posts" && item.actor === "x_posts")
-    ))
-  );
-  if (!completionValid) {
-    console.error("ECB_ACTOR_COMPLETION_GATE_REJECTED", JSON.stringify({
-      hasManifest: !!completion,
-      allRequiredComplete: completion?.allRequiredComplete ?? false,
-      datasetsRetrieved: completion?.datasetsRetrieved ?? false,
-      requiredActors: completion?.requiredActors?.length || 0,
-      completedActors: completion?.completedActors?.length || 0,
-      failedActors: completion?.failedActors?.length || 0
-    }));
-    return {
-      success: false,
-      reason: "Apify collection is incomplete or unverified. ECB will not create a final package until every required Actor has succeeded and its dataset has been retrieved.",
-      loop7Package: null,
-      collectionCompletion: completion || null
     };
   }
 
@@ -1897,11 +1889,8 @@ if (finalSize > ECB_TRANSPORT_LIMIT) {
 
   void truthLoopPackage;
 
-  finalPackage.collectionCompletion = completion;
-
   return {
     success: true,
-    collectionCompletion: completion,
     loop7Package: finalPackage,
     compressionStats: {
       originalChars: originalUniversalSize,
