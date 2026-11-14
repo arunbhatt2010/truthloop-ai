@@ -39,7 +39,7 @@ const APIFY_MAX_TOTAL_CHARGE_USD = "0.05";
 const X_APIFY_ACTOR_ID = process.env.APIFY_X_ACTOR_ID || "simple.actor~x-profile-posts";
 const UNUSED_SIGNAL_MODEL = "unused";
 
-const ENABLE_LINKEDIN_APIFY = true;
+const ENABLE_LINKEDIN_APIFY = false; // Temporarily paused through 27 Nov 2026; re-enable manually after billing reset.
 const ENABLE_CEB_WEBSITE_SCRAPER = false; // Website collection is owned by PCF.
 
 const ENABLE_X = true;
@@ -4003,6 +4003,16 @@ console.log(
                 apifyResult.reason
             );
         }
+    } else if (linkedinUrl && !ENABLE_LINKEDIN_APIFY) {
+        console.log(
+            "CEB_LINKEDIN_APIFY_DISABLED",
+            JSON.stringify({
+                linkedinUrl,
+                reason: "TEMPORARILY_PAUSED_FOR_APIFY_BILLING",
+                resumeAfter: "2026-11-27",
+                action: "No LinkedIn Apify Actor call was made."
+            })
+        );
     } else if (!linkedinUrl) {
         console.warn(
             "CEB_LINKEDIN_APIFY_SKIPPED_NO_PROFILE_URL",
