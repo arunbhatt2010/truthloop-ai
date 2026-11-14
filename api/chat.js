@@ -1626,8 +1626,7 @@ const loop7ReasoningEnabled = false;
    Loops 1–6 continue using the existing Groq path below.
    ========================================================= */
 const LOOP7_PROVIDER_ORDER = [
-  "velona",
-  "openrouter"
+  "velona"
 ];
 
 const LOOP7_PROVIDER_SETTINGS = {
@@ -1784,6 +1783,7 @@ try {
               ],
               temperature: settings.temperature,
               max_tokens: settings.maxTokens,
+              ...(providerName === "velona" ? { stream: true } : {}),
               ...(providerName === "openrouter"
                 ? {
                     reasoning: {
@@ -2170,7 +2170,85 @@ if (loopLevel === 7 && !response?.ok) {
 
 if (loopLevel === 7) {
 
-  const providerData = await response.json();
+  let providerData;
+
+  if (
+    selectedLoop7Provider === "velona" &&
+    String(response.headers?.get("content-type") || "").toLowerCase().includes("text/event-stream")
+  ) {
+    // Consume Velona SSE frames and reconstruct the OpenAI-compatible
+    // response shape expected by the existing report pipeline.
+    const reader = response.body?.getReader?.();
+    if (!reader) throw new Error("VELONA_STREAM_BODY_UNAVAILABLE");
+
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let streamedContent = "";
+    let streamedRole = "assistant";
+    let finishReason = null;
+    let usage = null;
+    let streamChunkCount = 0;
+
+    const processSseFrame = (frame) => {
+      const dataLines = frame
+        .split(/\r?\n/)
+        .filter(line => line.startsWith("data:"))
+        .map(line => line.slice(5).trim());
+
+      if (!dataLines.length) return;
+      const data = dataLines.join("\n");
+      if (!data || data === "[DONE]") return;
+
+      let chunk;
+      try {
+        chunk = JSON.parse(data);
+      } catch (_) {
+        return;
+      }
+
+      streamChunkCount += 1;
+      const choice = chunk?.choices?.[0];
+      const delta = choice?.delta || {};
+
+      if (delta.role) streamedRole = delta.role;
+      if (typeof delta.content === "string") streamedContent += delta.content;
+      if (typeof choice?.message?.content === "string") streamedContent += choice.message.content;
+      if (choice?.finish_reason) finishReason = choice.finish_reason;
+      if (chunk?.usage) usage = chunk.usage;
+    };
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const frames = buffer.split(/\r?\n\r?\n/);
+      buffer = frames.pop() || "";
+      for (const frame of frames) processSseFrame(frame);
+    }
+
+    buffer += decoder.decode();
+    if (buffer.trim()) processSseFrame(buffer);
+
+    providerData = {
+      choices: [{
+        message: { role: streamedRole, content: streamedContent },
+        finish_reason: finishReason
+      }],
+      usage
+    };
+
+    console.log(
+      "LOOP7_VELONA_STREAM_COMPLETE",
+      JSON.stringify({
+        chunks: streamChunkCount,
+        replyChars: streamedContent.length,
+        finishReason,
+        usage
+      })
+    );
+  } else {
+    providerData = await response.json();
+  }
 
   console.log(
     "LOOP7_PROVIDER_RAW_RESPONSE",
