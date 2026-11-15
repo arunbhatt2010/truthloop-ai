@@ -3424,7 +3424,10 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
 
     // Do not turn a received final report into an investigation failure merely
     // because a later frontend helper or report-rendering step throws.
-    if(directFinalReplyReceived && String(latestTruthLoopReport || "").trim()){
+    // The SSE reader may have durably captured the final event before a later
+    // stream/network operation failed. In that case the local report is the
+    // authoritative recovery source even if fetchLoop7Investigation did not return.
+    if((directFinalReplyReceived || String(latestTruthLoopReport || "").trim()) && String(latestTruthLoopReport || "").trim()){
       console.warn("DIRECT_LOOP7_FINAL_REPORT_PRESERVED", {
         replyChars: String(latestTruthLoopReport).length,
         error
@@ -3557,6 +3560,35 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
 
   const contentType = (response.headers.get("content-type") || "").toLowerCase();
 
+  // chat.js v27 final-event contract: { type:"final", final:true, reply,
+  // evidenceRegistry, loop7EvidenceRegistry, evidenceSourceRegistry,
+  // evidenceSourceIndex, evidenceRegistryCount }.
+  // Persist the report as soon as that final payload is received, rather than
+  // waiting for the streaming connection to close (which can stall on mobile).
+  const preserveLoop7FinalPayload = (payload, transport) => {
+    const reportText = typeof payload?.reply === "string" ? payload.reply : "";
+    if(!reportText.trim()) return false;
+
+    latestTruthLoopReport = reportText;
+    try {
+      captureEvidenceSourceRegistry(payload);
+    } catch(registryError) {
+      console.warn("LOOP7_FINAL_REGISTRY_CAPTURE_ERROR", registryError);
+    }
+    try {
+      saveJourney();
+    } catch(storageError) {
+      console.error("LOOP7_FINAL_REPORT_SAVE_ERROR", storageError);
+    }
+
+    console.info("LOOP7_FINAL_PAYLOAD_PRESERVED", {
+      transport,
+      replyChars: reportText.length,
+      sourceRegistryCount: Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry.length : 0
+    });
+    return true;
+  };
+
   if(!response.body || !contentType.includes("text/event-stream")){
     // Some mobile/browser/network paths may expose the completed response as
     // text without a readable streaming body or with a changed content-type.
@@ -3573,7 +3605,9 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
       catch(_){ return; }
 
       if(payload && (payload.reply || payload.final === true || payload.type === "final")){
-        recoveredFinalPayload = payload;
+        if(preserveLoop7FinalPayload(payload, "non_streaming_fallback")){
+          recoveredFinalPayload = payload;
+        }
       }
       if(payload && payload.type === "error"){
         const message = String(payload.message || "Loop 7 server reported an error.").trim();
@@ -3649,8 +3683,14 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
     // Capture the final report BEFORE running optional progress/UI updates.
     // A progress-handler exception must never discard a valid final payload.
     if(payload && (payload.reply || payload.final === true || payload.type === "final")) {
-      finalPayload = payload;
+      if(preserveLoop7FinalPayload(payload, "sse")){
+        finalPayload = payload;
+      }
     }
+
+    // Once the final report is captured and saved, optional progress updates
+    // are no longer needed. Do not let them delay or interfere with the report.
+    if(finalPayload) return;
 
     // Surface the server's actual Loop 7 error instead of replacing it with
     // the generic "stream ended without a final response payload" message.
@@ -3709,6 +3749,24 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
       const frames = buffer.split(/\r?\n\r?\n/);
       buffer = frames.pop() || "";
       frames.forEach(consumeFrame);
+
+      // chat.js ends the final SSE event with a blank-line separator. Return
+      // immediately after that complete event; do not wait for reader.read()
+      // to report EOF on mobile browsers or intermediary connections.
+      if(finalPayload){
+        try {
+          const cancelResult = reader.cancel();
+          if(cancelResult && typeof cancelResult.catch === "function"){
+            cancelResult.catch(cancelError => console.warn("LOOP7_FINAL_STREAM_CANCEL_WARNING", cancelError));
+          }
+        } catch(cancelError) {
+          console.warn("LOOP7_FINAL_STREAM_CANCEL_WARNING", cancelError);
+        }
+        console.info("LOOP7_FINAL_STREAM_RETURNED_ON_EVENT", {
+          replyChars: String(finalPayload.reply || "").length
+        });
+        return finalPayload;
+      }
     }
   }catch(error){
     // Do not discard an already-received final report because the stream closed
