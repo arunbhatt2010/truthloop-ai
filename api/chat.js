@@ -841,33 +841,33 @@ let investigationState = {
         date
       }));
 
-      // Build a model-facing projection without mutating the full ECB result.
-      // ECB intentionally keeps compatibility copies for application code;
-      // the model only needs one canonical copy of each evidence/analysis field.
+      // Build a model-facing projection aligned to ECB v27 output contract.
+      // ECB's canonical analysis fields are at loop7Package top level.
+      // Keep those exact paths because the Loop 7 prompt refers to them by name.
+      // Remove only duplicate mirrors from evidenceUniverse and transport metadata.
       const originalLoop7Package = compressedEvidencePackage?.loop7Package || {};
       const originalEvidenceUniverse = originalLoop7Package?.evidenceUniverse || {};
 
       const modelFacingEvidenceUniverse = { ...originalEvidenceUniverse };
-      // sourceRegistry is retained once at loop7Package.sourceRegistry.
-      // The nested copy and sourceLinks arrays duplicate the same source URLs.
+      // Canonical source registry is loop7Package.sourceRegistry.
+      // sourceLinks are duplicate URL indexes; sourceRegistry carries traceable IDs.
       delete modelFacingEvidenceUniverse.sourceRegistry;
       delete modelFacingEvidenceUniverse.sourceLinks;
+      // These three analysis objects are retained at loop7Package top level.
+      delete modelFacingEvidenceUniverse.behavioralClusters;
+      delete modelFacingEvidenceUniverse.evidenceConfidence;
+      delete modelFacingEvidenceUniverse.crossEvidenceIntelligence;
 
       const modelFacingLoop7Package = {
         ...originalLoop7Package,
         evidenceUniverse: modelFacingEvidenceUniverse
       };
 
-      // These analysis fields also exist inside evidenceUniverse. Keep that
-      // canonical copy and remove only their redundant top-level mirrors.
+      // Retain top-level behavioralClusters, evidenceConfidence and
+      // crossEvidenceIntelligence exactly where the Loop 7 prompt expects them.
+      // Omit only duplicate sourceLinks and non-evidence transport metadata.
       delete modelFacingLoop7Package.sourceLinks;
-      delete modelFacingLoop7Package.behavioralClusters;
-      delete modelFacingLoop7Package.evidenceConfidence;
-      delete modelFacingLoop7Package.crossEvidenceIntelligence;
 
-      // compressionStats and success are transport/diagnostic metadata, not
-      // investigation evidence. Keep the complete ECB object untouched for
-      // application logic; omit those fields only from the model request.
       const modelFacingCompressedEvidencePackage = {
         loop7Package: modelFacingLoop7Package
       };
@@ -899,21 +899,21 @@ let investigationState = {
             ? originalEvidenceUniverse.xPosts.length : 0,
           retainedCanonicalFields: [
             "loop7Package.sourceRegistry",
+            "loop7Package.behavioralClusters",
+            "loop7Package.evidenceConfidence",
+            "loop7Package.crossEvidenceIntelligence",
             "loop7Package.evidenceUniverse.websiteSources",
             "loop7Package.evidenceUniverse.githubEvidence",
             "loop7Package.evidenceUniverse.xProfile",
-            "loop7Package.evidenceUniverse.xPosts",
-            "loop7Package.evidenceUniverse.behavioralClusters",
-            "loop7Package.evidenceUniverse.evidenceConfidence",
-            "loop7Package.evidenceUniverse.crossEvidenceIntelligence"
+            "loop7Package.evidenceUniverse.xPosts"
           ],
           omittedDuplicateOrTransportFields: [
             "loop7Package.evidenceUniverse.sourceRegistry",
             "loop7Package.evidenceUniverse.sourceLinks",
+            "loop7Package.evidenceUniverse.behavioralClusters",
+            "loop7Package.evidenceUniverse.evidenceConfidence",
+            "loop7Package.evidenceUniverse.crossEvidenceIntelligence",
             "loop7Package.sourceLinks",
-            "loop7Package.behavioralClusters",
-            "loop7Package.evidenceConfidence",
-            "loop7Package.crossEvidenceIntelligence",
             "compressedEvidencePackage.compressionStats",
             "compressedEvidencePackage.success"
           ]
