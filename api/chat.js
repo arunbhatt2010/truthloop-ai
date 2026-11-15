@@ -841,10 +841,84 @@ let investigationState = {
         date
       }));
 
+      // Build a model-facing projection without mutating the full ECB result.
+      // ECB intentionally keeps compatibility copies for application code;
+      // the model only needs one canonical copy of each evidence/analysis field.
+      const originalLoop7Package = compressedEvidencePackage?.loop7Package || {};
+      const originalEvidenceUniverse = originalLoop7Package?.evidenceUniverse || {};
+
+      const modelFacingEvidenceUniverse = { ...originalEvidenceUniverse };
+      // sourceRegistry is retained once at loop7Package.sourceRegistry.
+      // The nested copy and sourceLinks arrays duplicate the same source URLs.
+      delete modelFacingEvidenceUniverse.sourceRegistry;
+      delete modelFacingEvidenceUniverse.sourceLinks;
+
+      const modelFacingLoop7Package = {
+        ...originalLoop7Package,
+        evidenceUniverse: modelFacingEvidenceUniverse
+      };
+
+      // These analysis fields also exist inside evidenceUniverse. Keep that
+      // canonical copy and remove only their redundant top-level mirrors.
+      delete modelFacingLoop7Package.sourceLinks;
+      delete modelFacingLoop7Package.behavioralClusters;
+      delete modelFacingLoop7Package.evidenceConfidence;
+      delete modelFacingLoop7Package.crossEvidenceIntelligence;
+
+      // compressionStats and success are transport/diagnostic metadata, not
+      // investigation evidence. Keep the complete ECB object untouched for
+      // application logic; omit those fields only from the model request.
+      const modelFacingCompressedEvidencePackage = {
+        loop7Package: modelFacingLoop7Package
+      };
+
       loop7AiUserPayload = {
-        compressedEvidencePackage,
+        compressedEvidencePackage: modelFacingCompressedEvidencePackage,
         ...(reportMode === "conversation" ? { truthLoopPackage } : {})
       };
+
+      const originalModelPayloadChars = JSON.stringify({
+        compressedEvidencePackage,
+        ...(reportMode === "conversation" ? { truthLoopPackage } : {})
+      }).length;
+      const optimizedModelPayloadChars = JSON.stringify(loop7AiUserPayload).length;
+
+      console.log(
+        "LOOP7_MODEL_PAYLOAD_OPTIMIZATION_AUDIT",
+        JSON.stringify({
+          mode: reportMode,
+          originalPayloadChars: originalModelPayloadChars,
+          optimizedPayloadChars: optimizedModelPayloadChars,
+          removedChars: Math.max(0, originalModelPayloadChars - optimizedModelPayloadChars),
+          sourceRegistryCount: loop7EvidenceRegistryCompact.length,
+          websiteSourceCount: Array.isArray(originalEvidenceUniverse.websiteSources)
+            ? originalEvidenceUniverse.websiteSources.length : 0,
+          githubPresent: !!originalEvidenceUniverse.githubEvidence,
+          xProfilePresent: !!originalEvidenceUniverse.xProfile,
+          xPostCount: Array.isArray(originalEvidenceUniverse.xPosts)
+            ? originalEvidenceUniverse.xPosts.length : 0,
+          retainedCanonicalFields: [
+            "loop7Package.sourceRegistry",
+            "loop7Package.evidenceUniverse.websiteSources",
+            "loop7Package.evidenceUniverse.githubEvidence",
+            "loop7Package.evidenceUniverse.xProfile",
+            "loop7Package.evidenceUniverse.xPosts",
+            "loop7Package.evidenceUniverse.behavioralClusters",
+            "loop7Package.evidenceUniverse.evidenceConfidence",
+            "loop7Package.evidenceUniverse.crossEvidenceIntelligence"
+          ],
+          omittedDuplicateOrTransportFields: [
+            "loop7Package.evidenceUniverse.sourceRegistry",
+            "loop7Package.evidenceUniverse.sourceLinks",
+            "loop7Package.sourceLinks",
+            "loop7Package.behavioralClusters",
+            "loop7Package.evidenceConfidence",
+            "loop7Package.crossEvidenceIntelligence",
+            "compressedEvidencePackage.compressionStats",
+            "compressedEvidencePackage.success"
+          ]
+        })
+      );
 
     loop7Instruction = `
 LOOP 7 — FINAL TRUTHLOOP INVESTIGATION
