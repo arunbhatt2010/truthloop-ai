@@ -402,6 +402,29 @@ word-break:break-word;
 /* =========================
    LOOP 7 PROCESSING UI
    ========================= */
+/* Processing details stay collapsed by default; visitors can open them on demand. */
+.lp7-processing-fold{
+  margin-top:12px;
+  border:1px solid rgba(168,85,247,.22);
+  border-radius:12px;
+  overflow:hidden;
+  background:rgba(255,255,255,.015);
+}
+.lp7-processing-fold > summary{
+  cursor:pointer;
+  list-style:none;
+  padding:11px 13px;
+  color:#c4b5fd;
+  font-size:12px;
+  font-weight:750;
+}
+.lp7-processing-fold > summary::-webkit-details-marker{display:none}
+.lp7-processing-fold > summary:after{content:"＋";float:right;color:#c4b5fd}
+.lp7-processing-fold[open] > summary:after{content:"−"}
+.lp7-processing-fold #loop7Processing{
+  margin-top:0;
+  border-top:1px solid rgba(168,85,247,.14);
+}
 #loop7Processing{
   display:none;
   margin-top:20px;
@@ -729,13 +752,7 @@ box-shadow:
   box-shadow:0 12px 28px rgba(255,140,0,.20);
   cursor:pointer;
 }
-#paywallBox #paypal-button{margin-top:10px;min-height:48px;}
-#paywallBox .tl-paywall-payment-card #razorpayBtn{margin-top:10px;}
-.tl-paywall-processing-details{margin:14px 0 20px;border:1px solid rgba(168,85,247,.22);border-radius:13px;background:rgba(12,16,32,.72);color:#cbd5e1;overflow:hidden;}
-.tl-paywall-processing-details>summary{padding:12px 14px;cursor:pointer;font-size:12px;font-weight:800;color:#c4b5fd;list-style-position:inside;}
-.tl-paywall-processing-content{padding:0 10px 10px;}
-.tl-paywall-processing-content #loop7Processing{margin-top:0;}
-
+#paywallBox #paypal-button{margin-top:16px;min-height:48px;}
   #paywallBox .tl-paywall-finding{margin:13px 0 15px;padding:13px 14px;text-align:left;border:1px solid rgba(96,165,250,.24);border-radius:13px;background:linear-gradient(145deg,rgba(96,165,250,.07),rgba(168,85,247,.055))}
   #paywallBox .tl-paywall-finding-label{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#a5b4fc;margin-bottom:8px}
   #paywallBox .tl-paywall-finding-text{font-size:13px;line-height:1.55;color:#f1f5f9;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
@@ -2189,54 +2206,6 @@ body.tl-report-not-ready #starterPatterns {
 }
 </style>
 
-
-<style id="truthloop-restore-screen-polish">
-  #restoreScreen{
-    width:min(680px,calc(100% - 32px));
-    min-height:calc(100dvh - 210px);
-    box-sizing:border-box;
-    margin:0 auto;
-    padding:clamp(24px,6vw,42px) clamp(18px,5vw,32px);
-    color:#fff;
-    text-align:center;
-    background:radial-gradient(circle at 90% 0%,rgba(168,85,247,.12),transparent 36%),linear-gradient(180deg,#0b1020,#090e1b);
-    border:1px solid rgba(168,85,247,.24);
-    border-radius:22px;
-    box-shadow:0 22px 65px rgba(0,0,0,.4);
-  }
-  #restoreScreen h2{
-    margin:0 0 16px;
-    color:#fff;
-    font-size:clamp(25px,6vw,32px);
-    line-height:1.2;
-    font-weight:850;
-  }
-  #restoreScreen p{
-    margin:8px 0;
-    color:#b8c1d2;
-    font-size:14px;
-    line-height:1.6;
-  }
-  #restoreScreen button{
-    display:block;
-    width:100%;
-    max-width:520px;
-    margin:14px auto 0;
-    padding:15px 16px;
-    border:0;
-    border-radius:13px;
-    color:#111827;
-    font-size:15px;
-    font-weight:850;
-    cursor:pointer;
-  }
-  #restoreScreen #continueJourneyBtn{background:linear-gradient(90deg,#ff9f0a,#ff6800);}
-  #restoreScreen #newPatternBtn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#e5e7eb;}
-  @media(max-width:520px){
-    #restoreScreen{width:calc(100% - 28px);min-height:calc(100dvh - 190px);margin:14px auto;padding:28px 18px;border-radius:19px;}
-  }
-</style>
-
 </head>    
     
 <body>    
@@ -3149,7 +3118,9 @@ function renderLoop7ProcessingShell(profileLink){
     ? "Public investigation source secured"
     : "Loop 1–6 case context secured";
   return `
-    <div id="loop7Processing" style="display:block;">
+    <details id="loop7ProcessingFold" class="lp7-processing-fold">
+      <summary>View report processing details</summary>
+      <div id="loop7Processing" style="display:block;">
       <div class="lp7-title">🧠 Building Your Investigation</div>
       <div class="lp7-sub">${processingDescription}</div>
 
@@ -3200,7 +3171,8 @@ function renderLoop7ProcessingShell(profileLink){
           <div class="lp7-live-footnote">These are the report sections being assembled; findings appear only after the report is complete.</div>
         </div>
       </details>
-    </div>
+      </div>
+    </details>
   `;
 }
 
@@ -3353,6 +3325,9 @@ function showLoop7ProcessingError(error){
 
   // Keep technical/API details in the console only. Never expose raw errors or debug text.
   console.error("LOOP7_PROCESSING_FAILURE_DETAILS", error);
+  if(!String(latestTruthLoopReport || "").trim()){
+    alert("TruthLoop could not generate the investigation report. Please try again.");
+  }
 
   const box = document.getElementById("loop7Processing");
   if(!box) return;
@@ -3388,11 +3363,12 @@ function showLoop7ProcessingError(error){
 
 /* TL_REPORT_TO_PAYWALL_DIAGNOSTICS_START */
 function tlReportPaywallDiagnostic(stage, detail){
-  // Developer-console diagnostics only. Never render internal diagnostics in the visitor UI.
+  // Diagnostics remain available in the developer console only; never create
+  // a fixed panel or expose internal stage names on the user's screen.
   try{
-    console.debug("TL_REPORT_PAYWALL_DIAGNOSTIC", stage, detail === undefined ? "" : detail);
     const oldPanel = document.getElementById("tlReportPaywallDiagnostics");
     if(oldPanel) oldPanel.remove();
+    console.debug("TL_REPORT_PAYWALL_DIAGNOSTIC", stage, detail === undefined ? "" : detail);
   }catch(diagnosticError){
     console.warn("TL_REPORT_PAYWALL_DIAGNOSTIC_FAILED", diagnosticError);
   }
@@ -5251,9 +5227,6 @@ document.addEventListener("click", function(event) {
 /* LOOP 7 PAYWALL */
 
 function unlockLoop7Report(method){
-  const processingDetails = document.getElementById("tlPaywallProcessingDetails");
-  if(processingDetails) processingDetails.remove();
-  outputBox.style.minHeight = "";
   loop7Unlocked = true;
   track("payment_success",{
     loop:7,
@@ -5323,7 +5296,33 @@ function selectPaywallFinding(reportText){
       candidates.push({text:clean,ids:validIds,score,section:current.name,ahaScore:tension+pattern+implication});
     }
   }
-  if(!candidates.length) return null;
+  if(!candidates.length){
+    // Report formats can vary (Markdown, HTML, or plain text). If the exact
+    // section-heading/source-ID format is absent, still select the strongest
+    // substantive finding from the report rather than showing generic filler.
+    const plain = raw
+      .replace(/<\/(?:p|div|li|h[1-6]|section|article)>/gi,"\n")
+      .replace(/<[^>]+>/g," ")
+      .replace(/&nbsp;/gi," ").replace(/&amp;/gi,"&")
+      .replace(/&quot;/gi,'"').replace(/&#39;/gi,"'")
+      .replace(/\r/g,"\n");
+    const lines = plain.split(/\n+/).map(line=>line.replace(/^\s*(?:[-*•▪▸→]+|\d+[.)])\s*/,"").replace(/\s+/g," ").trim())
+      .filter(line=>line.length>=65 && line.length<=900 && !/^0?\d[.)]?\s*(identity|claims|actions|capability|independent validation|consistency|reliability|overall pattern)/i.test(line));
+    const scored = lines.map(line=>{
+      const tension=/\b(but|however|although|despite|whereas|while|yet|gap|differ|diverg|align|misalign|inconsisten|contradict|disconnect|tension)\b/i.test(line)?5:0;
+      const pattern=/\b(repeat|recurr|consistent|across|multiple|pattern|repeated|over time|throughout)\b/i.test(line)?4:0;
+      const implication=/\b(risk|impact|consequence|signal|credib|trust|reliab|execution|decision|claim|behavior|behaviour|outcome)\b/i.test(line)?3:0;
+      const concrete=/\b(\d+|months?|years?|projects?|posts?|roles?|customers?|clients?|launch|revenue|team|product|founder|investor)\b/i.test(line)?2:0;
+      const ids=[...new Set((line.match(/\b(?:SOURCE[_ -]?\d{1,4}|S\d{1,4})\b/gi)||[]).map(x=>x.toUpperCase().replace(/[ -]/g,"_")))];
+      return {text:line,ids,ahaScore:tension+pattern+implication,score:tension+pattern+implication+concrete+Math.min(ids.length,4)*2};
+    }).filter(x=>x.score>0);
+    if(!scored.length) return null;
+    scored.sort((a,b)=>(b.ahaScore>=5)-(a.ahaScore>=5)||b.score-a.score||b.text.length-a.text.length);
+    const best=scored[0];
+    let text=best.text;
+    if(text.length>360) text=text.slice(0,357).replace(/\s+\S*$/,"")+"…";
+    return {text,ids:best.ids,section:"Report finding",aha:best.ahaScore>=5};
+  }
 
   // Selection order: genuine Aha Moment -> closest Aha-like finding -> best
   // evidence-backed finding. Preview selection must never affect report validity.
@@ -5349,7 +5348,7 @@ function selectPaywallFinding(reportText){
 
 function renderPaywallFinding(reportText){
   const finding=selectPaywallFinding(reportText);
-  if(!finding) return `<div class="tl-paywall-finding-fallback"><strong>One finding is only the starting point.</strong><br>The complete report brings the available evidence together, shows what it supports, and gives you a confidence assessment and one next action. No conclusion should go beyond the evidence.</div>`;
+  if(!finding) return `<div class="tl-paywall-finding-fallback"><strong>One public signal can raise a bigger question.</strong><br>The complete report brings the available evidence together, examines what it supports, and shows the confidence and limits of the findings. No conclusion should go beyond the evidence.</div>`;
   const citations=finding.ids.map(id=>`<span class="tl-paywall-source">${escapeHtml(id)}</span>`).join(" ");
   const label=finding.aha ? "THE PATTERN WORTH A CLOSER LOOK" : "THE MOST RELEVANT EVIDENCE-BACKED FINDING";
   const tease=finding.aha
@@ -5359,6 +5358,41 @@ function renderPaywallFinding(reportText){
 }
 
 async function showPaywall(){
+  // A paywall is valid only after a non-empty final report has been received
+  // or restored. Never show payment while a report is still being generated.
+  if(!String(latestTruthLoopReport || "").trim()){
+    paywallBox.style.display = "none";
+    console.warn("PAYWALL_BLOCKED_NO_COMPLETED_REPORT");
+    return false;
+  }
+  // The processing shell is only for active generation. Once the final report
+  // exists, remove that shell before displaying the paywall.
+  // Keep the investigation process visible above the paywall, but mark it
+  // complete because a final report is already available.
+  let completedProcessingShell = document.getElementById("loop7Processing");
+  if(!completedProcessingShell){
+    const profileLink = window.tlInvestigationSource || window.investigationSource || "";
+    outputBox.insertAdjacentHTML("afterbegin", renderLoop7ProcessingShell(profileLink));
+    completedProcessingShell = document.getElementById("loop7Processing");
+  }
+  if(completedProcessingShell){
+    ["case","evidence","cross","report"].forEach(step => setLoop7ProcessingStep(step,"done"));
+    completedProcessingShell.querySelectorAll(".lp7-report-section").forEach(section => {
+      section.classList.remove("active");
+      section.classList.add("done");
+      const icon = section.querySelector(".lp7-report-icon");
+      const status = section.querySelector(".lp7-section-status");
+      if(icon) icon.textContent = "✓";
+      if(status) status.textContent = "Complete";
+    });
+    const count = completedProcessingShell.querySelector("#loop7ProcessingSourceCount");
+    if(count && Array.isArray(evidenceSourceRegistry)){
+      count.textContent = `${evidenceSourceRegistry.length} public sources identified`;
+    }
+    const note = completedProcessingShell.querySelector("#loop7ProcessingLiveNote");
+    if(note) note.textContent = "All eight report sections have been assembled";
+  }
+
   tlReportPaywallDiagnostic("09 SHOW_PAYWALL_ENTERED", {countryStatus:userCountryStatus, country:userCountry});
 //  unlockLoop7Report("test");
 //  return;
@@ -5389,16 +5423,12 @@ async function showPaywall(){
     track("direct_report_paywall_viewed", {report_mode: "direct", price_inr: 499, price_usd: 9.99, payment_method: displayedPaymentMethod, ...paymentAnalyticsContext()});
   }
   tlReportPaywallDiagnostic("12 ABOUT_TO_SHOW_PAYWALL_CONTAINER");
-  // Put the access card before the processing area. Never force the visitor's scroll position.
-  if(outputBox && paywallBox && paywallBox.previousElementSibling !== outputBox){
-    outputBox.insertAdjacentElement("beforebegin", paywallBox);
-  }
   paywallBox.style.display="block";
   tlReportPaywallDiagnostic("13 PAYWALL_CONTAINER_DISPLAY_SET", {display:paywallBox.style.display});
   if(typeof window.truthLoopFroggySetStage === "function"){
     window.truthLoopFroggySetStage(directMode ? "direct_paywall" : "loop7_paywall", "paywall_rendered");
   }
-  // Do not auto-scroll the page. Visitors retain full control of mobile scrolling.
+  // Deliberately do not auto-scroll to the paywall. Keep the visitor's current scroll position stable.
   // Persist generated report + paywall stage for reliable Continue Journey recovery.
   saveJourney();
 
@@ -5461,45 +5491,15 @@ async function showPaywall(){
     </div>
   `;
 
-  tlReportPaywallDiagnostic("16 PAYWALL_MESSAGE_CARD_RENDERED", {htmlChars:paySub.innerHTML.length, country:userCountry, paymentMethod:displayedPaymentMethod});
-  const paymentCard = paySub.querySelector(".tl-paywall-payment-card");
-  const paypalMount = document.getElementById("paypal-button");
-  if(paymentCard){
-    // Keep the primary action inside the compact payment card, directly below price/meta.
-    paymentCard.appendChild(razorpayBtn);
-    paymentCard.appendChild(paypalMount);
-  }
   if(isIndia){
     razorpayBtn.style.display="block";
     razorpayBtn.innerText = paymentCardCopy.button;
-    paypalMount.style.display="none";
+    document.getElementById("paypal-button").style.display="none";
   }else{
     razorpayBtn.style.display="none";
-    paypalMount.style.display="block";
+    document.getElementById("paypal-button").style.display="block";
   }
 
-  // Move the entire processing panel into a user-controlled, collapsed disclosure below the paywall.
-  const processingPanel = document.getElementById("loop7Processing");
-  if(processingPanel){
-    let processingDetails = document.getElementById("tlPaywallProcessingDetails");
-    if(!processingDetails){
-      processingDetails = document.createElement("details");
-      processingDetails.id = "tlPaywallProcessingDetails";
-      processingDetails.className = "tl-paywall-processing-details";
-      const summary = document.createElement("summary");
-      summary.textContent = "View report processing details";
-      const content = document.createElement("div");
-      content.className = "tl-paywall-processing-content";
-      processingDetails.append(summary, content);
-    }
-    const content = processingDetails.querySelector(".tl-paywall-processing-content");
-    if(content && processingPanel.parentElement !== content) content.appendChild(processingPanel);
-    if(outputBox) outputBox.innerHTML = "";
-    if(outputBox) outputBox.style.minHeight = "0";
-    paywallBox.insertAdjacentElement("afterend", processingDetails);
-  }
-
-  tlReportPaywallDiagnostic("17 PAYWALL_RENDER_SEQUENCE_COMPLETE");
 
   razorpayBtn.onclick = async function(){
     if(razorpayBtn.dataset.tlPaymentBusy === "1") return;
@@ -5605,7 +5605,7 @@ async function showPaywall(){
               payment_method:"razorpay", currency:"INR",
               report_mode:reportMode, ...paymentAnalyticsContext()
             });
-            alert(verifyError.message || "We could not verify the payment yet. Please contact support with your payment ID.");
+            console.warn("PAYMENT_VERIFICATION_NOTICE", verifyError.message || "Payment verification is pending.");
             razorpayBtn.disabled = false;
             razorpayBtn.dataset.tlPaymentBusy = "0";
             razorpayBtn.innerText = originalButtonText;
@@ -5627,7 +5627,7 @@ async function showPaywall(){
       rzp.open();
     } catch(error) {
       console.error("RAZORPAY_ORDER_OR_CHECKOUT_ERROR", error);
-      alert(error.message || "Unable to start Razorpay checkout. Please try again.");
+      console.warn("RAZORPAY_CHECKOUT_NOTICE", error.message || "Unable to start Razorpay checkout.");
       razorpayBtn.disabled = false;
       razorpayBtn.dataset.tlPaymentBusy = "0";
       razorpayBtn.innerText = originalButtonText;
@@ -5836,9 +5836,8 @@ if(!text){
 if(currentCategory === "pattern" && text.split(/\s+/).filter(Boolean).length < 5){
     mainInput.focus();
     mainInput.style.borderColor = "orange";
-    alert(currentLang === "hi"
-      ? "कृपया अपनी स्थिति कम-से-कम 5 शब्दों में बताइए। अधिकतम 500 अक्षर लिख सकते हैं।"
-      : "Please describe your situation in at least 5 words. Maximum 500 characters.");
+    mainInput.setAttribute("aria-invalid", "true");
+    setTimeout(()=>mainInput.removeAttribute("aria-invalid"),1000);
     setTimeout(()=>{ mainInput.style.borderColor = "#262626"; },1000);
     return;
 }
@@ -6282,9 +6281,10 @@ if(loopLevel === 7 && latestTruthLoopReport.trim()){
   } else {
     try {
       validateLoop7ReportReady(latestTruthLoopReport);
-      outputBox.innerHTML = renderLoop7ProcessingShell(investigationSource || "");
-      updateLoop7ProcessingSources(evidenceSourceRegistry);
-      finishLoop7ReportSections();
+      // This is a completed, saved report being resumed—not a new generation.
+      // Show the paywall directly without rebuilding a fake processing screen.
+      outputBox.innerHTML = "";
+      paywallBox.style.display = "none";
       showPaywall();
       nextBtn.style.display = "none";
     } catch(error) {
@@ -6537,19 +6537,15 @@ if(loopLevel === 7 && latestTruthLoopReport.trim()){
     reflectionInput.placeholder = "What do you think about this report?";
     if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
   } else {
-    // Rebuild the same processing/evidence panel that was visible immediately
-    // before the paywall, using the saved report and saved source registry.
-    outputBox.innerHTML = renderLoop7ProcessingShell(investigationSource || "");
-    updateLoop7ProcessingSources(evidenceSourceRegistry);
+    // A saved, completed report should remain on the Journey Found screen
+    // until the user taps Continue Journey. Do not render the paywall on load.
+    outputBox.innerHTML = "";
+    paywallBox.style.display = "none";
     try {
       validateLoop7ReportReady(latestTruthLoopReport);
-      setLoop7ProcessingStep("evidence", "done");
-      setLoop7ProcessingStep("cross", "done");
-      setLoop7ProcessingStep("report", "done");
-      finishLoop7ReportSections();
-      showPaywall();
       nextBtn.style.display = "none";
     } catch(error) {
+      outputBox.innerHTML = renderLoop7ProcessingShell(investigationSource || "");
       showLoop7ProcessingError(error);
     }
   }
@@ -6567,9 +6563,7 @@ document.querySelector(
 '.categoryBtn[data-type="' + currentCategory + '"]'
 );
 document.getElementById("restorePattern").innerText =
-  window.tlLoop7ReportMode === "direct"
-    ? "Public Profile Investigation"
-    : (currentCategory ? "Pattern: " + currentCategory : "Your saved investigation is ready to resume.");
+"Pattern: " + currentCategory;
 
 document.getElementById("restoreLoop").innerText = "";
 getBtn.disabled = false;
@@ -6622,12 +6616,12 @@ async function startLinkedInOAuth() {
 
         }
 
-        alert(data.reason || "OAuth failed.");
+        console.warn("LINKEDIN_OAUTH_FAILED", data.reason || "OAuth failed.");
 
     } catch (err) {
 
         console.error(err);
-        alert("Connection failed.");
+        console.warn("LINKEDIN_CONNECTION_FAILED", err);
 
     }
 
