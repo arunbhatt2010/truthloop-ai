@@ -2189,6 +2189,54 @@ body.tl-report-not-ready #starterPatterns {
 }
 </style>
 
+
+<style id="truthloop-restore-screen-polish">
+  #restoreScreen{
+    width:min(680px,calc(100% - 32px));
+    min-height:calc(100dvh - 210px);
+    box-sizing:border-box;
+    margin:0 auto;
+    padding:clamp(24px,6vw,42px) clamp(18px,5vw,32px);
+    color:#fff;
+    text-align:center;
+    background:radial-gradient(circle at 90% 0%,rgba(168,85,247,.12),transparent 36%),linear-gradient(180deg,#0b1020,#090e1b);
+    border:1px solid rgba(168,85,247,.24);
+    border-radius:22px;
+    box-shadow:0 22px 65px rgba(0,0,0,.4);
+  }
+  #restoreScreen h2{
+    margin:0 0 16px;
+    color:#fff;
+    font-size:clamp(25px,6vw,32px);
+    line-height:1.2;
+    font-weight:850;
+  }
+  #restoreScreen p{
+    margin:8px 0;
+    color:#b8c1d2;
+    font-size:14px;
+    line-height:1.6;
+  }
+  #restoreScreen button{
+    display:block;
+    width:100%;
+    max-width:520px;
+    margin:14px auto 0;
+    padding:15px 16px;
+    border:0;
+    border-radius:13px;
+    color:#111827;
+    font-size:15px;
+    font-weight:850;
+    cursor:pointer;
+  }
+  #restoreScreen #continueJourneyBtn{background:linear-gradient(90deg,#ff9f0a,#ff6800);}
+  #restoreScreen #newPatternBtn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#e5e7eb;}
+  @media(max-width:520px){
+    #restoreScreen{width:calc(100% - 28px);min-height:calc(100dvh - 190px);margin:14px auto;padding:28px 18px;border-radius:19px;}
+  }
+</style>
+
 </head>    
     
 <body>    
@@ -3340,37 +3388,11 @@ function showLoop7ProcessingError(error){
 
 /* TL_REPORT_TO_PAYWALL_DIAGNOSTICS_START */
 function tlReportPaywallDiagnostic(stage, detail){
+  // Developer-console diagnostics only. Never render internal diagnostics in the visitor UI.
   try{
-    const stamp = new Date().toLocaleTimeString();
-    const detailText = detail instanceof Error
-      ? `${detail.name}: ${detail.message}${detail.stack ? "\n" + detail.stack.split("\n").slice(0,3).join("\n") : ""}`
-      : (detail === undefined ? "" : (typeof detail === "string" ? detail : JSON.stringify(detail)));
-    const line = `[${stamp}] ${stage}${detailText ? " — " + detailText : ""}`;
-    console.log("TL_REPORT_PAYWALL_DIAGNOSTIC", line);
-    let panel = document.getElementById("tlReportPaywallDiagnostics");
-    if(!panel){
-      panel = document.createElement("div");
-      panel.id = "tlReportPaywallDiagnostics";
-      panel.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;z-index:2147483646;max-height:26vh;overflow:auto;background:rgba(8,12,24,.96);color:#f5f7ff;border:1px solid #8b78c8;border-radius:9px;padding:9px 11px;font:11px/1.45 monospace;white-space:pre-wrap;box-shadow:0 4px 18px #0009;";
-      const heading = document.createElement("div");
-      heading.textContent = "TRUTHLOOP REPORT → PAYWALL DIAGNOSTICS";
-      heading.style.cssText = "font-weight:bold;color:#ffd08a;margin-bottom:5px;";
-      panel.appendChild(heading);
-      const log = document.createElement("div");
-      log.id = "tlReportPaywallDiagnosticsLog";
-      panel.appendChild(log);
-      document.body.appendChild(panel);
-    }
-    const log = document.getElementById("tlReportPaywallDiagnosticsLog");
-    if(log){
-      const row = document.createElement("div");
-      row.textContent = line;
-      row.style.borderTop = "1px solid #ffffff20";
-      row.style.padding = "2px 0";
-      log.appendChild(row);
-      while(log.children.length > 12) log.removeChild(log.firstChild);
-      panel.scrollTop = panel.scrollHeight;
-    }
+    console.debug("TL_REPORT_PAYWALL_DIAGNOSTIC", stage, detail === undefined ? "" : detail);
+    const oldPanel = document.getElementById("tlReportPaywallDiagnostics");
+    if(oldPanel) oldPanel.remove();
   }catch(diagnosticError){
     console.warn("TL_REPORT_PAYWALL_DIAGNOSTIC_FAILED", diagnosticError);
   }
@@ -6545,7 +6567,9 @@ document.querySelector(
 '.categoryBtn[data-type="' + currentCategory + '"]'
 );
 document.getElementById("restorePattern").innerText =
-"Pattern: " + currentCategory;
+  window.tlLoop7ReportMode === "direct"
+    ? "Public Profile Investigation"
+    : (currentCategory ? "Pattern: " + currentCategory : "Your saved investigation is ready to resume.");
 
 document.getElementById("restoreLoop").innerText = "";
 getBtn.disabled = false;
