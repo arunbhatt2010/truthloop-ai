@@ -3118,7 +3118,7 @@ function renderLoop7ProcessingShell(profileLink){
     ? "Public investigation source secured"
     : "Loop 1–6 case context secured";
   return `
-    <details id="loop7ProcessingFold" class="lp7-processing-fold">
+    <details id="loop7ProcessingFold" class="lp7-processing-fold" open>
       <summary>View report processing details</summary>
       <div id="loop7Processing" style="display:block;">
       <div class="lp7-title">🧠 Building Your Investigation</div>
@@ -5392,6 +5392,11 @@ async function showPaywall(){
     const note = completedProcessingShell.querySelector("#loop7ProcessingLiveNote");
     if(note) note.textContent = "All eight report sections have been assembled";
   }
+
+  // Collapse processing details only after the final report is ready and
+  // the paywall is about to be shown. During generation the details stay open.
+  const completedProcessingFold = document.getElementById("loop7ProcessingFold");
+  if(completedProcessingFold) completedProcessingFold.open = false;
 
   tlReportPaywallDiagnostic("09 SHOW_PAYWALL_ENTERED", {countryStatus:userCountryStatus, country:userCountry});
 //  unlockLoop7Report("test");
