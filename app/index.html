@@ -5320,7 +5320,6 @@ function selectPaywallFinding(reportText){
     scored.sort((a,b)=>(b.ahaScore>=5)-(a.ahaScore>=5)||b.score-a.score||b.text.length-a.text.length);
     const best=scored[0];
     let text=best.text;
-    if(text.length>360) text=text.slice(0,357).replace(/\s+\S*$/,"")+"…";
     return {text,ids:best.ids,section:"Report finding",aha:best.ahaScore>=5};
   }
 
@@ -5342,7 +5341,6 @@ function selectPaywallFinding(reportText){
     }
   }
   let text=chosen.text;
-  if(text.length>360){const cut=text.slice(0,357),lastSpace=cut.lastIndexOf(" ");text=(lastSpace>250?cut.slice(0,lastSpace):cut)+"…";}
   return {text,ids:chosen.ids,section:chosen.section,aha:chosen.ahaScore>=5};
 }
 
