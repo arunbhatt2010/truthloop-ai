@@ -764,6 +764,8 @@ box-shadow:
   #paywallBox .tl-paywall-finding{margin:13px 0 15px;padding:13px 14px;text-align:left;border:1px solid rgba(96,165,250,.24);border-radius:13px;background:linear-gradient(145deg,rgba(96,165,250,.07),rgba(168,85,247,.055))}
   #paywallBox .tl-paywall-finding-label{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#a5b4fc;margin-bottom:8px}
   #paywallBox .tl-paywall-finding-text{font-size:13px;line-height:1.55;color:#f1f5f9;display:block;overflow:visible;overflow-wrap:anywhere}
+  #paywallBox .tl-paywall-section-one{white-space:pre-wrap;overflow-wrap:anywhere}
+  #paywallBox .tl-paywall-source-link{color:#7dd3fc;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
   #paywallBox .tl-paywall-finding-sources{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
   #paywallBox .tl-paywall-source{display:inline-block;padding:3px 6px;border:1px solid rgba(96,165,250,.25);border-radius:6px;color:#7dd3fc;font-size:10px;font-weight:850}
   #paywallBox .tl-paywall-finding-tease{margin-top:8px;font-size:11px;line-height:1.45;color:#c4b5fd}
@@ -5391,14 +5393,76 @@ function selectPaywallFinding(reportText){
 }
 
 function renderPaywallFinding(reportText){
-  const finding=selectPaywallFinding(reportText);
-  if(!finding) return `<div class="tl-paywall-finding-fallback"><strong>One public signal can raise a bigger question.</strong><br>The complete report brings the available evidence together, examines what it supports, and shows the confidence and limits of the findings. No conclusion should go beyond the evidence.</div>`;
-  const citations=finding.ids.map(id=>`<span class="tl-paywall-source">${escapeHtml(id)}</span>`).join(" ");
-  const label=finding.aha ? "THE PATTERN WORTH A CLOSER LOOK" : "THE MOST RELEVANT EVIDENCE-BACKED FINDING";
-  const tease=finding.aha
-    ? "This is one signal. The full report examines how the evidence connects, how strong the pattern is, and what it may mean."
-    : "No dramatic conclusion is being assumed. The full report checks the wider evidence, its consistency, and the confidence behind each finding.";
-  return `<div class="tl-paywall-finding"><div class="tl-paywall-finding-label">${label}</div><div class="tl-paywall-finding-text">${escapeHtml(finding.text)}</div><div class="tl-paywall-finding-sources">${citations}</div><div class="tl-paywall-finding-tease">${tease}</div></div>`;
+  // Show the complete, already-generated Section 1/8. This is a preview only:
+  // it does not start another investigation or alter the report/payment flow.
+  const raw = String(reportText || "");
+  const sectionNames = [
+    "01. Identity & Self-Representation",
+    "02. Claims, Commitments & Intentions",
+    "03. Actions & Demonstrated Track Record",
+    "04. Capability & Execution Evidence",
+    "05. Independent Validation & Relationships",
+    "06. Consistency & Evolution Over Time",
+    "07. Reliability, Accountability & Risk Signals",
+    "08. Overall Pattern & Future Readiness"
+  ];
+  const escapedNames = sectionNames.map(name =>
+    name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  );
+  const headingPattern = new RegExp(
+    "(?:^|\\n)\\s*(?:#{1,6}\\s*)?(" + escapedNames.join("|") + ")\\s*(?=\\n|$)",
+    "g"
+  );
+  const headings = [];
+  let match;
+  while((match = headingPattern.exec(raw)) !== null){
+    headings.push({
+      name: match[1],
+      index: match.index + (match[0].startsWith("\n") ? 1 : 0),
+      end: headingPattern.lastIndex
+    });
+  }
+  const sectionIndex = headings.findIndex(item =>
+    item.name === "01. Identity & Self-Representation"
+  );
+  if(sectionIndex < 0){
+    return `<div class="tl-paywall-finding-fallback"><strong>Section 1/8 is not available in the received report format.</strong><br>The original report and investigation process have not been changed.</div>`;
+  }
+
+  const section = headings[sectionIndex];
+  const sectionEnd = sectionIndex + 1 < headings.length
+    ? headings[sectionIndex + 1].index
+    : raw.length;
+  let body = raw.slice(section.end, sectionEnd).trim();
+  body = body
+    .replace(/^\s*[-*_]{3,}\s*$/gm, "")
+    .replace(/^\s*#{1,6}\s*/gm, "")
+    .trim();
+
+  if(!body){
+    return `<div class="tl-paywall-finding-fallback"><strong>Section 1/8 is present but contains no preview text.</strong><br>The original report and investigation process have not been changed.</div>`;
+  }
+
+  // Replace only report source markers with their matching original URLs.
+  // If a source has no valid URL, retain its source ID as plain text.
+  const linkedBody = escapeHtml(body).replace(
+    /\[SOURCE_(\d{1,4})\]/gi,
+    (marker, digits) => {
+      const sourceId = `SOURCE_${String(digits).padStart(2,"0")}`;
+      const source = getLoop7EvidenceSource(sourceId);
+      const url = String(source?.url || "").trim();
+      const safeUrl = /^https?:\/\/[^\s"'<>]+$/i.test(url) ? url : "";
+      if(!safeUrl) return `<span class="tl-paywall-source">${escapeHtml(sourceId)}</span>`;
+      const title = escapeHtml(source?.title || source?.sourceType || "Open original public source");
+      return `<a class="tl-paywall-source tl-paywall-source-link" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${title}">${escapeHtml(sourceId)} ↗</a>`;
+    }
+  );
+
+  return `<div class="tl-paywall-finding">
+    <div class="tl-paywall-finding-label">SECTION 1/8 · IDENTITY & SELF-REPRESENTATION</div>
+    <div class="tl-paywall-finding-text tl-paywall-section-one">${linkedBody}</div>
+    <div class="tl-paywall-finding-tease">This is Section 1 of the original investigation report. Unlock the full report to read Sections 2–8, the complete evidence analysis, confidence assessment and One Next Action.</div>
+  </div>`;
 }
 
 async function showPaywall(){
