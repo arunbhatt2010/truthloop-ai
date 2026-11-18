@@ -764,10 +764,9 @@ box-shadow:
   #paywallBox .tl-paywall-finding{margin:13px 0 15px;padding:13px 14px;text-align:left;border:1px solid rgba(96,165,250,.24);border-radius:13px;background:linear-gradient(145deg,rgba(96,165,250,.07),rgba(168,85,247,.055))}
   #paywallBox .tl-paywall-finding-label{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#a5b4fc;margin-bottom:8px}
   #paywallBox .tl-paywall-finding-text{font-size:13px;line-height:1.55;color:#f1f5f9;display:block;overflow:visible;overflow-wrap:anywhere}
-  #paywallBox .tl-paywall-section-one{white-space:pre-wrap;overflow-wrap:anywhere}
-  #paywallBox .tl-paywall-source-link{color:#7dd3fc;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
   #paywallBox .tl-paywall-finding-sources{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
   #paywallBox .tl-paywall-source{display:inline-block;padding:3px 6px;border:1px solid rgba(96,165,250,.25);border-radius:6px;color:#7dd3fc;font-size:10px;font-weight:850}
+  #paywallBox a.tl-paywall-source-link{text-decoration:underline;text-underline-offset:2px;cursor:pointer}
   #paywallBox .tl-paywall-finding-tease{margin-top:8px;font-size:11px;line-height:1.45;color:#c4b5fd}
   #paywallBox .tl-paywall-finding-fallback{margin:13px 0;padding:12px;border-radius:12px;background:rgba(255,255,255,.035);color:#cbd5e1;font-size:12px;line-height:1.5;text-align:left}
   #paywallBox .tl-paywall-sample{display:block;width:100%;box-sizing:border-box;margin:10px 0 0;padding:11px 12px;border:1px solid rgba(168,85,247,.4);border-radius:11px;background:rgba(168,85,247,.08);color:#e9d5ff;text-align:center;text-decoration:none;font-size:11px;font-weight:850;line-height:1.35}
@@ -5308,160 +5307,45 @@ function unlockLoop7Report(method){
   }
 }
 
-function selectPaywallFinding(reportText){
-  const raw = String(reportText || "");
-  if(!raw.trim()) return null;
-  const sectionPriority = {
-    "05. Independent Validation & Relationships":7,
-    "03. Actions & Demonstrated Track Record":6,
-    "04. Capability & Execution Evidence":5,
-    "06. Consistency & Evolution Over Time":4,
-    "07. Reliability, Accountability & Risk Signals":3,
-    "02. Claims, Commitments & Intentions":2,
-    "01. Identity & Self-Representation":1,
-    "08. Overall Pattern & Future Readiness":0
-  };
-  const names = Object.keys(sectionPriority);
-  const headingPattern = new RegExp("(?:^|\\n)\\s*(?:#{1,6}\\s*)?(" + names.map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|") + ")\\s*(?=\\n|$)","g");
-  const headings=[]; let hm;
-  while((hm=headingPattern.exec(raw))!==null) headings.push({name:hm[1],index:hm.index+(hm[0].startsWith("\n")?1:0),end:headingPattern.lastIndex});
-  const candidates=[];
-  for(let i=0;i<headings.length;i++){
-    const current=headings[i], sectionEnd=i+1<headings.length?headings[i+1].index:raw.length;
-    const lines=raw.slice(current.end,sectionEnd).split(/\n+/).map(x=>x.trim()).filter(Boolean);
-    for(const line of lines){
-      const ids=[...new Set((line.match(/\[?SOURCE_\d{1,4}\]?/gi)||[]).map(x=>x.replace(/[\[\]]/g,"").toUpperCase()))];
-      if(!ids.length) continue;
-      const validIds=ids.filter(id=>!Array.isArray(evidenceSourceRegistry)||!evidenceSourceRegistry.length||getLoop7EvidenceSource(id));
-      if(!validIds.length) continue;
-      let clean=line.replace(/^[-*•▪▸→▶️➡️⏩]+\s*/,"").replace(/\[SOURCE_\d{1,4}\]/gi,"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
-      clean=clean.replace(/^\d+[.)]\s*/,""); if(clean.length<55) continue;
-      const tension=/\b(but|however|although|despite|whereas|while|yet|contrast|gap|differ|diverg|align|misalign|inconsisten|contradict|disconnect|tension)\b/i.test(clean)?5:0;
-      const pattern=/\b(repeat|recurr|consistent|across|multiple|pattern|repeated|over time|throughout|frequency)\b/i.test(clean)?4:0;
-      const implication=/\b(risk|cost|impact|consequence|signal|credib|trust|reliab|execution|decision|position|claim|behavior|behaviour|outcome)\b/i.test(clean)?3:0;
-      const concrete=/\b(\d+|months?|years?|projects?|posts?|roles?|customers?|clients?|launch|revenue|team|product|founder|investor|service|offer|activity)\b/i.test(clean)?2:0;
-      const score=(sectionPriority[current.name]||0)+tension+pattern+implication+concrete+Math.min(validIds.length,4)*2+(clean.length>=100&&clean.length<=280?3:0);
-      candidates.push({text:clean,ids:validIds,score,section:current.name,ahaScore:tension+pattern+implication});
-    }
-  }
-  if(!candidates.length){
-    // Report formats can vary (Markdown, HTML, or plain text). If the exact
-    // section-heading/source-ID format is absent, still select the strongest
-    // substantive finding from the report rather than showing generic filler.
-    const plain = raw
-      .replace(/<\/(?:p|div|li|h[1-6]|section|article)>/gi,"\n")
-      .replace(/<[^>]+>/g," ")
-      .replace(/&nbsp;/gi," ").replace(/&amp;/gi,"&")
-      .replace(/&quot;/gi,'"').replace(/&#39;/gi,"'")
-      .replace(/\r/g,"\n");
-    const lines = plain.split(/\n+/).map(line=>line.replace(/^\s*(?:[-*•▪▸→]+|\d+[.)])\s*/,"").replace(/\s+/g," ").trim())
-      .filter(line=>line.length>=65 && line.length<=900 && !/^0?\d[.)]?\s*(identity|claims|actions|capability|independent validation|consistency|reliability|overall pattern)/i.test(line));
-    const scored = lines.map(line=>{
-      const tension=/\b(but|however|although|despite|whereas|while|yet|gap|differ|diverg|align|misalign|inconsisten|contradict|disconnect|tension)\b/i.test(line)?5:0;
-      const pattern=/\b(repeat|recurr|consistent|across|multiple|pattern|repeated|over time|throughout)\b/i.test(line)?4:0;
-      const implication=/\b(risk|impact|consequence|signal|credib|trust|reliab|execution|decision|claim|behavior|behaviour|outcome)\b/i.test(line)?3:0;
-      const concrete=/\b(\d+|months?|years?|projects?|posts?|roles?|customers?|clients?|launch|revenue|team|product|founder|investor)\b/i.test(line)?2:0;
-      const ids=[...new Set((line.match(/\b(?:SOURCE[_ -]?\d{1,4}|S\d{1,4})\b/gi)||[]).map(x=>x.toUpperCase().replace(/[ -]/g,"_")))];
-      return {text:line,ids,ahaScore:tension+pattern+implication,score:tension+pattern+implication+concrete+Math.min(ids.length,4)*2};
-    }).filter(x=>x.score>0);
-    if(!scored.length) return null;
-    scored.sort((a,b)=>(b.ahaScore>=5)-(a.ahaScore>=5)||b.score-a.score||b.text.length-a.text.length);
-    const best=scored[0];
-    let text=best.text;
-    return {text,ids:best.ids,section:"Report finding",aha:best.ahaScore>=5};
-  }
-
-  // Selection order: genuine Aha Moment -> closest Aha-like finding -> best
-  // evidence-backed finding. Preview selection must never affect report validity.
-  const genuineAhaCandidates=candidates.filter(item=>item.ahaScore>=5);
-  let chosen=null;
-  if(genuineAhaCandidates.length){
-    genuineAhaCandidates.sort((a,b)=>b.score-a.score||b.ahaScore-a.ahaScore||b.ids.length-a.ids.length);
-    chosen=genuineAhaCandidates[0];
-  }else{
-    const closestAhaCandidates=candidates.filter(item=>item.ahaScore>0);
-    if(closestAhaCandidates.length){
-      closestAhaCandidates.sort((a,b)=>b.ahaScore-a.ahaScore||b.score-a.score||b.ids.length-a.ids.length);
-      chosen=closestAhaCandidates[0];
-    }else{
-      candidates.sort((a,b)=>b.score-a.score||b.ids.length-a.ids.length);
-      chosen=candidates[0];
-    }
-  }
-  let text=chosen.text;
-  return {text,ids:chosen.ids,section:chosen.section,aha:chosen.ahaScore>=5};
-}
-
 function renderPaywallFinding(reportText){
-  // Show the complete, already-generated Section 1/8. This is a preview only:
-  // it does not start another investigation or alter the report/payment flow.
-  const raw = String(reportText || "");
-  const sectionNames = [
-    "01. Identity & Self-Representation",
-    "02. Claims, Commitments & Intentions",
-    "03. Actions & Demonstrated Track Record",
-    "04. Capability & Execution Evidence",
-    "05. Independent Validation & Relationships",
-    "06. Consistency & Evolution Over Time",
-    "07. Reliability, Accountability & Risk Signals",
-    "08. Overall Pattern & Future Readiness"
+  // Preview the complete first section from the already-generated Loop 7 report.
+  // This replaces the former Aha/closest-Aha/best-finding selection entirely.
+  const sections = [
+    {heading:"01. Identity & Self-Representation", id:"identitySelfRepresentation"},
+    {heading:"02. Claims, Commitments & Intentions", id:"claimsCommitmentsIntentions"},
+    {heading:"03. Actions & Demonstrated Track Record", id:"actionsDemonstratedTrackRecord"},
+    {heading:"04. Capability & Execution Evidence", id:"capabilityExecutionEvidence"},
+    {heading:"05. Independent Validation & Relationships", id:"independentValidationRelationships"},
+    {heading:"06. Consistency & Evolution Over Time", id:"consistencyEvolutionOverTime"},
+    {heading:"07. Reliability, Accountability & Risk Signals", id:"reliabilityAccountabilityRiskSignals"},
+    {heading:"08. Overall Pattern & Future Readiness", id:"overallPatternFutureReadiness"}
   ];
-  const escapedNames = sectionNames.map(name =>
-    name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-  );
-  const headingPattern = new RegExp(
-    "(?:^|\\n)\\s*(?:#{1,6}\\s*)?(" + escapedNames.join("|") + ")\\s*(?=\\n|$)",
-    "g"
-  );
-  const headings = [];
-  let match;
-  while((match = headingPattern.exec(raw)) !== null){
-    headings.push({
-      name: match[1],
-      index: match.index + (match[0].startsWith("\n") ? 1 : 0),
-      end: headingPattern.lastIndex
-    });
-  }
-  const sectionIndex = headings.findIndex(item =>
-    item.name === "01. Identity & Self-Representation"
-  );
-  if(sectionIndex < 0){
-    return `<div class="tl-paywall-finding-fallback"><strong>Section 1/8 is not available in the received report format.</strong><br>The original report and investigation process have not been changed.</div>`;
+  const parsed = parseLoop7ReportSections(String(reportText || ""), sections);
+  const sectionOne = String(parsed.bodies[0] || "").trim();
+  if(!sectionOne){
+    return `<div class="tl-paywall-finding-fallback"><strong>Section 1/8 is not available in the generated report.</strong><br>No alternative finding is substituted. The full report and evidence are not changed.</div>`;
   }
 
-  const section = headings[sectionIndex];
-  const sectionEnd = sectionIndex + 1 < headings.length
-    ? headings[sectionIndex + 1].index
-    : raw.length;
-  let body = raw.slice(section.end, sectionEnd).trim();
-  body = body
-    .replace(/^\s*[-*_]{3,}\s*$/gm, "")
-    .replace(/^\s*#{1,6}\s*/gm, "")
-    .trim();
-
-  if(!body){
-    return `<div class="tl-paywall-finding-fallback"><strong>Section 1/8 is present but contains no preview text.</strong><br>The original report and investigation process have not been changed.</div>`;
-  }
-
-  // Replace only report source markers with their matching original URLs.
-  // If a source has no valid URL, retain its source ID as plain text.
-  const linkedBody = escapeHtml(body).replace(
-    /\[SOURCE_(\d{1,4})\]/gi,
-    (marker, digits) => {
+  // Keep the same safe text formatting as the full report, but make source IDs
+  // direct links to their original public URLs in this preview.
+  const formattedSection = escapeHtml(sectionOne)
+    .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[SOURCE_(\d+)\]/gi, (match, digits) => {
       const sourceId = `SOURCE_${String(digits).padStart(2,"0")}`;
       const source = getLoop7EvidenceSource(sourceId);
       const url = String(source?.url || "").trim();
       const safeUrl = /^https?:\/\/[^\s"'<>]+$/i.test(url) ? url : "";
       if(!safeUrl) return `<span class="tl-paywall-source">${escapeHtml(sourceId)}</span>`;
-      const title = escapeHtml(source?.title || source?.sourceType || "Open original public source");
-      return `<a class="tl-paywall-source tl-paywall-source-link" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${title}">${escapeHtml(sourceId)} ↗</a>`;
-    }
-  );
+      return `<a class="tl-paywall-source tl-paywall-source-link" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceId)} ↗</a>`;
+    })
+    .replace(/\n/g, "<br>");
 
   return `<div class="tl-paywall-finding">
-    <div class="tl-paywall-finding-label">SECTION 1/8 · IDENTITY & SELF-REPRESENTATION</div>
-    <div class="tl-paywall-finding-text tl-paywall-section-one">${linkedBody}</div>
-    <div class="tl-paywall-finding-tease">This is Section 1 of the original investigation report. Unlock the full report to read Sections 2–8, the complete evidence analysis, confidence assessment and One Next Action.</div>
+    <div class="tl-paywall-finding-label">SECTION 1/8 · IDENTITY &amp; SELF-REPRESENTATION</div>
+    <div class="tl-paywall-finding-text">${formattedSection}</div>
+    <div class="tl-paywall-finding-tease">This is the complete first section of the original investigation report. Unlock the full report to read Sections 2–8, the complete evidence analysis, confidence assessment and One Next Action.</div>
   </div>`;
 }
 
