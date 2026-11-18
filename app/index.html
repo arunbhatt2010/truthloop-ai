@@ -5460,10 +5460,6 @@ async function showPaywall(){
     report_mode: directMode ? "direct" : "conversation"
   });
   const isIndia = userCountry === "IN";
-  // Temporary, URL-scoped visual test for Indian sessions only.
-  // Enable with ?tl_paypal_test=1; this does not change country, currency, or pricing.
-  const isPayPalVisibilityTest = isIndia &&
-    new URLSearchParams(window.location.search).get("tl_paypal_test") === "1";
   const displayedPaymentMethod = isIndia ? "razorpay" : "paypal";
   track("payment_paywall_viewed", {
     payment_method: displayedPaymentMethod,
@@ -5547,7 +5543,7 @@ async function showPaywall(){
   if(isIndia){
     razorpayBtn.style.display="block";
     razorpayBtn.innerText = paymentCardCopy.button;
-    document.getElementById("paypal-button").style.display = isPayPalVisibilityTest ? "block" : "none";
+    document.getElementById("paypal-button").style.display="none";
   }else{
     razorpayBtn.style.display="none";
     document.getElementById("paypal-button").style.display="block";
@@ -5753,11 +5749,6 @@ async function showPaywall(){
     paypalContainer.innerHTML = "";
     const paypalRender = window.paypal.Buttons({
       createOrder:function(data,actions){
-        // Visibility testing must never create or capture a live PayPal payment.
-        if(isPayPalVisibilityTest){
-          track("paypal_visibility_test_click", {payment_method:"paypal", currency:"USD"});
-          return Promise.reject(new Error("PayPal visibility test only; payment is disabled."));
-        }
         track("payment_started", {
           amount: 9.99, currency: "USD", loop: 7, method: "paypal", payment_method: "paypal",
           report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation",
@@ -5811,8 +5802,8 @@ async function showPaywall(){
       });
   };
 
-  if(isIndia && !isPayPalVisibilityTest){
-    // Keep the existing India/Razorpay payment path unchanged outside the explicit test URL.
+  if(isIndia){
+    // Keep the existing India/Razorpay payment path unchanged.
     paypalContainer.style.display = "none";
     paypalContainer.innerHTML = "";
     delete paypalContainer.dataset.tlPayPalMounted;
