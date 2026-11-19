@@ -5637,6 +5637,52 @@ async function showPaywall(){
   };
 
   const paypalContainer = document.getElementById("paypal-button");
+
+  // Owner-only diagnostic: report only whether the PayPal button rendered.
+  // It is called only after the completed report's paywall card is displayed.
+  const sendPayPalVisibilityDiagnostic = (fallbackReason) => {
+    if(window.__tlPayPalVisibilityDiagnosticSent) return;
+    if(userCountry === "IN") return;
+    if(!paywallBox || getComputedStyle(paywallBox).display === "none") return;
+    const paywallCard = paySub?.querySelector(".tl-paywall-payment-card");
+    if(!paywallCard || !paypalContainer || getComputedStyle(paypalContainer).display === "none") return;
+
+    window.__tlPayPalVisibilityDiagnosticSent = true;
+    // Allow PayPal's iframe/layout to settle before checking actual visibility.
+    setTimeout(() => {
+      let visible = false;
+      let reason = String(fallbackReason || "").slice(0, 280);
+      try {
+        const frame = paypalContainer.querySelector('iframe');
+        const box = paypalContainer.getBoundingClientRect();
+        const frameBox = frame ? frame.getBoundingClientRect() : null;
+        const style = getComputedStyle(paypalContainer);
+        visible = !!(frame && box.width > 0 && box.height > 0 && frameBox &&
+          frameBox.width > 0 && frameBox.height > 0 && style.display !== "none" &&
+          style.visibility !== "hidden" && Number(style.opacity || 1) > 0);
+        if(!visible && !reason){
+          if(!window.paypal || typeof window.paypal.Buttons !== "function") reason = "PayPal SDK or Buttons API unavailable";
+          else if(!frame) reason = "PayPal render completed but no iframe was found in the button container";
+          else if(box.width <= 0 || box.height <= 0 || frameBox.width <= 0 || frameBox.height <= 0) reason = "PayPal iframe/container has zero width or height";
+          else reason = "PayPal container is hidden or has zero opacity";
+        }
+      } catch(checkError) {
+        visible = false;
+        reason = "Visibility check failed: " + String(checkError?.message || checkError).slice(0, 220);
+      }
+
+      const payload = { status: visible ? "YES" : "NO" };
+      if(!visible) payload.reason = (reason || "PayPal button did not become visible").slice(0, 280);
+      // Fire-and-forget: this request never blocks report generation or checkout.
+      fetch("/api/paypal-diagnostic", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        credentials: "same-origin",
+        keepalive: true,
+        body: JSON.stringify(payload)
+      }).catch(error => console.warn("PAYPAL_DIAGNOSTIC_SEND_FAILED", error?.message || error));
+    }, 450);
+  };
   const showPayPalLoadError = (message) => {
     if(!paypalContainer) return;
     paypalContainer.innerHTML = "";
@@ -5740,6 +5786,7 @@ async function showPaywall(){
     return Promise.resolve(paypalRender).then(() => {
       paypalContainer.dataset.tlPayPalMounted = "1";
       console.log("PAYPAL_BUTTON_RENDERED");
+      sendPayPalVisibilityDiagnostic("");
     });
   };
 
@@ -5752,6 +5799,7 @@ async function showPaywall(){
         delete paypalContainer.dataset.tlPayPalMounted;
         console.error("PAYPAL_SDK_OR_RENDER_ERROR", error);
         showPayPalLoadError("Secure PayPal checkout did not load. Your payment has not been taken.");
+        sendPayPalVisibilityDiagnostic(String(error?.message || error || "PayPal SDK/render failed"));
       });
   };
 
