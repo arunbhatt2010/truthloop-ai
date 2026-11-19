@@ -5640,27 +5640,44 @@ async function showPaywall(){
 
   // Owner-only diagnostic: report only whether the PayPal button rendered.
   // It is called only after the completed report's paywall card is displayed.
-  const sendPayPalVisibilityDiagnostic = (fallbackReason) => {
-    if(window.__tlPayPalVisibilityDiagnosticSent) return;
+  const sendPayPalDiagnostic = (payload) => {
     if(userCountry === "IN") return;
+    if(!paywallBox || getComputedStyle(paywallBox).display === "none") return;
+    const paywallCard = paySub?.querySelector(".tl-paywall-payment-card");
+    if(!paywallCard) return;
+
+    // Reuse the existing PayPal create-order route; no new Vercel function.
+    fetch("/api/paypal/create-order", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      credentials: "same-origin",
+      keepalive: true,
+      body: JSON.stringify({ action: "diagnostic", ...payload })
+    }).then(response => {
+      if(!response.ok) console.warn("PAYPAL_DIAGNOSTIC_HTTP_ERROR", response.status);
+    }).catch(error => console.warn("PAYPAL_DIAGNOSTIC_SEND_FAILED", error?.message || error));
+  };
+
+  let payPalVisibilityDiagnosticSent = false;
+  const sendPayPalVisibilityDiagnostic = (fallbackReason) => {
+    if(payPalVisibilityDiagnosticSent || userCountry === "IN") return;
     if(!paywallBox || getComputedStyle(paywallBox).display === "none") return;
     const paywallCard = paySub?.querySelector(".tl-paywall-payment-card");
     if(!paywallCard || !paypalContainer || getComputedStyle(paypalContainer).display === "none") return;
 
-    window.__tlPayPalVisibilityDiagnosticSent = true;
-    // Allow PayPal's iframe/layout to settle before checking actual visibility.
+    payPalVisibilityDiagnosticSent = true;
     setTimeout(() => {
       let visible = false;
       let reason = String(fallbackReason || "").slice(0, 280);
       try {
-        const frame = paypalContainer.querySelector('iframe');
+        const frame = paypalContainer.querySelector("iframe");
         const box = paypalContainer.getBoundingClientRect();
         const frameBox = frame ? frame.getBoundingClientRect() : null;
         const style = getComputedStyle(paypalContainer);
         visible = !!(frame && box.width > 0 && box.height > 0 && frameBox &&
           frameBox.width > 0 && frameBox.height > 0 && style.display !== "none" &&
           style.visibility !== "hidden" && Number(style.opacity || 1) > 0);
-        if(!visible && !reason){
+        if(!visible && !reason) {
           if(!window.paypal || typeof window.paypal.Buttons !== "function") reason = "PayPal SDK or Buttons API unavailable";
           else if(!frame) reason = "PayPal render completed but no iframe was found in the button container";
           else if(box.width <= 0 || box.height <= 0 || frameBox.width <= 0 || frameBox.height <= 0) reason = "PayPal iframe/container has zero width or height";
@@ -5671,17 +5688,41 @@ async function showPaywall(){
         reason = "Visibility check failed: " + String(checkError?.message || checkError).slice(0, 220);
       }
 
-      const payload = { status: visible ? "YES" : "NO" };
-      if(!visible) payload.reason = (reason || "PayPal button did not become visible").slice(0, 280);
-      // Fire-and-forget: this request never blocks report generation or checkout.
-      fetch("/api/paypal-diagnostic", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        credentials: "same-origin",
-        keepalive: true,
-        body: JSON.stringify(payload)
-      }).catch(error => console.warn("PAYPAL_DIAGNOSTIC_SEND_FAILED", error?.message || error));
+      sendPayPalDiagnostic({
+        stage: "BUTTON_VISIBILITY",
+        status: visible ? "VISIBLE_YES" : "VISIBLE_NO",
+        reason: visible ? "" : (reason || "PayPal button did not become visible").slice(0, 280),
+        timestamp: new Date().toISOString()
+      });
     }, 450);
+  };
+
+  let payPalClickSequence = 0;
+  const monitorPayPalCheckoutOpen = () => {
+    const sequence = ++payPalClickSequence;
+    let openSignal = false;
+    const markOpenSignal = () => { openSignal = true; };
+    const onVisibility = () => {
+      if(document.visibilityState === "hidden") markOpenSignal();
+    };
+    window.addEventListener("blur", markOpenSignal, {once:true});
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", markOpenSignal, {once:true});
+
+    setTimeout(() => {
+      window.removeEventListener("blur", markOpenSignal);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", markOpenSignal);
+      if(sequence !== payPalClickSequence) return;
+      sendPayPalDiagnostic({
+        stage: "CHECKOUT_OPEN_AFTER_CLICK",
+        status: openSignal ? "OPEN_SIGNAL_DETECTED" : "OPEN_NOT_CONFIRMED",
+        reason: openSignal
+          ? "Browser focus or page visibility changed after PayPal SDK click callback; this is an opening signal, not direct inspection of the cross-origin PayPal interface."
+          : "PayPal SDK click callback fired, but no browser focus/visibility signal confirmed the checkout interface within 2500ms.",
+        timestamp: new Date().toISOString()
+      });
+    }, 2500);
   };
   const showPayPalLoadError = (message) => {
     if(!paypalContainer) return;
@@ -5747,6 +5788,10 @@ async function showPaywall(){
     if(paypalContainer.dataset.tlPayPalMounted === "1") return Promise.resolve();
     paypalContainer.innerHTML = "";
     const paypalRender = window.paypal.Buttons({
+      onClick:function(data,actions){
+        // This callback is proof of a PayPal SDK button click, not merely a tap on its container.
+        monitorPayPalCheckoutOpen();
+      },
       createOrder:function(data,actions){
         track("payment_started", {
           amount: 9.99, currency: "USD", loop: 7, method: "paypal", payment_method: "paypal",
@@ -5765,6 +5810,12 @@ async function showPaywall(){
         });
       },
       onApprove:function(data,actions){
+        sendPayPalDiagnostic({
+          stage: "CHECKOUT_RETURN_CALLBACK",
+          status: "CHECKOUT_RETURNED_APPROVE",
+          reason: "PayPal onApprove callback received; checkout flow returned to the merchant page.",
+          timestamp: new Date().toISOString()
+        });
         return actions.order.capture().then(function(details){
           console.log("PAYPAL_SUCCESS",details);
           track("paypal_payment_success", {payment_method:"paypal", currency:"USD", value:9.99, report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
@@ -5775,6 +5826,12 @@ async function showPaywall(){
         });
       },
       onCancel:function(data){
+        sendPayPalDiagnostic({
+          stage: "CHECKOUT_RETURN_CALLBACK",
+          status: "CHECKOUT_RETURNED_CANCEL",
+          reason: "PayPal onCancel callback received; checkout flow returned to the merchant page.",
+          timestamp: new Date().toISOString()
+        });
         track("paypal_checkout_cancelled", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
       },
       onError:function(error){
