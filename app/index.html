@@ -57,9 +57,7 @@ gtag('config', 'AW-18466210652');
 <!-- Razorpay -->    
 <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>    
     
-<!-- PayPal -->    
-<script defer src="https://www.paypal.com/sdk/js?client-id=AbX5PiAHABsKUXrSLi2nNoEcAfkKBSB5j610m_OClv4aCsO5wSER3dNZw9sXAhLOiA_gT6PbKJ9-jjf1&currency=USD"></script>    
-    
+
 <style>    
 .truthHighlight{    
     
@@ -5448,7 +5446,7 @@ async function showPaywall(){
     report_mode: directMode ? "direct" : "conversation"
   });
   const isIndia = userCountry === "IN";
-  const displayedPaymentMethod = isIndia ? "razorpay" : "paypal";
+  const displayedPaymentMethod = "razorpay";
   track("payment_paywall_viewed", {
     payment_method: displayedPaymentMethod,
     currency: isIndia ? "INR" : "USD",
@@ -5478,12 +5476,12 @@ async function showPaywall(){
     meta: "₹499 · One time payment · Secure Razorpay checkout · No login or signup required",
     button: directMode ? "🔓 Unlock Full Report — ₹499" : "🔓 Unlock Your Final Report — ₹499"
   } : {
-    kicker: "INTERNATIONAL · PAYPAL CHECKOUT",
+    kicker: "INTERNATIONAL · RAZORPAY CHECKOUT",
     heading: directMode ? "One public signal is only the beginning." : "Your conversation and public evidence now meet in one investigation.",
     description: directMode ? "The full report examines public identity, claims, demonstrated actions, capability, independent validation, consistency and documented risk signals. It distinguishes observed facts from interpretation and shows the confidence and limits of the available evidence." : "The full Loop 7 report connects your Loop 1–6 statements with the existing public-profile report and newly collected evidence. It examines where claims, actions, capability and independent signals align or diverge, while keeping conversation context separate from public-source citations.",
     question: directMode ? "What does the wider public record support, challenge or leave unanswered?" : "When your stated intentions are compared with public claims, actions and independent evidence, what pattern emerges?",
-    meta: "$9.99 USD · One time payment · Secure PayPal checkout · No login or signup required",
-    button: "Unlock Full Report — $9.99 USD"
+    meta: "$9.99 USD · One time payment · Secure Razorpay checkout · PayPal option where enabled · No login or signup required",
+    button: "🔓 Unlock Full Report — $9.99 USD"
   };
   const reportPoints = directMode
     ? [
@@ -5532,15 +5530,15 @@ async function showPaywall(){
     </div>
   `;
 
-  if(isIndia){
-    razorpayBtn.style.display="block";
-    razorpayBtn.innerText = paymentCardCopy.button;
-    document.getElementById("paypal-button").style.display="none";
-  }else{
-    razorpayBtn.style.display="none";
-    document.getElementById("paypal-button").style.display="block";
+  // Both country-specific paywalls use Razorpay Standard Checkout.
+  // PayPal, when enabled for this merchant, appears as a payment method inside Razorpay Checkout.
+  razorpayBtn.style.display = "block";
+  razorpayBtn.innerText = paymentCardCopy.button;
+  const legacyPayPalContainer = document.getElementById("paypal-button");
+  if(legacyPayPalContainer){
+    legacyPayPalContainer.style.display = "none";
+    legacyPayPalContainer.innerHTML = "";
   }
-
 
   razorpayBtn.onclick = async function(){
     if(razorpayBtn.dataset.tlPaymentBusy === "1") return;
@@ -5551,19 +5549,24 @@ async function showPaywall(){
 
     const reportMode = window.tlLoop7ReportMode === "direct" ? "direct" : "conversation";
     const analyticsContext = paymentAnalyticsContext();
+    const paymentCurrency = isIndia ? "INR" : "USD";
+    const paymentValue = isIndia ? 499 : 9.99;
+    const paymentAmountSubunits = isIndia ? 49900 : 999;
 
     track("payment_started", {
-      amount: 499, currency: "INR", loop: 7, method: "razorpay",
-      payment_method: "razorpay", report_mode: reportMode, ...analyticsContext
+      amount: paymentValue, currency: paymentCurrency, loop: 7,
+      method: "razorpay", payment_method: "razorpay",
+      report_mode: reportMode, ...analyticsContext
     });
     track("razorpay_payment_started", {
-      amount: 499, currency: "INR", payment_method: "razorpay",
-      report_mode: reportMode, ...analyticsContext
+      amount: paymentValue, currency: paymentCurrency,
+      payment_method: "razorpay", report_mode: reportMode, ...analyticsContext
     });
     if(reportMode === "direct"){
       track("direct_report_payment_started", {
-        amount: 499, currency: "INR", method: "razorpay",
-        payment_method: "razorpay", report_mode: "direct", ...analyticsContext
+        amount: paymentValue, currency: paymentCurrency,
+        method: "razorpay", payment_method: "razorpay",
+        report_mode: "direct", ...analyticsContext
       });
     }
 
@@ -5572,16 +5575,17 @@ async function showPaywall(){
         throw new Error("Razorpay Checkout could not load. Please refresh and try again.");
       }
 
-      // The server creates the authoritative INR 499 order (49900 paise).
+      // The server creates the authoritative order for the selected country/currency.
       const orderResponse = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         credentials: "same-origin",
-        body: JSON.stringify({amount:499})
+        body: JSON.stringify({amount:paymentValue, currency:paymentCurrency})
       });
       const orderData = await orderResponse.json().catch(() => ({}));
-      if(!orderResponse.ok || !orderData.id || orderData.amount !== 49900 ||
-         orderData.currency !== "INR" || !orderData.key){
+      if(!orderResponse.ok || !orderData.id ||
+         orderData.amount !== paymentAmountSubunits ||
+         orderData.currency !== paymentCurrency || !orderData.key){
         throw new Error(orderData.message || orderData.error || "Could not create the Razorpay order. Please try again.");
       }
 
@@ -5603,7 +5607,7 @@ async function showPaywall(){
           handleback:true,
           ondismiss:function(){
             track("razorpay_checkout_cancelled", {
-              payment_method:"razorpay", currency:"INR",
+              payment_method:"razorpay", currency:paymentCurrency,
               report_mode:reportMode, ...paymentAnalyticsContext()
             });
             razorpayBtn.disabled = false;
@@ -5612,7 +5616,6 @@ async function showPaywall(){
           }
         },
         handler: async function(response){
-          // A Checkout success callback is NOT proof of payment. Verify it on the server.
           razorpayBtn.disabled = true;
           razorpayBtn.innerText = "Verifying payment…";
           try {
@@ -5623,18 +5626,21 @@ async function showPaywall(){
               body:JSON.stringify({
                 razorpay_order_id:response.razorpay_order_id,
                 razorpay_payment_id:response.razorpay_payment_id,
-                razorpay_signature:response.razorpay_signature
+                razorpay_signature:response.razorpay_signature,
+                expected_currency:paymentCurrency
               })
             });
             const verifyData = await verifyResponse.json().catch(() => ({}));
             if(!verifyResponse.ok || verifyData.success !== true ||
-               verifyData.paid !== true || verifyData.amount !== 49900 ||
-               verifyData.currency !== "INR"){
+               verifyData.paid !== true ||
+               verifyData.amount !== paymentAmountSubunits ||
+               verifyData.currency !== paymentCurrency){
               throw new Error(verifyData.message || "Payment verification is pending or unsuccessful. Your report has not been unlocked.");
             }
 
             track("razorpay_payment_success", {
-              payment_method:"razorpay", currency:"INR", value:499,
+              payment_method:verifyData.method || "razorpay",
+              currency:paymentCurrency, value:paymentValue,
               razorpay_order_id:response.razorpay_order_id,
               razorpay_payment_id:response.razorpay_payment_id,
               report_mode:reportMode, ...paymentAnalyticsContext()
@@ -5643,7 +5649,7 @@ async function showPaywall(){
           } catch(verifyError) {
             console.error("RAZORPAY_SERVER_VERIFICATION_FAILED", verifyError);
             track("razorpay_payment_verification_failed", {
-              payment_method:"razorpay", currency:"INR",
+              payment_method:"razorpay", currency:paymentCurrency,
               report_mode:reportMode, ...paymentAnalyticsContext()
             });
             console.warn("PAYMENT_VERIFICATION_NOTICE", verifyError.message || "Payment verification is pending.");
@@ -5657,7 +5663,7 @@ async function showPaywall(){
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", function(response){
         track("razorpay_payment_failed", {
-          payment_method:"razorpay", currency:"INR", report_mode:reportMode,
+          payment_method:"razorpay", currency:paymentCurrency, report_mode:reportMode,
           error_code:response?.error?.code || "unknown",
           ...paymentAnalyticsContext()
         });
@@ -5674,240 +5680,6 @@ async function showPaywall(){
       razorpayBtn.innerText = originalButtonText;
     }
   };
-
-  const paypalContainer = document.getElementById("paypal-button");
-
-  // Owner-only diagnostic: report only whether the PayPal button rendered.
-  // It is called only after the completed report's paywall card is displayed.
-  const sendPayPalDiagnostic = (payload) => {
-    if(userCountry === "IN") return;
-    if(!paywallBox || getComputedStyle(paywallBox).display === "none") return;
-    const paywallCard = paySub?.querySelector(".tl-paywall-payment-card");
-    if(!paywallCard) return;
-
-    // Reuse the existing PayPal create-order route; no new Vercel function.
-    fetch("/api/paypal/create-order", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      credentials: "same-origin",
-      keepalive: true,
-      body: JSON.stringify({ action: "diagnostic", ...payload })
-    }).then(response => {
-      if(!response.ok) console.warn("PAYPAL_DIAGNOSTIC_HTTP_ERROR", response.status);
-    }).catch(error => console.warn("PAYPAL_DIAGNOSTIC_SEND_FAILED", error?.message || error));
-  };
-
-  let payPalVisibilityDiagnosticSent = false;
-  const sendPayPalVisibilityDiagnostic = (fallbackReason) => {
-    if(payPalVisibilityDiagnosticSent || userCountry === "IN") return;
-    if(!paywallBox || getComputedStyle(paywallBox).display === "none") return;
-    const paywallCard = paySub?.querySelector(".tl-paywall-payment-card");
-    if(!paywallCard || !paypalContainer || getComputedStyle(paypalContainer).display === "none") return;
-
-    payPalVisibilityDiagnosticSent = true;
-    setTimeout(() => {
-      let visible = false;
-      let reason = String(fallbackReason || "").slice(0, 280);
-      try {
-        const frame = paypalContainer.querySelector("iframe");
-        const box = paypalContainer.getBoundingClientRect();
-        const frameBox = frame ? frame.getBoundingClientRect() : null;
-        const style = getComputedStyle(paypalContainer);
-        visible = !!(frame && box.width > 0 && box.height > 0 && frameBox &&
-          frameBox.width > 0 && frameBox.height > 0 && style.display !== "none" &&
-          style.visibility !== "hidden" && Number(style.opacity || 1) > 0);
-        if(!visible && !reason) {
-          if(!window.paypal || typeof window.paypal.Buttons !== "function") reason = "PayPal SDK or Buttons API unavailable";
-          else if(!frame) reason = "PayPal render completed but no iframe was found in the button container";
-          else if(box.width <= 0 || box.height <= 0 || frameBox.width <= 0 || frameBox.height <= 0) reason = "PayPal iframe/container has zero width or height";
-          else reason = "PayPal container is hidden or has zero opacity";
-        }
-      } catch(checkError) {
-        visible = false;
-        reason = "Visibility check failed: " + String(checkError?.message || checkError).slice(0, 220);
-      }
-
-      sendPayPalDiagnostic({
-        stage: "BUTTON_VISIBILITY",
-        status: visible ? "VISIBLE_YES" : "VISIBLE_NO",
-        reason: visible ? "" : (reason || "PayPal button did not become visible").slice(0, 280),
-        timestamp: new Date().toISOString()
-      });
-    }, 450);
-  };
-
-  let payPalClickSequence = 0;
-  const monitorPayPalCheckoutOpen = () => {
-    const sequence = ++payPalClickSequence;
-    let openSignal = false;
-    const markOpenSignal = () => { openSignal = true; };
-    const onVisibility = () => {
-      if(document.visibilityState === "hidden") markOpenSignal();
-    };
-    window.addEventListener("blur", markOpenSignal, {once:true});
-    document.addEventListener("visibilitychange", onVisibility);
-    window.addEventListener("pagehide", markOpenSignal, {once:true});
-
-    setTimeout(() => {
-      window.removeEventListener("blur", markOpenSignal);
-      document.removeEventListener("visibilitychange", onVisibility);
-      window.removeEventListener("pagehide", markOpenSignal);
-      if(sequence !== payPalClickSequence) return;
-      sendPayPalDiagnostic({
-        stage: "CHECKOUT_OPEN_AFTER_CLICK",
-        status: openSignal ? "OPEN_SIGNAL_DETECTED" : "OPEN_NOT_CONFIRMED",
-        reason: openSignal
-          ? "Browser focus or page visibility changed after PayPal SDK click callback; this is an opening signal, not direct inspection of the cross-origin PayPal interface."
-          : "PayPal SDK click callback fired, but no browser focus/visibility signal confirmed the checkout interface within 2500ms.",
-        timestamp: new Date().toISOString()
-      });
-    }, 2500);
-  };
-  const showPayPalLoadError = (message) => {
-    if(!paypalContainer) return;
-    paypalContainer.innerHTML = "";
-    const wrap = document.createElement("div");
-    wrap.style.cssText = "padding:12px;border:1px solid rgba(248,113,113,.45);border-radius:12px;background:rgba(127,29,29,.16);color:#fee2e2;text-align:center;font-size:13px;line-height:1.5";
-    const note = document.createElement("div");
-    note.textContent = message || "PayPal checkout could not load. Please try again.";
-    const retry = document.createElement("button");
-    retry.type = "button";
-    retry.textContent = "Retry PayPal checkout";
-    retry.style.cssText = "display:block;width:100%;margin-top:10px;padding:12px;border:0;border-radius:10px;background:#ffc439;color:#111827;font-weight:800;font-size:15px;cursor:pointer";
-    retry.addEventListener("click", () => {
-      retry.disabled = true;
-      retry.textContent = "Loading PayPal…";
-      loadAndMountPayPal(true);
-    });
-    wrap.append(note, retry);
-    paypalContainer.appendChild(wrap);
-  };
-
-  const loadPayPalSdk = (forceReload) => {
-    if(window.paypal && typeof window.paypal.Buttons === "function") return Promise.resolve(window.paypal);
-    if(window.__tlPayPalSdkPromise && !forceReload) return window.__tlPayPalSdkPromise;
-    const existingSdk = document.querySelector('script[src*="paypal.com/sdk/js"]');
-    const sdkUrl = existingSdk ? existingSdk.src : (window.__tlPayPalSdkUrl || "");
-    if(!sdkUrl) return Promise.reject(new Error("PayPal SDK script URL is missing."));
-    window.__tlPayPalSdkUrl = sdkUrl;
-    if(existingSdk) existingSdk.remove();
-    window.__tlPayPalSdkPromise = new Promise((resolve, reject) => {
-      const sdk = document.createElement("script");
-      let settled = false;
-      const finish = (error) => {
-        if(settled) return;
-        settled = true;
-        clearTimeout(timer);
-        if(error){
-          window.__tlPayPalSdkPromise = null;
-          sdk.remove();
-          reject(error);
-        }else if(window.paypal && typeof window.paypal.Buttons === "function"){
-          resolve(window.paypal);
-        }else{
-          window.__tlPayPalSdkPromise = null;
-          sdk.remove();
-          reject(new Error("PayPal SDK loaded but Buttons API is unavailable."));
-        }
-      };
-      const timer = setTimeout(() => finish(new Error("PayPal SDK load timed out.")), 20000);
-      sdk.src = sdkUrl;
-      sdk.async = true;
-      sdk.onload = () => finish(null);
-      sdk.onerror = () => finish(new Error("PayPal SDK failed to load."));
-      document.head.appendChild(sdk);
-    });
-    return window.__tlPayPalSdkPromise;
-  };
-
-  const mountPayPalButton = () => {
-    if(!paypalContainer || !window.paypal || typeof window.paypal.Buttons !== "function"){
-      return Promise.reject(new Error("PayPal Buttons API is not ready."));
-    }
-    if(paypalContainer.dataset.tlPayPalMounted === "1") return Promise.resolve();
-    paypalContainer.innerHTML = "";
-    const paypalRender = window.paypal.Buttons({
-      onClick:function(data,actions){
-        // This callback is proof of a PayPal SDK button click, not merely a tap on its container.
-        monitorPayPalCheckoutOpen();
-      },
-      createOrder:function(data,actions){
-        track("payment_started", {
-          amount: 9.99, currency: "USD", loop: 7, method: "paypal", payment_method: "paypal",
-          report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation",
-          ...paymentAnalyticsContext()
-        });
-        track("paypal_payment_started", {amount:9.99, currency:"USD", payment_method:"paypal", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-        if(window.tlLoop7ReportMode === "direct"){
-          track("direct_report_payment_started", {amount:9.99, currency:"USD", method:"paypal", payment_method:"paypal", report_mode:"direct", ...paymentAnalyticsContext()});
-        }
-        return actions.order.create({
-          purchase_units:[{
-            description: window.tlLoop7ReportMode === "direct" ? "TruthLoop Investigation Report" : "TruthLoop Loop 7 Investigation",
-            amount:{currency_code:"USD",value:"9.99"}
-          }]
-        });
-      },
-      onApprove:function(data,actions){
-        sendPayPalDiagnostic({
-          stage: "CHECKOUT_RETURN_CALLBACK",
-          status: "CHECKOUT_RETURNED_APPROVE",
-          reason: "PayPal onApprove callback received; checkout flow returned to the merchant page.",
-          timestamp: new Date().toISOString()
-        });
-        return actions.order.capture().then(function(details){
-          console.log("PAYPAL_SUCCESS",details);
-          track("paypal_payment_success", {payment_method:"paypal", currency:"USD", value:9.99, report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
-          unlockLoop7Report("paypal");
-        }).catch(function(error){
-          track("paypal_payment_failed", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-          throw error;
-        });
-      },
-      onCancel:function(data){
-        sendPayPalDiagnostic({
-          stage: "CHECKOUT_RETURN_CALLBACK",
-          status: "CHECKOUT_RETURNED_CANCEL",
-          reason: "PayPal onCancel callback received; checkout flow returned to the merchant page.",
-          timestamp: new Date().toISOString()
-        });
-        track("paypal_checkout_cancelled", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", paypal_order_id: data?.orderID || "", ...paymentAnalyticsContext()});
-      },
-      onError:function(error){
-        track("paypal_payment_failed", {payment_method:"paypal", currency:"USD", report_mode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation", ...paymentAnalyticsContext()});
-        console.error("PAYPAL_CHECKOUT_ERROR", error);
-        showPayPalLoadError("PayPal checkout encountered an error. Please retry.");
-      }
-    }).render("#paypal-button");
-    return Promise.resolve(paypalRender).then(() => {
-      paypalContainer.dataset.tlPayPalMounted = "1";
-      console.log("PAYPAL_BUTTON_RENDERED");
-      sendPayPalVisibilityDiagnostic("");
-    });
-  };
-
-  const loadAndMountPayPal = (forceReload) => {
-    if(!paypalContainer) return;
-    paypalContainer.innerHTML = '<div style="padding:10px;text-align:center;color:#cbd5e1;font-size:13px">Loading secure PayPal checkout…</div>';
-    loadPayPalSdk(forceReload)
-      .then(() => mountPayPalButton())
-      .catch(error => {
-        delete paypalContainer.dataset.tlPayPalMounted;
-        console.error("PAYPAL_SDK_OR_RENDER_ERROR", error);
-        showPayPalLoadError("Secure PayPal checkout did not load. Your payment has not been taken.");
-        sendPayPalVisibilityDiagnostic(String(error?.message || error || "PayPal SDK/render failed"));
-      });
-  };
-
-  if(isIndia){
-    // Keep the existing India/Razorpay payment path unchanged.
-    paypalContainer.style.display = "none";
-    paypalContainer.innerHTML = "";
-    delete paypalContainer.dataset.tlPayPalMounted;
-  }else{
-    paypalContainer.style.display = "block";
-    loadAndMountPayPal(false);
-  }
 }
 
 document.querySelectorAll(".categoryBtn").forEach(btn=>{
