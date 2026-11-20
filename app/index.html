@@ -400,6 +400,13 @@ word-break:break-word;
 }
 
 
+.tl-source-availability{position:relative;overflow:hidden;width:100%;margin:0 0 15px;padding:8px 0;border-top:1px solid rgba(74,222,128,.25);border-bottom:1px solid rgba(74,222,128,.25);background:linear-gradient(90deg,rgba(20,83,45,.22),rgba(22,101,52,.12),rgba(20,83,45,.22));color:#bbf7d0;font-size:11px;font-weight:750;line-height:1.5}
+.tl-source-availability-track{display:flex;width:max-content;animation:tlSourceAvailabilityRun 34s linear infinite}
+.tl-source-availability-track span{flex:0 0 auto;padding-right:52px;white-space:nowrap}
+.tl-source-availability:hover .tl-source-availability-track{animation-play-state:paused}
+@keyframes tlSourceAvailabilityRun{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.tl-source-availability-track{animation:none;display:block;width:auto}.tl-source-availability-track span:nth-child(2){display:none}}
+@media(max-width:520px){.tl-source-availability{font-size:10px;padding:7px 0;margin-bottom:11px}}
 .tl-free-investigation{margin:16px 0 18px;padding:15px;border:1px solid rgba(34,197,94,.28);border-radius:14px;background:rgba(34,197,94,.055);display:grid;gap:12px}
 .tl-free-investigation-heading{display:flex;align-items:center;gap:9px;flex-wrap:wrap;color:#f3f4f6;font-size:15px}
 .tl-free-investigation-heading span{display:inline-flex;align-items:center;padding:3px 8px;border-radius:6px;background:rgba(34,197,94,.14);color:#86efac;font-size:11px;font-weight:900;letter-spacing:.06em}
@@ -4003,6 +4010,12 @@ return `
     <div class="tl-direct-brand">TRUTHLOOP AI · PUBLIC EVIDENCE INVESTIGATION</div>
     <h2 class="tl-direct-title">Investigate a Public Profile. Follow the Evidence.</h2>
     <div class="tl-direct-intro">Start with one public profile or website. TruthLoop connects accessible public evidence across sources and helps you examine patterns, potential inconsistencies, and the sources behind its findings.</div>
+    <div class="tl-source-availability" role="status" aria-label="Temporary source availability update">
+      <div class="tl-source-availability-track">
+        <span>Temporary Source Availability Update: Until 29 November 2026, LinkedIn and X evidence collection is temporarily paused. GitHub evidence collection remains available. Website evidence collection continues as usual.</span>
+        <span aria-hidden="true">Temporary Source Availability Update: Until 29 November 2026, LinkedIn and X evidence collection is temporarily paused. GitHub evidence collection remains available. Website evidence collection continues as usual.</span>
+      </div>
+    </div>
     <section class="tl-free-investigation" aria-label="Free investigation experience">
       <div class="tl-free-investigation-heading"><span>FREE</span><strong>Your Free Investigation Experience</strong></div>
       <div class="tl-free-investigation-item"><strong>Up to 30 Free Website Evidence Sources</strong><span>Trackable public website sources collected during report generation, depending on available content.</span></div>
