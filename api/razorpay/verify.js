@@ -6,6 +6,11 @@ const ALLOWED_ORIGINS = new Set([
   "https://www.truthloop.in"
 ]);
 
+const EXPECTED_ORDERS = {
+  INR: { amount: 49900 },
+  USD: { amount: 999 }
+};
+
 export default async function handler(req, res) {
   const origin = req.headers.origin;
   if (origin && ALLOWED_ORIGINS.has(origin)) {
@@ -19,7 +24,13 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({success:false, error:"method_not_allowed"});
 
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body || {};
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      expected_currency
+    } = req.body || {};
+
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({success:false, error:"missing_payment_fields"});
     }
@@ -27,30 +38,43 @@ export default async function handler(req, res) {
       return res.status(500).json({success:false, error:"payment_configuration_missing"});
     }
 
+    const currency = String(expected_currency || "").toUpperCase();
+    const expected = EXPECTED_ORDERS[currency];
+    if (!expected) {
+      return res.status(400).json({success:false, error:"unsupported_currency"});
+    }
+
     // Verify Checkout's signature with the server-only Razorpay secret.
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-    const expected = crypto
+    const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(body)
       .digest("hex");
 
     const suppliedBuffer = Buffer.from(String(razorpay_signature), "hex");
-    const expectedBuffer = Buffer.from(expected, "hex");
+    const expectedBuffer = Buffer.from(expectedSignature, "hex");
     if (suppliedBuffer.length !== expectedBuffer.length ||
         !crypto.timingSafeEqual(suppliedBuffer, expectedBuffer)) {
       return res.status(400).json({success:false, error:"signature_verification_failed"});
     }
 
-    // Fetch the payment from Razorpay itself; never trust amount/status from the browser.
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
       key_secret: process.env.RAZORPAY_KEY_SECRET
     });
-    const payment = await razorpay.payments.fetch(razorpay_payment_id);
 
-    if (payment.order_id !== razorpay_order_id ||
-        payment.amount !== 49900 ||
-        payment.currency !== "INR") {
+    // Verify both the order and payment directly with Razorpay.
+    const [order, payment] = await Promise.all([
+      razorpay.orders.fetch(razorpay_order_id),
+      razorpay.payments.fetch(razorpay_payment_id)
+    ]);
+
+    if (order.id !== razorpay_order_id ||
+        order.amount !== expected.amount ||
+        order.currency !== currency ||
+        payment.order_id !== razorpay_order_id ||
+        payment.amount !== expected.amount ||
+        payment.currency !== currency) {
       return res.status(400).json({success:false, error:"payment_details_mismatch"});
     }
 
@@ -69,6 +93,7 @@ export default async function handler(req, res) {
       paid:true,
       amount:payment.amount,
       currency:payment.currency,
+      method:payment.method || "unknown",
       payment_id:payment.id,
       order_id:payment.order_id
     });
