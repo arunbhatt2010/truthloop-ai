@@ -779,7 +779,6 @@ box-shadow:
   box-shadow:0 12px 28px rgba(255,140,0,.20);
   cursor:pointer;
 }
-#paywallBox #paypal-button{margin-top:16px;min-height:48px;}
   #paywallBox .tl-paywall-finding{margin:13px 0 15px;padding:13px 14px;text-align:left;border:1px solid rgba(96,165,250,.24);border-radius:13px;background:linear-gradient(145deg,rgba(96,165,250,.07),rgba(168,85,247,.055))}
   #paywallBox .tl-paywall-finding-label{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#a5b4fc;margin-bottom:8px}
   #paywallBox .tl-paywall-finding-text{font-size:13px;line-height:1.55;color:#f1f5f9;display:block;overflow:visible;overflow-wrap:anywhere}
@@ -2403,7 +2402,7 @@ START NEW PATTERN
       <button onclick="whatsappShare()">WhatsApp</button>
     </div>
     <div class="tl-footer"><span>TruthLoop © 2026</span><div><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms</a><a href="/refund.html">Refund Policy</a><a href="/cookie-policy.html">Cookie Policy</a></div></div>
-  <div id="articleBlock" style="display:none;"><div>Explore More Clarity Systems</div></div><div id="paywallBox" style="display:none;"><div id="paySub"></div><button id="razorpayBtn"></button><div id="paypal-button"></div></div><div id="categoryMessage" style="display:none;">Category selected.</div><div id="hintBox" style="display:none;">💡 HOW DOES THIS WORK?</div><div id="hintContent" style="display:none;"></div><div id="welcomeOverlay" class="hidden"></div><div id="idleGuide" style="display:none;"></div><div id="guideText" style="display:none;"></div>
+  <div id="articleBlock" style="display:none;"><div>Explore More Clarity Systems</div></div><div id="paywallBox" style="display:none;"><div id="paySub"></div><button id="razorpayBtn"></button></div><div id="categoryMessage" style="display:none;">Category selected.</div><div id="hintBox" style="display:none;">💡 HOW DOES THIS WORK?</div><div id="hintContent" style="display:none;"></div><div id="welcomeOverlay" class="hidden"></div><div id="idleGuide" style="display:none;"></div><div id="guideText" style="display:none;"></div>
 </div></div>
 <script>    
     
@@ -5534,11 +5533,6 @@ async function showPaywall(){
   // PayPal, when enabled for this merchant, appears as a payment method inside Razorpay Checkout.
   razorpayBtn.style.display = "block";
   razorpayBtn.innerText = paymentCardCopy.button;
-  const legacyPayPalContainer = document.getElementById("paypal-button");
-  if(legacyPayPalContainer){
-    legacyPayPalContainer.style.display = "none";
-    legacyPayPalContainer.innerHTML = "";
-  }
 
   razorpayBtn.onclick = async function(){
     if(razorpayBtn.dataset.tlPaymentBusy === "1") return;
