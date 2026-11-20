@@ -18,8 +18,11 @@ export default async function handler(req, res) {
 
   let loop7StreamStarted = false;
   let wantsLoop7Progress = false;
-  let sendLoop7Progress = () => {};
+  let sendLoop7Progress = () => false;
   let endLoop7ProgressStream = () => {};
+  let loop7HeartbeatTimer = null;
+  let loop7ClientDisconnected = false;
+  let loop7StreamWriteFailure = null;
 
   // Values needed by the outer crash guard must live outside the try block.
   // Otherwise the catch block cannot access try-scoped let/const bindings.
@@ -530,10 +533,39 @@ let investigationState = {
     wantsLoop7Progress = loopLevel === 7 && progress === true;
 
     sendLoop7Progress = (payload = {}) => {
-      if (!wantsLoop7Progress || !loop7StreamStarted) return;
+      if (
+        !wantsLoop7Progress ||
+        !loop7StreamStarted ||
+        loop7ClientDisconnected ||
+        res.destroyed ||
+        res.writableEnded
+      ) return false;
+
       try {
-        res.write(`data: ${JSON.stringify(payload)}\n\n`);
-      } catch {}
+        // A successful write means Node accepted the frame into its response
+        // stream. It does not prove that the browser has received the frame.
+        const accepted = res.write(`data: ${JSON.stringify(payload)}\n\n`);
+        if (accepted === false) {
+          console.warn("LOOP7_STREAM_BACKPRESSURE", JSON.stringify({
+            type: payload?.type || null,
+            phase: payload?.phase || null
+          }));
+        }
+        return true;
+      } catch (error) {
+        loop7StreamWriteFailure = String(error?.message || error);
+        loop7ClientDisconnected = true;
+        console.error("LOOP7_STREAM_WRITE_FAILED", JSON.stringify({
+          type: payload?.type || null,
+          phase: payload?.phase || null,
+          error: loop7StreamWriteFailure
+        }));
+        if (loop7HeartbeatTimer) {
+          clearInterval(loop7HeartbeatTimer);
+          loop7HeartbeatTimer = null;
+        }
+        return false;
+      }
     };
 
     const startLoop7ProgressStream = () => {
@@ -545,6 +577,50 @@ let investigationState = {
       res.setHeader("X-Accel-Buffering", "no");
       if (typeof res.flushHeaders === "function") res.flushHeaders();
       loop7StreamStarted = true;
+      loop7ClientDisconnected = false;
+      loop7StreamWriteFailure = null;
+
+      // Long PCF/CEB fetches can legitimately take much longer than the normal
+      // run. Without bytes on the SSE connection, mobile networks/proxies may
+      // retire the idle stream before the final report is ready. SSE comments
+      // are ignored by the frontend parser but keep the connection active.
+      res.once?.("close", () => {
+        if (!res.writableEnded) {
+          loop7ClientDisconnected = true;
+          console.warn("LOOP7_STREAM_CLIENT_DISCONNECTED", JSON.stringify({
+            writableEnded: !!res.writableEnded,
+            destroyed: !!res.destroyed
+          }));
+        }
+        if (loop7HeartbeatTimer) {
+          clearInterval(loop7HeartbeatTimer);
+          loop7HeartbeatTimer = null;
+        }
+      });
+
+      loop7HeartbeatTimer = setInterval(() => {
+        if (
+          !loop7StreamStarted ||
+          loop7ClientDisconnected ||
+          res.destroyed ||
+          res.writableEnded
+        ) {
+          clearInterval(loop7HeartbeatTimer);
+          loop7HeartbeatTimer = null;
+          return;
+        }
+        try {
+          res.write(": tl-heartbeat\n\n");
+        } catch (error) {
+          loop7StreamWriteFailure = String(error?.message || error);
+          loop7ClientDisconnected = true;
+          console.error("LOOP7_STREAM_HEARTBEAT_FAILED", loop7StreamWriteFailure);
+          clearInterval(loop7HeartbeatTimer);
+          loop7HeartbeatTimer = null;
+        }
+      }, 12000);
+      if (typeof loop7HeartbeatTimer?.unref === "function") loop7HeartbeatTimer.unref();
+
       sendLoop7Progress({
         type: "progress",
         phase: "case",
@@ -553,8 +629,16 @@ let investigationState = {
     };
 
     endLoop7ProgressStream = () => {
+      if (loop7HeartbeatTimer) {
+        clearInterval(loop7HeartbeatTimer);
+        loop7HeartbeatTimer = null;
+      }
       if (!loop7StreamStarted) return;
-      try { res.end(); } catch {}
+      try {
+        if (!res.writableEnded && !res.destroyed) res.end();
+      } catch (error) {
+        console.error("LOOP7_STREAM_END_FAILED", String(error?.message || error));
+      }
       loop7StreamStarted = false;
     };
 
@@ -2929,7 +3013,7 @@ const finalPayload = {
 };
 
 if (loop7StreamStarted) {
-  sendLoop7Progress({
+  const finalWriteAccepted = sendLoop7Progress({
     type: "final",
     final: true,
     ...finalPayload
@@ -2937,10 +3021,13 @@ if (loop7StreamStarted) {
   console.log(
    "LOOP7_FINAL_STREAM_SENT",
    JSON.stringify({
-      final:true,
-      replyChars:(finalPayload.reply || "").length
+      final: true,
+      replyChars: (finalPayload.reply || "").length,
+      serverWriteAccepted: finalWriteAccepted,
+      clientDisconnected: loop7ClientDisconnected,
+      streamWriteFailure: loop7StreamWriteFailure
    })
-);
+  );
   endLoop7ProgressStream();
   return;
 }
