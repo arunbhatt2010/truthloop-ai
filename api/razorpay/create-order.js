@@ -5,6 +5,11 @@ const ALLOWED_ORIGINS = new Set([
   "https://www.truthloop.in"
 ]);
 
+const PRICE_CONFIG = {
+  INR: { amount: 499, subunits: 49900 },
+  USD: { amount: 9.99, subunits: 999 }
+};
+
 export default async function handler(req, res) {
   const origin = req.headers.origin;
   if (origin && ALLOWED_ORIGINS.has(origin)) {
@@ -22,9 +27,14 @@ export default async function handler(req, res) {
       return res.status(500).json({error:"payment_configuration_missing"});
     }
 
-    const amountRupees = Number(req.body?.amount);
-    if (amountRupees !== 499) {
-      return res.status(400).json({error:"invalid_amount", message:"Only INR 499 payments are accepted."});
+    const currency = String(req.body?.currency || "").toUpperCase();
+    const config = PRICE_CONFIG[currency];
+    const requestedAmount = Number(req.body?.amount);
+    if (!config || requestedAmount !== config.amount) {
+      return res.status(400).json({
+        error:"invalid_amount_or_currency",
+        message:"Only INR 499 or USD 9.99 payments are accepted."
+      });
     }
 
     const razorpay = new Razorpay({
@@ -33,9 +43,13 @@ export default async function handler(req, res) {
     });
 
     const order = await razorpay.orders.create({
-      amount: 49900,
-      currency: "INR",
-      receipt: `truthloop_${Date.now()}`
+      amount: config.subunits,
+      currency,
+      receipt: `truthloop_${currency.toLowerCase()}_${Date.now()}`,
+      notes: {
+        product: "truthloop_loop7_report",
+        price_currency: currency
+      }
     });
 
     return res.status(200).json({
