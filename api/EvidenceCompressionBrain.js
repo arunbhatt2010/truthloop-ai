@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v28.0 — CHECKLIST PAGE SELECTION + NEED-BASED COMPRESSION
+   EVIDENCE COMPRESSION BRAIN v28.1 — SOURCE TRACEABILITY + PUBLISHED-DATE PRESERVATION
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -46,7 +46,7 @@ const MAX_LINKEDIN_ARTICLES = 0;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
 const MAX_REDDIT_POSTS = 0;
 
-const PACKAGE_VERSION = "28.0";
+const PACKAGE_VERSION = "28.1";
 
 // Suppress all evidence streams originating from CEB's Apify scrapers
 // through 27 Nov 2026. PCF website and direct GitHub evidence remain enabled.
@@ -118,6 +118,56 @@ const getDate = item =>
   item?.updatedAt ||
   item?.date ||
   null;
+
+// Publication date is deliberately distinct from fetch/collection/update dates.
+// Website pages use only explicit publication metadata; social posts may use
+// their canonical post-created timestamp when the platform exposes that field.
+const getPublishedDate = item => {
+  const nested = [item?.metadata, item?.structuredData, item?.jsonLd, item?.meta]
+    .filter(value => value && typeof value === "object");
+  const explicit = firstText(
+    item?.publishedDate,
+    item?.publishedAt,
+    item?.published_at,
+    item?.datePublished,
+    item?.date_published,
+    item?.articlePublishedTime,
+    item?.publicationDate,
+    ...nested.flatMap(value => [
+      value?.publishedDate,
+      value?.publishedAt,
+      value?.published_at,
+      value?.datePublished,
+      value?.date_published,
+      value?.articlePublishedTime,
+      value?.publicationDate
+    ])
+  );
+  if (explicit) return explicit;
+
+  const sourceType = String(
+    item?.sourceType || item?.platform || item?.sourcePlatform || item?.postType || ""
+  ).toLowerCase();
+  const url = String(getUrl(item) || "").toLowerCase();
+  const isSocialPost = /linkedin|twitter|\bx\b|social|post|article/.test(sourceType) ||
+    /linkedin\.com\/(?:posts|pulse)\//.test(url) ||
+    /(?:^|\.)x\.com\//.test(url) ||
+    /twitter\.com\//.test(url);
+
+  if (isSocialPost) {
+    return firstText(
+      item?.createdAtIso,
+      item?.postedAt,
+      item?.createdAt,
+      item?.created_at,
+      item?.created_utc,
+      item?.timestamp,
+      item?.date
+    ) || null;
+  }
+
+  return null;
+};
 
 const getId = item =>
   item?.id ??
@@ -1030,6 +1080,8 @@ async function loadEvidenceCompressionBrain({
     url: getUrl(source),
     title: firstText(source?.title, source?.headline).slice(0, 220) || null,
     date: getDate(source),
+    publishedDate: getPublishedDate(source),
+    collectedAt: source?.collectedAt || source?.fetchTimestamp || null,
     content: rawEvidenceText(source),
     pageCategory: source?.pageCategory || source?.category || null,
     pageCategories: Array.isArray(source?.pageCategories) ? source.pageCategories : [],
@@ -1075,6 +1127,8 @@ async function loadEvidenceCompressionBrain({
     url: getUrl(source),
     title: firstText(source?.title, source?.headline, source?.name).slice(0, 220) || null,
     date: getDate(source),
+    publishedDate: getPublishedDate(source),
+    collectedAt: source?.collectedAt || source?.fetchTimestamp || null,
     pageCategory: source?.pageCategory || source?.category || null,
     collectionPurpose: source?.collectionPurpose || "general_website",
     topicKey: source?.topicKey || null,
@@ -1469,6 +1523,8 @@ async function loadEvidenceCompressionBrain({
       title: source.title || "Website source",
       url: source.url,
       date: source.date || null,
+      publishedDate: source.publishedDate || getPublishedDate(source) || null,
+      collectedAt: source.collectedAt || source.fetchTimestamp || null,
       pageCategory: source.pageCategory || null,
       pageCategories: Array.isArray(source.pageCategories) ? source.pageCategories : [],
       investigationSections: Array.isArray(source.investigationSections) ? source.investigationSections : [],
@@ -1491,7 +1547,9 @@ async function loadEvidenceCompressionBrain({
       sourceType: profile.sourceType,
       title: profile.name || "LinkedIn Profile",
       url: profile.profileUrl,
-      date: null
+      date: null,
+      publishedDate: null,
+      collectedAt: null
     });
   }
 
@@ -1501,7 +1559,9 @@ async function loadEvidenceCompressionBrain({
       sourceType: post.sourceType,
       title: post.title || "LinkedIn Post",
       url: post.url,
-      date: post.date || null
+      date: post.date || null,
+      publishedDate: post.publishedDate || getPublishedDate(post) || post.date || null,
+      collectedAt: post.collectedAt || null
     });
   }
 
@@ -1511,7 +1571,9 @@ async function loadEvidenceCompressionBrain({
       sourceType: article.sourceType,
       title: article.title || "LinkedIn Article",
       url: article.url,
-      date: article.date || null
+      date: article.date || null,
+      publishedDate: article.publishedDate || getPublishedDate(article) || article.date || null,
+      collectedAt: article.collectedAt || null
     });
   }
 
@@ -1521,15 +1583,17 @@ async function loadEvidenceCompressionBrain({
       sourceType: "github",
       title: githubEvidence.title || githubEvidence.name || "GitHub",
       url: githubEvidence.url,
-      date: githubEvidence.date || null
+      date: githubEvidence.date || null,
+      publishedDate: getPublishedDate(githubEvidence),
+      collectedAt: githubEvidence.collectedAt || null
     });
   }
 
   for (const socialProfile of [xProfile, redditProfile].filter(Boolean)) {
-    sourceRegistry.push({ sourceId: socialProfile.sourceId, sourceType: socialProfile.sourceType, title: socialProfile.name || `${socialProfile.platform} profile`, url: socialProfile.profileUrl, date: null });
+    sourceRegistry.push({ sourceId: socialProfile.sourceId, sourceType: socialProfile.sourceType, title: socialProfile.name || `${socialProfile.platform} profile`, url: socialProfile.profileUrl, date: null, publishedDate: null, collectedAt: null });
   }
   for (const socialPost of [...xPosts, ...redditPosts]) {
-    sourceRegistry.push({ sourceId: socialPost.sourceId, sourceType: socialPost.sourceType, title: socialPost.title || `${socialPost.platform} post`, url: socialPost.url, date: socialPost.date || null });
+    sourceRegistry.push({ sourceId: socialPost.sourceId, sourceType: socialPost.sourceType, title: socialPost.title || `${socialPost.platform} post`, url: socialPost.url, date: socialPost.date || null, publishedDate: socialPost.publishedDate || getPublishedDate(socialPost) || socialPost.date || null, collectedAt: socialPost.collectedAt || null });
   }
 
   const sourceLinks = [
@@ -1656,9 +1720,11 @@ async function loadEvidenceCompressionBrain({
       sourceId: source.sourceId,
       sourceType: source.sourceType,
       evidenceStream: source.evidenceStream || (source.sourceType === "website_scraper" ? "ceb_website_scraper" : "pcf_website"),
-      title: firstText(source.title).slice(0, 44) || null,
+      title: firstText(source.title).slice(0, 180) || null,
       url: source.url || null,
       date: source.date || null,
+      publishedDate: source.publishedDate || null,
+      collectedAt: source.collectedAt || null,
       pageCategory: source.pageCategory || null,
       pageCategories: Array.isArray(source.pageCategories) ? source.pageCategories : [],
       investigationSections: Array.isArray(source.investigationSections) ? source.investigationSections : [],
