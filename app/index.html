@@ -712,9 +712,12 @@ box-shadow:
 #paywallBox .tl-paywall-payment-card .tl-paywall-question{margin:0 auto 6px;padding:8px 9px;font-size:12px;line-height:1.4;}
 #paywallBox .tl-paywall-payment-card .tl-paywall-price{margin-top:3px;font-size:clamp(24px,5vw,30px);}
 #paywallBox .tl-paywall-payment-card .tl-paywall-meta{margin-top:3px;font-size:10px;line-height:1.35;}
-#paywallBox .tl-paywall-finding{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;}
-#paywallBox .tl-paywall-finding-text{column-count:2;column-gap:16px;column-rule:1px solid rgba(255,255,255,.08);font-size:12px;line-height:1.48;}
-#paywallBox .tl-paywall-finding-tease{grid-column:1/-1;}
+#paywallBox .tl-strategic-free-finding{margin:14px 0 16px;padding:14px;border:1px solid rgba(52,211,153,.28);border-radius:13px;background:linear-gradient(145deg,rgba(16,185,129,.075),rgba(59,130,246,.045));text-align:left;}
+#paywallBox .tl-strategic-free-finding-label{font-size:10px;font-weight:900;letter-spacing:1px;color:#6ee7b7;margin-bottom:7px;}
+#paywallBox .tl-strategic-free-finding-title{font-size:14px;font-weight:900;line-height:1.4;color:#f8fafc;margin:0 0 9px;}
+#paywallBox .tl-strategic-free-finding-body{font-size:12px;line-height:1.65;color:#e2e8f0;overflow-wrap:anywhere;}
+#paywallBox .tl-strategic-free-finding-body .tlr-citation{display:inline-block;margin:1px 2px;padding:1px 4px;border:1px solid rgba(125,211,252,.3);border-radius:4px;background:rgba(14,165,233,.1);color:#7dd3fc;font-size:10px;font-weight:800;}
+#paywallBox .tl-strategic-free-finding-note{margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.09);font-size:10px;line-height:1.5;color:#a7f3d0;}
 #paywallBox .tl-paywall-payment-kicker{
   color:#c4b5fd;
   font-size:10px;
@@ -779,15 +782,6 @@ box-shadow:
   box-shadow:0 12px 28px rgba(255,140,0,.20);
   cursor:pointer;
 }
-  #paywallBox .tl-paywall-finding{margin:13px 0 15px;padding:13px 14px;text-align:left;border:1px solid rgba(96,165,250,.24);border-radius:13px;background:linear-gradient(145deg,rgba(96,165,250,.07),rgba(168,85,247,.055))}
-  #paywallBox .tl-paywall-finding-label{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#a5b4fc;margin-bottom:8px}
-  #paywallBox .tl-paywall-finding-text{font-size:13px;line-height:1.55;color:#f1f5f9;display:block;overflow:visible;overflow-wrap:anywhere}
-  #paywallBox .tl-paywall-finding-sources{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
-  #paywallBox .tl-paywall-source{display:inline-block;padding:3px 6px;border:1px solid rgba(96,165,250,.25);border-radius:6px;color:#7dd3fc;font-size:10px;font-weight:850}
-  #paywallBox a.tl-paywall-source-link{text-decoration:underline;text-underline-offset:2px;cursor:pointer}
-  #paywallBox .tl-paywall-finding-tease{margin-top:8px;font-size:11px;line-height:1.45;color:#c4b5fd}
-  #paywallBox .tl-paywall-finding-fallback{margin:13px 0;padding:12px;border-radius:12px;background:rgba(255,255,255,.035);color:#cbd5e1;font-size:12px;line-height:1.5;text-align:left}
-  #paywallBox .tl-paywall-sample{display:block;width:100%;box-sizing:border-box;margin:10px 0 0;padding:11px 12px;border:1px solid rgba(168,85,247,.4);border-radius:11px;background:rgba(168,85,247,.08);color:#e9d5ff;text-align:center;text-decoration:none;font-size:11px;font-weight:850;line-height:1.35}
 @media(max-width:520px){
   #paywallBox{padding:14px 12px;border-radius:16px;}
   #paywallBox .tl-paywall-payment-card{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:7px;padding:10px 9px;}
@@ -795,9 +789,10 @@ box-shadow:
   #paywallBox .tl-paywall-payment-card .tl-paywall-unlock-title{font-size:12px;line-height:1.3;margin-top:4px;}
   #paywallBox .tl-paywall-payment-card .tl-paywall-intro{font-size:10px;line-height:1.35;margin-top:5px;}
   #paywallBox .tl-paywall-payment-card .tl-paywall-question{font-size:10px;padding:7px 6px;line-height:1.3;}
-  #paywallBox .tl-paywall-finding-text{column-gap:10px;font-size:10.5px;line-height:1.42;}
-  #paywallBox .tl-paywall-finding-label{font-size:9px;letter-spacing:.7px;}
-  #paywallBox .tl-paywall-finding-tease{font-size:9px;line-height:1.35;}
+  #paywallBox .tl-strategic-free-finding{margin:12px 0;padding:12px 11px;}
+  #paywallBox .tl-strategic-free-finding-title{font-size:13px;}
+  #paywallBox .tl-strategic-free-finding-body{font-size:12px;line-height:1.62;}
+  #paywallBox .tl-strategic-free-finding-label{font-size:9px;}
   #paywallBox .tl-paywall-kicker{font-size:9px;padding:6px 9px;}
   #paywallBox .tl-paywall-title{margin:9px auto 7px;font-size:22px;}
   #paywallBox .tl-paywall-intro{margin-bottom:10px;font-size:12.5px;line-height:1.45;}
@@ -4875,6 +4870,73 @@ function parseLoop7ReportSections(reportText, sections){
   };
 }
 
+
+function selectPaywallFreeFinding(reportText){
+  const sections = [
+    {heading:"01. Identity & Self-Representation", title:"01. Identity & Self-Representation"},
+    {heading:"02. Claims, Commitments & Intentions", title:"02. Claims, Commitments & Intentions"},
+    {heading:"03. Actions & Demonstrated Track Record", title:"03. Actions & Demonstrated Track Record"},
+    {heading:"04. Capability & Execution Evidence", title:"04. Capability & Execution Evidence"},
+    {heading:"05. Independent Validation & Relationships", title:"05. Independent Validation & Relationships"},
+    {heading:"06. Consistency & Evolution Over Time", title:"06. Consistency & Evolution Over Time"},
+    {heading:"07. Reliability, Accountability & Risk Signals", title:"07. Reliability, Accountability & Risk Signals"},
+    {heading:"08. Overall Pattern & Future Readiness", title:"08. Overall Pattern & Future Readiness"}
+  ];
+  const parsed = parseLoop7ReportSections(reportText, sections);
+
+  // A candidate must contain substantive analysis plus evidence anchors and
+  // section-specific analytical signals. This avoids treating generic copy as an Aha finding.
+  const criteria = {
+    4: /independent|corroborat|third[- ]party|not independently|self[- ]published|unverified|validation|relationship|partner|not found|supporting evidence/gi,
+    5: /over time|historical|evolution|consistent|consistency|contradict|inconsisten|dated|timeline|shift|trend|not provided|no material/gi,
+    6: /risk|limitation|not found|complaint|dispute|regulatory|security|accountab|reliance|self[- ]reported|unverified|not independently/gi,
+    3: /capability|execution|demonstrat|technical|implementation|deployment|architecture|operational|documented|evidence/gi,
+    2: /action|track record|dated|contribution|release|delivered|published|milestone|evidence|not found/gi
+  };
+  const priority = [4,5,6,3,2]; // Sections 5, 6, 7, 4, 3 in the requested order.
+  const countMatches = (text, regex) => (String(text || '').match(regex) || []).length;
+  const isAhaCandidate = (body, sectionIndex) => {
+    const text = String(body || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if(text.length < 180) return false;
+    const sourceRefs = new Set((text.match(/SOURCE_\d{1,3}/gi) || []).map(x => x.toUpperCase()));
+    const signalCount = countMatches(text, criteria[sectionIndex]);
+    const hasEvidenceAnchor = sourceRefs.size >= 1 || /https?:\/\/|dated evidence|public record|source reference/i.test(text);
+    return hasEvidenceAnchor && signalCount >= 3;
+  };
+
+  for(const index of priority){
+    const body = parsed.bodies[index] || '';
+    if(isAhaCandidate(body, index)){
+      return {index, title:sections[index].title, body, fallback:false};
+    }
+  }
+
+  // Section 1 is the only permitted final fallback; never invent a substitute.
+  const fallbackBody = parsed.bodies[0] || '';
+  if(fallbackBody.trim()){
+    return {index:0, title:sections[0].title, body:fallbackBody, fallback:true};
+  }
+  return null;
+}
+
+function renderPaywallFreeFinding(reportText){
+  const selected = selectPaywallFreeFinding(reportText);
+  if(!selected) return '';
+  const safeBody = decorateLoop7Citations(
+    escapeHtml(String(selected.body || ''))
+      .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\n/g, '<br>')
+  );
+  return `<section class="tl-strategic-free-finding">
+    <div class="tl-strategic-free-finding-label">FREE INVESTIGATION FINDING</div>
+    <h3 class="tl-strategic-free-finding-title">${escapeHtml(selected.title)}</h3>
+    <div class="tl-strategic-free-finding-body">${safeBody}</div>
+    <div class="tl-strategic-free-finding-note">${selected.fallback ? 'This is the available first-section preview from your investigation.' : 'This evidence-led finding is included in your complete report. Unlock the full report to explore all eight sections and the complete source analysis.'}</div>
+  </section>`;
+}
+
 function renderLoop7Report(report){
   const rawReport = String(report || "").trim();
   const sections = [
@@ -5462,6 +5524,8 @@ async function showPaywall(){
       <div class="tl-paywall-kicker">TRUTHLOOP AI · COMPLETE INVESTIGATION</div>
       <h2 class="tl-paywall-title">YOUR INVESTIGATION IS READY</h2>
       <p class="tl-paywall-intro">TruthLoop has completed the public-profile investigation you requested.</p>
+
+      ${renderPaywallFreeFinding(latestTruthLoopReport)}
 
       <div class="tl-strategic-paywall-offer-title">Unlock your complete 8-section investigation report:</div>
       <ul class="tl-strategic-paywall-list">
