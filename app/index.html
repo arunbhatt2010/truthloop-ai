@@ -2427,9 +2427,9 @@ START NEW PATTERN
     
 const API_URL="/api/chat";
 /* Production mode: Loop 7 reports remain behind the paywall until payment is confirmed. */
-//const TL_TEMPORARY_TEST_BYPASS = false;
+const TL_TEMPORARY_TEST_BYPASS = false;
 // Temporary unlock test only: uncomment the next line and comment out the false line above.
- const TL_TEMPORARY_TEST_BYPASS = true;    
+// const TL_TEMPORARY_TEST_BYPASS = true;    
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
 const outputBox=document.getElementById("outputBox");
@@ -3157,7 +3157,11 @@ function captureEvidenceSourceRegistry(data){
           sourceType: String(item.sourceType || "").trim(),
           title: String(item.title || "").trim(),
           url: String(item.url || "").trim(),
-          date: item.date || null
+          date: item.date || null,
+          publishedDate: item.publishedDate || item.publishedAt || item.datePublished || null,
+          collectedAt: item.collectedAt || item.fetchTimestamp || null,
+          evidenceStream: String(item.evidenceStream || "").trim() || null,
+          pageCategory: String(item.pageCategory || "").trim() || null
         }))
         .filter(item => item.sourceId || item.url);
 
@@ -4611,6 +4615,19 @@ function cleanReportSectionText(text){
     return value.trim();
 }
 
+function formatLoop7EvidenceDate(value, missingLabel = "Publication date unavailable"){
+    const raw = String(value || "").trim();
+    if(!raw) return missingLabel;
+    const parsed = new Date(raw);
+    if(!Number.isFinite(parsed.getTime())) return raw;
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC"
+    }).format(parsed);
+}
+
 function getLoop7EvidenceSource(sourceId){
     const key = String(sourceId || "").trim().toUpperCase();
     return (Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry : [])
@@ -4673,7 +4690,10 @@ function openLoop7EvidenceSource(sourceId){
     const sourceIdText = escapeHtml(source.sourceId || sourceId);
     const title = escapeHtml(source.title || "Public evidence source");
     const type = escapeHtml(source.sourceType || "public_evidence");
-    const date = escapeHtml(source.date ? String(source.date) : "Date not provided");
+    const publishedDate = escapeHtml(formatLoop7EvidenceDate(source.publishedDate));
+    const collectedAt = source.collectedAt
+      ? escapeHtml(formatLoop7EvidenceDate(source.collectedAt, ""))
+      : "";
     const url = String(source.url || "").trim();
 
     const backdrop = document.createElement("div");
@@ -4685,7 +4705,7 @@ function openLoop7EvidenceSource(sourceId){
         <div class="tlr-modal-head">
           <div>
             <h3>${sourceIdText}</h3>
-            <div class="tlr-modal-meta">${type} · ${date}</div>
+            <div class="tlr-modal-meta">${type} · Published: ${publishedDate}${collectedAt ? ` · Collected: ${collectedAt}` : ""}</div>
           </div>
           <button type="button" class="tlr-modal-close" aria-label="Close">✕</button>
         </div>
@@ -4728,6 +4748,18 @@ function openLoop7EvidenceSource(sourceId){
     });
 }
 
+// SOURCE IDs inside report findings are interactive evidence links.
+// Delegate from document because the report is rendered dynamically.
+if(!window.__tlLoop7CitationClickHandlerBound){
+  window.__tlLoop7CitationClickHandlerBound = true;
+  document.addEventListener("click", function(event){
+    const citation = event.target?.closest?.(".tlr-citation[data-source-id]");
+    if(!citation) return;
+    event.preventDefault();
+    openLoop7EvidenceSource(citation.getAttribute("data-source-id"));
+  });
+}
+
 function getLoop7SourceLabel(item){
     const type = String(item?.sourceType || "").toLowerCase();
     const url = String(item?.url || "").toLowerCase();
@@ -4755,7 +4787,10 @@ function renderEvidenceSources(){
         const label = getLoop7SourceLabel(item);
         const title = item.title || "Untitled source";
         const url = item.url || "";
-        const date = item.date ? String(item.date) : "Date not provided";
+        const publishedDate = formatLoop7EvidenceDate(item.publishedDate);
+        const collectedAt = item.collectedAt
+          ? formatLoop7EvidenceDate(item.collectedAt, "")
+          : "";
 
         return `
           <details class="tlr-source-card">
@@ -4769,8 +4804,9 @@ function renderEvidenceSources(){
             <div class="tlr-source-details">
               <div class="tlr-source-top">
                 <div class="tlr-source-type">${escapeHtml(type)}</div>
-                <div class="tlr-source-date">${escapeHtml(date)}</div>
+                <div class="tlr-source-date">Published: ${escapeHtml(publishedDate)}</div>
               </div>
+              ${collectedAt ? `<div class="tlr-source-date">Collected: ${escapeHtml(collectedAt)}</div>` : ""}
               ${
                 url
                   ? `<a class="tlr-source-link"
@@ -5100,7 +5136,10 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     const type = item.sourceType || "public_evidence";
     const title = item.title || "Untitled source";
     const url = item.url || "";
-    const date = item.date ? String(item.date) : "Date not provided";
+    const publishedDate = formatLoop7EvidenceDate(item.publishedDate);
+    const collectedAt = item.collectedAt
+      ? formatLoop7EvidenceDate(item.collectedAt, "")
+      : "";
 
     return `
       <div style="
@@ -5116,7 +5155,8 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
         </div>
         <div><b>Type:</b> ${escapeHtml(type)}</div>
         <div><b>Title:</b> ${escapeHtml(title)}</div>
-        <div><b>Date:</b> ${escapeHtml(date)}</div>
+        <div><b>Published date:</b> ${escapeHtml(publishedDate)}</div>
+        ${collectedAt ? `<div><b>Collected:</b> ${escapeHtml(collectedAt)}</div>` : ""}
         ${
           url
             ? `<div style="overflow-wrap:anywhere;">
