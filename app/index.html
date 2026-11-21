@@ -808,6 +808,30 @@ box-shadow:
   #paywallBox .tl-paywall-price{font-size:29px;}
   #paywallBox #razorpayBtn{font-size:14px;margin-top:9px;padding:12px 10px;}
 }
+/* Strategic paywall: one clear offer, readable on desktop and mobile. */
+#paywallBox .tl-strategic-paywall{max-width:680px;margin:0 auto;text-align:left;}
+#paywallBox .tl-strategic-paywall .tl-paywall-kicker{display:inline-block;margin-bottom:8px;}
+#paywallBox .tl-strategic-paywall .tl-paywall-title{text-align:left;margin:5px 0 8px;max-width:none;}
+#paywallBox .tl-strategic-paywall .tl-paywall-intro{max-width:none;margin:0 0 17px;text-align:left;font-size:14px;}
+#paywallBox .tl-strategic-paywall-offer-title{margin:0 0 9px;color:#fff;font-size:15px;font-weight:800;}
+#paywallBox .tl-strategic-paywall-list{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;margin:0;padding:0;list-style:none;}
+#paywallBox .tl-strategic-paywall-list li{position:relative;padding:8px 10px 8px 34px;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:rgba(255,255,255,.035);color:#e5e7eb;font-size:13px;line-height:1.45;}
+#paywallBox .tl-strategic-paywall-list li:before{content:"✓";position:absolute;left:12px;top:8px;color:#86efac;font-weight:900;}
+#paywallBox .tl-strategic-paywall-download{margin:15px 0 12px;padding:12px 14px;border:1px solid rgba(74,222,128,.24);border-radius:11px;background:rgba(34,197,94,.07);}
+#paywallBox .tl-strategic-paywall-download-title{color:#bbf7d0;font-size:14px;font-weight:850;}
+#paywallBox .tl-strategic-paywall-download p{margin:5px 0 0;color:#d1d5db;font-size:13px;line-height:1.5;}
+#paywallBox .tl-strategic-paywall-price{margin-top:12px;color:#ffc94a;font-size:clamp(28px,6vw,35px);font-weight:900;line-height:1.2;text-align:center;}
+#paywallBox .tl-strategic-paywall-meta{margin-top:4px;color:#e5e7eb;font-size:13px;font-weight:750;text-align:center;}
+#paywallBox .tl-strategic-paywall-checkout{margin-top:7px;color:#aeb8ca;font-size:12px;line-height:1.45;text-align:center;}
+#paywallBox #razorpayBtn{margin-top:12px;}
+@media(max-width:520px){
+  #paywallBox .tl-strategic-paywall .tl-paywall-title{font-size:23px;}
+  #paywallBox .tl-strategic-paywall .tl-paywall-intro{font-size:13px;line-height:1.5;}
+  #paywallBox .tl-strategic-paywall-offer-title{font-size:14px;}
+  #paywallBox .tl-strategic-paywall-list li{font-size:12.5px;padding:9px 9px 9px 32px;}
+  #paywallBox .tl-strategic-paywall-download{padding:11px 12px;}
+  #paywallBox .tl-strategic-paywall-download p{font-size:12.5px;}
+}
 /* TruthLoop Pattern Mirror */
 
 #patternProfile{
@@ -5344,48 +5368,6 @@ function unlockLoop7Report(method){
   }
 }
 
-function renderPaywallFinding(reportText){
-  // Preview the complete first section from the already-generated Loop 7 report.
-  // This replaces the former Aha/closest-Aha/best-finding selection entirely.
-  const sections = [
-    {heading:"01. Identity & Self-Representation", id:"identitySelfRepresentation"},
-    {heading:"02. Claims, Commitments & Intentions", id:"claimsCommitmentsIntentions"},
-    {heading:"03. Actions & Demonstrated Track Record", id:"actionsDemonstratedTrackRecord"},
-    {heading:"04. Capability & Execution Evidence", id:"capabilityExecutionEvidence"},
-    {heading:"05. Independent Validation & Relationships", id:"independentValidationRelationships"},
-    {heading:"06. Consistency & Evolution Over Time", id:"consistencyEvolutionOverTime"},
-    {heading:"07. Reliability, Accountability & Risk Signals", id:"reliabilityAccountabilityRiskSignals"},
-    {heading:"08. Overall Pattern & Future Readiness", id:"overallPatternFutureReadiness"}
-  ];
-  const parsed = parseLoop7ReportSections(String(reportText || ""), sections);
-  const sectionOne = String(parsed.bodies[0] || "").trim();
-  if(!sectionOne){
-    return `<div class="tl-paywall-finding-fallback"><strong>Section 1/8 is not available in the generated report.</strong><br>No alternative finding is substituted. The full report and evidence are not changed.</div>`;
-  }
-
-  // Keep the same safe text formatting as the full report, but make source IDs
-  // direct links to their original public URLs in this preview.
-  const formattedSection = escapeHtml(sectionOne)
-    .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\[?SOURCE_(\d{1,3})\]?/gi, (match, digits) => {
-      const sourceId = `SOURCE_${String(digits).padStart(2,"0")}`;
-      const source = getLoop7EvidenceSource(sourceId);
-      const url = String(source?.url || "").trim();
-      const safeUrl = /^https?:\/\/[^\s\"'<>]+$/i.test(url) ? url : "";
-      if(!safeUrl) return `<span class="tl-paywall-source">${escapeHtml(sourceId)}</span>`;
-      return `<a class="tl-paywall-source tl-paywall-source-link" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceId)} ↗</a>`;
-    })
-    .replace(/\n/g, "<br>");
-
-  return `<div class="tl-paywall-finding">
-    <div class="tl-paywall-finding-label">SECTION 1/8 · IDENTITY &amp; SELF-REPRESENTATION</div>
-    <div class="tl-paywall-finding-text">${formattedSection}</div>
-    <div class="tl-paywall-finding-tease">This is the complete first section of the original investigation report. Unlock the full report to read Sections 2–8, the complete evidence analysis, confidence assessment and One Next Action.</div>
-  </div>`;
-}
-
 async function showPaywall(){
   // A paywall is valid only after a non-empty final report has been received
   // or restored. Never show payment while a report is still being generated.
@@ -5467,72 +5449,47 @@ async function showPaywall(){
   saveJourney();
 
   const priceLabel = isIndia ? "₹499" : "$9.99 USD";
-  const paymentCardCopy = isIndia ? {
-    kicker: "INDIA · RAZORPAY CHECKOUT",
-    heading: directMode ? "One public signal is only the beginning." : "Your conversation and public evidence now meet in one investigation.",
-    description: directMode ? "The full report examines public identity, claims, demonstrated actions, capability, independent validation, consistency and documented risk signals. It distinguishes observed facts from interpretation and shows the confidence and limits of the available evidence." : "The full Loop 7 report connects your Loop 1–6 statements with the existing public-profile report and newly collected evidence. It examines where claims, actions, capability and independent signals align or diverge, while keeping conversation context separate from public-source citations.",
-    question: directMode ? "What does the wider public record support, challenge or leave unanswered?" : "When your stated intentions are compared with public claims, actions and independent evidence, what pattern emerges?",
-    meta: "₹499 · One time payment · Secure Razorpay checkout · No login or signup required",
-    button: directMode ? "🔓 Unlock Full Report — ₹499" : "🔓 Unlock Your Final Report — ₹499"
-  } : {
-    kicker: "INTERNATIONAL · RAZORPAY CHECKOUT",
-    heading: directMode ? "One public signal is only the beginning." : "Your conversation and public evidence now meet in one investigation.",
-    description: directMode ? "The full report examines public identity, claims, demonstrated actions, capability, independent validation, consistency and documented risk signals. It distinguishes observed facts from interpretation and shows the confidence and limits of the available evidence." : "The full Loop 7 report connects your Loop 1–6 statements with the existing public-profile report and newly collected evidence. It examines where claims, actions, capability and independent signals align or diverge, while keeping conversation context separate from public-source citations.",
-    question: directMode ? "What does the wider public record support, challenge or leave unanswered?" : "When your stated intentions are compared with public claims, actions and independent evidence, what pattern emerges?",
-    meta: "$9.99 USD · One time payment · Secure Razorpay checkout · PayPal option where enabled · No login or signup required",
-    button: "🔓 Unlock Full Report — $9.99 USD"
-  };
-  const reportPoints = directMode
-    ? [
-        "Examine identity, public claims, demonstrated work and execution evidence",
-        "Check independent validation, consistency over time and documented risk signals",
-        "See the overall evidence pattern, source references and confidence limitations"
-      ]
-    : [
-        "Connect your Loop 1–6 statements with the existing public-profile report and new evidence",
-        "Examine claims, actions, capability, independent validation and consistency across sources",
-        "Review reliability signals, the overall pattern, confidence limitations and next questions"
-      ];
-  const paywallTitle = directMode
-    ? "One public signal can raise a bigger question."
-    : "Your answers have brought the investigation to its most revealing stage.";
-  const paywallDescription = directMode
-    ? "The preview shows one finding from the public evidence TruthLoop could access. The full report examines the wider pattern without claiming more than the evidence supports."
-    : "Your responses across Loops 1–6 now meet the available evidence. Loop 7 examines what consistently appears, what does not line up, and how confidently the evidence supports each finding.";
-  const unlockTitle = directMode
-    ? "Unlock your full investigation report"
-    : "Unlock your complete Loop 7 Investigation Report";
+  const paymentButtonLabel = isIndia
+    ? "UNLOCK MY FULL REPORT — ₹499"
+    : "UNLOCK MY FULL REPORT — $9.99 USD";
+  const currencyMeta = isIndia
+    ? "₹499 INR · One-time payment · No subscription"
+    : "$9.99 USD · One-time payment · No subscription";
 
   tlReportPaywallDiagnostic("15 ABOUT_TO_RENDER_PAYWALL_MESSAGE_CARD", {reportChars:String(latestTruthLoopReport || "").length});
   paySub.innerHTML = `
-    <div class="tl-paywall-kicker">TRUTHLOOP AI · ${directMode ? "PATTERN INVESTIGATION" : "LOOP 7 · EXECUTIVE SUMMARY"}</div>
-    <h2 class="tl-paywall-title">${paywallTitle}</h2>
-    <p class="tl-paywall-intro">${paywallDescription}</p>
-    ${renderPaywallFinding(latestTruthLoopReport)}
-    <div class="tl-paywall-section-label">${directMode ? "Your full report reveals:" : "Your complete report examines:"}</div>
-    <ul class="tl-paywall-list">
-      ${reportPoints.map(point => `<li>${point}</li>`).join("")}
-    </ul>
-    <div class="tl-paywall-slogan">Not Answers. Patterns.</div>
-    <div class="tl-paywall-slogan-sub">TruthLoop investigates behavior.</div>
-    <div class="tl-paywall-payment-card">
-      <div class="tl-paywall-payment-left">
-        <div class="tl-paywall-payment-kicker">${paymentCardCopy.kicker}</div>
-        <div class="tl-paywall-unlock-title">${paymentCardCopy.heading}</div>
-        <p class="tl-paywall-intro">${paymentCardCopy.description}</p>
+    <div class="tl-strategic-paywall">
+      <div class="tl-paywall-kicker">TRUTHLOOP AI · COMPLETE INVESTIGATION</div>
+      <h2 class="tl-paywall-title">YOUR INVESTIGATION IS READY</h2>
+      <p class="tl-paywall-intro">TruthLoop has completed the public-profile investigation you requested.</p>
+
+      <div class="tl-strategic-paywall-offer-title">Unlock your complete 8-section investigation report:</div>
+      <ul class="tl-strategic-paywall-list">
+        <li>Identity, claims, commitments and demonstrated actions</li>
+        <li>Capability and execution evidence</li>
+        <li>Independent validation and consistency across sources</li>
+        <li>Reliability, accountability and documented risk signals</li>
+        <li>Overall pattern and future readiness</li>
+        <li>Evidence references with clickable public-source links</li>
+        <li>Confidence assessment and evidence limitations</li>
+        <li>One Next Action</li>
+      </ul>
+
+      <div class="tl-strategic-paywall-download">
+        <div class="tl-strategic-paywall-download-title">✓ Read and Download Your Report</div>
+        <p>After unlocking, you can view your complete report online and download a copy with a single click.</p>
       </div>
-      <div class="tl-paywall-payment-right">
-        <div class="tl-paywall-question"><span class="tl-paywall-question-label">THE QUESTION WORTH ANSWERING</span>${paymentCardCopy.question}</div>
-        <div class="tl-paywall-price">${priceLabel}</div>
-        <div class="tl-paywall-meta">${paymentCardCopy.meta}</div>
-      </div>
+
+      <div class="tl-strategic-paywall-price">${priceLabel}</div>
+      <div class="tl-strategic-paywall-meta">${currencyMeta}</div>
+      <div class="tl-strategic-paywall-checkout">Secure checkout via Razorpay. Available payment methods are shown at checkout.</div>
     </div>
   `;
 
   // Both country-specific paywalls use Razorpay Standard Checkout.
   // PayPal, when enabled for this merchant, appears as a payment method inside Razorpay Checkout.
   razorpayBtn.style.display = "block";
-  razorpayBtn.innerText = paymentCardCopy.button;
+  razorpayBtn.innerText = paymentButtonLabel;
 
   razorpayBtn.onclick = async function(){
     if(razorpayBtn.dataset.tlPaymentBusy === "1") return;
