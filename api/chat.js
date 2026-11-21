@@ -916,13 +916,34 @@ let investigationState = {
         sourceType,
         title,
         url,
-        date
+        date,
+        publishedDate,
+        collectedAt,
+        evidenceStream,
+        pageCategory
       }) => ({
         sourceId,
         sourceType,
         title,
         url,
-        date
+        date,
+        publishedDate: publishedDate || null,
+        collectedAt: collectedAt || null,
+        evidenceStream: evidenceStream || null,
+        pageCategory: pageCategory || null
+      }));
+
+      // A separate, compact manifest makes the exact source-ID-to-URL mapping
+      // explicit to the report model, instead of asking it to infer IDs from
+      // page counts or from unrelated source metadata.
+      const loop7SourceCitationIndex = loop7EvidenceSourceIndexCompact.map(source => ({
+        sourceId: source.sourceId,
+        sourceType: source.sourceType,
+        title: source.title,
+        url: source.url,
+        publishedDate: source.publishedDate,
+        pageCategory: source.pageCategory,
+        evidenceStream: source.evidenceStream
       }));
 
       // Build a model-facing projection aligned to ECB v27 output contract.
@@ -958,11 +979,13 @@ let investigationState = {
 
       loop7AiUserPayload = {
         compressedEvidencePackage: modelFacingCompressedEvidencePackage,
+        sourceCitationIndex: loop7SourceCitationIndex,
         ...(reportMode === "conversation" ? { truthLoopPackage } : {})
       };
 
       const originalModelPayloadChars = JSON.stringify({
         compressedEvidencePackage,
+        sourceCitationIndex: loop7SourceCitationIndex,
         ...(reportMode === "conversation" ? { truthLoopPackage } : {})
       }).length;
       const optimizedModelPayloadChars = JSON.stringify(loop7AiUserPayload).length;
@@ -975,6 +998,9 @@ let investigationState = {
           optimizedPayloadChars: optimizedModelPayloadChars,
           removedChars: Math.max(0, originalModelPayloadChars - optimizedModelPayloadChars),
           sourceRegistryCount: loop7EvidenceRegistryCompact.length,
+          sourceCitationIndexCount: loop7SourceCitationIndex.length,
+          sourcesWithPublishedDate: loop7SourceCitationIndex.filter(source => !!source.publishedDate).length,
+          sourcesWithoutPublishedDate: loop7SourceCitationIndex.filter(source => !source.publishedDate).length,
           websiteSourceCount: Array.isArray(originalEvidenceUniverse.websiteSources)
             ? originalEvidenceUniverse.websiteSources.length : 0,
           githubPresent: !!originalEvidenceUniverse.githubEvidence,
@@ -1166,13 +1192,18 @@ CASE-SPECIFIC ANALYSIS — NO GENERIC FILLER
 - Use behavioralClusters only as leads; independently ground conclusions in actual retained source content. Use crossEvidenceIntelligence only as supporting deterministic analysis and verify it against retained source records. It is never a substitute for a traceable source.
 
 SOURCE TRACEABILITY — EVERY FINDING MUST BE CHECKABLE
-- sourceRegistry is the canonical traceability map for this NEW Loop 7 public investigation.
-- Use ONLY SOURCE_XX IDs that actually exist in sourceRegistry. Never invent, renumber, merge, alter or guess a source ID, URL, title, date or source type.
-- Every material public-evidence factual claim and every positive finding, contradiction, potential inconsistency, risk signal or validation finding in Sections 1–7 must carry an inline citation such as [SOURCE_01] using the exact ID from sourceRegistry.
+- sourceRegistry is the canonical traceability map for this NEW Loop 7 public investigation. sourceCitationIndex is its compact ID-to-title/URL/date index. Both refer to the same evidence records.
+- Use ONLY SOURCE_XX IDs that actually exist in sourceRegistry and sourceCitationIndex. Never invent, renumber, merge, alter or guess a source ID, URL, title, published date or source type.
+- Every material public-evidence factual claim and every positive finding, contradiction, potential inconsistency, risk signal or validation finding in Sections 1–7 MUST carry an inline citation such as [SOURCE_01] using the exact ID from sourceCitationIndex.
+- Put the citation immediately after the specific sentence it supports. Do not place all citations only at the end of a section or in the Confidence Breakdown. Every factual paragraph in Sections 1–7 must contain one or more valid inline SOURCE IDs.
+- When a paragraph contains multiple distinct factual claims, cite each claim next to its own supporting evidence; a single citation at paragraph end is acceptable only when that exact source supports every claim in the paragraph.
+- Before returning the report, silently audit Sections 1–7: confirm that every factual finding has a valid citation, every cited ID exists in sourceCitationIndex, and every cited source's actual content supports the nearby claim. If support is unavailable, narrow the statement or label it NOT ESTABLISHED / INSUFFICIENT EVIDENCE; never invent a citation to fill a gap.
+- A source's published date is only the date stored in its explicit publishedDate field. Do not present fetchTimestamp, collectedAt, updatedAt, crawl time or an ambiguous generic timestamp as a publication date. If publishedDate is null, state that the publication date is unavailable.
+- Never fabricate a source date or infer a publication date from a URL, filename, copyright year or the date on which the website was fetched.
 - Put the citation immediately after the statement it supports. The cited source's actual content must directly support the nearby claim; a title, URL, metadata field, platform label or source existence alone is not proof of page content.
 - When comparing aligned evidence or a contradiction, cite every material record used in the comparison. For a contradiction, cite both the website-side claim and the supporting-source-side claim, not just one side.
 - A source ID may appear in multiple sections if the same record genuinely supports each cited finding. Never reuse an ID to support a claim that the source does not establish.
-- Keep source provenance explicit in the prose: official-website/company-published, LinkedIn, X, GitHub, other third-party, or independently published. Do not call a company-published claim independent validation.
+- Keep source provenance explicit in the prose: official-website/company-published, LinkedIn, X, GitHub, other third-party, or independently published. Do not call a company-published claim independent validation. Use sourceCitationIndex to preserve the exact SOURCE ID next to the related observation.
 - Keep the source ID exactly as stored and ensure it resolves to the corresponding sourceRegistry record, including its available title and URL. Do not cite Direct Report inherited sources as if they were newly collected Loop 7 sources. Do not cite Loop 1–6 conversation statements with public SOURCE_XX IDs.
 - For NOT FOUND statements, describe the scope actually checked (for example, collected official-website pages or collected supporting records). Where relevant inspected source IDs exist, cite them as the records reviewed, but do not imply that a citation proves global absence.
 - Never write a bare or guessed SOURCE_XX. Never cite a source that is not in the current sourceRegistry. Never fabricate a link or claim that a source was checked when it was not.
@@ -2433,6 +2464,25 @@ if (loopLevel === 7) {
         : 0
     })
   );
+
+  // Diagnostic only: measure inline citation coverage without rewriting the
+  // model's report or inserting unsupported source IDs into its findings.
+  const knownSourceIds = new Set(
+    (Array.isArray(loop7EvidenceSourceIndexCompact) ? loop7EvidenceSourceIndexCompact : [])
+      .map(source => String(source?.sourceId || "").toUpperCase())
+      .filter(Boolean)
+  );
+  const emittedSourceIds = [...String(reply || "").matchAll(/\[?(SOURCE_\d{1,3})\]?/gi)]
+    .map(match => String(match[1] || "").toUpperCase());
+  const validCitationIds = [...new Set(emittedSourceIds.filter(id => knownSourceIds.has(id)))];
+  const invalidCitationIds = [...new Set(emittedSourceIds.filter(id => !knownSourceIds.has(id)))];
+  console.log("LOOP7_CITATION_COVERAGE_AUDIT", JSON.stringify({
+    validCitationCount: emittedSourceIds.filter(id => knownSourceIds.has(id)).length,
+    uniqueValidSourceIds: validCitationIds,
+    invalidOrUnknownSourceIds: invalidCitationIds,
+    citationManifestCount: knownSourceIds.size,
+    reportContainsInlineCitations: validCitationIds.length > 0
+  }));
 }
 
     /* =========================
@@ -3015,12 +3065,18 @@ const finalPayload = {
         evidenceRegistry: finalEvidenceRegistry,
         loop7EvidenceRegistry: finalEvidenceRegistry,
         evidenceSourceRegistry: finalEvidenceRegistry,
-        evidenceSourceIndex: finalEvidenceRegistry.map(({ sourceId, sourceType, title, url, date }) => ({
+        evidenceSourceIndex: finalEvidenceRegistry.map(({
+          sourceId, sourceType, title, url, date, publishedDate, collectedAt, evidenceStream, pageCategory
+        }) => ({
           sourceId,
           sourceType,
           title,
           url,
-          date
+          date,
+          publishedDate: publishedDate || null,
+          collectedAt: collectedAt || null,
+          evidenceStream: evidenceStream || null,
+          pageCategory: pageCategory || null
         })),
         evidenceRegistryCount:
           finalEvidenceRegistry.length
