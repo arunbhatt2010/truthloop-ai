@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v27.1 — PCF 5K PER SOURCE + ADDITIONAL PLATFORMS 1L
+   EVIDENCE COMPRESSION BRAIN v28.0 — CHECKLIST PAGE SELECTION + NEED-BASED COMPRESSION
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -28,16 +28,17 @@
 const MAX_TOTAL_PACKAGE_CHARS = 1600000;
 const ECB_OUTPUT_LIMIT = 1600000;
 const ECB_TRANSPORT_LIMIT = 1600000;
+const MAX_PCF_WEBSITE_CONTENT_CHARS = 1350000;
 const MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS = 100000;
 const MAX_INPUT_PACKAGE_CHARS = 10000000;
 
 /*
  * Loop 7 transport boundary:
- * Preserve every PCF website record and every CEB website-scraper page.
- * Preserve every available scraper family already delivered by CEB.
- * Meaningful text compression is allowed; silent source dropping is not.
+ * Select up to 50 checklist-relevant PCF website pages. Keep all page
+ * content unchanged when it fits the combined budget; otherwise allocate
+ * the combined budget by relevance and preserve every selected source URL.
  */
-const MAX_WEBSITE_SOURCES = Number.POSITIVE_INFINITY;
+const MAX_WEBSITE_SOURCES = 50;
 const MAX_WEBSITE_SCRAPER_SOURCES = Number.POSITIVE_INFINITY; // Legacy stream retained for compatibility; CEB website crawler is disabled.
 const MAX_LINKEDIN_POSTS = 10;
 const MIN_LINKEDIN_POSTS = 1;
@@ -45,7 +46,7 @@ const MAX_LINKEDIN_ARTICLES = 0;
 const MAX_X_POSTS = Number.POSITIVE_INFINITY;
 const MAX_REDDIT_POSTS = 0;
 
-const PACKAGE_VERSION = "27.1";
+const PACKAGE_VERSION = "28.0";
 
 // Suppress all evidence streams originating from CEB's Apify scrapers
 // through 27 Nov 2026. PCF website and direct GitHub evidence remain enabled.
@@ -210,105 +211,225 @@ const meaningfulText = (value, maxChars = 700, maxSentences = 5) => {
 };
 
 /* ---------------------------------------------------------
-   PCF WEBSITE EVIDENCE CAP — PER SOURCE
-   Every selected PCF website source remains in the package.
-   Its evidence text is limited to 5,000 characters independently.
-   Selection prefers complete, high-value evidence sentences.
-   URLs, titles, dates, source IDs and source registry are preserved.
+   INVESTIGATION-CHECKLIST WEBSITE PAGE SELECTION
+   PCF and CEB retain the complete fetched page text. ECB first selects
+   relevant pages using the 8-section public investigation checklist.
+   Content is compressed later only when the combined website payload
+   exceeds MAX_PCF_WEBSITE_CONTENT_CHARS.
 --------------------------------------------------------- */
-const MAX_PCF_WEBSITE_CHARS_PER_SOURCE = 5000;
+const WEBSITE_PAGE_CATEGORY_RULES = [
+  { category: "financial_disclosures", weight: 150, pattern: /\b(investor relations?|investors?|annual reports?|financial results?|quarterly results?|financial statements?|revenue|profit and loss|balance sheets?|cash flow|earnings|shareholders?|stock information|funding disclosures?|credit ratings?|prospectus|filings?)\b/i },
+  { category: "customer_validation", weight: 145, pattern: /\b(case studies|customer stories|client stories|our customers|customers|clients|testimonials?|reviews?|success stories|customer success|deployments?|customer results)\b/i },
+  { category: "leadership_and_governance", weight: 135, pattern: /\b(about us|our story|company overview|leadership|founders?|management team|board of directors|board members|executive team|governance|ownership)\b/i },
+  { category: "products_and_services", weight: 125, pattern: /\b(products?|services?|solutions?|platform|features?|use cases?|industries served|how it works|product overview)\b/i },
+  { category: "business_model_and_pricing", weight: 118, pattern: /\b(pricing|plans|subscriptions?|billing|business model|licensing|fees|rates|packages)\b/i },
+  { category: "partnerships_and_ecosystem", weight: 112, pattern: /\b(partners?|partnerships?|alliances?|integrations?|ecosystem|resellers?|distributors?)\b/i },
+  { category: "technology_and_ip", weight: 108, pattern: /\b(technology|engineering|developer|api reference|documentation|architecture|research and development|r\s*&\s*d|patents?|intellectual property|open source|changelog|release notes)\b/i },
+  { category: "operations_and_delivery", weight: 104, pattern: /\b(operations?|delivery|implementation|workflows?|processes?|manufacturing|facilities|supply chain|logistics|service levels?|sla)\b/i },
+  { category: "risk_security_compliance", weight: 102, pattern: /\b(security|trust center|compliance|certifications?|privacy|risk management|business continuity|disaster recovery|incident response|code of conduct|regulatory disclosures?)\b/i },
+  { category: "news_and_execution_history", weight: 96, pattern: /\b(news|press releases?|announcements?|milestones?|launches?|events?|acquisitions?|media coverage|company updates|blog|insights)\b/i },
+  { category: "careers_and_hiring", weight: 84, pattern: /\b(careers?|jobs|hiring|open positions|life at|our people|employee stories|graduate programs)\b/i },
+  { category: "market_and_positioning", weight: 78, pattern: /\b(market|industry insights|competitive|why choose us|differentiators?|analyst reports?|market research)\b/i },
+  { category: "contact_and_support", weight: 35, pattern: /\b(contact us|support|help center|faqs?|locations?|customer service)\b/i }
+];
 
-const scoreWebsiteEvidenceSegment = (text, index, total) => {
-  let score = 1;
-  const rules = [
-    [/\b(revenue|turnover|profit|funding|valuation|investment|financial|\bUSD\b|\bINR\b)\b/i, 12],
-    [/\b(customer|client|case study|contract|deployment|users served|customers served)\b/i, 11],
-    [/\b(partner|partnership|investor|acquisition|subsidiary|ownership|founder|leadership|board)\b/i, 10],
-    [/\b(product|platform|service|technology|patent|proprietary|solution|business model)\b/i, 9],
-    [/\b(launched|built|delivered|implemented|completed|achieved|generated|served|deployed|certified)\b/i, 8],
-    [/\b(risk|dispute|lawsuit|litigation|complaint|penalty|breach|failure|delay|recall|controversy|inconsistent|contradict)\b/i, 12],
-    [/\b(not|never|no longer|ceased|terminated|declined|loss|debt|default|warning|limitation|unable)\b/i, 8],
-    [/\b\d+(?:[.,]\d+)?\s?(?:%|million|billion|crore|lakh|thousand|k|m|bn)?\b/i, 5],
-    [/\b(202[0-9]|19[89][0-9])\b/, 3],
-    [/\b(according to|reported|announced|disclosed|claimed|published|as of|since|between)\b/i, 3]
-  ];
-  for (const [regex, weight] of rules) if (regex.test(text)) score += weight;
-  if (index === 0 || index === total - 1) score += 1;
-  return score;
+const SECTION_BY_PAGE_CATEGORY = {
+  financial_disclosures: ["02", "05", "06", "07", "08"],
+  customer_validation: ["03", "04", "05", "07", "08"],
+  leadership_and_governance: ["01", "02", "05", "06", "07", "08"],
+  products_and_services: ["01", "02", "03", "04", "08"],
+  business_model_and_pricing: ["02", "04", "05", "07", "08"],
+  partnerships_and_ecosystem: ["03", "05", "06", "07", "08"],
+  technology_and_ip: ["02", "03", "04", "05", "07"],
+  operations_and_delivery: ["03", "04", "06", "07", "08"],
+  risk_security_compliance: ["02", "04", "05", "06", "07", "08"],
+  news_and_execution_history: ["02", "03", "06", "07", "08"],
+  careers_and_hiring: ["01", "03", "04", "06", "07"],
+  market_and_positioning: ["01", "02", "04", "05", "08"],
+  contact_and_support: ["01", "05", "07"],
+  general_company_information: ["01", "02", "03", "04", "08"]
 };
 
-const selectWebsiteEvidencePerSource = (sources, maxChars = MAX_PCF_WEBSITE_CHARS_PER_SOURCE) => {
-  let originalChars = 0;
-  let selectedChars = 0;
-  let sourcesCapped = 0;
-  const output = sources.map(source => {
-    const original = String(source?.content || "");
-    originalChars += original.length;
-    if (original.length <= maxChars) {
-      selectedChars += original.length;
-      return source;
-    }
-
-    sourcesCapped++;
-    const sentences = original.match(/[^.!?\n]+[.!?]?/g) || (original ? [original] : []);
-    const records = sentences
-      .map((raw, index) => ({ text: raw.trim(), index, score: scoreWebsiteEvidenceSegment(raw, index, sentences.length) }))
-      .filter(item => item.text);
-
-    // First reserve the strongest sentence from each available evidence category.
-    const categoryPatterns = [
-      /\b(revenue|turnover|profit|funding|valuation|investment|financial|USD|INR|₹|\$)\b/i,
-      /\b(customer|client|case study|contract|deployment|users served|customers served)\b/i,
-      /\b(partner|partnership|investor|acquisition|subsidiary|ownership|founder|leadership|board)\b/i,
-      /\b(product|platform|service|technology|patent|proprietary|solution|business model)\b/i,
-      /\b(launched|built|delivered|implemented|completed|achieved|generated|served|deployed|certified)\b/i,
-      /\b(risk|dispute|lawsuit|litigation|complaint|penalty|breach|failure|delay|recall|controversy|inconsistent|contradict)\b/i,
-      /\b(not|never|no longer|ceased|terminated|declined|loss|debt|default|warning|limitation|unable)\b/i,
-      /\b(202[0-9]|19[89][0-9])\b/
-    ];
-    const chosen = new Set();
-    let used = 0;
-    const add = item => {
-      if (!item || chosen.has(item.index)) return;
-      const cost = item.text.length + (chosen.size ? 1 : 0);
-      if (cost > maxChars - used) return;
-      chosen.add(item.index);
-      used += cost;
-    };
-
-    add([...records].sort((a, b) => b.score - a.score || a.index - b.index)[0]);
-    for (const pattern of categoryPatterns) {
-      const best = records
-        .filter(item => pattern.test(item.text))
-        .sort((a, b) => b.score - a.score || a.index - b.index)[0];
-      add(best);
-    }
-
-    // Fill remaining space with the strongest remaining complete sentences.
-    const remaining = records.filter(item => !chosen.has(item.index))
-      .sort((a, b) => b.score - a.score || a.index - b.index);
-    for (const item of remaining) add(item);
-
-    let content = records.filter(item => chosen.has(item.index))
-      .sort((a, b) => a.index - b.index)
-      .map(item => item.text)
-      .join(" ");
-
-    // Handle a page consisting of one oversized sentence: retain a bounded excerpt.
-    if (!content && original.trim()) content = original.trim().slice(0, maxChars);
-    if (content.length > maxChars) content = content.slice(0, maxChars).trimEnd();
-    selectedChars += content.length;
-    return { ...source, content };
-  });
-
+const classifyChecklistPage = source => {
+  const content = rawEvidenceText(source);
+  const title = firstText(source?.title, source?.headline);
+  const url = getUrl(source) || "";
+  const searchable = `${source?.pageCategory || ""} ${Array.isArray(source?.pageCategories) ? source.pageCategories.join(" ") : ""} ${title} ${url} ${content.slice(0, 9000)}`;
+  const matchedRules = WEBSITE_PAGE_CATEGORY_RULES.filter(rule => rule.pattern.test(searchable));
+  const detected = matchedRules.map(rule => rule.category);
+  const pageCategory = firstText(source?.pageCategory, detected[0], "general_company_information");
+  const validCategory = SECTION_BY_PAGE_CATEGORY[pageCategory] ? pageCategory : (detected[0] || "general_company_information");
+  const pageCategories = [...new Set([
+    ...(Array.isArray(source?.pageCategories) ? source.pageCategories : []),
+    ...detected,
+    validCategory
+  ])].filter(category => !!SECTION_BY_PAGE_CATEGORY[category]);
   return {
-    sources: output,
-    originalChars,
-    selectedChars,
-    omittedChars: Math.max(0, originalChars - selectedChars),
-    sourcesCapped,
-    capApplied: sourcesCapped > 0
+    pageCategory: validCategory,
+    pageCategories: pageCategories.length ? pageCategories : ["general_company_information"],
+    investigationSections: Array.isArray(source?.investigationSections) && source.investigationSections.length
+      ? source.investigationSections
+      : (SECTION_BY_PAGE_CATEGORY[validCategory] || SECTION_BY_PAGE_CATEGORY.general_company_information)
   };
+};
+
+const scoreChecklistPage = source => {
+  const classified = classifyChecklistPage(source);
+  const content = rawEvidenceText(source);
+  const title = firstText(source?.title, source?.headline);
+  const categoryWeight = WEBSITE_PAGE_CATEGORY_RULES.find(rule => rule.category === classified.pageCategory)?.weight || 20;
+  let score = categoryWeight + sourceScore(source, "website");
+  if (title.length > 8) score += 5;
+  if (content.length >= 2500) score += 20;
+  else if (content.length >= 1000) score += 12;
+  else if (content.length < 350) score -= 12;
+  if (/\b(202[0-9]|19[89][0-9])\b/.test(content)) score += 7;
+  if (/\b(\d+(?:[.,]\d+)?\s?(?:%|million|billion|crore|lakh|thousand|users?|customers?|clients?|employees?|projects?))\b/i.test(content)) score += 12;
+  if (/\b(delivered|deployed|launched|implemented|renewed|retained|audited|certified|filed|acquired|partnered|shipped)\b/i.test(content)) score += 10;
+  return { ...classified, score, contentChars: content.length };
+};
+
+const selectChecklistWebsitePages = (items, limit = MAX_WEBSITE_SOURCES) => {
+  const deduped = new Map();
+  for (const source of Array.isArray(items) ? items : []) {
+    if (!source || typeof source !== "object") continue;
+    const url = getUrl(source);
+    const key = url || `${firstText(source?.title)}:${rawEvidenceText(source).slice(0, 100)}`;
+    const existing = deduped.get(key);
+    if (!existing || rawEvidenceText(source).length > rawEvidenceText(existing).length) deduped.set(key, source);
+  }
+
+  const ranked = [...deduped.values()].map((source, index) => {
+    const assessment = scoreChecklistPage(source);
+    return {
+      source,
+      index,
+      ...assessment,
+      url: getUrl(source),
+      score: assessment.score
+    };
+  }).sort((a, b) => b.score - a.score || b.contentChars - a.contentChars || a.index - b.index);
+
+  const selected = [];
+  const selectedKeys = new Set();
+  const categoryWinners = new Map();
+  for (const item of ranked) {
+    const category = item.pageCategory || "general_company_information";
+    if (!categoryWinners.has(category)) categoryWinners.set(category, item);
+  }
+
+  // Reserve the strongest available page for each discovered investigation category first.
+  const categoryOrder = [...categoryWinners.values()].sort((a, b) => b.score - a.score);
+  for (const item of categoryOrder) {
+    const key = item.url || `${item.source?.title}:${item.index}`;
+    if (selected.length >= limit || selectedKeys.has(key)) continue;
+    selected.push(item);
+    selectedKeys.add(key);
+  }
+  for (const item of ranked) {
+    const key = item.url || `${item.source?.title}:${item.index}`;
+    if (selected.length >= limit || selectedKeys.has(key)) continue;
+    selected.push(item);
+    selectedKeys.add(key);
+  }
+
+  const sources = selected.map(item => ({
+    ...item.source,
+    pageCategory: item.pageCategory,
+    pageCategories: item.pageCategories,
+    investigationSections: item.investigationSections,
+    selectionScore: item.score,
+    selectionReason: `Selected for public investigation checklist coverage: ${item.pageCategory}; relevant sections ${item.investigationSections.join(", ")}.`
+  }));
+  const categoryCounts = sources.reduce((counts, source) => {
+    const category = source.pageCategory || "general_company_information";
+    counts[category] = (counts[category] || 0) + 1;
+    return counts;
+  }, {});
+  return {
+    sources,
+    available: deduped.size,
+    selected: sources.length,
+    omitted: Math.max(0, deduped.size - sources.length),
+    categoryCounts,
+    originalContentChars: sources.reduce((sum, source) => sum + rawEvidenceText(source).length, 0)
+  };
+};
+
+const compressWebsitePageToBudget = (content, maxChars) => {
+  const original = String(content || "");
+  if (!original || original.length <= maxChars) return original;
+  const sentenceAllowance = Math.min(5000, Math.max(100, Math.ceil(Math.max(250, maxChars) / 60)));
+  const selected = meaningfulText(original, Math.max(250, maxChars), sentenceAllowance);
+  if (selected && selected.length <= maxChars) return selected;
+  return original.slice(0, Math.max(250, maxChars)).trimEnd();
+};
+
+// Allocate the combined website-content budget without needlessly cutting
+// short pages. Every selected page first receives a baseline allowance; the
+// remaining budget is distributed by checklist relevance and remaining size.
+const allocateWebsitePageBudgets = (sources = [], totalBudget = MAX_PCF_WEBSITE_CONTENT_CHARS) => {
+  const items = (Array.isArray(sources) ? sources : []).map((source, index) => ({
+    source,
+    index,
+    id: source?.sourceId || getUrl(source) || `website-page-${index}`,
+    length: String(source?.content || "").length,
+    weight: Math.max(1, Number(source?.selectionScore) || 1)
+  })).filter(item => item.length > 0);
+  const originalChars = items.reduce((sum, item) => sum + item.length, 0);
+  const budgets = new Map();
+  if (originalChars <= totalBudget) {
+    for (const item of items) budgets.set(item.id, item.length);
+    return { budgets, originalChars, allocatedChars: originalChars, compressionRequired: false };
+  }
+
+  const baselinePerPage = 2500;
+  let remainingBudget = Math.max(0, totalBudget);
+  const active = [];
+  for (const item of items) {
+    const baseline = Math.min(item.length, baselinePerPage);
+    budgets.set(item.id, baseline);
+    remainingBudget -= baseline;
+    if (item.length > baseline) active.push({ ...item, remaining: item.length - baseline });
+  }
+  remainingBudget = Math.max(0, remainingBudget);
+
+  // Weighted water-filling: pages with stronger checklist relevance receive
+  // more of the remaining characters, while shorter pages can stay complete.
+  let pool = active;
+  while (remainingBudget > 0 && pool.length) {
+    const totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
+    let spent = 0;
+    const nextPool = [];
+    for (const item of pool) {
+      const share = Math.floor(remainingBudget * item.weight / totalWeight);
+      const grant = Math.min(item.remaining, share);
+      if (grant > 0) {
+        budgets.set(item.id, (budgets.get(item.id) || 0) + grant);
+        item.remaining -= grant;
+        spent += grant;
+      }
+      if (item.remaining > 0) nextPool.push(item);
+    }
+    remainingBudget -= spent;
+    if (remainingBudget > 0 && nextPool.length) {
+      // Distribute integer-division remainder one character at a time.
+      nextPool.sort((a, b) => b.weight - a.weight || a.index - b.index);
+      for (const item of nextPool) {
+        if (remainingBudget <= 0) break;
+        if (item.remaining <= 0) continue;
+        budgets.set(item.id, (budgets.get(item.id) || 0) + 1);
+        item.remaining -= 1;
+        remainingBudget -= 1;
+        spent += 1;
+      }
+    }
+    if (spent <= 0) break;
+    pool = nextPool.filter(item => item.remaining > 0);
+  }
+
+  const allocatedChars = [...budgets.values()].reduce((sum, value) => sum + value, 0);
+  return { budgets, originalChars, allocatedChars, compressionRequired: true };
 };
 
 /* ---------------------------------------------------------
@@ -798,11 +919,11 @@ async function loadEvidenceCompressionBrain({
     ? universalPackage.websiteScraperEvidence.topicCollectionStatus
     : {};
 
-  const websiteSourcesInput = selectSources(
+  const websitePageSelection = selectChecklistWebsitePages(
     websiteInput,
-    MAX_WEBSITE_SOURCES,
-    "website"
+    MAX_WEBSITE_SOURCES
   );
+  const websiteSourcesInput = websitePageSelection.sources;
   const websiteScraperSourcesInput = selectSources(
     websiteScraperInput,
     MAX_WEBSITE_SCRAPER_SOURCES,
@@ -911,6 +1032,10 @@ async function loadEvidenceCompressionBrain({
     date: getDate(source),
     content: rawEvidenceText(source),
     pageCategory: source?.pageCategory || source?.category || null,
+    pageCategories: Array.isArray(source?.pageCategories) ? source.pageCategories : [],
+    investigationSections: Array.isArray(source?.investigationSections) ? source.investigationSections : [],
+    selectionScore: Number.isFinite(Number(source?.selectionScore)) ? Number(source.selectionScore) : null,
+    selectionReason: source?.selectionReason || null,
     collectionPurpose: source?.collectionPurpose || null,
     topicKey: source?.topicKey || null,
     topicLabel: source?.topicLabel || null,
@@ -923,17 +1048,23 @@ async function loadEvidenceCompressionBrain({
     structuredData: source?.structuredData ?? source?.jsonLd ?? null
   }));
 
-  const pcfWebsiteSelection = selectWebsiteEvidencePerSource(websiteSources);
-  websiteSources.splice(0, websiteSources.length, ...pcfWebsiteSelection.sources);
-  console.log("ECB_PCF_WEBSITE_CAP_AUDIT", JSON.stringify({
-    rule: "Each PCF website source retains at most 5000 chars using high-value complete-sentence selection",
-    maxCharsPerSource: MAX_PCF_WEBSITE_CHARS_PER_SOURCE,
-    sourcesCapped: pcfWebsiteSelection.sourcesCapped,
-    originalChars: pcfWebsiteSelection.originalChars,
-    selectedChars: pcfWebsiteSelection.selectedChars,
-    omittedChars: pcfWebsiteSelection.omittedChars,
-    capApplied: pcfWebsiteSelection.capApplied,
-    sourceCount: websiteSources.length,
+  const pcfWebsiteSelection = {
+    sources: websiteSources,
+    originalChars: websiteSources.reduce((sum, source) => sum + String(source.content || "").length, 0),
+    selectedChars: websiteSources.reduce((sum, source) => sum + String(source.content || "").length, 0),
+    omittedChars: 0,
+    sourcesCapped: 0,
+    capApplied: false
+  };
+  console.log("ECB_PCF_WEBSITE_CHECKLIST_SELECTION_AUDIT", JSON.stringify({
+    selectionRule: "Select public website pages by investigation-checklist relevance and category coverage before content compression",
+    maxWebsiteSources: MAX_WEBSITE_SOURCES,
+    availableSources: websitePageSelection.available,
+    selectedSources: websitePageSelection.selected,
+    omittedSources: websitePageSelection.omitted,
+    categoryCounts: websitePageSelection.categoryCounts,
+    originalContentChars: pcfWebsiteSelection.originalChars,
+    contentCompressionAtSelectionStage: false,
     sourcesWithContent: websiteSources.filter(source => String(source.content || "").length > 0).length
   }));
 
@@ -1233,10 +1364,41 @@ async function loadEvidenceCompressionBrain({
     !!getDate(source)
   ).length;
 
+  const primaryWebsiteHost = (() => {
+    try {
+      return new URL(universalPackage?.primarySource || "").hostname.replace(/^www\./i, "").toLowerCase();
+    } catch {
+      return "";
+    }
+  })();
+  const sourceDomainOf = source => {
+    try {
+      return new URL(getUrl(source) || "").hostname.replace(/^www\./i, "").toLowerCase();
+    } catch {
+      return "";
+    }
+  };
+  const distinctSourceDomains = new Set(retainedEvidenceUnits.map(sourceDomainOf).filter(Boolean));
+  const distinctNonPrimaryDomains = new Set(
+    [...distinctSourceDomains].filter(domain => primaryWebsiteHost && domain !== primaryWebsiteHost && !domain.endsWith(`.${primaryWebsiteHost}`))
+  );
+  const reviewedWebsiteCategories = new Set(websiteSources.flatMap(source =>
+    Array.isArray(source.pageCategories) && source.pageCategories.length
+      ? source.pageCategories
+      : [source.pageCategory || "general_company_information"]
+  ));
+  const datedEvidenceRatio = retainedEvidenceUnits.length
+    ? datedEvidenceCount / retainedEvidenceUnits.length
+    : 0;
+
+  // This is a coverage diagnostic only, not the final Loop 7 report score.
+  // Same-domain pages add topical coverage, not independent corroboration.
   const observedEvidenceScore = Math.min(100, Math.round(
-    Math.min(50, retainedEvidenceUnits.length * 3) +
-    Math.min(30, behavioralClusters.reduce((sum, item) => sum + Math.min(6, item.sourceCount), 0)) +
-    Math.min(20, datedEvidenceCount * 2)
+    Math.min(25, reviewedWebsiteCategories.size * 2.5) +
+    Math.min(25, distinctNonPrimaryDomains.size * 6) +
+    Math.min(20, datedEvidenceRatio * 20) +
+    Math.min(15, Math.min(5, retainedEvidenceUnits.length) * 3) +
+    Math.min(15, Math.min(5, behavioralClusters.length) * 3)
   ));
 
   const interpretationConfidence = Number(
@@ -1253,11 +1415,20 @@ async function loadEvidenceCompressionBrain({
     observedFactsConfidence: Number((observedEvidenceScore / 100).toFixed(2)),
     behavioralInterpretationConfidence: interpretationConfidence,
     basis: [
-      "source coverage",
-      "cross-source evidence",
-      "dated evidence coverage",
-      "behavioral cluster recurrence"
-    ]
+      "website investigation-category coverage",
+      "distinct non-primary source domains (not automatic proof of independence)",
+      "dated evidence proportion",
+      "retained evidence-stream breadth",
+      "signal-family coverage"
+    ],
+    diagnosticOnly: true,
+    distinctSourceDomains: distinctSourceDomains.size,
+    distinctNonPrimaryDomains: distinctNonPrimaryDomains.size,
+    reviewedWebsiteCategories: [...reviewedWebsiteCategories],
+    datedEvidenceCount,
+    totalRetainedEvidenceUnits: retainedEvidenceUnits.length,
+    datedEvidenceRatio: Number(datedEvidenceRatio.toFixed(3)),
+    independenceMustBeAssessedFromSourceOwnership: true
   };
 
   console.log(
@@ -1299,6 +1470,10 @@ async function loadEvidenceCompressionBrain({
       url: source.url,
       date: source.date || null,
       pageCategory: source.pageCategory || null,
+      pageCategories: Array.isArray(source.pageCategories) ? source.pageCategories : [],
+      investigationSections: Array.isArray(source.investigationSections) ? source.investigationSections : [],
+      selectionScore: source.selectionScore ?? null,
+      selectionReason: source.selectionReason || null,
       collectionPurpose: source.collectionPurpose || null,
       topicKey: source.topicKey || null,
       topicLabel: source.topicLabel || null,
@@ -1423,6 +1598,9 @@ async function loadEvidenceCompressionBrain({
     evidenceCoverage: {
       websiteSourcesRetained: websiteSources.length,
       pcfWebsiteSourcesRetained: websiteSources.length,
+      pcfWebsitePagesAvailable: websitePageSelection.available,
+      pcfWebsitePagesOmitted: websitePageSelection.omitted,
+      pcfWebsitePageCategoryCounts: websitePageSelection.categoryCounts,
       websiteScraperSourcesRetained: websiteScraperSources.length,
       cebWebsiteScraperSourcesRetained: websiteScraperSources.length,
       linkedinProfileRetained: profile ? 1 : 0,
@@ -1482,6 +1660,10 @@ async function loadEvidenceCompressionBrain({
       url: source.url || null,
       date: source.date || null,
       pageCategory: source.pageCategory || null,
+      pageCategories: Array.isArray(source.pageCategories) ? source.pageCategories : [],
+      investigationSections: Array.isArray(source.investigationSections) ? source.investigationSections : [],
+      selectionScore: source.selectionScore ?? null,
+      selectionReason: source.selectionReason || null,
       collectionPurpose: source.collectionPurpose || null,
       topicKey: source.topicKey || null,
       topicLabel: source.topicLabel || null,
@@ -1492,28 +1674,41 @@ async function loadEvidenceCompressionBrain({
       sourceIndependence: source.sourceIndependence || null
     }));
 
-    const website = websiteSources.map(source => ({
-  sourceId: source.sourceId,
-  sourceType: source.sourceType,
-  url: getUrl(source),
-  title: firstText(source.title, source.headline).slice(0, 64) || null,
-  date: getDate(source),
-  // PCF website evidence has already passed the 5K per-source selection.
-  // Preserve the selected content unchanged during package rebuilding.
-  content: String(source.content || ""),
-  evidenceStream: source.evidenceStream || "pcf_website",
-  pageCategory: source.pageCategory || null,
-  collectionPurpose: source.collectionPurpose || null,
-  topicKey: source.topicKey || null,
-  topicLabel: source.topicLabel || null,
-  topicRelevanceScore: source.topicRelevanceScore ?? null,
-  topicEvidenceStatus: source.topicEvidenceStatus || null,
-  topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
-  sourceDomain: source.sourceDomain || null,
-  sourceIndependence: source.sourceIndependence || null,
-  metadata: source.metadata ?? null,
-  structuredData: source.structuredData ?? null
-}));
+    const website = websiteSources.map((source, index) => {
+      const originalContent = String(source.content || "");
+      const pageKey = source.sourceId || getUrl(source) || `website-page-${index}`;
+      const pageBudget = websitePageBudgets.budgets.get(pageKey) ?? originalContent.length;
+      const selectedContent = pageBudget >= originalContent.length
+        ? originalContent
+        : compressWebsitePageToBudget(originalContent, pageBudget);
+      return {
+        sourceId: source.sourceId,
+        sourceType: source.sourceType,
+        url: getUrl(source),
+        title: firstText(source.title, source.headline).slice(0, 220) || null,
+        date: getDate(source),
+        content: selectedContent,
+        originalContentChars: originalContent.length,
+        selectedContentChars: selectedContent.length,
+        contentCompressionApplied: selectedContent.length < originalContent.length,
+        evidenceStream: source.evidenceStream || "pcf_website",
+        pageCategory: source.pageCategory || null,
+        pageCategories: Array.isArray(source.pageCategories) ? source.pageCategories : [],
+        investigationSections: Array.isArray(source.investigationSections) ? source.investigationSections : [],
+        selectionScore: source.selectionScore ?? null,
+        selectionReason: source.selectionReason || null,
+        collectionPurpose: source.collectionPurpose || null,
+        topicKey: source.topicKey || null,
+        topicLabel: source.topicLabel || null,
+        topicRelevanceScore: source.topicRelevanceScore ?? null,
+        topicEvidenceStatus: source.topicEvidenceStatus || null,
+        topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
+        sourceDomain: source.sourceDomain || null,
+        sourceIndependence: source.sourceIndependence || null,
+        metadata: source.metadata ?? null,
+        structuredData: source.structuredData ?? null
+      };
+    });
 
 const websiteScraper = websiteScraperSources.map(source => ({
   sourceId: source.sourceId,
@@ -1733,6 +1928,9 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
       evidenceCoverage: {
         websiteSourcesRetained: website.length,
         pcfWebsiteSourcesRetained: website.length,
+        pcfWebsitePagesAvailable: websitePageSelection.available,
+        pcfWebsitePagesOmitted: websitePageSelection.omitted,
+        pcfWebsitePageCategoryCounts: websitePageSelection.categoryCounts,
         websiteScraperSourcesRetained: websiteScraper.length,
         cebWebsiteScraperSourcesRetained: websiteScraper.length,
         linkedinProfileRetained: linkedinProfile ? 1 : 0,
@@ -1757,14 +1955,13 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
   const preCompressionPackageSize = finalSize;
 
   /*
-   * v27 budget contract:
-   * - PCF website text is limited to 5,000 chars per selected source.
-   * - All non-PCF evidence text streams share an additional 100,000-char cap.
+   * v28 budget contract:
+   * - Keep all selected PCF page text unchanged when the combined website
+   *   content is <= 300,000 characters.
+   * - If that combined website content exceeds the budget, compress selected
+   *   page text proportionally using complete evidence sentences.
+   * - Non-PCF evidence streams share their existing additional 100,000-char cap.
    * - The complete serialized Loop 7 package must remain <= 1,600,000 chars.
-   *
-   * PCF website text is deliberately excluded from the secondary family
-   * compression scale. Rebuilds preserve the already-selected PCF website
-   * content unchanged; only additional evidence streams are reduced.
    */
   const evidenceFamilies = {
     cebWebsiteScraper: websiteScraperSources,
@@ -1792,18 +1989,24 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
   }));
 
   const dynamicTargetChars = MAX_TOTAL_PACKAGE_CHARS;
+  const websitePageBudgets = allocateWebsitePageBudgets(websiteSources, MAX_PCF_WEBSITE_CONTENT_CHARS);
+  const pcfWebsiteOriginalChars = websitePageBudgets.originalChars;
+  const websiteContentScale = pcfWebsiteOriginalChars > 0
+    ? websitePageBudgets.allocatedChars / pcfWebsiteOriginalChars
+    : 1;
   const additionalBudgetScale = totalAdditionalEvidenceTextChars > 0
     ? Math.min(1, MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS / totalAdditionalEvidenceTextChars)
     : 1;
   const needsAdditionalBudgeting = totalAdditionalEvidenceTextChars > MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS;
 
-  if (finalSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting) {
+  if (finalSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting || websiteContentScale < 0.999) {
     let scale = additionalBudgetScale;
     finalPackage = rebuildAtBudget(makeAdditionalFamilyBudgets(scale), Math.max(1, Math.floor(2200 * scale)), 0);
     finalSize = packageSize(finalPackage);
 
     // If package metadata/registries push the serialized package over 1.6M,
-    // reduce only the non-PCF evidence families. PCF website text stays intact.
+    // reduce only the non-PCF evidence families. The selected PCF page budgets
+    // remain fixed so source content is not repeatedly re-compressed.
     for (let attempt = 0; finalSize > MAX_TOTAL_PACKAGE_CHARS && attempt < 8; attempt += 1) {
       scale *= 0.72;
       finalPackage = rebuildAtBudget(makeAdditionalFamilyBudgets(scale), Math.max(1, Math.floor(1500 * scale)), 0);
@@ -1840,6 +2043,9 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
   }
 
   const finalEvidenceUniverse = finalPackage?.evidenceUniverse || {};
+  const finalPcfWebsiteSelectedChars =
+    (Array.isArray(finalEvidenceUniverse.websiteSources) ? finalEvidenceUniverse.websiteSources : [])
+      .reduce((sum, item) => sum + String(item.content || "").length, 0);
   const additionalPlatformContentChars =
     (Array.isArray(finalEvidenceUniverse.websiteScraperSources) ? finalEvidenceUniverse.websiteScraperSources : []).reduce((sum, item) => sum + String(item.content || "").length, 0) +
     (Array.isArray(finalEvidenceUniverse.linkedinPosts) ? finalEvidenceUniverse.linkedinPosts : []).reduce((sum, item) => sum + String(item.content || "").length, 0) +
@@ -1977,7 +2183,7 @@ if (finalSize > ECB_TRANSPORT_LIMIT || additionalPlatformContentChars > MAX_ADDI
       originalChars: originalUniversalSize,
       finalChars: finalSize,
       targetChars: dynamicTargetChars,
-      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting,
+      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting || websitePageBudgets.compressionRequired,
       hardCapExceededAfterCompression: finalSize > MAX_TOTAL_PACKAGE_CHARS,
       maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
       websiteSources: websiteSources.length,
@@ -2004,6 +2210,7 @@ if (finalSize > ECB_TRANSPORT_LIMIT || additionalPlatformContentChars > MAX_ADDI
       evidenceSourcesRetained: sourceRegistry.length,
       meaningfulCompression: finalSize < preCompressionPackageSize,
       hardCapOnlyCompression: true,
+      websitePageCompressionApplied: websitePageBudgets.compressionRequired,
       destructiveCharacterCompaction: false,
       linksModified: false
     })
@@ -2019,17 +2226,21 @@ if (finalSize > ECB_TRANSPORT_LIMIT || additionalPlatformContentChars > MAX_ADDI
       compressedChars: finalSize,
       targetChars: dynamicTargetChars,
       maxAllowedChars: MAX_TOTAL_PACKAGE_CHARS,
-      maxPcfWebsiteContentChars: MAX_PCF_WEBSITE_CHARS_PER_SOURCE,
-      maxPcfWebsiteCharsPerSource: MAX_PCF_WEBSITE_CHARS_PER_SOURCE,
-      pcfWebsiteSourcesCapped: pcfWebsiteSelection.sourcesCapped,
+      maxPcfWebsiteContentChars: MAX_PCF_WEBSITE_CONTENT_CHARS,
+      maxPcfWebsiteCharsPerSource: null,
+      pcfWebsiteSourcesCapped: (Array.isArray(finalEvidenceUniverse.websiteSources) ? finalEvidenceUniverse.websiteSources : []).filter(item => item.contentCompressionApplied).length,
       maxAdditionalPlatformContentChars: MAX_ADDITIONAL_PLATFORM_CONTENT_CHARS,
       additionalPlatformContentChars,
       maxTotalPackageChars: MAX_TOTAL_PACKAGE_CHARS,
-      pcfWebsiteOriginalChars: pcfWebsiteSelection.originalChars,
-      pcfWebsiteSelectedChars: pcfWebsiteSelection.selectedChars,
-      pcfWebsiteOmittedChars: pcfWebsiteSelection.omittedChars,
-      pcfWebsiteCapApplied: pcfWebsiteSelection.capApplied,
-      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting,
+      pcfWebsiteOriginalChars,
+      pcfWebsiteSelectedChars: finalPcfWebsiteSelectedChars,
+      pcfWebsiteOmittedChars: Math.max(0, pcfWebsiteOriginalChars - finalPcfWebsiteSelectedChars),
+      pcfWebsiteCapApplied: finalPcfWebsiteSelectedChars < pcfWebsiteOriginalChars,
+      pcfWebsiteContentBudget: MAX_PCF_WEBSITE_CONTENT_CHARS,
+      pcfWebsiteAllocatedChars: websitePageBudgets.allocatedChars,
+      pcfWebsiteCompressionRequired: websitePageBudgets.compressionRequired,
+      websitePageSelection: websitePageSelection.categoryCounts,
+      compressionTriggered: preCompressionPackageSize > MAX_TOTAL_PACKAGE_CHARS || needsAdditionalBudgeting || websitePageBudgets.compressionRequired,
       hardCapExceededAfterCompression: finalSize > MAX_TOTAL_PACKAGE_CHARS,
       websiteSources: websiteSources.length,
       websiteScraperSources: websiteScraperSources.length,
@@ -2049,6 +2260,7 @@ if (finalSize > ECB_TRANSPORT_LIMIT || additionalPlatformContentChars > MAX_ADDI
       evidenceSourcesRetained: sourceRegistry.length,
       meaningfulCompression: finalSize < preCompressionPackageSize,
       hardCapOnlyCompression: true,
+      websitePageCompressionApplied: websitePageBudgets.compressionRequired,
       destructiveCharacterCompaction: false,
       linksModified: false
     }
