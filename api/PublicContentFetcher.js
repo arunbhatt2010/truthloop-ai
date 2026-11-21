@@ -1,5 +1,5 @@
 /* ============================================================
-   PUBLIC CONTENT FETCHER v5
+   PUBLIC CONTENT FETCHER v6 — INVESTIGATION PAGE COVERAGE + FULL CONTENT HANDOFF
    TruthLoop Universal Public Evidence Pipeline
 
    Responsibility:
@@ -29,10 +29,10 @@ const MAX_POSTS = 10;
 const MAX_ARTICLES = 40;
 const MAX_EVIDENCE = 250;
 
-const MAX_SOURCES = 30;
+const MAX_SOURCES = 50;
 // Allow retries after unavailable pages so one or two fetch failures do not
-// consume the complete 30-page evidence allowance.
-const MAX_FETCH_ATTEMPTS = 45;
+// consume the complete 50-page website evidence allowance.
+const MAX_FETCH_ATTEMPTS = 75;
 const MAX_SITEMAP_URLS = 200;
 const MAX_SITEMAPS = 10;
 const MAX_CONTENT_LINKS = 100;
@@ -675,135 +675,60 @@ async function discoverSitemapUrls(rootUrl = "") {
 
 
 
-const MAX_WEBSITE_POST_CANDIDATES = 120;
-// The root page is retained separately; select up to 29 additional targeted pages.
-const MAX_WEBSITE_POSTS = MAX_SOURCES - 1;
-const WEBSITE_POST_MIN_CHARS = 500;
-const WEBSITE_POST_MAX_CHARS = 50000;
+const MAX_WEBSITE_POST_CANDIDATES = 200;
+// The root page is retained separately; up to 49 additional relevant pages are selected.
 
-function splitMeaningfulSentences(value = "") {
-    const text = cleanText(String(value || ""), MAX_VISIBLE_TEXT);
-    if (!text) return [];
+const WEBSITE_PAGE_CATEGORY_RULES = [
+    { category: "financial_disclosures", weight: 150, pattern: /\b(investor relations?|investors?|annual reports?|financial results?|quarterly results?|financial statements?|revenue|profit and loss|balance sheets?|cash flow|earnings|shareholders?|stock information|funding disclosures?|credit ratings?|prospectus|filings?)\b/i },
+    { category: "customer_validation", weight: 145, pattern: /\b(case studies|customer stories|client stories|our customers|customers|clients|testimonials?|reviews?|success stories|customer success|deployments?|customer results)\b/i },
+    { category: "leadership_and_governance", weight: 135, pattern: /\b(about us|our story|company overview|leadership|founders?|management team|board of directors|board members|executive team|governance|ownership)\b/i },
+    { category: "products_and_services", weight: 125, pattern: /\b(products?|services?|solutions?|platform|features?|use cases?|industries served|how it works|product overview)\b/i },
+    { category: "business_model_and_pricing", weight: 118, pattern: /\b(pricing|plans|subscriptions?|billing|business model|licensing|fees|rates|packages)\b/i },
+    { category: "partnerships_and_ecosystem", weight: 112, pattern: /\b(partners?|partnerships?|alliances?|integrations?|ecosystem|resellers?|distributors?)\b/i },
+    { category: "technology_and_ip", weight: 108, pattern: /\b(technology|engineering|developer|api reference|documentation|architecture|research and development|r\s*&\s*d|patents?|intellectual property|open source|changelog|release notes)\b/i },
+    { category: "operations_and_delivery", weight: 104, pattern: /\b(operations?|delivery|implementation|workflows?|processes?|manufacturing|facilities|supply chain|logistics|service levels?|sla)\b/i },
+    { category: "risk_security_compliance", weight: 102, pattern: /\b(security|trust center|compliance|certifications?|privacy|risk management|business continuity|disaster recovery|incident response|code of conduct|regulatory disclosures?)\b/i },
+    { category: "news_and_execution_history", weight: 96, pattern: /\b(news|press releases?|announcements?|milestones?|launches?|events?|acquisitions?|media coverage|company updates|blog|insights)\b/i },
+    { category: "careers_and_hiring", weight: 84, pattern: /\b(careers?|jobs|hiring|open positions|life at|our people|employee stories|graduate programs)\b/i },
+    { category: "market_and_positioning", weight: 78, pattern: /\b(market|industry insights|competitive|why choose us|differentiators?|analyst reports?|market research)\b/i },
+    { category: "contact_and_support", weight: 35, pattern: /\b(contact us|support|help center|faqs?|locations?|customer service)\b/i }
+];
 
-    const sentences = text
-        .match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g) || [];
-
-    return sentences
-        .map(item => item.trim())
-        .filter(Boolean);
-}
-
-function scoreMeaningfulSentence(sentence = "", index = 0, total = 1) {
-    const text = String(sentence || "").trim();
-    const lower = text.toLowerCase();
-    let score = 0;
-
-    if (/\b(i|we|my|our|me|us)\b/.test(lower)) score += 6;
-    if (/\b(build|built|create|created|launch|launched|ship|shipped|use|uses|used|solve|solves|help|helps|helped|learn|learned|experiment|experiments|experimented|work|works|worked|found|find|founder|customer|customers|client|clients|product|products|users|user|revenue|growth|result|results|decision|decided|change|changed|action|actions|avoid|avoiding|pattern|patterns)\b/.test(lower)) score += 4;
-    if (/\d/.test(text)) score += 3;
-    if (/\b(because|therefore|however|but|instead|why|how|what|when|until|after|before)\b/.test(lower)) score += 2;
-    if (text.length >= 90) score += 1;
-    if (index === 0) score += 1;
-    if (index === total - 1) score += 1;
-
-    return score;
-}
-
-function meaningfulCompressWebsiteText(value = "", minChars = WEBSITE_POST_MIN_CHARS, maxChars = WEBSITE_POST_MAX_CHARS) {
-    const normalized = cleanText(String(value || ""), MAX_VISIBLE_TEXT);
-    if (!normalized) return "";
-    if (normalized.length <= maxChars) return normalized;
-
-    const sentences = splitMeaningfulSentences(normalized);
-    if (!sentences.length) return normalized.slice(0, Math.max(minChars, maxChars));
-
-    const scored = sentences
-        .map((sentence, index) => ({
-            sentence,
-            index,
-            score: scoreMeaningfulSentence(sentence, index, sentences.length)
-        }))
-        .sort((a, b) => b.score - a.score || a.index - b.index);
-
-    const selected = [];
-    let total = 0;
-
-    for (const item of scored) {
-        const extra = selected.length ? 1 : 0;
-        if (total + item.sentence.length + extra > maxChars) continue;
-        selected.push(item);
-        total += item.sentence.length + extra;
-        if (total >= minChars) break;
-    }
-
-    // Guarantee the minimum evidence floor without destructive character slicing.
-    if (total < minChars) {
-        for (const item of sentences.map((sentence, index) => ({ sentence, index }))) {
-            if (selected.some(existing => existing.index === item.index)) continue;
-            if (total + item.sentence.length + 1 > maxChars) continue;
-            selected.push(item);
-            total += item.sentence.length + 1;
-            if (total >= minChars) break;
-        }
-    }
-
-    if (total < minChars) {
-        // The source itself is shorter than the requested floor.
-        return normalized.slice(0, Math.min(normalized.length, maxChars));
-    }
-
-    return selected
-        .sort((a, b) => a.index - b.index)
-        .map(item => item.sentence)
-        .join(" ")
-        .trim();
-}
-
-function compressWebsitePost(source = {}) {
-    const compressed = { ...source };
-
-    // URL, canonical URL, title, dates, identity and socialLinks are intentionally untouched.
-    compressed.visibleText = meaningfulCompressWebsiteText(
-        source?.visibleText || "",
-        WEBSITE_POST_MIN_CHARS,
-        WEBSITE_POST_MAX_CHARS
-    );
-
-    if (Array.isArray(source?.publicEvidence)) {
-        compressed.publicEvidence = source.publicEvidence.map(item => {
-            const next = { ...item };
-            const evidenceType = String(item?.type || "").toLowerCase();
-
-            if (typeof item?.value === "string" &&
-                (evidenceType === "page-content" || evidenceType === "article" || evidenceType === "post")) {
-                next.value = cleanText(item.value, MAX_VISIBLE_TEXT);
-            }
-
-            return next;
-        });
-    }
-
-    if (Array.isArray(source?.articles)) {
-        compressed.articles = source.articles.map(item => ({
-            ...item,
-            description:
-                typeof item?.description === "string"
-                    ? cleanText(item.description, MAX_VISIBLE_TEXT)
-                    : item?.description
-        }));
-    }
-
-    if (Array.isArray(source?.posts)) {
-        compressed.posts = source.posts.map(item => ({
-            ...item,
-            description:
-                typeof item?.description === "string"
-                    ? cleanText(item.description, MAX_VISIBLE_TEXT)
-                    : item?.description
-        }));
-    }
-
-    return compressed;
+function classifyWebsitePage(source = {}) {
+    const url = String(source?.sourceUrl || source?.canonicalUrl || "");
+    const title = String(source?.title || source?.ogTitle || "");
+    const headings = Array.isArray(source?.headings) ? source.headings.join(" ") : "";
+    const description = String(source?.description || "");
+    const visibleText = String(source?.visibleText || "").slice(0, 7000);
+    const searchable = `${url} ${title} ${headings} ${description} ${visibleText}`.toLowerCase();
+    const categories = WEBSITE_PAGE_CATEGORY_RULES
+        .filter(rule => rule.pattern.test(searchable))
+        .map(rule => rule.category);
+    const pageCategory = categories[0] || "general_company_information";
+    const rule = WEBSITE_PAGE_CATEGORY_RULES.find(item => item.category === pageCategory);
+    const investigationSections = {
+        financial_disclosures: ["02", "05", "06", "07", "08"],
+        customer_validation: ["03", "04", "05", "07", "08"],
+        leadership_and_governance: ["01", "02", "05", "06", "07", "08"],
+        products_and_services: ["01", "02", "03", "04", "08"],
+        business_model_and_pricing: ["02", "04", "05", "07", "08"],
+        partnerships_and_ecosystem: ["03", "05", "06", "07", "08"],
+        technology_and_ip: ["02", "03", "04", "05", "07"],
+        operations_and_delivery: ["03", "04", "06", "07", "08"],
+        risk_security_compliance: ["02", "04", "05", "06", "07", "08"],
+        news_and_execution_history: ["02", "03", "06", "07", "08"],
+        careers_and_hiring: ["01", "03", "04", "06", "07"],
+        market_and_positioning: ["01", "02", "04", "05", "08"],
+        contact_and_support: ["01", "05", "07"],
+        general_company_information: ["01", "02", "03", "04", "08"]
+    };
+    return {
+        pageCategory,
+        pageCategories: categories.length ? [...new Set(categories)] : [pageCategory],
+        investigationSections: investigationSections[pageCategory] || investigationSections.general_company_information,
+        collectionPurpose: "public_company_due_diligence",
+        categoryPriority: rule?.weight || 20
+    };
 }
 
 function isWebsitePostSource(source = {}, rootUrl = "") {
@@ -835,24 +760,24 @@ function isWebsitePostSource(source = {}, rootUrl = "") {
 
 function scoreWebsitePostSource(source = {}, rootUrl = "") {
     const url = source?.sourceUrl || source?.canonicalUrl || "";
-    const visibleLength = Number(source?.visibleText?.length || 0);
-    const articleCount = Array.isArray(source?.articles) ? source.articles.length : 0;
-    const postCount = Array.isArray(source?.posts) ? source.posts.length : 0;
-    const evidenceCount = Array.isArray(source?.publicEvidence) ? source.publicEvidence.length : 0;
-    const headings = Array.isArray(source?.headings) ? source.headings.length : 0;
+    const visibleText = String(source?.visibleText || "");
+    const evidenceText = `${source?.title || ""} ${source?.description || ""} ${visibleText}`;
+    const classification = classifyWebsitePage(source);
+    let score = classification.categoryPriority;
 
-    let score = 0;
-    if (looksLikeContentUrl(url)) score += 300;
-    if (String(source?.ogType || "").toLowerCase() === "article") score += 160;
-    if (articleCount > 0) score += Math.min(articleCount, 10) * 12;
-    if (postCount > 0) score += Math.min(postCount, 10) * 10;
-    score += Math.min(evidenceCount, 40) * 3;
-    score += Math.min(headings, 20) * 2;
-    if (visibleLength >= 2500) score += 100;
-    else if (visibleLength >= 1200) score += 70;
-    else if (visibleLength >= 700) score += 45;
-    else if (visibleLength >= 500) score += 30;
-    score += scoreUrl(url, rootUrl) * 0.05;
+    if (isSameHost(url, rootUrl)) score += 20;
+    if (looksLikeContentUrl(url)) score += 8; // Useful discovery hint, not a blanket blog preference.
+    if (visibleText.length >= 2500) score += 35;
+    else if (visibleText.length >= 1200) score += 25;
+    else if (visibleText.length >= 700) score += 15;
+    else if (visibleText.length >= 500) score += 8;
+
+    if (/\b(202[0-9]|19[89][0-9])\b/.test(evidenceText)) score += 8;
+    if (/\b(\d+(?:[.,]\d+)?\s?(?:%|million|billion|crore|lakh|thousand|users?|customers?|clients?|employees?|projects?))\b/i.test(evidenceText)) score += 12;
+    if (/\b(delivered|deployed|launched|implemented|renewed|retained|audited|certified|filed|acquired|partnered|shipped)\b/i.test(evidenceText)) score += 10;
+    if (Array.isArray(source?.headings)) score += Math.min(8, source.headings.length);
+    if (isLegalUrl(url)) score -= 500;
+
     return score;
 }
 
@@ -860,61 +785,63 @@ function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
     const deduped = dedupeSources(sources);
     const rootNormalized = normalizeUrl(rootUrl);
 
-    const rootSource = deduped.find(source => {
+    const classifySource = source => ({
+        ...source,
+        ...classifyWebsitePage(source),
+        investigationRelevanceScore: scoreWebsitePostSource(source, rootUrl)
+    });
+
+    const rootSourceRaw = deduped.find(source => {
         const sourceUrl = normalizeUrl(source?.sourceUrl || source?.canonicalUrl || "");
         const status = Number(source?.status || 0);
         return sourceUrl && rootNormalized && sourceUrl === rootNormalized && status >= 200 && status < 300;
     }) || null;
+    const rootSource = rootSourceRaw ? classifySource(rootSourceRaw) : null;
 
-    // Only website content candidates are filtered here. Social-platform links
-    // and any non-website source objects are not filtered or rewritten.
+    // Every eligible same-host public page may be considered, not only blog/article URLs.
+    // Page categories create investigation coverage; they are discovery metadata, not proof.
     const websitePostCandidates = deduped
         .filter(source =>
             (source?.sourcePlatform || source?.platform || detectPlatform(source?.sourceUrl || "")) === "website"
         )
         .filter(source => isWebsitePostSource(source, rootUrl))
-        .sort((a, b) => scoreWebsitePostSource(b, rootUrl) - scoreWebsitePostSource(a, rootUrl))
-        .slice(0, MAX_WEBSITE_POST_CANDIDATES);
+        .map(source => ({
+            source: classifySource(source),
+            index: 0,
+            score: scoreWebsitePostSource(source, rootUrl)
+        }))
+        .sort((a, b) => b.score - a.score);
 
-    const compressedCandidates = websitePostCandidates.map((source, index) => {
-        const compressed = compressWebsitePost(source);
-        const evidenceText = `${compressed?.visibleText || ""} ${
-            Array.isArray(compressed?.publicEvidence)
-                ? compressed.publicEvidence
-                    .filter(item => {
-                        const type = String(item?.type || "").toLowerCase();
-                        return type === "page-content" || type === "article" || type === "post";
-                    })
-                    .map(item => typeof item?.value === "string" ? item.value : "")
-                    .join(" ")
-                : ""
-        }`;
+    const limit = Math.max(0, MAX_SOURCES - (rootSource ? 1 : 0));
+    const selected = [];
+    const selectedUrls = new Set();
+    const categoryWinners = new Map();
 
-        const meaningfulScore =
-            splitMeaningfulSentences(evidenceText)
-                .reduce((sum, sentence, sentenceIndex, all) =>
-                    sum + scoreMeaningfulSentence(sentence, sentenceIndex, all.length),
-                0);
+    for (const candidate of websitePostCandidates) {
+        const category = candidate.source.pageCategory || "general_company_information";
+        const current = categoryWinners.get(category);
+        if (!current || candidate.score > current.score) categoryWinners.set(category, candidate);
+    }
 
-        return {
-            source: compressed,
-            index,
-            meaningfulScore
-        };
-    });
+    const categoryOrder = [...categoryWinners.values()].sort((a, b) => b.score - a.score);
+    for (const candidate of categoryOrder) {
+        const url = normalizeUrl(candidate.source?.sourceUrl || candidate.source?.canonicalUrl || "");
+        if (!url || selectedUrls.has(url) || selected.length >= limit) continue;
+        selected.push(candidate.source);
+        selectedUrls.add(url);
+    }
 
-    const selectedPosts = compressedCandidates
-        .sort((a, b) => b.meaningfulScore - a.meaningfulScore || a.index - b.index)
-        .slice(0, Math.max(0, MAX_SOURCES - (rootSource ? 1 : 0)))
-        .map(item => item.source);
+    for (const candidate of websitePostCandidates) {
+        const url = normalizeUrl(candidate.source?.sourceUrl || candidate.source?.canonicalUrl || "");
+        if (!url || selectedUrls.has(url) || selected.length >= limit) continue;
+        selected.push(candidate.source);
+        selectedUrls.add(url);
+    }
 
-    // Keep the original root source intact so its social/platform links remain exactly where PCF found them.
-    const selected = [
+    // The root page is retained separately; category-aware ranking chooses the other pages.
+    const selectedWebsiteSources = [
         ...(rootSource ? [rootSource] : []),
-        ...selectedPosts.filter(source => {
-            const url = normalizeUrl(source?.sourceUrl || source?.canonicalUrl || "");
-            return !rootNormalized || url !== rootNormalized;
-        })
+        ...selected
     ];
 
     // Preserve explicit non-website source objects exactly as received.
@@ -923,18 +850,24 @@ function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
         return platform !== "website";
     });
 
-    selected.push(...nonWebsiteSources);
-
-    const finalSelected = dedupeSources(selected);
+    const finalSelected = dedupeSources([...selectedWebsiteSources, ...nonWebsiteSources]);
+    const categoryCounts = finalSelected
+        .filter(source => (source?.sourcePlatform || source?.platform || detectPlatform(source?.sourceUrl || "")) === "website")
+        .reduce((counts, source) => {
+            const category = source.pageCategory || "general_company_information";
+            counts[category] = (counts[category] || 0) + 1;
+            return counts;
+        }, {});
 
     return {
         sources: finalSelected,
         originalSourceCount: deduped.length,
         websitePostCandidateCount: websitePostCandidates.length,
-        websitePostSelectedCount: selectedPosts.length,
+        websitePostSelectedCount: selected.length,
         filteredSourceCount: finalSelected.length,
         filteredOutSourceCount: Math.max(0, deduped.length - finalSelected.length),
         filteredSourceUrls: finalSelected.map(source => source?.sourceUrl).filter(Boolean),
+        websitePageCategoryCounts: categoryCounts,
         discoveredSocialLinks: unique(
             deduped.flatMap(source => Array.isArray(source?.socialLinks) ? source.socialLinks : []),
             MAX_SOCIAL_LINKS,
@@ -1330,6 +1263,7 @@ export async function acquirePublicContent({
             websitePostCandidateCount: filteredEvidence.websitePostCandidateCount,
             websitePostSelectedCount: filteredEvidence.websitePostSelectedCount,
             targetWebsitePageCount: MAX_SOURCES,
+            websitePageCategoryCounts: filteredEvidence.websitePageCategoryCounts,
             maxFetchAttempts: MAX_FETCH_ATTEMPTS,
             filteredSourceCount: filteredEvidence.filteredSourceCount,
             filteredOutSourceCount: filteredEvidence.filteredOutSourceCount,
@@ -1346,6 +1280,7 @@ export async function acquirePublicContent({
         websitePostCandidateCount: filteredEvidence.websitePostCandidateCount,
         websitePostSelectedCount: filteredEvidence.websitePostSelectedCount,
         targetWebsitePageCount: MAX_SOURCES,
+        websitePageCategoryCounts: filteredEvidence.websitePageCategoryCounts,
         maxFetchAttempts: MAX_FETCH_ATTEMPTS,
         filteredOutSourceCount: filteredEvidence.filteredOutSourceCount,
         discoveredSitemaps: [...discoveredSitemaps].slice(0, MAX_SITEMAPS),
@@ -1646,144 +1581,21 @@ console.log(
 };
 }
 
-function buildContentCompressionPackage(
-    sources = [],
-    maxSources = 20
-) {
-
- /*   console.log(
-        "CONTENT_COMPRESSION_START",
-        sources.length
-    ); */
-
-    const scoredSources = sources
-        .filter(Boolean)
-        .map(source => {
-
-            const url =
-                source?.sourceUrl ||
-                source?.url ||
-                "";
-
-            let score = 0;
-
-            if (source?.isOriginalInput) score += 100;
-
-            if (/linkedin\.com/i.test(url))
-                score += 90;
-
-            if (/github\.com/i.test(url))
-                score += 80;
-
-            if (/medium\.com/i.test(url))
-                score += 70;
-
-            if (/substack\.com/i.test(url))
-                score += 70;
-
-            if (/youtube\.com/i.test(url))
-                score += 60;
-
-            if (
-                source?.visibleText &&
-                source.visibleText.length > 1000
-            ) {
-                score += 30;
-            }
-
-            if (
-                source?.publicEvidence?.length
-            ) {
-                score +=
-                    source.publicEvidence.length;
-            }
-
-            return {
-                source,
-                score
-            };
-        });
-
-    const filteredSources =
-        scoredSources
-            .sort((a, b) => b.score - a.score)
-            .slice(0, maxSources)
-            .map(item => item.source);
-
-    let compressedContent = "";
-
-    for (const source of filteredSources) {
-
-        const title =
-            source?.title || "";
-
-        const content =
-            source?.visibleText || "";
-
-        compressedContent += `
-
-SOURCE:
-${title}
-
-${content}
-
-`;
-    }
-
-    compressedContent =
-       compressedContent.substring(
-            0,
-           50000
-        );
-
-    const packageData = {
-
-        sourceCount:
-            filteredSources.length,
-
-        originalSourceCount:
-            sources.length,
-
-        compressedCharacters:
-            compressedContent.length,
-
-        filteredSources:
-            filteredSources.map(source => ({
-
-                url:
-                    source?.sourceUrl ||
-                    source?.url ||
-                    null,
-
-                title:
-                    source?.title || null,
-
-                platform:
-                    source?.sourcePlatform ||
-                    source?.platform ||
-                    "unknown"
-
-            })),
-
-        compressedContent
+function buildContentInventoryPackage(sources = []) {
+    const list = Array.isArray(sources) ? sources : [];
+    return {
+        sourceCount: list.length,
+        originalSourceCount: list.length,
+        contentCharacters: list.reduce((sum, source) => sum + String(source?.visibleText || "").length, 0),
+        pages: list.map(source => ({
+            url: source?.sourceUrl || source?.canonicalUrl || null,
+            title: source?.title || null,
+            pageCategory: source?.pageCategory || null,
+            pageCategories: Array.isArray(source?.pageCategories) ? source.pageCategories : [],
+            contentCharacters: String(source?.visibleText || "").length
+        }))
     };
-
- /*   console.log(
-        "CONTENT_COMPRESSION_COMPLETE",
-        {
-            originalSources:
-                sources.length,
-
-            filteredSources:
-                filteredSources.length,
-
-            compressedCharacters:
-                compressedContent.length
-        }
-    );
-*/
-    return packageData;
-       }
+}
 
 export function buildPublicContentPackage(
     rawPackage = {},
@@ -1793,23 +1605,13 @@ export function buildPublicContentPackage(
     const sources = Array.isArray(rawPackage?.sources)
         ? rawPackage.sources
         : [];
-const contentCompressionPackage =
-    buildContentCompressionPackage(
-        sources
-    );
+const contentInventoryPackage = buildContentInventoryPackage(sources);
     const source = sources[0] || {};
-/*console.log(
-    "CONTENT_COMPRESSION_PACKAGE",
-    JSON.stringify({
-        compressedSources:
-            contentCompressionPackage?.sources?.length || 0,
-        compressedCharacters:
-            contentCompressionPackage?.compressedContent?.length || 0
-    }, null, 2)
-);*/
+
     return {
         success: true,
-       contentCompressionPackage,
+       contentCompressionPackage: null,
+       contentInventoryPackage,
         sourceUrl: source.sourceUrl || null,
         canonicalUrl: extractedPackage?.canonicalUrl || source.canonicalUrl || null,
         platform: source.platform || source.sourcePlatform || "unknown",
