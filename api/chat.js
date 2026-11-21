@@ -1078,6 +1078,17 @@ RETURN EXACTLY THESE 8 HEADINGS, EACH ON ITS OWN LINE, IN THIS ORDER:
 07. Reliability, Accountability & Risk Signals
 08. Overall Pattern & Future Readiness
 
+BEST FINDINGS EXPERIENCE — ANALYTICAL QUALITY STANDARD
+- Do not write a generic company summary or merely paraphrase page descriptions. Surface the strongest, most useful findings that the collected evidence actually supports.
+- Each existing section may contain multiple distinct findings. Eight report sections do NOT mean eight findings. Include every material finding that changes an investor's or investigator's understanding, but do not force a fixed finding count or pad the report with weak observations.
+- For each material finding, make the reasoning easy to follow: (1) the precise observation or pattern; (2) the direct SOURCE_XX evidence; (3) whether another genuinely independent record corroborates, qualifies or contradicts it; (4) why the observation matters; and (5) the confidence, unresolved uncertainty or scope limitation.
+- Keep finding statements specific: identify the company/person, action/claim/output, relevant time period, scale or measure when evidenced, and what can or cannot be concluded. Avoid vague labels such as “strong execution”, “good traction”, “weak governance” or “high risk” unless the cited evidence explains exactly why.
+- Separate fact from interpretation. State the observable fact first, then a proportionate interpretation. A source's own claim is evidence that the claim was made, not automatic proof that the claimed result occurred.
+- Distinguish source count from source independence. Ten pages on one official domain may expand subject coverage but do not constitute ten independent confirmations. Multiple copies or syndicated versions of one record are not independent corroboration.
+- Where evidence is mixed, show the positive and adverse sides fairly. Explain whether the difference is a confirmed contradiction, a potential inconsistency, a time-based change, or simply an evidence gap.
+- Do not repeat the same point across sections unless the new section adds a materially different implication. When a section has no material finding, state the bounded evidence limitation rather than inventing a finding.
+- Use compact finding labels such as POSITIVE FINDING, ALIGNED EVIDENCE, CONFIRMED CONTRADICTION, POTENTIAL INCONSISTENCY, or INSUFFICIENT EVIDENCE only when the evidence warrants them. These are labels within the eight sections, not new report sections.
+
 SECTION-SPECIFIC INVESTIGATION REQUIREMENTS
 01. Identity & Self-Representation
 Examine how the subject represents itself publicly: identity, background, roles, stated credentials, capabilities, affiliations, cross-platform identity consistency, and differences between claims and available evidence. Use official-website evidence as the primary basis. Use supporting records only to verify or qualify specific claims, and distinguish self-description from independently established facts.
@@ -1101,7 +1112,26 @@ Examine dated historical and recent official-website statements, commitments, de
 Examine documented disputes, failures, complaints, corrections, responses to problems, accountability, repeated unresolved issues and material contradictions. Start with relevant official-website disclosures and responses; use supporting records to verify or challenge them. Do not turn absence of complaints into proof of reliability, or allegations into established facts. Attribute contested claims, distinguish confirmed contradictions from potential inconsistencies, and explain their status.
 
 08. Overall Pattern & Future Readiness
-Synthesize only the findings already established in Sections 1–7. Explain where official-website representation is aligned with, corroborated by or challenged by supporting records. Give fair recognition to verified positive findings and clearly identify substantiated contradictions, unresolved questions and evidence gaps. State demonstrated strengths, limitations and observable indicators to watch. Do not collect new sources or introduce new facts. You may repeat the already established SOURCE_XX citations when needed to keep each summarized finding traceable; do not introduce new source IDs. At the end of this section, include a separate exact line: "Confidence Score: NN/100". Calibrate the 0–100 score to the strength, relevance, recency, independence and corroboration of the available NEW Loop 7 public evidence; do not score the person's character, and do not inflate the score to fill gaps. Briefly explain the main reason for the score in the surrounding prose.
+Synthesize only the findings already established in Sections 1–7. Explain where official-website representation is aligned with, corroborated by or challenged by supporting records. Give fair recognition to verified positive findings and clearly identify substantiated contradictions, unresolved questions and evidence gaps. State demonstrated strengths, limitations and observable indicators to watch. Do not collect new sources or introduce new facts. You may repeat the already established SOURCE_XX citations when needed to keep each summarized finding traceable; do not introduce new source IDs.
+
+CONFIDENCE SCORE — EVIDENCE STRENGTH, NOT A VERDICT
+The score is a 0–100 assessment of how strongly and reliably the collected public evidence supports the report's factual findings and bounded interpretations. It is NOT a score of the founder's trustworthiness, the company's quality, investment attractiveness, probability of success, fraud risk, or future performance. It is also not a percentage probability that the report is correct.
+
+Build the score transparently from these six weighted dimensions. Assign a score within each dimension's maximum based only on the actual retained evidence, then add the six values. Show the earned points and maximum for each dimension, with a short evidence-specific reason:
+- Source provenance and traceability — 15 points: identifiable source, working/canonical URL, clear origin and attribution.
+- Relevance and specificity — 20 points: directness, detail, measurability and closeness of evidence to the actual finding.
+- Independent corroboration — 25 points: genuinely independent records confirming or qualifying important claims; same-domain pages and self-published claims do not earn independent-corroboration credit.
+- Recency and temporal depth — 15 points: useful dates, relevant currentness and a meaningful timeline rather than isolated/undated snapshots.
+- Investigation coverage — 15 points: how well the collected evidence covers the relevant public-evidence areas for this subject and investigation; do not penalize simply because private information is not public, but explain what that limits.
+- Interpretive reliability — 10 points: careful treatment of contradictions, source scope, gaps, attribution and limits; no unsupported leaps.
+
+The six earned values MUST sum exactly to the final score out of 100. Do not copy ECB's evidenceConfidence diagnostic as the final report score; use it only as contextual data and verify against the actual sources. Do not award points merely for a high page/source count. A confirmed, well-evidenced contradiction can increase confidence that a conflict exists while reducing confidence in the underlying disputed claim; explain this distinction rather than automatically penalizing or rewarding it.
+
+Explain the score's placement, not just its arithmetic: state why the evidence supports this score rather than a score 10 points lower, and what specific missing corroboration, coverage, recency or clarity prevents a score 10 points higher. For example, at 80 explain why the evidence is stronger than 70 but not yet strong enough for 90; at 60 explain why it is stronger than 50 but not enough for 70. Tailor both comparisons to this case; do not use generic boilerplate. If the score is near 0 or 100, explain the nearest meaningful boundary without inventing a gap.
+
+Also distinguish confidence in directly observed facts from confidence in interpretation and from completeness of public evidence. A report can contain a high-confidence fact alongside a low-confidence interpretation. Missing private financial, customer or operational records are limitations on what public evidence can establish; they are not proof of misconduct or non-existence.
+
+At the end of this section, include a compact "Confidence Breakdown" with all six dimensions as earned points / maximum, one concise reason per dimension, the total, and the case-specific +10 / -10 comparison. Then include a separate exact final line: "Confidence Score: NN/100".
 
 SEVEN ADDITIONAL FINDINGS — INCLUDE ONLY WHEN SUPPORTED BY COLLECTED EVIDENCE
 These are additional investigation findings to be incorporated within the existing eight report sections. They are NOT new report sections. Do not rename, reorder, remove, split, or add to the eight required headings above.
@@ -1148,10 +1178,14 @@ SOURCE TRACEABILITY — EVERY FINDING MUST BE CHECKABLE
 - Never write a bare or guessed SOURCE_XX. Never cite a source that is not in the current sourceRegistry. Never fabricate a link or claim that a source was checked when it was not.
 
 CONFIDENCE & LIMITATIONS
-- Distinguish confidence in an observed fact from confidence in an interpretation.
-- Use evidenceConfidence data when present, but do not let a numeric score substitute for explaining evidence quality.
-- Assess source relevance, specificity, recency, independence and corroboration limits. Distinguish confidence in official-website statements from confidence in independently corroborated facts and from confidence in interpretations.
-- Positive findings and negative findings must meet the same evidence and traceability standard. A credible positive record must not be hidden; an adverse claim must not be overstated.
+- The final report-level Confidence Score is a calibrated assessment of the strength and reliability of the collected evidence, not a rating of the subject and not a probability of success or truth.
+- Use the six weighted dimensions and exact maxima specified in Section 08. Score only what the retained source content supports, show each earned value, and ensure the values add exactly to 100-point total.
+- Explicitly distinguish why the chosen score is 10 points stronger than the lower comparison and what prevents it from being 10 points higher. The comparison must refer to specific sources, corroboration, dates, coverage or limitations in this case.
+- Treat evidenceConfidence as an ECB diagnostic only. It may help identify source breadth or coverage but must not be copied as the final score or used as a substitute for reading the actual sources.
+- Distinguish confidence in a directly observed fact, confidence in an interpretation and completeness of public evidence. A reliable source can establish that a company made a claim without independently proving the claim's outcome.
+- Assess source relevance, specificity, recency, independence and corroboration limits. Multiple pages on one official domain are not independent corroboration. Assess independence from source ownership/provenance, not the count of URLs.
+- A confirmed contradiction may establish high confidence that two incompatible statements exist; it does not automatically establish which statement is true. Explain what is and is not resolved.
+- Positive findings and adverse findings must meet the same evidence and traceability standard. A credible positive record must not be hidden; an adverse claim must not be overstated.
 - Do not claim certainty about an unseen cause. Missing public information does not prove that an activity, capability, relationship or problem does not exist. Use NOT FOUND or INSUFFICIENT EVIDENCE with a precise evidence boundary.
 
 FINDING STATUS — USE PRECISE, EVIDENCE-BASED LABELS
