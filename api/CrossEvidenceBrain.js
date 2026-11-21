@@ -1,5 +1,5 @@
 /* ============================================================
-   CROSS EVIDENCE BRAIN v29 — PCF 30-PAGE WEBSITE OWNERSHIP + CEB WEBSITE APIFY DISABLED
+   CROSS EVIDENCE BRAIN v30 — UNCOMPRESSED UNIVERSAL PACKAGE + PCF WEBSITE OWNERSHIP
    TruthLoop AI
 
    RESPONSIBILITY
@@ -196,253 +196,10 @@ function safeText(value = "") {
 }
 
 /* ------------------------------------------------------------
-   UNIVERSAL PACKAGE CONTENT COMPRESSOR
-   ------------------------------------------------------------
-   Runs AFTER evidence collection + signal collection.
-
-   Rules:
-   - meaningful compression only
-   - NEVER modify URLs / links
-   - NEVER modify titles
-   - NEVER modify dates
-   - preserve object / array structure
-   - metadata text is compressed meaningfully
+   UNIVERSAL PACKAGE PASSTHROUGH
+   CEB must preserve source content exactly as collected. Do not add
+   content truncation, sentence extraction, summarization or compression here.
    ------------------------------------------------------------ */
-
-const UNIVERSAL_CONTENT_MAX_CHARS = 900;
-const UNIVERSAL_ITEM_TEXT_MAX_CHARS = 420;
-const UNIVERSAL_ABOUT_MAX_CHARS = 900;
-const UNIVERSAL_METADATA_MAX_CHARS = 360;
-const UNIVERSAL_SIGNAL_TEXT_MAX_CHARS = 320;
-
-function isImmutableEvidenceKey(key = "") {
-    const k = String(key || "").toLowerCase();
-
-    return (
-        k === "url" ||
-        k.endsWith("url") ||
-        k.includes("url") ||
-        k === "link" ||
-        k.endsWith("link") ||
-        k.includes("link") ||
-        k === "links" ||
-        k === "sociallinks" ||
-        k === "socialprofiles" ||
-        k === "sourceurls" ||
-        k === "sourcelinks" ||
-        k === "title" ||
-        k === "date" ||
-        k === "publisheddate" ||
-        k === "publishedat" ||
-        k === "postedat" ||
-        k === "createdat" ||
-        k === "updatedat" ||
-        k === "timestamp" ||
-        k === "id" ||
-        k === "sourceid"
-    );
-}
-
-function splitMeaningfulSentences(value = "") {
-    const text = safeText(value)
-        .replace(/\s+/g, " ")
-        .trim();
-
-    if (!text) return [];
-
-    const sentences =
-        text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
-
-    return sentences
-        .map(item => item.trim())
-        .filter(Boolean);
-}
-
-function scoreMeaningfulSentence(sentence = "", key = "") {
-    const text = String(sentence || "");
-    const lower = text.toLowerCase();
-
-    let score = 0;
-
-    if (text.length >= 45) score += 2;
-    if (/\b(i|we|our|my|company|product|build|built|work|worked|focus|help|serve|customer|client|founder|engineer|developer|ai|software|business|revenue|project|open source|repository|repo)\b/i.test(text)) {
-        score += 3;
-    }
-
-    if (/\b(is|are|was|were|builds|built|creates|created|works|helps|serves|develops|ships|leads|focuses|specializes|supports)\b/i.test(text)) {
-        score += 1;
-    }
-
-    if (/https?:\/\/|www\./i.test(text)) score -= 3;
-    if (/^[\W_]+$/.test(text)) score -= 3;
-
-    if (
-        ["about", "bio", "summary", "description", "content",
-         "text", "body", "articletext", "posttext", "visibletext"].includes(
-            String(key || "").toLowerCase()
-        )
-    ) {
-        score += 1;
-    }
-
-    return score;
-}
-
-function meaningfulCompressText(value = "", maxChars = UNIVERSAL_CONTENT_MAX_CHARS, key = "") {
-    const text = safeText(value);
-    if (!text) return "";
-
-    if (text.length <= maxChars) return text;
-
-    const sentences = splitMeaningfulSentences(text)
-        .map(sentence => ({
-            sentence,
-            score: scoreMeaningfulSentence(sentence, key)
-        }))
-        .sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            return a.sentence.length - b.sentence.length;
-        });
-
-    const selected = [];
-    let used = 0;
-
-    for (const item of sentences) {
-        if (used + item.sentence.length + (selected.length ? 1 : 0) > maxChars) continue;
-        selected.push(item.sentence);
-        used += item.sentence.length + (selected.length ? 1 : 0);
-        if (used >= Math.floor(maxChars * 0.85)) break;
-    }
-
-    if (!selected.length) {
-        return text.slice(0, maxChars).trim();
-    }
-
-    return selected.join(" ").trim();
-}
-
-function compressUniversalContent(value, maxChars = UNIVERSAL_CONTENT_MAX_CHARS, key = "") {
-    if (typeof value === "string") {
-        if (isImmutableEvidenceKey(key)) return value;
-
-        const lowerKey = String(key || "").toLowerCase();
-
-        if (
-            lowerKey === "about" ||
-            lowerKey === "bio" ||
-            lowerKey === "summary"
-        ) {
-            return meaningfulCompressText(
-                value,
-                UNIVERSAL_ABOUT_MAX_CHARS,
-                key
-            );
-        }
-
-        if (
-            lowerKey === "text" ||
-            lowerKey === "content" ||
-            lowerKey === "description" ||
-            lowerKey === "snippet" ||
-            lowerKey === "visibletext" ||
-            lowerKey === "body" ||
-            lowerKey === "articletext" ||
-            lowerKey === "posttext"
-        ) {
-            return meaningfulCompressText(
-                value,
-                UNIVERSAL_ITEM_TEXT_MAX_CHARS,
-                key
-            );
-        }
-
-        return meaningfulCompressText(
-            value,
-            maxChars,
-            key
-        );
-    }
-
-    if (Array.isArray(value)) {
-        return value.map(item =>
-            compressUniversalContent(
-                item,
-                maxChars,
-                key
-            )
-        );
-    }
-
-    if (value && typeof value === "object") {
-        const result = {};
-
-        for (const [childKey, childValue] of Object.entries(value)) {
-            let childMax = maxChars;
-
-            const lowerKey = childKey.toLowerCase();
-
-            if (
-                lowerKey === "about" ||
-                lowerKey === "summary" ||
-                lowerKey === "bio"
-            ) {
-                childMax = UNIVERSAL_ABOUT_MAX_CHARS;
-            } else if (
-                lowerKey === "text" ||
-                lowerKey === "content" ||
-                lowerKey === "description" ||
-                lowerKey === "snippet" ||
-                lowerKey === "visibletext" ||
-                lowerKey === "body" ||
-                lowerKey === "articletext" ||
-                lowerKey === "posttext"
-            ) {
-                childMax = UNIVERSAL_ITEM_TEXT_MAX_CHARS;
-            } else if (
-                lowerKey === "company" ||
-                lowerKey === "location" ||
-                lowerKey === "country" ||
-                lowerKey === "headline" ||
-                lowerKey === "repository" ||
-                lowerKey === "repoDescription"
-            ) {
-                childMax = UNIVERSAL_METADATA_MAX_CHARS;
-            } else if (
-                lowerKey === "signal" ||
-                lowerKey === "basis" ||
-                lowerKey === "reason" ||
-                lowerKey === "rationale"
-            ) {
-                childMax = UNIVERSAL_SIGNAL_TEXT_MAX_CHARS;
-            }
-
-            result[childKey] =
-                compressUniversalContent(
-                    childValue,
-                    childMax,
-                    childKey
-                );
-        }
-
-        return result;
-    }
-
-    return value;
-}
-
-function compressUniversalSource(source = {}) {
-    return compressUniversalContent(
-        source,
-        UNIVERSAL_CONTENT_MAX_CHARS
-    );
-}
-
-function compressUniversalSignals(signals = {}) {
-    return compressUniversalContent(
-        signals,
-        UNIVERSAL_SIGNAL_TEXT_MAX_CHARS
-    );
-}
 
 function selectLatestLinkedInItem(items = [], type = "post") {
     const list = Array.isArray(items) ? items.filter(Boolean) : [];
@@ -3395,105 +3152,65 @@ function buildUniversalPackage({
     /*
      * PCF WEBSITE EVIDENCE PASSTHROUGH
      * --------------------------------
-     * PCF owns discovery, fetching and page extraction. CEB must not
-     * truncate or compress those 30 page records. ECB is the sole
-     * downstream content-compression stage.
+     * PCF owns website discovery, fetching and extraction. CEB preserves
+     * every retained page record and all of its extracted text unchanged.
+     * ECB is the only downstream stage allowed to select/compress page content.
      */
-    const compressedWebsiteSources =
-        websiteSources.map(source => ({ ...source }));
+    const universalWebsiteSources = Array.isArray(websiteSources)
+        ? websiteSources.slice()
+        : [];
 
-    const linkedInProfile =
-        linkedinSource?.linkedinProfile ||
-        null;
+    const linkedInProfile = linkedinSource?.linkedinProfile || null;
+    const linkedinPosts = selectLatestLinkedInItems(
+        linkedinSource?.posts || [],
+        "post",
+        9
+    );
+    const linkedinArticles = selectLatestLinkedInItems(
+        linkedinSource?.articles || [],
+        "article",
+        1
+    );
 
-    const latestLinkedInPosts =
-        selectLatestLinkedInItems(
-            linkedinSource?.posts || [],
-            "post",
-            9
-        );
+    // Preserve original record objects and text; the existing collector item
+    // boundaries (9 latest posts and 1 article) remain unchanged.
+    const universalLinkedinSource = linkedinSource
+        ? {
+            ...linkedinSource,
+            linkedinProfile: linkedInProfile,
+            posts: linkedinPosts,
+            articles: linkedinArticles
+        }
+        : null;
 
-    const latestLinkedInArticles =
-        selectLatestLinkedInItems(
-            linkedinSource?.articles || [],
-            "article",
-            1
-        );
-
-    const linkedinPosts =
-        latestLinkedInPosts;
-
-    const linkedinArticles =
-        latestLinkedInArticles;
-
-    const compressedLinkedinProfile =
-        linkedinSource?.linkedinProfile &&
-        typeof linkedinSource.linkedinProfile === "object"
-            ? {
-                ...linkedinSource.linkedinProfile,
-                about:
-                    meaningfulCompressText(
-                        linkedinSource.linkedinProfile.about || "",
-                        UNIVERSAL_ABOUT_MAX_CHARS,
-                        "about"
-                    )
-            }
-            : null;
-
-    const compressedLinkedinSource =
-        linkedinSource
-            ? {
-                ...compressUniversalSource({
-                    ...linkedinSource,
-                    posts: undefined,
-                    articles: undefined,
-                    apifyData: undefined
-                }),
-                linkedinProfile:
-                    compressedLinkedinProfile,
-                posts:
-                    linkedinPosts.map(item =>
-                        compressUniversalContent(
-                            {
-                                ...item,
-                                title: item?.title,
-                                date: item?.date
-                            }
-                        )
-                    ),
-                articles:
-                    linkedinArticles.map(item =>
-                        compressUniversalContent(
-                            {
-                                ...item,
-                                title: item?.title,
-                                date: item?.date
-                            }
-                        )
-                    )
-            }
-            : null;
-
-    const compressedGithubEvidence =
-        githubEvidence
-            ? compressUniversalSource(githubEvidence)
-            : null;
-
-    const compressSocialEvidence = (source, platform) => source ? ({
-        ...compressUniversalSource({ ...source, posts: undefined, recentPosts: undefined, apifyData: undefined }),
-        sourcePlatform: platform,
-        profile: source.profile || null,
-        posts: (Array.isArray(source.posts) ? source.posts : Array.isArray(source.recentPosts) ? source.recentPosts : []).slice(0, 3).map(item => compressUniversalContent({ ...item, title: item?.title || item?.text, date: item?.date || item?.createdAt }))
-    }) : null;
-    const compressedXEvidence = compressSocialEvidence(xEvidence, "x");
-    const compressedRedditEvidence = compressSocialEvidence(redditEvidence, "reddit");
+    const universalGithubEvidence = githubEvidence || null;
+    const universalXEvidence = xEvidence
+        ? {
+            ...xEvidence,
+            posts: (Array.isArray(xEvidence.posts)
+                ? xEvidence.posts
+                : Array.isArray(xEvidence.recentPosts)
+                    ? xEvidence.recentPosts
+                    : []).slice(0, 3)
+        }
+        : null;
+    const universalRedditEvidence = redditEvidence
+        ? {
+            ...redditEvidence,
+            posts: (Array.isArray(redditEvidence.posts)
+                ? redditEvidence.posts
+                : Array.isArray(redditEvidence.recentPosts)
+                    ? redditEvidence.recentPosts
+                    : []).slice(0, 3)
+        }
+        : null;
 
     /*
      * SIGNALS ARE NOT COMPRESSED HERE.
      * Evidence Compression Brain (ECB) is the downstream compression stage.
      * Keep the complete deep signal matrix intact for downstream analysis.
      */
-    const compressedSignals =
+    const universalSignals =
         signalResult?.signals || {
             identity: {},
             positioning: [],
@@ -3521,7 +3238,7 @@ function buildUniversalPackage({
         };
 
     const websiteSourceUrls =
-    websiteSources
+    universalWebsiteSources
       .map(source =>
           normalizeUrl(
               source?.sourceUrl ||
@@ -3534,7 +3251,7 @@ function buildUniversalPackage({
 
     const allSourceUrls = [
         ...websiteSourceUrls,
-        compressedLinkedinSource?.linkedinProfile?.profileUrl,
+        universalLinkedinSource?.linkedinProfile?.profileUrl,
         ...linkedinPosts.map(item =>
             item?.url ||
             item?.postUrl ||
@@ -3545,47 +3262,38 @@ function buildUniversalPackage({
             item?.articleUrl ||
             item?.sourceUrl
         ),
-        compressedGithubEvidence?.sourceUrl ||
-        compressedGithubEvidence?.canonicalUrl ||
-        compressedGithubEvidence?.url,
-        compressedXEvidence?.sourceUrl,
-        ...(compressedXEvidence?.posts || []).map(item => item?.url || item?.sourceUrl),
-        compressedRedditEvidence?.sourceUrl,
-        ...(compressedRedditEvidence?.posts || []).map(item => item?.url || item?.sourceUrl)
+        universalGithubEvidence?.sourceUrl ||
+        universalGithubEvidence?.canonicalUrl ||
+        universalGithubEvidence?.url,
+        universalXEvidence?.sourceUrl,
+        ...(universalXEvidence?.posts || []).map(item => item?.url || item?.sourceUrl),
+        universalRedditEvidence?.sourceUrl,
+        ...(universalRedditEvidence?.posts || []).map(item => item?.url || item?.sourceUrl)
     ].filter(Boolean);
 
     console.log(
-        "UNIVERSAL_CONTENT_COMPRESSION",
+        "UNIVERSAL_EVIDENCE_PASSTHROUGH",
         JSON.stringify({
-            websiteSources: websiteSources.length,
-            linkedinProfile: !!compressedLinkedinSource?.linkedinProfile,
-            linkedinPosts:
-                Array.isArray(compressedLinkedinSource?.posts)
-                    ? compressedLinkedinSource.posts.length
-                    : 0,
-            linkedinArticles:
-                Array.isArray(compressedLinkedinSource?.articles)
-                    ? compressedLinkedinSource.articles.length
-                    : 0,
-            githubEvidence:
-                !!compressedGithubEvidence,
-            xProfile: !!compressedXEvidence,
-            xPosts: compressedXEvidence?.posts?.length || 0,
-            redditProfile: !!compressedRedditEvidence,
-            redditPosts: compressedRedditEvidence?.posts?.length || 0,
-            signalSignals:
-                Object.keys(compressedSignals || {}).length
+            websiteSources: universalWebsiteSources.length,
+            websiteContentChars: universalWebsiteSources.reduce((sum, source) => sum + String(source?.visibleText || "").length, 0),
+            linkedinProfile: !!universalLinkedinSource?.linkedinProfile,
+            linkedinPosts: universalLinkedinSource?.posts?.length || 0,
+            linkedinArticles: universalLinkedinSource?.articles?.length || 0,
+            githubEvidence: !!universalGithubEvidence,
+            xProfile: !!universalXEvidence,
+            xPosts: universalXEvidence?.posts?.length || 0,
+            redditProfile: !!universalRedditEvidence,
+            redditPosts: universalRedditEvidence?.posts?.length || 0,
+            signalSignals: Object.keys(universalSignals || {}).length,
+            compression: false
         })
     );
 
     /*
      * CARRY FORWARD RETAINED EVIDENCE.
      * Website sources come from PCF.
-     * LinkedIn posts/articles are carried up to 10 each.
-     * No evidence content is discarded here beyond the explicit
-     * existing 10-item transport boundary.
-     * CONTENT compression only.
-     * URLs / links remain untouched.
+     * LinkedIn keeps its existing latest 9-post / 1-article boundary.
+     * CEB does not compress, truncate or rewrite the retained content.
      */
     return {
         success: true,
@@ -3593,12 +3301,12 @@ function buildUniversalPackage({
         packageType:
             "UniversalPublicEvidencePackage",
 
-        version: "23.0",
+        version: "24.0",
 
         postmaster: {
             role: "evidence-delivery-only",
             filtering: false,
-            compression: true,
+            compression: false,
             ranking: false,
             investigation: false
         },
@@ -3607,7 +3315,7 @@ function buildUniversalPackage({
             normalizeUrl(primaryUrl) || null,
 
         websiteEvidence: {
-            sources: compressedWebsiteSources,
+            sources: universalWebsiteSources,
             sourceUrls: websiteSourceUrls
         },
 
@@ -3621,25 +3329,25 @@ function buildUniversalPackage({
 
         linkedinEvidence: linkedinSource
             ? {
-                source: compressedLinkedinSource,
+                source: universalLinkedinSource,
                 profile:
-                    compressedLinkedinSource?.linkedinProfile || linkedInProfile,
+                    universalLinkedinSource?.linkedinProfile || linkedInProfile,
                 about:
-                    compressedLinkedinSource?.linkedinProfile?.about ||
+                    universalLinkedinSource?.linkedinProfile?.about ||
                     null,
                 followersCount:
-                    compressedLinkedinSource?.linkedinProfile?.followersCount ??
+                    universalLinkedinSource?.linkedinProfile?.followersCount ??
                     null,
                 connectionsCount:
-                    compressedLinkedinSource?.linkedinProfile?.connectionsCount ??
+                    universalLinkedinSource?.linkedinProfile?.connectionsCount ??
                     null,
                 posts:
-                    compressedLinkedinSource?.posts || [],
+                    universalLinkedinSource?.posts || [],
                 articles:
-                    compressedLinkedinSource?.articles || [],
+                    universalLinkedinSource?.articles || [],
                 sourceUrl:
                     normalizeUrl(
-                        compressedLinkedinSource?.sourceUrl ||
+                        universalLinkedinSource?.sourceUrl ||
                         ""
                     ) || null
             }
@@ -3655,10 +3363,10 @@ function buildUniversalPackage({
             },
 
         githubEvidence:
-            compressedGithubEvidence || null,
+            universalGithubEvidence || null,
 
-        xEvidence: compressedXEvidence,
-        redditEvidence: compressedRedditEvidence,
+        xEvidence: universalXEvidence,
+        redditEvidence: universalRedditEvidence,
 
         sourceLinks:
             [...new Set(allSourceUrls)],
@@ -3668,7 +3376,7 @@ function buildUniversalPackage({
          * Raw evidence remains outside Signal's output and above.
          */
      /*   signalSignals:
-    compressedSignals || {
+    universalSignals || {
         identity: {},
         positioning: [],
         niches: [],
@@ -3697,7 +3405,7 @@ function buildUniversalPackage({
             },
         evidenceCoverage: {
             websitePagesInvestigated:
-                websiteSources.length,
+                universalWebsiteSources.length,
             websiteScraperPagesInvestigated:
                 websiteScraperSources.length,
 
@@ -3718,7 +3426,7 @@ function buildUniversalPackage({
             redditPostsAvailable: redditEvidence?.posts?.length || 0,
 
             totalSourcesReviewed:
-                websiteSources.length + websiteScraperSources.length + (linkedinSource ? 1 : 0) + (githubEvidence ? 1 : 0) +
+                universalWebsiteSources.length + websiteScraperSources.length + (linkedinSource ? 1 : 0) + (githubEvidence ? 1 : 0) +
                 (xEvidence ? 1 + (xEvidence.posts?.length || 0) : 0) +
                 (redditEvidence ? 1 + (redditEvidence.posts?.length || 0) : 0)
         }
@@ -4205,7 +3913,7 @@ console.log(
             packageType:
                 "CrossEvidencePackage",
 
-            version: "23.0",
+            version: "24.0",
 
             universalPackage,
 
