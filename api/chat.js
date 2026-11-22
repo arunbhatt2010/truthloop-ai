@@ -2097,7 +2097,9 @@ try {
 
       let providerResponse;
       let providerBody = null;
-      let pro      try {
+      let providerErrorBody = "";
+      let providerOutput = "";
+      try {
         providerResponse = await fetch(settings.endpoint, {
           method: "POST",
           headers: {
@@ -2328,9 +2330,6 @@ try {
       }
 
       const providerDurationMs = Date.now() - providerStartedAt;
-(readError?.message || readError);
-        }
-      }
 
       loop7LastProviderErrorBody = String(providerErrorBody).slice(0, 6000);
       loop7LastProviderError = {
