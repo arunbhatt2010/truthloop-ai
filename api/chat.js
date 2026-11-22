@@ -3189,11 +3189,15 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 }
-    console.log(
-  "FINAL_RESPONSE",
-  JSON.stringify(response, null, 2)
-);
-console.log("FINAL RETURN REACHED");
+    // Do not JSON.stringify the Fetch Response object here: Response instances
+    // have no enumerable payload fields and therefore misleadingly log as {}.
+    // The actual normalized model content is logged separately by
+    // LOOP7_FINAL_RESPONSE / LOOP7_REPORT_PAYLOAD below.
+    console.log("FINAL_RETURN_REACHED", JSON.stringify({
+      loopLevel,
+      provider: loopLevel === 7 ? selectedLoop7Provider : null,
+      normalizedReplyChars: String(reply || "").length
+    }));
 
 const finalEvidenceRegistry =
   loopLevel === 7
@@ -3355,18 +3359,30 @@ const finalPayload = {
     loopLevel === 6 ? 6 : undefined
 };
 
+console.log("FINAL_RESPONSE_PAYLOAD_AUDIT", JSON.stringify({
+  loopLevel,
+  payloadKeys: Object.keys(finalPayload),
+  replyChars: String(finalPayload.reply || "").length,
+  analysisMatchesReply: typeof finalPayload.analysis === "string" && finalPayload.analysis === finalPayload.reply,
+  evidenceRegistryCount: finalEvidenceRegistry.length,
+  streamMode: !!loop7StreamStarted
+}));
+
 if (loop7StreamStarted) {
-  // The full evidence registry has already been sent in the preceding
-  // `phase: "compression"` progress event. Sending it again in the terminal
-  // frame needlessly couples the report text to a second copy of all source
-  // metadata and makes the final SSE frame larger. Keep the JSON/non-stream
-  // response contract unchanged; compact only the SSE terminal event.
-  const streamFinalPayload = { ...finalPayload };
-  if (loopLevel === 7) {
-    delete streamFinalPayload.evidenceRegistry;
-    streamFinalPayload.evidenceRegistryCount = finalEvidenceRegistry.length;
-    streamFinalPayload.evidenceRegistryDeliveredInProgress = true;
-  }
+  // Loop 7's `analysis` and `reply` are the same 8-section report. The
+  // progress stream previously serialized both fields, doubling report text
+  // in the terminal frame (e.g. ~23 KB for an ~11.5 KB report). The browser's
+  // Loop 7 contract consumes `reply`; send that canonical field only. The
+  // complete evidence registry was already sent in the compression progress
+  // event, so retain only its count here. Non-streaming JSON stays unchanged.
+  const streamFinalPayload = loopLevel === 7
+    ? {
+        reply: String(finalPayload.reply || ""),
+        evidenceRegistryCount: finalEvidenceRegistry.length,
+        evidenceRegistryDeliveredInProgress: true
+      }
+    : { ...finalPayload };
+
   const finalStreamEvent = {
     type: "final",
     final: true,
@@ -3379,11 +3395,13 @@ if (loop7StreamStarted) {
    JSON.stringify({
       final: true,
       replyChars: String(finalPayload.reply || "").length,
+      analysisDuplicatedInFinalFrame: false,
       registryCount: finalEvidenceRegistry.length,
       registryRepeatedInFinalFrame: false,
       finalFrameBytes: Buffer.byteLength(finalFrameJson, "utf8"),
       serverWriteQueued: finalWriteAccepted,
       backpressurePending: loop7StreamPendingDrain || res.writableNeedDrain === true,
+      writableLengthAtFinalWrite: Number(res.writableLength || 0),
       clientDisconnected: loop7ClientDisconnected,
       streamWriteFailure: loop7StreamWriteFailure
    })
