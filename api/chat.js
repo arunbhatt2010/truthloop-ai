@@ -1987,7 +1987,7 @@ const cleanMessages = messages
   .filter(message => message.content.trim());
 
 const maxTokens =
-  loopLevel === 7 ? 12000 : 320;
+  loopLevel === 7 ? 16000 : 320; // Raised from the legacy OpenRouter-era 12,000 cap.
 
 const loop7ReasoningEnabled = false;
 
@@ -2097,10 +2097,7 @@ try {
 
       let providerResponse;
       let providerBody = null;
-      let providerOutput = "";
-      let providerErrorBody = "";
-
-      try {
+      let pro      try {
         providerResponse = await fetch(settings.endpoint, {
           method: "POST",
           headers: {
@@ -2113,6 +2110,7 @@ try {
               { role: "system", content: loop7Instruction },
               { role: "user", content: JSON.stringify(loop7AiUserPayload) }
             ],
+            stream: true,
             config: {
               temperature: settings.temperature,
               max_tokens: settings.maxTokens
@@ -2135,7 +2133,6 @@ try {
         continue;
       }
 
-      const providerDurationMs = Date.now() - providerStartedAt;
       const providerRequestId =
         providerResponse.headers?.get("x-request-id") ||
         providerResponse.headers?.get("request-id") ||
@@ -2147,39 +2144,141 @@ try {
         status: providerResponse.status,
         statusText: providerResponse.statusText,
         ok: providerResponse.ok,
-        durationMs: providerDurationMs,
         requestId: providerRequestId,
         contentType: providerResponse.headers?.get("content-type") || null,
-        retryAfter: providerResponse.headers?.get("retry-after") || null
+        retryAfter: providerResponse.headers?.get("retry-after") || null,
+        upstreamStreaming: true,
+        maxTokens: settings.maxTokens
       }));
 
       if (providerResponse.ok) {
         try {
-          providerBody = await providerResponse.json();
-        } catch (parseError) {
-          providerErrorBody = "Invalid JSON response: " + String(parseError?.message || parseError);
+          if (!providerResponse.body || typeof providerResponse.body.getReader !== "function") {
+            throw new Error("Provider returned no readable SSE response body.");
+          }
+
+          const reader = providerResponse.body.getReader();
+          const decoder = new TextDecoder();
+          let sseBuffer = "";
+          let streamDone = false;
+          let streamError = null;
+          let nativeUsage = null;
+          let nativeFinishReason = null;
+          let streamRequestId = providerRequestId;
+          let firstDeltaAt = null;
+          let deltaCount = 0;
+
+          const consumeProviderSseLine = (rawLine) => {
+            const line = rawLine.trim();
+            if (!line || line.startsWith(":") || !line.startsWith("data:")) return;
+
+            const dataText = line.slice(5).trim();
+            if (!dataText || dataText === "[DONE]") return;
+
+            let event;
+            try {
+              event = JSON.parse(dataText);
+            } catch (parseError) {
+              throw new Error("Invalid provider SSE JSON: " + String(parseError?.message || parseError));
+            }
+
+            if (event?.request_id && !streamRequestId) {
+              streamRequestId = event.request_id;
+            }
+
+            if (event?.event === "delta") {
+              const delta = event?.data?.delta;
+              if (typeof delta === "string" && delta.length) {
+                if (firstDeltaAt === null) firstDeltaAt = Date.now();
+                providerOutput += delta;
+                deltaCount += 1;
+              }
+              return;
+            }
+
+            if (event?.event === "done") {
+              streamDone = true;
+              nativeUsage = event?.data?.usage || null;
+              nativeFinishReason = event?.data?.finish || null;
+              providerBody = {
+                request_id: streamRequestId,
+                status: "success",
+                data: {
+                  output: providerOutput,
+                  usage: nativeUsage,
+                  finish: nativeFinishReason
+                }
+              };
+              return;
+            }
+
+            if (event?.event === "error") {
+              streamError = event?.data || event?.error || event;
+              throw new Error(
+                "Provider SSE error: " +
+                String(streamError?.message || streamError?.error?.message || JSON.stringify(streamError))
+              );
+            }
+          };
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            sseBuffer += decoder.decode(value, { stream: true });
+            let newlineIndex;
+            while ((newlineIndex = sseBuffer.indexOf("\n")) !== -1) {
+              const line = sseBuffer.slice(0, newlineIndex).replace(/\r$/, "");
+              sseBuffer = sseBuffer.slice(newlineIndex + 1);
+              consumeProviderSseLine(line);
+            }
+          }
+
+          sseBuffer += decoder.decode();
+          if (sseBuffer.trim()) consumeProviderSseLine(sseBuffer);
+
+          if (streamError) {
+            throw new Error("Provider stream ended with an error event.");
+          }
+          if (!streamDone) {
+            throw new Error(
+              "Provider SSE closed before its done event. Partial output chars: " +
+              providerOutput.length
+            );
+          }
+
+          providerBody.data.usage = nativeUsage;
+          providerBody.data.finish = nativeFinishReason;
+
+          console.log("LOOP7_PROVIDER_STREAM_COMPLETE", JSON.stringify({
+            provider: providerName,
+            model: settings.model,
+            requestId: streamRequestId,
+            deltaCount,
+            replyChars: providerOutput.length,
+            firstDeltaMs: firstDeltaAt === null ? null : firstDeltaAt - providerStartedAt,
+            durationMs: Date.now() - providerStartedAt,
+            finish: nativeFinishReason,
+            usage: nativeUsage
+          }));
+        } catch (streamError) {
+          providerErrorBody = String(streamError?.message || streamError);
+          console.error("LOOP7_PROVIDER_STREAM_ERROR", JSON.stringify({
+            provider: providerName,
+            model: settings.model,
+            durationMs: Date.now() - providerStartedAt,
+            partialOutputChars: providerOutput.length,
+            error: providerErrorBody
+          }));
         }
 
-        const rawOutput = providerBody?.data?.output;
-        if (typeof rawOutput === "string") {
-          providerOutput = rawOutput.trim();
-        } else if (typeof rawOutput?.text === "string") {
-          providerOutput = rawOutput.text.trim();
-        } else if (typeof rawOutput?.content === "string") {
-          providerOutput = rawOutput.content.trim();
-        } else if (Array.isArray(rawOutput)) {
-          providerOutput = rawOutput.map(part =>
-            typeof part === "string" ? part : (part?.text || part?.content || "")
-          ).join("").trim();
-        }
-
-        if (providerOutput) {
-          // Normalize the already-parsed native response while it is still
-          // inside the provider attempt. The response body is a one-shot
-          // stream: never call response.json()/text() again downstream.
+        if (!providerErrorBody && providerOutput.trim()) {
+          // Normalize the fully collected native SSE response. The provider
+          // stream is consumed exactly once and never parsed again downstream.
           const nativeUsage =
             providerBody?.data?.usage || providerBody?.usage || null;
           const nativeFinishReason =
+            providerBody?.data?.finish ||
             providerBody?.data?.finish_reason ||
             providerBody?.data?.finishReason ||
             null;
@@ -2188,7 +2287,7 @@ try {
             choices: [{
               message: {
                 role: "assistant",
-                content: providerOutput
+                content: providerOutput.trim()
               },
               finish_reason: nativeFinishReason
             }],
@@ -2197,31 +2296,39 @@ try {
 
           selectedLoop7Provider = providerName;
           loop7NativeResponseData = providerBody;
-          loop7NativeOutput = providerOutput;
+          loop7NativeOutput = providerOutput.trim();
           console.log("LOOP7_PROVIDER_SELECTED", JSON.stringify({
             provider: providerName,
             model: settings.model,
-            replyChars: providerOutput.length,
-            durationMs: providerDurationMs,
-            normalized: !!normalizedData?.choices?.[0]?.message?.content
+            replyChars: providerOutput.trim().length,
+            durationMs: Date.now() - providerStartedAt,
+            normalized: !!normalizedData?.choices?.[0]?.message?.content,
+            streaming: true
           }));
           break;
         }
 
-        providerErrorBody = providerErrorBody ||
-          "Provider returned HTTP success but data.output was empty or unsupported.";
+        if (!providerErrorBody) {
+          providerErrorBody =
+            "Provider stream completed but returned an empty output.";
+        }
         console.error("LOOP7_PROVIDER_EMPTY_OUTPUT", JSON.stringify({
           provider: providerName,
           model: settings.model,
+          replyChars: providerOutput.length,
           responseKeys: Object.keys(providerBody || {}),
-          dataKeys: Object.keys(providerBody?.data || {}),
-          outputType: typeof rawOutput
+          dataKeys: Object.keys(providerBody?.data || {})
         }));
       } else {
         try {
           providerErrorBody = await providerResponse.text();
         } catch (readError) {
           providerErrorBody = "Failed to read provider error: " + String(readError?.message || readError);
+        }
+      }
+
+      const providerDurationMs = Date.now() - providerStartedAt;
+(readError?.message || readError);
         }
       }
 
