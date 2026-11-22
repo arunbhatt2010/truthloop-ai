@@ -3445,6 +3445,108 @@ function showLoop7ProcessingError(error){
   box.scrollIntoView({behavior:"smooth", block:"start"});
 }
 
+function handleLoop7InvestigationFailure(payload){
+  if(!payload || !(payload.investigationFailure === true || payload.type === "investigation_failure")) return false;
+
+  const failure = payload.failure && typeof payload.failure === "object" ? payload.failure : {};
+  const mode = window.tlLoop7ReportMode === "direct" ? "direct" : "conversation";
+  const safeUrl = escapeHtml(String(failure.requestedUrl || investigationSource || ""));
+  const reasonLabel = escapeHtml(String(failure.reasonLabel || "The primary public source could not be examined."));
+  const userMessage = escapeHtml(String(failure.userMessage || "TruthLoop AI could not collect usable public content from the submitted URL. No investigation report has been generated."));
+  const technicalDetail = String(failure.technicalDetail || "").trim();
+  const recommendedAction = escapeHtml(String(failure.recommendedAction || "Check the URL and try again, or submit another supported public URL."));
+  const supportedSourcesMessage = escapeHtml(String(failure.supportedSourcesMessage || "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported."));
+  const safeTechnicalDetail = technicalDetail ? escapeHtml(technicalDetail) : "";
+
+  // A collection failure is not a report. Clear report state before persisting
+  // the journey so refresh/recovery cannot restore a stale report or paywall.
+  latestTruthLoopReport = "";
+  evidenceSourceRegistry = [];
+  loop7Unlocked = false;
+  loopLevel = 7;
+  window.loop7Started = false;
+  isLoading = false;
+  if(window.tlLoop7ReportProgressTimer){
+    clearInterval(window.tlLoop7ReportProgressTimer);
+    window.tlLoop7ReportProgressTimer = null;
+  }
+  stopLoop7ReportAnimation();
+
+  if(paywallBox) paywallBox.style.display = "none";
+  if(paySub) paySub.innerHTML = "";
+  if(razorpayBtn){
+    razorpayBtn.style.display = "none";
+    razorpayBtn.disabled = false;
+    razorpayBtn.dataset.tlPaymentBusy = "0";
+    razorpayBtn.onclick = null;
+  }
+  const bridgeHost = document.getElementById("tlLoop7BridgeMount");
+  if(bridgeHost){
+    bridgeHost.hidden = true;
+    bridgeHost.style.display = "none";
+  }
+  if(reflectionInput) reflectionInput.style.display = "none";
+  const composer = document.getElementById("tlReflectionComposer");
+  if(composer) composer.style.display = "none";
+  if(mainInput) mainInput.style.display = "none";
+  if(getBtn) getBtn.style.display = "none";
+  if(shareBox) shareBox.style.display = "none";
+  const article = document.getElementById("articleBlock");
+  if(article) article.style.display = "none";
+  if(nextBtn){
+    nextBtn.style.display = "none";
+    nextBtn.disabled = true;
+  }
+
+  outputBox.innerHTML = `
+    <section class="tl-investigation-failure" role="alert" aria-live="assertive" style="margin:18px 0;padding:22px;border:1px solid rgba(248,113,113,.38);border-radius:16px;background:linear-gradient(145deg,rgba(127,29,29,.20),rgba(15,23,42,.96));color:#e5e7eb;line-height:1.65;">
+      <div style="font-size:11px;font-weight:850;letter-spacing:1.5px;text-transform:uppercase;color:#fca5a5;">TRUTHLOOP AI · COLLECTION NOT COMPLETED</div>
+      <h2 style="margin:9px 0 12px;color:#fff;font-size:23px;line-height:1.2;">We couldn't complete this investigation</h2>
+      <p style="margin:0 0 14px;color:#e5e7eb;">${userMessage}</p>
+      <div style="padding:13px 14px;margin:12px 0;border-radius:11px;background:rgba(2,6,23,.48);border:1px solid rgba(148,163,184,.16);">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#fbbf24;margin-bottom:4px;">Why it failed</div>
+        <div style="font-weight:700;color:#fff;">${reasonLabel}</div>
+        ${safeTechnicalDetail ? `<div style="margin-top:7px;color:#aebbd0;font-size:13px;overflow-wrap:anywhere;">${safeTechnicalDetail}</div>` : ""}
+        ${safeUrl ? `<div style="margin-top:8px;color:#94a3b8;font-size:12px;overflow-wrap:anywhere;">Submitted URL: ${safeUrl}</div>` : ""}
+      </div>
+      <div style="padding:13px 14px;margin:12px 0;border-radius:11px;background:rgba(2,6,23,.30);border:1px solid rgba(148,163,184,.14);">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#86efac;margin-bottom:4px;">What you can do next</div>
+        <div style="color:#e5e7eb;">${recommendedAction}</div>
+      </div>
+      <p style="margin:14px 0 0;padding-top:12px;border-top:1px solid rgba(148,163,184,.18);font-size:12px;line-height:1.55;color:#aebbd0;">${supportedSourcesMessage}</p>
+      <p style="margin:8px 0 0;font-size:12px;color:#94a3b8;">No investigation report was generated. No payment is required for this failed attempt.</p>
+      <button id="tlFailureEditUrlBtn" type="button" style="display:block;width:100%;margin-top:17px;padding:13px 16px;border:0;border-radius:11px;background:linear-gradient(100deg,#ff7b14,#ffa31a);color:#101014;font-weight:900;cursor:pointer;">EDIT URL / TRY ANOTHER LINK →</button>
+    </section>
+  `;
+
+  try{
+    track("loop7_primary_collection_failed", {
+      report_mode: mode,
+      failure_code: String(failure.code || "PRIMARY_INVESTIGATION_FAILED"),
+      failure_reason: String(failure.reasonCode || "unknown"),
+      source_platform: String(failure.platform || "unknown")
+    });
+  }catch(trackError){ console.warn("LOOP7_FAILURE_ANALYTICS_ERROR", trackError); }
+
+  try{ saveJourney(); }catch(saveError){ console.warn("LOOP7_FAILURE_STATE_SAVE_ERROR", saveError); }
+
+  const editButton = document.getElementById("tlFailureEditUrlBtn");
+  if(editButton){
+    editButton.addEventListener("click", () => {
+      outputBox.innerHTML = "";
+      mountLoop7Bridge(investigationSource || "", mode);
+      const input = document.getElementById("loop7ProfileLink");
+      if(input){
+        input.focus();
+        try{ input.scrollIntoView({behavior:"smooth", block:"center"}); }catch(_){}
+      }
+    });
+  }
+
+  outputBox.scrollIntoView({behavior:"smooth", block:"start"});
+  return true;
+}
+
 /* TL_REPORT_TO_PAYWALL_DIAGNOSTICS_START */
 function tlReportPaywallDiagnostic(stage, detail){
   // Diagnostics remain available in the developer console only; never create
@@ -3512,6 +3614,7 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
   try{
     tlReportPaywallDiagnostic("01 REQUEST_SENT_TO_CHAT_JS");
     const data = await fetchLoop7Investigation(profileLink, "direct");
+    if(handleLoop7InvestigationFailure(data)) return;
     latestTruthLoopReport = data.reply || JSON.stringify(data);
     tlReportPaywallDiagnostic("02 FINAL_REPORT_RECEIVED", {replyChars:String(latestTruthLoopReport || "").length, hasReply:!!(data && data.reply)});
     directFinalReplyReceived = !!(data && typeof data.reply === "string" && data.reply.trim());
@@ -3706,6 +3809,7 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   // Persist the report as soon as that final payload is received, rather than
   // waiting for the streaming connection to close (which can stall on mobile).
   const preserveLoop7FinalPayload = (payload, transport) => {
+    if(payload?.investigationFailure === true || payload?.type === "investigation_failure") return false;
     const reportText = typeof payload?.reply === "string" ? payload.reply : "";
     if(!reportText.trim()) return false;
 
@@ -3735,6 +3839,7 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
     // Read that body once and accept either the normal JSON response or SSE text.
     const rawResponse = await response.text();
     let recoveredFinalPayload = null;
+    let recoveredInvestigationFailure = null;
     let recoveredServerError = null;
 
     const consumeFallbackPayload = candidate => {
@@ -3744,6 +3849,10 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
       try{ payload = JSON.parse(value); }
       catch(_){ return; }
 
+      if(payload && (payload.investigationFailure === true || payload.type === "investigation_failure")){
+        recoveredInvestigationFailure = payload;
+        return;
+      }
       if(payload && (payload.reply || payload.final === true || payload.type === "final")){
         if(preserveLoop7FinalPayload(payload, "non_streaming_fallback")){
           recoveredFinalPayload = payload;
@@ -3792,6 +3901,7 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
       });
     }
 
+    if(recoveredInvestigationFailure) return recoveredInvestigationFailure;
     if(recoveredFinalPayload) return recoveredFinalPayload;
     if(recoveredServerError) throw recoveredServerError;
     throw new Error(
@@ -3805,6 +3915,7 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   const decoder = new TextDecoder();
   let buffer = "";
   let finalPayload = null;
+  let investigationFailurePayload = null;
   let streamReadError = null;
   let serverStreamError = null;
 
@@ -3817,6 +3928,13 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
       payload = JSON.parse(candidate);
     }catch(error){
       // Non-JSON SSE data frames (for example [DONE]) are not report payloads.
+      return;
+    }
+
+    // A collection failure is a terminal non-report result. Keep it separate
+    // from the final-report path so it can never be saved or paywalled as a report.
+    if(payload?.investigationFailure === true || payload?.type === "investigation_failure") {
+      investigationFailurePayload = payload;
       return;
     }
 
@@ -3893,7 +4011,7 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
       // chat.js ends the final SSE event with a blank-line separator. Return
       // immediately after that complete event; do not wait for reader.read()
       // to report EOF on mobile browsers or intermediary connections.
-      if(finalPayload){
+      if(finalPayload || investigationFailurePayload){
         try {
           const cancelResult = reader.cancel();
           if(cancelResult && typeof cancelResult.catch === "function"){
@@ -3901,6 +4019,12 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
           }
         } catch(cancelError) {
           console.warn("LOOP7_FINAL_STREAM_CANCEL_WARNING", cancelError);
+        }
+        if(investigationFailurePayload){
+          console.info("LOOP7_INVESTIGATION_FAILURE_STREAM_RETURNED", {
+            failureReason: investigationFailurePayload?.failure?.reasonCode || "unknown"
+          });
+          return investigationFailurePayload;
         }
         console.info("LOOP7_FINAL_STREAM_RETURNED_ON_EVENT", {
           replyChars: String(finalPayload.reply || "").length
@@ -3918,6 +4042,9 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   if(buffer.trim()) consumeFrame(buffer); // Also parse a final frame lacking a blank terminator.
 
   /* TL_SSE_FINAL_RECOVERY_FIX_END */
+  // A structured investigation failure is a valid terminal response, not a
+  // transport error and not a report. It takes precedence over stream-close noise.
+  if(investigationFailurePayload) return investigationFailurePayload;
   // A completed final report takes precedence over a later stream-close/error.
   if(finalPayload) return finalPayload;
   if(serverStreamError) throw serverStreamError;
@@ -5982,6 +6109,7 @@ if (loopLevel === 7) {
     track("loop7_started", {journey_state: "restored"});
     beginLoop7Processing(profileLink);
     const data = await fetchLoop7Investigation(profileLink, "conversation");
+    if(handleLoop7InvestigationFailure(data)) return;
 
     latestTruthLoopReport = data.reply || JSON.stringify(data);
     if(typeof latestTruthLoopReport === "string" && latestTruthLoopReport.trim()){
@@ -6066,6 +6194,7 @@ if (loopLevel === 6) {
 
     try {
       const data = await fetchLoop7Investigation(profileLink, "conversation");
+      if(handleLoop7InvestigationFailure(data)) return;
 /* console.log("PROFILE UPDATE:", {
   primaryLoop: data.primaryLoop,
   emotionalDriver: data.emotionalDriver,
