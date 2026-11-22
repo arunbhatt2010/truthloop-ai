@@ -3257,6 +3257,14 @@ function captureEvidenceSourceRegistry(data){
     }
   }
 
+  // A compact terminal SSE event may intentionally omit the registry because
+  // the complete registry was already delivered in the earlier compression
+  // progress event. Preserve that verified in-memory registry. A new
+  // investigation and a primary-collection failure explicitly clear it.
+  if(Array.isArray(evidenceSourceRegistry) && evidenceSourceRegistry.length){
+    console.log("FRONTEND_EVIDENCE_REGISTRY_PRESERVED", evidenceSourceRegistry.length);
+    return evidenceSourceRegistry;
+  }
   evidenceSourceRegistry = [];
   console.log("FRONTEND_EVIDENCE_REGISTRY_COUNT", 0);
   return evidenceSourceRegistry;
@@ -3886,9 +3894,11 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
 
   const contentType = (response.headers.get("content-type") || "").toLowerCase();
 
-  // chat.js v27 final-event contract: { type:"final", final:true, reply,
-  // evidenceRegistry, loop7EvidenceRegistry, evidenceSourceRegistry,
-  // evidenceSourceIndex, evidenceRegistryCount }.
+  // Current chat.js SSE contract:
+  // - phase:"compression" progress event carries the full evidenceRegistry.
+  // - terminal {type:"final", final:true} carries the report and registry count,
+  //   not a duplicate copy of the registry already captured from progress.
+  // - non-streaming JSON responses continue to include evidenceRegistry.
   // Persist the report as soon as that final payload is received, rather than
   // waiting for the streaming connection to close (which can stall on mobile).
   const preserveLoop7FinalPayload = (payload, transport) => {
@@ -4003,14 +4013,19 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   let serverStreamError = null;
 
   const consumePayload = (rawPayload) => {
-    const candidate = String(rawPayload || "").trim();
+    const candidate = String(rawPayload || "").replace(/^\uFEFF/, "").trim();
     if(!candidate || candidate === "[DONE]") return;
 
     let payload;
     try{
       payload = JSON.parse(candidate);
     }catch(error){
-      // Non-JSON SSE data frames (for example [DONE]) are not report payloads.
+      // Keep malformed SSE frames diagnosable without logging report contents.
+      console.warn("LOOP7_SSE_FRAME_JSON_PARSE_FAILED", {
+        frameChars: candidate.length,
+        preview: candidate.slice(0, 100),
+        error: String(error?.message || error)
+      });
       return;
     }
 
@@ -4026,6 +4041,12 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
     if(payload && (payload.reply || payload.final === true || payload.type === "final")) {
       if(preserveLoop7FinalPayload(payload, "sse")){
         finalPayload = payload;
+        console.info("LOOP7_FINAL_EVENT_PARSED", {
+          replyChars: String(payload.reply || "").length,
+          registryIncludedInFinal: Array.isArray(payload.evidenceRegistry),
+          registryCountFromProgress: Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry.length : 0,
+          finalFrameChars: candidate.length
+        });
       }
     }
 
@@ -4130,6 +4151,13 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   if(investigationFailurePayload) return investigationFailurePayload;
   // A completed final report takes precedence over a later stream-close/error.
   if(finalPayload) return finalPayload;
+  console.error("LOOP7_SSE_ENDED_WITHOUT_FINAL", {
+    contentType,
+    streamReadError: String(streamReadError?.message || streamReadError || ""),
+    serverStreamError: String(serverStreamError?.message || serverStreamError || ""),
+    bufferedChars: buffer.length,
+    registryAlreadyReceived: Array.isArray(evidenceSourceRegistry) && evidenceSourceRegistry.length > 0
+  });
   if(serverStreamError) throw serverStreamError;
   if(streamReadError) throw streamReadError;
   throw new Error("Loop 7 stream ended without a final response payload. No final event or server error event was received by the client.");
@@ -6209,6 +6237,7 @@ if (loopLevel === 7) {
   nextBtn.disabled = true;
 
   investigationSource = profileLink;
+  evidenceSourceRegistry = [];
 
   /* Remove only the previous Loop 7 report from the
      in-memory conversation before generating a fresh one. */
@@ -6301,6 +6330,7 @@ if (loopLevel === 6) {
     // Keep Loop 7 evidence/report out of the persistent 12-message case spine.
     // profileLink is already sent separately in the API payload.
     loopLevel = 7;
+    evidenceSourceRegistry = [];
     loop7Unlocked = false;
     paywallBox.style.display = "none";
     saveJourney();
