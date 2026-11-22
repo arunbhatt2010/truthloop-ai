@@ -23,6 +23,7 @@ export default async function handler(req, res) {
   let loop7HeartbeatTimer = null;
   let loop7ClientDisconnected = false;
   let loop7StreamWriteFailure = null;
+  let loop7StreamPendingDrain = false;
 
   // Values needed by the outer crash guard must live outside the try block.
   // Otherwise the catch block cannot access try-scoped let/const bindings.
@@ -546,12 +547,17 @@ let investigationState = {
         // stream. It does not prove that the browser has received the frame.
         const accepted = res.write(`data: ${JSON.stringify(payload)}\n\n`);
         if (accepted === false) {
+          // Node has queued this frame, but its writable buffer is full.
+          // Do not end the SSE response until the queued bytes drain.
+          loop7StreamPendingDrain = true;
           console.warn("LOOP7_STREAM_BACKPRESSURE", JSON.stringify({
             type: payload?.type || null,
-            phase: payload?.phase || null
+            phase: payload?.phase || null,
+            writableLength: Number(res.writableLength || 0),
+            writableHighWaterMark: Number(res.writableHighWaterMark || 0)
           }));
         }
-        return true;
+        return true; // The frame was queued; delivery/flush is tracked separately.
       } catch (error) {
         loop7StreamWriteFailure = String(error?.message || error);
         loop7ClientDisconnected = true;
@@ -584,6 +590,13 @@ let investigationState = {
       // run. Without bytes on the SSE connection, mobile networks/proxies may
       // retire the idle stream before the final report is ready. SSE comments
       // are ignored by the frontend parser but keep the connection active.
+      res.on?.("drain", () => {
+        loop7StreamPendingDrain = false;
+        console.log("LOOP7_STREAM_DRAINED", JSON.stringify({
+          writableLength: Number(res.writableLength || 0)
+        }));
+      });
+
       res.once?.("close", () => {
         if (!res.writableEnded) {
           loop7ClientDisconnected = true;
@@ -610,7 +623,8 @@ let investigationState = {
           return;
         }
         try {
-          res.write(": tl-heartbeat\n\n");
+          const heartbeatAccepted = res.write(": tl-heartbeat\n\n");
+          if (heartbeatAccepted === false) loop7StreamPendingDrain = true;
         } catch (error) {
           loop7StreamWriteFailure = String(error?.message || error);
           loop7ClientDisconnected = true;
@@ -628,17 +642,104 @@ let investigationState = {
       });
     };
 
-    endLoop7ProgressStream = () => {
+    const waitForLoop7StreamDrain = (timeoutMs = 5000) => {
+      if (!loop7StreamPendingDrain && res.writableNeedDrain !== true) {
+        return Promise.resolve({ drained: true, reason: "not_pending" });
+      }
+
+      return new Promise(resolve => {
+        let settled = false;
+        const cleanup = () => {
+          clearTimeout(timer);
+          res.removeListener?.("drain", onDrain);
+          res.removeListener?.("close", onClose);
+          res.removeListener?.("error", onError);
+        };
+        const finish = result => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve(result);
+        };
+        const onDrain = () => {
+          loop7StreamPendingDrain = false;
+          finish({ drained: true, reason: "drain_event" });
+        };
+        const onClose = () => finish({ drained: false, reason: "response_closed" });
+        const onError = error => finish({ drained: false, reason: String(error?.message || error) });
+        const timer = setTimeout(() => finish({ drained: false, reason: "drain_timeout" }), timeoutMs);
+        res.once?.("drain", onDrain);
+        res.once?.("close", onClose);
+        res.once?.("error", onError);
+
+        // The drain event may have fired between the write and waiter setup.
+        if (!loop7StreamPendingDrain && res.writableNeedDrain !== true) {
+          finish({ drained: true, reason: "already_drained" });
+        }
+      });
+    };
+
+    const waitForLoop7StreamFinish = (timeoutMs = 3000) => {
+      if (res.writableFinished === true) {
+        return Promise.resolve({ finished: true, reason: "already_finished" });
+      }
+      return new Promise(resolve => {
+        let settled = false;
+        const cleanup = () => {
+          clearTimeout(timer);
+          res.removeListener?.("finish", onFinish);
+          res.removeListener?.("close", onClose);
+          res.removeListener?.("error", onError);
+        };
+        const finish = result => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve(result);
+        };
+        const onFinish = () => finish({ finished: true, reason: "finish_event" });
+        const onClose = () => finish({ finished: !!res.writableFinished, reason: "response_closed" });
+        const onError = error => finish({ finished: false, reason: String(error?.message || error) });
+        const timer = setTimeout(() => finish({ finished: !!res.writableFinished, reason: "finish_timeout" }), timeoutMs);
+        res.once?.("finish", onFinish);
+        res.once?.("close", onClose);
+        res.once?.("error", onError);
+      });
+    };
+
+    endLoop7ProgressStream = async () => {
       if (loop7HeartbeatTimer) {
         clearInterval(loop7HeartbeatTimer);
         loop7HeartbeatTimer = null;
       }
       if (!loop7StreamStarted) return;
+
+      // Critical reliability guard: a large final report can exceed the
+      // ServerResponse high-water mark. Wait for Node/Vercel to drain queued
+      // SSE bytes before ending the response; otherwise mobile clients can
+      // receive progress but miss the final report event.
+      const drainResult = await waitForLoop7StreamDrain();
+      console.log("LOOP7_STREAM_DRAIN_RESULT", JSON.stringify({
+        ...drainResult,
+        writableLength: Number(res.writableLength || 0),
+        writableNeedDrain: res.writableNeedDrain === true,
+        clientDisconnected: loop7ClientDisconnected
+      }));
+
+      if (loop7ClientDisconnected || res.destroyed) {
+        loop7StreamStarted = false;
+        return;
+      }
+
+      const finishPromise = waitForLoop7StreamFinish();
       try {
         if (!res.writableEnded && !res.destroyed) res.end();
       } catch (error) {
         console.error("LOOP7_STREAM_END_FAILED", String(error?.message || error));
       }
+      const finishResult = await finishPromise;
+      console.log("LOOP7_STREAM_FINISH_RESULT", JSON.stringify(finishResult));
+      loop7StreamPendingDrain = false;
       loop7StreamStarted = false;
     };
 
@@ -720,7 +821,7 @@ let investigationState = {
           console.warn("LOOP7_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null, requestedUrl: failurePayload.failure.requestedUrl || profileLink || null }));
           if (wantsLoop7Progress && loop7StreamStarted) {
             sendLoop7Progress(failurePayload);
-            endLoop7ProgressStream();
+            await endLoop7ProgressStream();
             return;
           }
           return res.status(200).json(failurePayload);
@@ -798,7 +899,7 @@ let investigationState = {
           console.warn("LOOP7_ECB_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null }));
           if (wantsLoop7Progress && loop7StreamStarted) {
             sendLoop7Progress(failurePayload);
-            endLoop7ProgressStream();
+            await endLoop7ProgressStream();
             return;
           }
           return res.status(200).json(failurePayload);
@@ -941,7 +1042,7 @@ let investigationState = {
             error: String(e?.message || e).slice(0, 1000),
             stage: "LOOP7_EVIDENCE_PIPELINE"
           });
-          endLoop7ProgressStream();
+          await endLoop7ProgressStream();
           return;
         }
         throw e;
@@ -2320,7 +2421,7 @@ try {
         error: "PROVIDER_REQUEST_FAILED",
         stage: "LOOP7_AI_FETCH"
       });
-      endLoop7ProgressStream();
+      await endLoop7ProgressStream();
       return;
     }
 
@@ -2382,7 +2483,7 @@ if (loopLevel === 7 && !response?.ok) {
       stage: "LOOP7_AI_HTTP",
       provider: selectedLoop7Provider
     });
-    endLoop7ProgressStream();
+    await endLoop7ProgressStream();
     return;
   }
 
@@ -3111,24 +3212,21 @@ const finalPayload = {
 
   ...(loopLevel === 7
     ? {
-        evidenceRegistry: finalEvidenceRegistry,
-        loop7EvidenceRegistry: finalEvidenceRegistry,
-        evidenceSourceRegistry: finalEvidenceRegistry,
-        evidenceSourceIndex: finalEvidenceRegistry.map(({
-          sourceId, sourceType, title, url, date, publishedDate, collectedAt, evidenceStream, pageCategory
-        }) => ({
-          sourceId,
-          sourceType,
-          title,
-          url,
-          date,
-          publishedDate: publishedDate || null,
-          collectedAt: collectedAt || null,
-          evidenceStream: evidenceStream || null,
-          pageCategory: pageCategory || null
+        // Send one compact canonical registry. The previous response repeated
+        // the same registry under three compatibility aliases plus another
+        // projected array, multiplying the size of the final SSE frame.
+        evidenceRegistry: finalEvidenceRegistry.map(source => ({
+          sourceId: String(source?.sourceId || ""),
+          sourceType: String(source?.sourceType || ""),
+          title: String(source?.title || ""),
+          url: String(source?.url || ""),
+          date: source?.date || null,
+          publishedDate: source?.publishedDate || source?.publishedAt || source?.datePublished || null,
+          collectedAt: source?.collectedAt || source?.fetchTimestamp || null,
+          evidenceStream: source?.evidenceStream || null,
+          pageCategory: source?.pageCategory || null
         })),
-        evidenceRegistryCount:
-          finalEvidenceRegistry.length
+        evidenceRegistryCount: finalEvidenceRegistry.length
       }
     : {}),
 
@@ -3162,12 +3260,15 @@ if (loop7StreamStarted) {
    JSON.stringify({
       final: true,
       replyChars: (finalPayload.reply || "").length,
-      serverWriteAccepted: finalWriteAccepted,
+      registryCount: finalEvidenceRegistry.length,
+      finalFrameBytes: Buffer.byteLength(JSON.stringify({ type: "final", final: true, ...finalPayload }), "utf8"),
+      serverWriteQueued: finalWriteAccepted,
+      backpressurePending: loop7StreamPendingDrain || res.writableNeedDrain === true,
       clientDisconnected: loop7ClientDisconnected,
       streamWriteFailure: loop7StreamWriteFailure
    })
   );
-  endLoop7ProgressStream();
+  await endLoop7ProgressStream();
   return;
 }
 
@@ -3194,7 +3295,7 @@ return res.status(200).json(finalPayload);
         error: error?.message || String(error),
         stage: "SERVER_CRASH"
       });
-      endLoop7ProgressStream();
+      await endLoop7ProgressStream();
       return;
     }
 
