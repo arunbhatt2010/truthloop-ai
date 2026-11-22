@@ -701,6 +701,31 @@ let investigationState = {
         if (truthLoopPackage) crossEvidenceInput.truthLoopPackage = truthLoopPackage;
 
         const crossEvidencePackage = await loadCrossEvidenceBrain(crossEvidenceInput);
+
+        if (crossEvidencePackage?.investigationFailure === true) {
+          const failurePayload = {
+            type: "investigation_failure",
+            final: true,
+            investigationFailure: true,
+            failure: crossEvidencePackage.failure || {
+              code: "PRIMARY_INVESTIGATION_FAILED",
+              stage: "cross_evidence_collection",
+              reasonCode: "PRIMARY_SOURCE_UNAVAILABLE",
+              reasonLabel: "The primary public source could not be examined.",
+              userMessage: "TruthLoop AI could not collect usable public content from the submitted URL. No investigation report has been generated.",
+              recommendedAction: "Check the URL or submit another supported public URL.",
+              supportedSourcesMessage: "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported."
+            }
+          };
+          console.warn("LOOP7_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null, requestedUrl: failurePayload.failure.requestedUrl || profileLink || null }));
+          if (wantsLoop7Progress && loop7StreamStarted) {
+            sendLoop7Progress(failurePayload);
+            endLoop7ProgressStream();
+            return;
+          }
+          return res.status(200).json(failurePayload);
+        }
+
         if (!crossEvidencePackage || crossEvidencePackage.success !== true) {
           throw new Error(
             `CEB_FAILED: ${JSON.stringify({
@@ -754,6 +779,30 @@ let investigationState = {
         compressedEvidencePackage = await loadEvidenceCompressionBrain({
           publicEvidencePackage
         });
+
+        if (compressedEvidencePackage?.investigationFailure === true) {
+          const failurePayload = {
+            type: "investigation_failure",
+            final: true,
+            investigationFailure: true,
+            failure: compressedEvidencePackage.failure || {
+              code: "PRIMARY_INVESTIGATION_FAILED",
+              stage: "evidence_compression",
+              reasonCode: "PRIMARY_SOURCE_UNAVAILABLE",
+              reasonLabel: "The primary public source could not be examined.",
+              userMessage: "TruthLoop AI could not collect usable public content from the submitted URL. No investigation report has been generated.",
+              recommendedAction: "Check the URL or submit another supported public URL.",
+              supportedSourcesMessage: "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported."
+            }
+          };
+          console.warn("LOOP7_ECB_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null }));
+          if (wantsLoop7Progress && loop7StreamStarted) {
+            sendLoop7Progress(failurePayload);
+            endLoop7ProgressStream();
+            return;
+          }
+          return res.status(200).json(failurePayload);
+        }
 
         if (!compressedEvidencePackage || compressedEvidencePackage.success !== true) {
           throw new Error(
