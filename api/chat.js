@@ -3356,18 +3356,32 @@ const finalPayload = {
 };
 
 if (loop7StreamStarted) {
-  const finalWriteAccepted = sendLoop7Progress({
+  // The full evidence registry has already been sent in the preceding
+  // `phase: "compression"` progress event. Sending it again in the terminal
+  // frame needlessly couples the report text to a second copy of all source
+  // metadata and makes the final SSE frame larger. Keep the JSON/non-stream
+  // response contract unchanged; compact only the SSE terminal event.
+  const streamFinalPayload = { ...finalPayload };
+  if (loopLevel === 7) {
+    delete streamFinalPayload.evidenceRegistry;
+    streamFinalPayload.evidenceRegistryCount = finalEvidenceRegistry.length;
+    streamFinalPayload.evidenceRegistryDeliveredInProgress = true;
+  }
+  const finalStreamEvent = {
     type: "final",
     final: true,
-    ...finalPayload
-  });
+    ...streamFinalPayload
+  };
+  const finalFrameJson = JSON.stringify(finalStreamEvent);
+  const finalWriteAccepted = sendLoop7Progress(finalStreamEvent);
   console.log(
    "LOOP7_FINAL_STREAM_SENT",
    JSON.stringify({
       final: true,
-      replyChars: (finalPayload.reply || "").length,
+      replyChars: String(finalPayload.reply || "").length,
       registryCount: finalEvidenceRegistry.length,
-      finalFrameBytes: Buffer.byteLength(JSON.stringify({ type: "final", final: true, ...finalPayload }), "utf8"),
+      registryRepeatedInFinalFrame: false,
+      finalFrameBytes: Buffer.byteLength(finalFrameJson, "utf8"),
       serverWriteQueued: finalWriteAccepted,
       backpressurePending: loop7StreamPendingDrain || res.writableNeedDrain === true,
       clientDisconnected: loop7ClientDisconnected,
