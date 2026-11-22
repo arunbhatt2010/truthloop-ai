@@ -782,7 +782,12 @@ function scoreWebsitePostSource(source = {}, rootUrl = "") {
 }
 
 function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
-    const deduped = dedupeSources(sources);
+    // Failed, blocked, login, and platform-error responses are not evidence.
+    // A failed secondary page is omitted without failing an otherwise usable
+    // primary website investigation.
+    const usableSources = (Array.isArray(sources) ? sources : [])
+        .filter(source => !source?.fetchFailure);
+    const deduped = dedupeSources(usableSources);
     const rootNormalized = normalizeUrl(rootUrl);
 
     const classifySource = source => ({
@@ -792,9 +797,11 @@ function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
     });
 
     const rootSourceRaw = deduped.find(source => {
+        const requestedUrl = normalizeUrl(source?.requestedUrl || "");
         const sourceUrl = normalizeUrl(source?.sourceUrl || source?.canonicalUrl || "");
         const status = Number(source?.status || 0);
-        return sourceUrl && rootNormalized && sourceUrl === rootNormalized && status >= 200 && status < 300;
+        const isSubmittedRoot = requestedUrl === rootNormalized || sourceUrl === rootNormalized;
+        return isSubmittedRoot && status >= 200 && status < 300;
     }) || null;
     const rootSource = rootSourceRaw ? classifySource(rootSourceRaw) : null;
 
@@ -976,7 +983,10 @@ MAX_SOCIAL_LINKS
         });
     }
     return {
+        requestedUrl: normalizeUrl(url) || url,
         sourceUrl,
+        finalUrl: sourceUrl,
+        redirected: !!response?.redirected || normalizeUrl(sourceUrl) !== normalizeUrl(url),
         canonicalUrl: structured.canonicalUrl || extractCanonical(html, sourceUrl),
         platform,
         sourcePlatform: platform,
@@ -999,6 +1009,169 @@ MAX_SOCIAL_LINKS
         contentLength: visibleText.length,
         fetchTimestamp: new Date().toISOString()
     };
+}
+
+function buildCollectionFailure({
+    requestedUrl = "",
+    finalUrl = "",
+    platform = "website",
+    status = 0,
+    reasonCode = "PRIMARY_SOURCE_UNAVAILABLE",
+    technicalDetail = "The primary public source could not be collected."
+} = {}) {
+    return {
+        code: "PRIMARY_SOURCE_COLLECTION_FAILED",
+        stage: "public_content_fetch",
+        reasonCode,
+        requestedUrl: normalizeUrl(requestedUrl) || requestedUrl || null,
+        finalUrl: normalizeUrl(finalUrl) || finalUrl || null,
+        platform: platform || "website",
+        httpStatus: Number(status) || null,
+        technicalDetail: String(technicalDetail || "Primary public source unavailable.").slice(0, 700),
+        retryable: [408, 425, 429, 500, 502, 503, 504].includes(Number(status)) || reasonCode === "FETCH_TIMEOUT"
+    };
+}
+
+function detectPageCollectionFailure({ requestedUrl = "", response = null, source = null, fetchError = null } = {}) {
+    const finalUrl = normalizeUrl(response?.url || source?.finalUrl || source?.sourceUrl || requestedUrl) || requestedUrl;
+    const platform = source?.platform || source?.sourcePlatform || "website";
+    const status = Number(response?.status ?? source?.status ?? 0);
+
+    if (fetchError) {
+        const aborted = fetchError?.name === "AbortError";
+        return buildCollectionFailure({
+            requestedUrl,
+            finalUrl,
+            platform,
+            status: 0,
+            reasonCode: aborted ? "FETCH_TIMEOUT" : "FETCH_REQUEST_FAILED",
+            technicalDetail: aborted
+                ? "The request timed out before the primary page content could be retrieved."
+                : (fetchError?.message || "The primary page request failed.")
+        });
+    }
+
+    if (status >= 400) {
+        const reasonCode = status === 401 || status === 403
+            ? "ACCESS_RESTRICTED"
+            : status === 404
+                ? "PRIMARY_URL_NOT_FOUND"
+                : status === 429
+                    ? "RATE_LIMITED"
+                    : status >= 500
+                        ? "PLATFORM_SERVER_ERROR"
+                        : "HTTP_ERROR";
+        return buildCollectionFailure({
+            requestedUrl,
+            finalUrl,
+            platform,
+            status,
+            reasonCode,
+            technicalDetail: `The primary URL returned HTTP ${status}${response?.statusText ? ` ${response.statusText}` : ""}.`
+        });
+    }
+
+    let finalPath = "";
+    try { finalPath = new URL(finalUrl).pathname.toLowerCase(); } catch {}
+    if (/\/(?:login|log-in|signin|sign-in|checkpoint|auth)(?:\/|$)/i.test(finalPath)) {
+        return buildCollectionFailure({
+            requestedUrl,
+            finalUrl,
+            platform,
+            status,
+            reasonCode: "LOGIN_REDIRECT",
+            technicalDetail: `The requested URL resolved to an authentication page (${finalUrl}). Public page content was not returned.`
+        });
+    }
+
+    const title = String(source?.title || "").trim();
+    const visibleText = String(source?.visibleText || "").replace(/\s+/g, " ").trim();
+    const description = String(source?.description || "").trim();
+    const pageText = `${title} ${description} ${visibleText}`.toLowerCase();
+    const explicitErrorPatterns = [
+        /sorry[, ]+something went wrong/i,
+        /we(?:'|’)re working on getting this fixed/i,
+        /access denied/i,
+        /request blocked/i,
+        /temporarily unavailable/i,
+        /service unavailable/i,
+        /verify (?:that )?you are human/i,
+        /checking your browser/i,
+        /unusual traffic/i,
+        /this page isn(?:'|’)t available/i,
+        /content isn(?:'|’)t available/i,
+        /please log in to continue/i,
+        /you must log in to view/i
+    ];
+    const matchedError = explicitErrorPatterns.find(pattern => pattern.test(pageText));
+    const errorTitle = /^(error|access denied|request blocked|page unavailable|service unavailable|robot check|captcha)$/i.test(title);
+    const strongAccessChallengePatterns = [
+        /robot check/i,
+        /to discuss automated access to amazon/i,
+        /automated access to amazon/i,
+        /enter the characters you see below/i,
+        /type the characters you see in this image/i,
+        /we just need to make sure you(?:'|’)re not a robot/i,
+        /verify (?:that )?you(?:'|’)re not a robot/i,
+        /complete the security check/i,
+        /human verification required/i,
+        /your request has been blocked/i,
+        /attention required[!|: ]+cloudflare/i,
+        /checking your browser before accessing/i,
+        /enable javascript and cookies to continue/i
+    ];
+    const matchedAccessChallenge = strongAccessChallengePatterns.find(pattern => pattern.test(pageText));
+
+    if (matchedAccessChallenge) {
+        return buildCollectionFailure({
+            requestedUrl,
+            finalUrl,
+            platform,
+            status,
+            reasonCode: "ACCESS_RESTRICTED",
+            technicalDetail: `The response appears to be an automated-access, CAPTCHA, or security-challenge page rather than the requested public content: ${visibleText.slice(0, 320) || title}`
+        });
+    }
+
+    if (matchedError && (visibleText.length < 2400 || errorTitle || /facebook\.com|linkedin\.com|x\.com|twitter\.com/i.test(finalUrl))) {
+        return buildCollectionFailure({
+            requestedUrl,
+            finalUrl,
+            platform,
+            status,
+            reasonCode: "PLATFORM_ERROR_PAGE",
+            technicalDetail: `The response contained a platform-generated error or access-interruption page: ${visibleText.slice(0, 260) || title || "No page content"}`
+        });
+    }
+
+    if (errorTitle && visibleText.length < 900 && description.length < 120) {
+        return buildCollectionFailure({
+            requestedUrl,
+            finalUrl,
+            platform,
+            status,
+            reasonCode: "GENERIC_ERROR_PAGE",
+            technicalDetail: `The primary page title was "${title}" and the returned page contained too little substantive content to investigate.`
+        });
+    }
+
+    const meaningfulContentChars = visibleText.length + description.length +
+        (Array.isArray(source?.headings) ? source.headings.join(" ").length : 0) +
+        (Array.isArray(source?.posts) ? source.posts.reduce((sum, item) => sum + String(item?.text || item?.description || item?.title || "").length, 0) : 0) +
+        (Array.isArray(source?.articles) ? source.articles.reduce((sum, item) => sum + String(item?.text || item?.description || item?.title || "").length, 0) : 0);
+
+    if (meaningfulContentChars < 35) {
+        return buildCollectionFailure({
+            requestedUrl,
+            finalUrl,
+            platform,
+            status,
+            reasonCode: "NO_USABLE_PUBLIC_CONTENT",
+            technicalDetail: "The request returned a page, but no substantive public text, description, headings, or useful links could be extracted."
+        });
+    }
+
+    return null;
 }
 
 function extractPlatformEvidence(html = "", url = "", platform = "") {
@@ -1180,14 +1353,27 @@ export async function acquirePublicContent({
 
             const html = await response.text();
             const source = buildSource({
-  url,
-  response,
-  html
-});
+                url,
+                response,
+                html
+            });
+            source.fetchFailure = detectPageCollectionFailure({
+                requestedUrl: url,
+                response,
+                source
+            });
 
             sources.push(source);
 
-            // Discover more public links from the fetched source.
+            // Never use links embedded in an error/login/challenge page as
+            // crawl seeds. If the submitted primary URL fails, stop collection
+            // immediately; failed secondary pages are skipped independently.
+            if (source.fetchFailure) {
+                if (normalizeUrl(url) === normalizeUrl(rootUrl)) break;
+                continue;
+            }
+
+            // Discover more public links from a usable fetched source.
             enqueueUrls(
     queue,
     [
@@ -1223,8 +1409,11 @@ export async function acquirePublicContent({
                 sitemapSeeded = true;
             }
         } catch (error) {
-            sources.push({
+            const failedSource = {
+                requestedUrl: url,
                 sourceUrl: url,
+                finalUrl: url,
+                redirected: false,
                 canonicalUrl: null,
                 platform: detectPlatform(url),
                 sourcePlatform: detectPlatform(url),
@@ -1245,11 +1434,55 @@ export async function acquirePublicContent({
                     ? "Public source fetch timed out."
                     : (error?.message || "Public source fetch failed."),
                 fetchTimestamp: new Date().toISOString()
+            };
+            failedSource.fetchFailure = detectPageCollectionFailure({
+                requestedUrl: url,
+                source: failedSource,
+                fetchError: error
             });
+            sources.push(failedSource);
         }
     }
 
     const finalSources = dedupeSources(sources).slice(0, MAX_FETCH_ATTEMPTS);
+    const primarySource = sources.find(source =>
+        normalizeUrl(source?.requestedUrl || source?.sourceUrl || "") === rootUrl
+    ) || null;
+
+    if (!primarySource) {
+        const failure = buildCollectionFailure({
+            requestedUrl: rootUrl,
+            finalUrl: rootUrl,
+            platform: detectPlatform(rootUrl),
+            reasonCode: "PRIMARY_SOURCE_NOT_FETCHED",
+            technicalDetail: "The submitted primary URL did not produce a fetch result."
+        });
+        console.warn("PCF_PRIMARY_INVESTIGATION_FAILED", JSON.stringify(failure));
+        return {
+            success: false,
+            investigationFailure: true,
+            failure,
+            stage: "Public Content Fetcher",
+            sourceCount: 0,
+            originalSourceCount: sources.length,
+            filteredSourceCount: 0,
+            sources: []
+        };
+    }
+
+    if (primarySource.fetchFailure) {
+        console.warn("PCF_PRIMARY_INVESTIGATION_FAILED", JSON.stringify(primarySource.fetchFailure));
+        return {
+            success: false,
+            investigationFailure: true,
+            failure: primarySource.fetchFailure,
+            stage: "Public Content Fetcher",
+            sourceCount: 0,
+            originalSourceCount: sources.length,
+            filteredSourceCount: 0,
+            sources: []
+        };
+    }
 
     const filteredEvidence = filterWebsiteEvidenceSources(
         finalSources,
@@ -1273,6 +1506,9 @@ export async function acquirePublicContent({
 
     return {
         success: true,
+        investigationFailure: false,
+        primarySourceCollected: true,
+        primarySourceUrl: rootUrl,
         stage: "Public Content Fetcher",
         sourceCount: filteredEvidence.filteredSourceCount,
         originalSourceCount: filteredEvidence.originalSourceCount,
