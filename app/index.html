@@ -412,6 +412,20 @@ word-break:break-word;
 .tl-free-investigation-item strong{font-size:13px;line-height:1.45;color:#f3f4f6}
 .tl-free-investigation-item span{font-size:12px;line-height:1.55;color:#aab2c0}
 
+.tl-investigation-overview{margin:15px 0 17px;padding:14px 15px;border:1px solid rgba(96,165,250,.24);border-radius:14px;background:linear-gradient(145deg,rgba(17,27,46,.92),rgba(10,16,29,.96));display:grid;gap:10px}
+.tl-investigation-overview-heading{color:#f8fafc;font-size:15px;font-weight:850;line-height:1.35}
+.tl-investigation-overview-item{display:grid;gap:3px;padding-left:11px;border-left:2px solid rgba(96,165,250,.45)}
+.tl-investigation-overview-item strong{color:#fff;font-size:12.5px;line-height:1.4}
+.tl-investigation-overview-item span{color:#b8c4d6;font-size:11.5px;line-height:1.5}
+.tl-first-screen-price{margin:7px 0 2px;padding:9px 11px;border:1px solid rgba(250,204,21,.20);border-radius:10px;background:rgba(250,204,21,.045);color:#cbd5e1;font-size:10.5px;line-height:1.5;text-align:center}
+.tl-first-screen-price strong{color:#fde68a;font-weight:850}
+#paywallBox .tl-strategic-free-finding-body{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;overflow:hidden;font-size:12.5px;line-height:1.55}
+#paywallBox .tl-paywall-evidence-row{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:9px;color:#aebbd0;font-size:10px;line-height:1.4}
+#paywallBox .tl-paywall-evidence-chip{display:inline-block!important;flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:100%;margin:0!important;padding:3px 7px!important;border:1px solid rgba(125,211,252,.30)!important;border-radius:6px!important;background:rgba(14,165,233,.10)!important;color:#7dd3fc!important;font-size:10px!important;font-weight:800!important;line-height:1.3!important;box-shadow:none!important;cursor:pointer}
+#paywallBox .tl-strategic-paywall-list li strong{color:#fff;font-weight:850}
+@media(max-width:520px){.tl-investigation-overview{padding:12px;gap:8px;margin:12px 0}.tl-investigation-overview-heading{font-size:14px}.tl-investigation-overview-item strong{font-size:12px}.tl-investigation-overview-item span{font-size:11px}.tl-first-screen-price{font-size:10px;padding:8px 9px}#paywallBox .tl-strategic-free-finding-body{-webkit-line-clamp:5;font-size:12px}#paywallBox .tl-paywall-evidence-chip{font-size:9px!important}}
+
+
 /* =========================
    LOOP 7 PROCESSING UI
    ========================= */
@@ -2332,30 +2346,24 @@ START NEW PATTERN
         <div class="tl-direct-brand">TRUTHLOOP AI · PUBLIC EVIDENCE INVESTIGATION</div>
         <h2 class="tl-direct-title">Investigate a Public Profile. Follow the Evidence.</h2>
         <div class="tl-direct-intro">Start with one public profile or website. TruthLoop connects accessible public evidence across sources and helps you examine patterns, potential inconsistencies, and the sources behind its findings.</div>
-        <div class="tl-source-availability" role="status" aria-label="Temporary source availability update">
-          <div class="tl-source-availability-track">
-            <span>Temporary Source Availability Update: Until 29 November 2026, LinkedIn and X evidence collection is temporarily paused. GitHub evidence collection remains available. Website evidence collection continues as usual.</span>
-            <span aria-hidden="true">Temporary Source Availability Update: Until 29 November 2026, LinkedIn and X evidence collection is temporarily paused. GitHub evidence collection remains available. Website evidence collection continues as usual.</span>
-          </div>
-        </div>
-        <section class="tl-free-investigation" aria-label="Free investigation experience">
-          <div class="tl-free-investigation-heading"><span>FREE</span><strong>Your Free Investigation Experience</strong></div>
-          <div class="tl-free-investigation-item"><strong>Up to 50 Free Website Evidence Sources</strong><span>Trackable public website sources collected during report generation, depending on available content.</span></div>
-          <div class="tl-free-investigation-item"><strong>Up to 15 Free Additional Platform Sources</strong><span>Trackable public evidence from GitHub, X and LinkedIn, depending on availability.</span></div>
-          <div class="tl-free-investigation-item"><strong>Free Evidence Collection Visibility</strong><span>See the evidence-collection process and source count while your investigation report is being generated.</span></div>
-          <div class="tl-free-investigation-item"><strong>Free Preview of a Key Investigation Finding</strong><span>See one actual finding from your investigation before unlocking the full report. The same finding is also included in your complete report.</span></div>
+        <section class="tl-investigation-overview" aria-label="How this investigation works">
+          <div class="tl-investigation-overview-heading">How This Investigation Works</div>
+          <div class="tl-investigation-overview-item"><strong>1. Public-source scan</strong><span>Examines accessible website pages, articles, and supported public-profile content related to the subject.</span></div>
+          <div class="tl-investigation-overview-item"><strong>2. Cross-source checks</strong><span>Compares available public claims, activity, and supporting material for patterns, gaps, and consistency.</span></div>
+          <div class="tl-investigation-overview-item"><strong>3. One finding preview</strong><span>Review an actual evidence-led finding before deciding whether to unlock the complete report.</span></div>
         </section>
         <div class="tl-direct-action-intro"><strong>Start with one public link.</strong></div>
         <label class="tl-loop7-link-label" for="loop7ProfileLink">PUBLIC PROFILE OR WEBSITE URL</label>
         <input id="loop7ProfileLink" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com" aria-label="Public profile or website URL">
         <div class="tl-loop7-link-note">Paste a public profile or website link. Findings depend on accessible public evidence.</div>
         <button id="tlDirectReportBtn" type="button" disabled>GENERATE INVESTIGATION REPORT →</button>
+        <div class="tl-first-screen-price">One finding preview is included. Complete 8-section report with clickable public-source links and PDF download: <strong>₹499 (India) / $9.99 USD (international)</strong>. One-time payment · No subscription.</div>
 
         <div class="tl-direct-preview tl-direct-preview-compact" aria-label="What your investigation report includes">
-          <div class="tl-direct-preview-title">WHAT YOUR INVESTIGATION CAN REVEAL</div>
-          <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">01</span><span><strong>Connected public evidence</strong> across accessible sources</span></div>
-          <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">02</span><span><strong>Patterns and potential inconsistencies</strong> across sources</span></div>
-          <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">03</span><span><strong>Evidence-linked findings</strong> with source links and an evidence confidence assessment</span></div>
+          <div class="tl-direct-preview-title">WHAT THIS INVESTIGATION EXAMINES</div>
+          <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">01</span><span><strong>Public claims and demonstrated activity</strong> found in accessible material</span></div>
+          <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">02</span><span><strong>Patterns, gaps, and potential inconsistencies</strong> across available evidence</span></div>
+          <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">03</span><span><strong>Evidence-linked findings</strong> with source references and an evidence-confidence assessment</span></div>
         </div>
         <div class="tl-direct-preview-note"><strong>Your report is structured across 8 dimensions:</strong> Identity, Claims, Actions, Capability, Independent Validation, Consistency, Reliability &amp; Risk, and Overall Pattern.</div>
         <div class="tl-direct-verify"><span class="tl-direct-preview-icon">✓</span><div><strong>Check the evidence yourself.</strong> Findings include source references so you can examine the material behind the report. Results depend on what public content is accessible.</div></div>
@@ -2386,7 +2394,7 @@ START NEW PATTERN
             <summary>Questions before you begin?</summary>
             <div class="tl-mobile-faq-content">
               <details><summary>What does TruthLoop investigate?</summary><p>It connects accessible public content to help examine patterns, connections, and potential inconsistencies. Findings depend on available evidence.</p></details>
-              <details><summary>What sources may be collected?</summary><p>Up to 50 website evidence sources and, when available, additional public evidence from supported platforms. No source or platform is guaranteed.</p></details>
+              <details><summary>What sources may be collected?</summary><p>Relevant accessible website content and, where currently supported and retrievable, additional public-profile content. Coverage varies by subject and source availability; no source or platform is guaranteed.</p></details>
               <details><summary>What will the report include?</summary><p>An eight-section investigation with evidence-linked findings, source references, and an evidence-confidence assessment.</p></details>
               <details><summary>How much does the full report cost?</summary><p>₹499 in India or $9.99 USD internationally. The applicable price is shown before payment.</p></details>
             </div>
@@ -4258,18 +4266,11 @@ return `
     <div class="tl-direct-brand">TRUTHLOOP AI · PUBLIC EVIDENCE INVESTIGATION</div>
     <h2 class="tl-direct-title">Investigate a Public Profile. Follow the Evidence.</h2>
     <div class="tl-direct-intro">Start with one public profile or website. TruthLoop connects accessible public evidence across sources and helps you examine patterns, potential inconsistencies, and the sources behind its findings.</div>
-    <div class="tl-source-availability" role="status" aria-label="Temporary source availability update">
-      <div class="tl-source-availability-track">
-        <span>Temporary Source Availability Update: Until 29 November 2026, LinkedIn and X evidence collection is temporarily paused. GitHub evidence collection remains available. Website evidence collection continues as usual.</span>
-        <span aria-hidden="true">Temporary Source Availability Update: Until 29 November 2026, LinkedIn and X evidence collection is temporarily paused. GitHub evidence collection remains available. Website evidence collection continues as usual.</span>
-      </div>
-    </div>
-    <section class="tl-free-investigation" aria-label="Free investigation experience">
-      <div class="tl-free-investigation-heading"><span>FREE</span><strong>Your Free Investigation Experience</strong></div>
-      <div class="tl-free-investigation-item"><strong>Up to 50 Free Website Evidence Sources</strong><span>Trackable public website sources collected during report generation, depending on available content.</span></div>
-      <div class="tl-free-investigation-item"><strong>Up to 15 Free Additional Platform Sources</strong><span>Trackable public evidence from GitHub, X and LinkedIn, depending on availability.</span></div>
-      <div class="tl-free-investigation-item"><strong>Free Evidence Collection Visibility</strong><span>See the evidence-collection process and source count while your investigation report is being generated.</span></div>
-      <div class="tl-free-investigation-item"><strong>Free Preview of a Key Investigation Finding</strong><span>See one actual finding from your investigation before unlocking the full report. The same finding is also included in your complete report.</span></div>
+    <section class="tl-investigation-overview" aria-label="How this investigation works">
+      <div class="tl-investigation-overview-heading">How This Investigation Works</div>
+      <div class="tl-investigation-overview-item"><strong>1. Public-source scan</strong><span>Examines accessible website pages, articles, and supported public-profile content related to the subject.</span></div>
+      <div class="tl-investigation-overview-item"><strong>2. Cross-source checks</strong><span>Compares available public claims, activity, and supporting material for patterns, gaps, and consistency.</span></div>
+      <div class="tl-investigation-overview-item"><strong>3. One finding preview</strong><span>Review an actual evidence-led finding before deciding whether to unlock the complete report.</span></div>
     </section>
     <div class="tl-direct-action-intro"><strong>Start with one public link.</strong></div>
   ` : `
@@ -4288,12 +4289,13 @@ return `
   <div class="tl-loop7-link-note">${directMode ? "Paste a public profile or website link. Findings depend on accessible public evidence." : "Paste a public profile or website URL. The next action appears after a valid link is entered."}</div>
   ${directMode ? `
     <button id="tlDirectReportBtn" type="button" disabled style="display:block;width:100%;margin-top:11px;padding:13px 16px;border:0;border-radius:11px;background:linear-gradient(100deg,#ff7b14,#ffa31a);color:#101014;font-weight:900;cursor:pointer;">GENERATE INVESTIGATION REPORT →</button>
+    <div class="tl-first-screen-price">One finding preview is included. Complete 8-section report with clickable public-source links and PDF download: <strong>₹499 (India) / $9.99 USD (international)</strong>. One-time payment · No subscription.</div>
     
     <div class="tl-direct-preview tl-direct-preview-compact" aria-label="What your investigation report includes">
-      <div class="tl-direct-preview-title">WHAT YOUR INVESTIGATION CAN REVEAL</div>
-      <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">01</span><span><strong>Connected public evidence</strong> across accessible sources</span></div>
-      <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">02</span><span><strong>Patterns and potential inconsistencies</strong> across sources</span></div>
-      <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">03</span><span><strong>Evidence-linked findings</strong> with source links and an evidence confidence assessment</span></div>
+      <div class="tl-direct-preview-title">WHAT THIS INVESTIGATION EXAMINES</div>
+      <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">01</span><span><strong>Public claims and demonstrated activity</strong> found in accessible material</span></div>
+      <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">02</span><span><strong>Patterns, gaps, and potential inconsistencies</strong> across available evidence</span></div>
+      <div class="tl-direct-preview-row"><span class="tl-direct-preview-icon">03</span><span><strong>Evidence-linked findings</strong> with source references and an evidence-confidence assessment</span></div>
     </div>
     <div class="tl-direct-preview-note"><strong>Your report is structured across 8 dimensions:</strong> Identity, Claims, Actions, Capability, Independent Validation, Consistency, Reliability &amp; Risk, and Overall Pattern.</div>
     <div class="tl-direct-verify"><span class="tl-direct-preview-icon">✓</span><div><strong>Check the evidence yourself.</strong> Findings include source references so you can examine the material behind the report. Results depend on what public content is accessible.</div></div>
@@ -4323,7 +4325,7 @@ return `
         <summary>Questions before you begin?</summary>
         <div class="tl-mobile-faq-content">
           <details><summary>What does TruthLoop investigate?</summary><p>It connects accessible public content to help examine patterns, connections, and potential inconsistencies. Findings depend on available evidence.</p></details>
-          <details><summary>What sources may be collected?</summary><p>Up to 30 website sources and, when available, additional public evidence from platforms such as GitHub, X, and LinkedIn. No source or platform is guaranteed.</p></details>
+          <details><summary>What sources may be collected?</summary><p>Relevant accessible website content and, where currently supported and retrievable, additional public-profile content. Coverage varies by subject and source availability; no source or platform is guaranteed.</p></details>
           <details><summary>What will the report include?</summary><p>An eight-section investigation with evidence-linked findings, source references, and an evidence-confidence assessment.</p></details>
           <details><summary>How much does the full report cost?</summary><p>₹499 in India or $9.99 USD internationally. The applicable price is shown before payment.</p></details>
         </div>
@@ -5169,21 +5171,61 @@ function selectPaywallFreeFinding(reportText){
 function renderPaywallFreeFinding(reportText){
   const selected = selectPaywallFreeFinding(reportText);
   if(!selected) return '';
-  const safeBody = decorateLoop7Citations(
-    escapeHtml(String(selected.body || ''))
-      .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\n/g, '<br>')
-  );
-  return `<section class="tl-strategic-free-finding">
-    <div class="tl-strategic-free-finding-label">FREE INVESTIGATION FINDING</div>
-    <h3 class="tl-strategic-free-finding-title">${escapeHtml(selected.title)}</h3>
+
+  // Keep the sample to a short, readable excerpt. Source IDs are rendered as
+  // compact inline evidence chips below instead of full-width buttons in the prose.
+  const sourceIds = [...new Set(
+    (String(selected.body || '').match(/\[?SOURCE_\d{1,3}\]?/gi) || [])
+      .map(value => value.replace(/[\[\]]/g, '').toUpperCase())
+  )];
+  const excerptText = String(selected.body || '')
+    .replace(/\r/g, '')
+    .replace(/^\s*[-*•▪▸→▶️➡️⏩]\s*/gm, '')
+    .replace(/^\s*SOURCE_\d{1,3}\s*$/gim, '')
+    .replace(/\[?SOURCE_\d{1,3}\]?/gi, ' ')
+    .replace(/\[\[highlight\]\]|\[\[end\]\]/gi, '')
+    .replace(/\*\*/g, '')
+    .replace(/`/g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/[,;]\s*[,;]+/g, ',')
+    .trim();
+
+  let excerpt = excerptText;
+  const maxChars = 420;
+  if(excerpt.length > maxChars){
+    const limited = excerpt.slice(0, maxChars);
+    const sentenceEnd = Math.max(
+      limited.lastIndexOf('. '),
+      limited.lastIndexOf('? '),
+      limited.lastIndexOf('! ')
+    );
+    const cutAt = sentenceEnd > 180 ? sentenceEnd + 1 : limited.lastIndexOf(' ');
+    excerpt = (cutAt > 120 ? limited.slice(0, cutAt) : limited).trimEnd() + '…';
+  }
+
+  const safeBody = escapeHtml(excerpt)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+
+  const evidenceChips = sourceIds
+    .filter(sourceId => !!getLoop7EvidenceSource(sourceId))
+    .slice(0, 3)
+    .map(sourceId => {
+      const source = getLoop7EvidenceSource(sourceId);
+      return `<button type="button" class="tlr-citation tl-paywall-evidence-chip" data-source-id="${escapeHtml(sourceId)}" title="${escapeHtml(source?.title || 'Open cited public evidence')}">${escapeHtml(sourceId)}</button>`;
+    }).join('');
+
+  const sectionNumber = String(Number(selected.index) + 1).padStart(2, '0');
+  const sectionTitle = String(selected.title || 'Investigation finding').replace(/^\d{2}\.\s*/, '');
+  return `<section class="tl-strategic-free-finding" aria-label="Finding preview from your investigation">
+    <div class="tl-strategic-free-finding-label">${selected.fallback ? 'INVESTIGATION PREVIEW' : 'KEY INVESTIGATION FINDING'} · SECTION ${sectionNumber} OF 08</div>
+    <h3 class="tl-strategic-free-finding-title">${escapeHtml(sectionTitle)}</h3>
     <div class="tl-strategic-free-finding-body">${safeBody}</div>
-    <div class="tl-strategic-free-finding-note">${selected.fallback ? 'This is the available first-section preview from your investigation.' : 'This evidence-led finding is included in your complete report. Unlock the full report to explore all eight sections and the complete source analysis.'}</div>
+    ${evidenceChips ? `<div class="tl-paywall-evidence-row" aria-label="Cited evidence links">Evidence cited: ${evidenceChips}</div>` : ''}
+    <div class="tl-strategic-free-finding-note">This is one finding from your completed investigation. The full report includes all eight sections, the complete analysis, available source references, confidence assessment, and evidence limitations.</div>
   </section>`;
 }
-
 function renderLoop7Report(report){
   const rawReport = String(report || "").trim();
   const sections = [
@@ -5778,16 +5820,12 @@ async function showPaywall(){
 
       ${renderPaywallFreeFinding(latestTruthLoopReport)}
 
-      <div class="tl-strategic-paywall-offer-title">Unlock your complete 8-section investigation report:</div>
+      <div class="tl-strategic-paywall-offer-title">Unlock the complete investigation:</div>
       <ul class="tl-strategic-paywall-list">
-        <li>Identity, claims, commitments and demonstrated actions</li>
-        <li>Capability and execution evidence</li>
-        <li>Independent validation and consistency across sources</li>
-        <li>Reliability, accountability and documented risk signals</li>
-        <li>Overall pattern and future readiness</li>
-        <li>Evidence references with clickable public-source links</li>
-        <li>Confidence assessment and evidence limitations</li>
-        <li>One Next Action</li>
+        <li><strong>All 8 investigation sections:</strong> identity, claims, actions, capability, independent validation, consistency, reliability and risk, and overall pattern.</li>
+        <li><strong>Evidence you can inspect:</strong> available source references with clickable links to the original public material.</li>
+        <li><strong>Confidence and limitations:</strong> an evidence-confidence assessment that distinguishes supported findings from gaps or unavailable evidence.</li>
+        <li><strong>Your next step:</strong> One Next Action, plus the complete report to read online and download as a PDF.</li>
       </ul>
 
       <div class="tl-strategic-paywall-download">
@@ -5797,7 +5835,7 @@ async function showPaywall(){
 
       <div class="tl-strategic-paywall-price">${priceLabel}</div>
       <div class="tl-strategic-paywall-meta">${currencyMeta}</div>
-      <div class="tl-strategic-paywall-checkout">Secure checkout via Razorpay. Available payment methods are shown at checkout.</div>
+      <div class="tl-strategic-paywall-checkout">Secure one-time checkout via Razorpay. No subscription. Available payment methods are shown before you pay.</div>
     </div>
   `;
 
