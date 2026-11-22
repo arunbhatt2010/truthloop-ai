@@ -901,6 +901,28 @@ async function loadEvidenceCompressionBrain({
 } = {}) {
   console.log("ECB_START");
 
+  // A primary-source collection failure is a terminal investigation state.
+  // Never convert it into an evidence package or pass it to the report model.
+  if (publicEvidencePackage?.investigationFailure === true || publicEvidencePackage?.failure?.code === "PRIMARY_INVESTIGATION_FAILED") {
+    const failure = publicEvidencePackage?.failure || {
+      code: "PRIMARY_INVESTIGATION_FAILED",
+      stage: "evidence_compression",
+      reasonCode: "PRIMARY_SOURCE_UNAVAILABLE",
+      reasonLabel: "The primary public source could not be examined.",
+      userMessage: "TruthLoop AI could not collect usable public content from the submitted URL. No investigation report has been generated.",
+      recommendedAction: "Check the URL or submit another supported public URL.",
+      supportedSourcesMessage: "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported."
+    };
+    console.warn("ECB_PRIMARY_INVESTIGATION_FAILURE_PASSTHROUGH", JSON.stringify({ reasonCode: failure.reasonCode || null, requestedUrl: failure.requestedUrl || null }));
+    return {
+      success: false,
+      investigationFailure: true,
+      failure,
+      reason: failure.userMessage || "Primary source collection failed.",
+      loop7Package: null
+    };
+  }
+
   const universalPackage =
     resolveUniversalPackage(publicEvidencePackage);
 
@@ -921,6 +943,62 @@ async function loadEvidenceCompressionBrain({
     return {
       success: false,
       reason: "No public evidence",
+      loop7Package: null
+    };
+  }
+
+  // Defense-in-depth: if a failure-marked page somehow reaches ECB inside a
+  // nominally successful package, stop only when it is the submitted primary
+  // source. Failed secondary pages must not cancel an otherwise valid report.
+  const primarySourceUrl = String(universalPackage?.primarySource || universalPackage?.primaryUrl || "");
+  const primaryWebsiteSource = (Array.isArray(universalPackage?.websiteEvidence?.sources)
+    ? universalPackage.websiteEvidence.sources
+    : []).find(source => {
+      const candidate = String(source?.requestedUrl || source?.sourceUrl || source?.canonicalUrl || "");
+      if (!candidate || !primarySourceUrl) return false;
+      try { return new URL(candidate).origin + new URL(candidate).pathname === new URL(primarySourceUrl).origin + new URL(primarySourceUrl).pathname; }
+      catch { return candidate === primarySourceUrl; }
+    }) || null;
+
+  const primaryContent = String(primaryWebsiteSource?.visibleText || primaryWebsiteSource?.content || "").replace(/\s+/g, " ").trim();
+  const primaryMeaningfulChars =
+    String(primaryWebsiteSource?.description || "").length +
+    primaryContent.length +
+    (Array.isArray(primaryWebsiteSource?.headings) ? primaryWebsiteSource.headings.join(" ").length : 0) +
+    (Array.isArray(primaryWebsiteSource?.posts) ? primaryWebsiteSource.posts.reduce((sum, item) => sum + String(item?.text || item?.description || item?.title || "").length, 0) : 0) +
+    (Array.isArray(primaryWebsiteSource?.articles) ? primaryWebsiteSource.articles.reduce((sum, item) => sum + String(item?.text || item?.description || item?.title || "").length, 0) : 0);
+  const primaryFailureText = /sorry[, ]+something went wrong|we(?:'|’)re working on getting this fixed|access denied|request blocked|temporarily unavailable|service unavailable|verify (?:that )?you are human|this page isn(?:'|’)t available|robot check|to discuss automated access to amazon|automated access to amazon|enter the characters you see below|type the characters you see in this image|we just need to make sure you(?:'|’)re not a robot|verify (?:that )?you(?:'|’)re not a robot|complete the security check|human verification required|your request has been blocked|attention required[!|: ]+cloudflare|checking your browser before accessing|enable javascript and cookies to continue/i.test(primaryContent);
+  const primaryErrorTitle = /^(error|access denied|request blocked|page unavailable|service unavailable)$/i.test(String(primaryWebsiteSource?.title || "").trim());
+  const primaryLoginRedirect = /\/(?:login|log-in|signin|sign-in|checkpoint|auth)(?:\/|$)/i.test(String(primaryWebsiteSource?.finalUrl || primaryWebsiteSource?.sourceUrl || ""));
+  if (primaryWebsiteSource && (primaryWebsiteSource.fetchFailure || primaryLoginRedirect || ((primaryFailureText || primaryErrorTitle) && primaryContent.length < 2400) || primaryMeaningfulChars < 35)) {
+    const inferredReasonCode = primaryLoginRedirect
+      ? "LOGIN_REDIRECT"
+      : (primaryFailureText || primaryErrorTitle)
+        ? "PLATFORM_ERROR_PAGE"
+        : "NO_USABLE_PUBLIC_CONTENT";
+    const failure = primaryWebsiteSource.fetchFailure || {
+      code: "PRIMARY_INVESTIGATION_FAILED",
+      stage: "evidence_compression",
+      reasonCode: inferredReasonCode,
+      reasonLabel: primaryLoginRedirect ? "The URL redirected to a login page." : (inferredReasonCode === "PLATFORM_ERROR_PAGE" ? "The primary URL returned an error page instead of usable content." : "The primary page contained no substantive public content."),
+      userMessage: primaryLoginRedirect
+        ? "The submitted URL redirected to a login or authentication page. The actual public content could not be examined, so no report has been generated."
+        : (inferredReasonCode === "PLATFORM_ERROR_PAGE"
+          ? "The submitted URL returned a platform-generated error page rather than usable public content. The error page is not treated as investigation evidence, and no report has been generated."
+          : "The submitted URL returned too little substantive public content for a reliable investigation. No report has been generated."),
+      technicalDetail: primaryContent.slice(0, 500) || String(primaryWebsiteSource?.error || "Primary source response was unusable."),
+      requestedUrl: primaryWebsiteSource?.requestedUrl || primarySourceUrl,
+      finalUrl: primaryWebsiteSource?.finalUrl || primaryWebsiteSource?.sourceUrl || null,
+      retryable: false,
+      recommendedAction: "Check that the URL opens publicly without a login, then retry or submit another supported public URL.",
+      supportedSourcesMessage: "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported."
+    };
+    console.warn("ECB_PRIMARY_SOURCE_VALIDATION_FAILED", JSON.stringify({ reasonCode: failure.reasonCode || null, requestedUrl: failure.requestedUrl || primarySourceUrl }));
+    return {
+      success: false,
+      investigationFailure: true,
+      failure,
+      reason: failure.userMessage || "The primary source is not usable.",
       loop7Package: null
     };
   }
