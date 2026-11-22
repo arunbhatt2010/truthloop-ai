@@ -2514,9 +2514,9 @@ START NEW PATTERN
     
 const API_URL="/api/chat";
 /* Production mode: Loop 7 reports remain behind the paywall until payment is confirmed. */
-//const TL_TEMPORARY_TEST_BYPASS = false;
+const TL_TEMPORARY_TEST_BYPASS = false;
 // Temporary unlock test only: uncomment the next line and comment out the false line above.
- const TL_TEMPORARY_TEST_BYPASS = true;    
+// const TL_TEMPORARY_TEST_BYPASS = true;    
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
 const outputBox=document.getElementById("outputBox");
@@ -5327,7 +5327,7 @@ function renderLoop7Report(report){
       ${nav}
       ${reportBodyHtml}
       ${renderEvidenceSources()}
-      <div style="margin-top:26px;text-align:center;"><button id="downloadReportBtn" type="button">📄 Download PDF Report</button></div>
+      <div style="margin-top:26px;text-align:center;"><button id="downloadReportBtn">📄 Download Report</button></div>
       <button type="button" id="tlDeeperInvestigationCTA" class="tl-deeper-investigation-cta">Not satisfied yet, or want a deeper investigation? Tap here to continue.</button>
     </div>`;
 }
@@ -5402,387 +5402,330 @@ function whatsappShare(){
 window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 
   }
-/* TruthLoop PDF export shared by Direct Public Profile and Guided Loop 1-7 reports.
-   Uses native PDF text and PDF link annotations, not a screenshot of the HTML page. */
-let tlPdfMakeReadyPromise = null;
+ function downloadTruthLoopReport(){
+  const report = document.querySelector(".truthLoopReport");
+  if(!report) return false;
 
-function loadTruthLoopPdfScript(src){
-  return new Promise((resolve,reject)=>{
-    let existing = Array.from(document.scripts).find(script => script.src === src);
-    if(existing && existing.dataset.failed === "true"){
-      existing.remove();
-      existing = null;
-    }
-    if(existing){
-      if(existing.dataset.loaded === "true") return resolve();
-      existing.addEventListener("load", resolve, {once:true});
-      existing.addEventListener("error", () => reject(new Error("Could not load PDF component: " + src)), {once:true});
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = src;
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    script.onload = () => { script.dataset.loaded = "true"; resolve(); };
-    script.onerror = () => { script.dataset.failed = "true"; reject(new Error("Could not load PDF component: " + src)); };
-    document.head.appendChild(script);
+  const generatedDate = new Date().toLocaleDateString(undefined,{
+    year:"numeric",
+    month:"long",
+    day:"numeric"
   });
-}
 
-async function ensureTruthLoopPdfMake(){
-  if(window.pdfMake && window.pdfMake.vfs) return window.pdfMake;
-  if(!tlPdfMakeReadyPromise){
-    tlPdfMakeReadyPromise = (async()=>{
-      const bases = [
-        "https://cdn.jsdelivr.net/npm/pdfmake@0.2.23/build/",
-        "https://unpkg.com/pdfmake@0.2.23/build/"
-      ];
-      let lastError = null;
-      for(const base of bases){
-        try{
-          if(!window.pdfMake || typeof window.pdfMake.createPdf !== "function"){
-            await loadTruthLoopPdfScript(base + "pdfmake.min.js");
-          }
-          if(!window.pdfMake?.vfs) await loadTruthLoopPdfScript(base + "vfs_fonts.js");
-          if(window.pdfMake && typeof window.pdfMake.createPdf === "function" && window.pdfMake.vfs){
-            return window.pdfMake;
-          }
-          throw new Error("PDF engine loaded without its embedded fonts.");
-        }catch(error){ lastError = error; }
+  function getCleanSectionBody(id){
+    const source = report.querySelector(id);
+    if(!source) return "";
+
+    const clone = source.cloneNode(true);
+    clone.querySelectorAll("h1,h2,h3,h4").forEach(node => node.remove());
+    return clone.innerHTML.trim();
+  }
+
+  const sourceRows = (Array.isArray(evidenceSourceRegistry)
+    ? evidenceSourceRegistry
+    : []
+  ).map((item,index) => {
+    const sourceId = item.sourceId || `SOURCE_${String(index + 1).padStart(2,"0")}`;
+    const type = item.sourceType || "public_evidence";
+    const title = item.title || "Untitled source";
+    const url = item.url || "";
+    const publishedDate = formatLoop7EvidenceDate(item.publishedDate);
+    const collectedAt = item.collectedAt
+      ? formatLoop7EvidenceDate(item.collectedAt, "")
+      : "";
+
+    return `
+      <div style="
+        margin:12px 0;
+        padding:14px;
+        border:1px solid #333;
+        border-radius:10px;
+        background:#171a21;
+        line-height:1.75;
+      ">
+        <div style="font-weight:800;color:#ffcc66;">
+          ${escapeHtml(sourceId)}
+        </div>
+        <div><b>Type:</b> ${escapeHtml(type)}</div>
+        <div><b>Title:</b> ${escapeHtml(title)}</div>
+        <div><b>Published date:</b> ${escapeHtml(publishedDate)}</div>
+        ${collectedAt ? `<div><b>Collected:</b> ${escapeHtml(collectedAt)}</div>` : ""}
+        ${
+          url
+            ? `<div style="overflow-wrap:anywhere;">
+                <b>URL:</b>
+                <a href="${escapeHtml(url)}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   style="color:#8ab4ff;">
+                  ${escapeHtml(url)}
+                </a>
+              </div>`
+            : ""
+        }
+      </div>
+    `;
+  }).join("");
+
+  const evidenceReferenceSection = `
+    <section id="downloadEvidenceSources"
+      style="
+        margin-top:36px;
+        padding-top:24px;
+        border-top:2px solid #333;
+      ">
+      <h2>📚 Evidence Sources</h2>
+      <p style="color:#aaa;">
+        Reference key for the source IDs cited in this investigation.
+      </p>
+      ${
+        sourceRows ||
+        `<p style="color:#aaa;">
+          Evidence source mapping was not returned by the investigation response.
+        </p>`
       }
-      throw lastError || new Error("Could not load the PDF engine.");
-    })().catch(error=>{
-      tlPdfMakeReadyPromise = null;
-      throw error;
-    });
+    </section>
+  `;
+
+  const unstructuredReportText = document.getElementById("tlr-unstructured-report");
+  const unstructuredReportHtml = unstructuredReportText
+    ? `<section style="margin-top:24px;"><h2>Investigation Report (original response)</h2>${unstructuredReportText.innerHTML.replace(/<h2[^>]*>[\s\S]*?<\/h2>/i, "")}</section>`
+    : "";
+
+  const downloadReport = `
+    <div style="max-width:900px;margin:0 auto;">
+
+      <h2>01. Identity & Self-Representation</h2>
+      ${getCleanSectionBody("#identitySelfRepresentation")}
+
+      <h2>02. Claims, Commitments & Intentions</h2>
+      ${getCleanSectionBody("#claimsCommitmentsIntentions")}
+
+      <h2>03. Actions & Demonstrated Track Record</h2>
+      ${getCleanSectionBody("#actionsDemonstratedTrackRecord")}
+
+      <h2>04. Capability & Execution Evidence</h2>
+      ${getCleanSectionBody("#capabilityExecutionEvidence")}
+
+      <h2>05. Independent Validation & Relationships</h2>
+      ${getCleanSectionBody("#independentValidationRelationships")}
+
+      <h2>06. Consistency & Evolution Over Time</h2>
+      ${getCleanSectionBody("#consistencyEvolutionOverTime")}
+
+      <h2>07. Reliability, Accountability & Risk Signals</h2>
+      ${getCleanSectionBody("#reliabilityAccountabilityRiskSignals")}
+
+      <h2>08. Overall Pattern & Future Readiness</h2>
+      ${getCleanSectionBody("#overallPatternFutureReadiness")}
+
+      ${unstructuredReportHtml}
+      ${evidenceReferenceSection}
+
+      <p style="margin-top:30px;color:#777;font-size:12px;">
+        Generated ${escapeHtml(generatedDate)} by TruthLoop AI.
+      </p>
+    </div>
+  `;
+
+  const conversationBasedReport = window.tlLoop7ReportMode !== "direct";
+  const reportHeader = `
+    <div style="
+      max-width:900px;
+      margin:0 auto 40px;
+      padding-bottom:25px;
+      border-bottom:2px solid #333;
+      text-align:center;
+      font-family:Arial,sans-serif;
+    ">
+
+      <h1 style="margin-bottom:8px;">
+        🧠 TruthLoop Investigation Report
+      </h1>
+
+      <p style="color:#666;margin:0;">
+        Find what you're avoiding.
+      </p>
+
+      <div style="
+        margin-top:30px;
+        padding:18px;
+        background:#171a21;
+        border:1px solid #333;
+        border-radius:12px;
+        text-align:left;
+      ">
+
+        <h3 style="margin-top:0;color:#ff9d00;">
+          📂 Investigation Scope
+        </h3>
+
+        <p style="margin:8px 0;">
+          <b>Investigation Basis</b>
+        </p>
+
+        ${conversationBasedReport ? `<p style="margin:6px 0;">✓ Loop 1 → Loop 7 Conversation</p>` : ""}
+
+        <p style="margin:6px 0;">
+          ✓ Public Footprint Analysis
+        </p>
+
+        <p style="margin-top:12px;">
+          <b>Investigation Source</b><br>
+          ${escapeHtml(investigationSource || "Not provided")}
+        </p>
+
+        <p style="color:#999;font-size:13px;">
+          ${conversationBasedReport
+            ? "This investigation report is based on your Loop 1 to Loop 6 case together with publicly available evidence from the investigation source above."
+            : "This investigation report is based on publicly available evidence from the investigation source above. No Loop 1–6 conversation was used."}
+        </p>
+
+      </div>
+    </div>
+  `;
+
+  const blob = new Blob([`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body{
+          background:#0f1115;
+          color:#f5f5f5;
+          font-family:Arial,sans-serif;
+          line-height:1.8;
+          padding:40px;
+        }
+        .truthLoopReport{
+          max-width:900px;
+          margin:auto;
+        }
+        .truthLoopReport h1,
+        .truthLoopReport h2{
+          color:#ff9d00;
+        }
+        .truthLoopReport p,
+        .truthLoopReport li{
+          color:#ddd;
+        }
+        .truthLoopReport hr{
+          border:0;
+          border-top:1px solid #333;
+        }
+        a{
+          color:#8ab4ff;
+        }
+      </style>
+      <title>TruthLoop Investigation Report</title>
+    
+<style id="truthloop-final-touch">
+  /* Final landing/investigation state controls */
+  #starterPatterns.is-hidden{
+    display:none !important;
   }
-  return tlPdfMakeReadyPromise;
-}
-
-function tlPdfSafeUrl(value){
-  const raw = String(value || "").trim();
-  if(!raw) return "";
-  try{
-    const parsed = new URL(raw);
-    return (parsed.protocol === "https:" || parsed.protocol === "http:") ? parsed.href : "";
-  }catch(_){ return ""; }
-}
-
-function tlPdfFindSource(sourceId, registry){
-  const wanted = String(sourceId || "").trim().toUpperCase();
-  if(!wanted) return null;
-  const rows = Array.isArray(registry) ? registry : [];
-  let found = rows.find(item => String(item?.sourceId || "").trim().toUpperCase() === wanted);
-  if(found) return found;
-  const wantedNumber = wanted.match(/^SOURCE_0*(\d+)$/)?.[1];
-  if(wantedNumber){
-    found = rows.find(item => {
-      const match = String(item?.sourceId || "").trim().toUpperCase().match(/^SOURCE_0*(\d+)$/);
-      return match && Number(match[1]) === Number(wantedNumber);
-    });
+  #patternProfile:not(.tl-visible){
+    display:none !important;
   }
-  return found || null;
-}
-
-function tlPdfCleanInlineText(value){
-  return String(value || "")
-    .replace(/\u00a0/g, " ")
-    .replace(/[\t ]+/g, " ")
-    .replace(/\s*\n\s*/g, " ");
-}
-
-function tlPdfApplyRunStyle(runs, style){
-  if(!style || !Object.keys(style).length) return runs;
-  return runs.map(run=>{
-    if(typeof run === "string") return {text:run, ...style};
-    if(!run || typeof run !== "object") return run;
-    return {...run, ...style, ...(run.link ? {link:run.link} : {})};
-  });
-}
-
-function tlPdfInlineRuns(node, registry){
-  if(!node) return [];
-  if(node.nodeType === Node.TEXT_NODE){
-    const text = tlPdfCleanInlineText(node.nodeValue);
-    return text ? [text] : [];
+  #patternProfile.tl-visible{
+    display:block !important;
+    animation:tlProfileReveal .35s ease both;
   }
-  if(node.nodeType !== Node.ELEMENT_NODE) return [];
-  const tag = node.tagName.toLowerCase();
-  if(["script","style","noscript","svg"].includes(tag)) return [];
-  if(tag === "br") return ["\n"];
+  #loopIndicator:not(.is-active){
+    display:none !important;
+  }
+  #loopIndicator.is-active{
+    display:inline-flex !important;
+    animation:tlIndicatorReveal .3s ease both;
+  }
+  .tl-analysis-state{
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid rgba(168,85,247,.18);
+    background:linear-gradient(145deg,rgba(168,85,247,.07),rgba(255,140,0,.04));
+    color:#a9b4c6;
+    font-size:13px;
+    line-height:1.5;
+    letter-spacing:.01em;
+    opacity:.95;
+  }
+  .tl-analysis-state.hidden{
+    display:none !important;
+  }
+  @keyframes tlProfileReveal{
+    from{opacity:0;transform:translateY(6px)}
+    to{opacity:1;transform:none}
+  }
+  @keyframes tlIndicatorReveal{
+    from{opacity:0;transform:translateY(4px) scale(.98)}
+    to{opacity:1;transform:none}
+  }
+</style>
 
-  if(node.classList?.contains("tlr-citation") && node.dataset?.sourceId){
-    const sourceId = String(node.dataset.sourceId).trim();
-    const source = tlPdfFindSource(sourceId, registry);
-    const url = tlPdfSafeUrl(source?.url);
-    const label = source?.sourceId || sourceId;
-    return [url
-      ? {text:label, link:url, color:"#1769aa", bold:true, decoration:"underline"}
-      : {text:label, color:"#334155", bold:true}
-    ];
-  }
 
-  if(tag === "a"){
-    const href = tlPdfSafeUrl(node.getAttribute("href"));
-    const label = tlPdfCleanInlineText(node.textContent || node.getAttribute("href") || "");
-    if(!label) return [];
-    return [href
-      ? {text:label, link:href, color:"#1769aa", decoration:"underline"}
-      : label
-    ];
-  }
-
-  // The download/action buttons are controls, not part of the report text.
-  if(tag === "button") return [];
-
-  let runs = [];
-  node.childNodes.forEach(child=>{ runs = runs.concat(tlPdfInlineRuns(child, registry)); });
-  let style = {};
-  if(tag === "strong" || tag === "b") style.bold = true;
-  if(tag === "em" || tag === "i") style.italics = true;
-  if(tag === "code"){
-    style.font = "Roboto";
-    style.color = "#334155";
-    style.background = "#eef2f7";
-  }
-  if(node.classList?.contains("truthHighlight")){
-    style.bold = true;
-    style.color = "#8a4b00";
-  }
-  return tlPdfApplyRunStyle(runs, style);
-}
-
-function tlPdfPushParagraph(content, runs, extra = {}){
-  const cleaned = (Array.isArray(runs) ? runs : []).filter(run=>{
-    if(typeof run === "string") return !!run.trim();
-    return run && typeof run === "object" && String(run.text || "").trim();
-  });
-  if(!cleaned.length) return;
-  content.push({text:cleaned, style:"bodyText", margin:[0,0,0,7], ...extra});
-}
-
-function tlPdfCollectBlocks(node, content, registry){
-  if(!node) return;
-  if(node.nodeType === Node.TEXT_NODE){
-    const text = tlPdfCleanInlineText(node.nodeValue).trim();
-    if(text) tlPdfPushParagraph(content, [text]);
-    return;
-  }
-  if(node.nodeType !== Node.ELEMENT_NODE) return;
-  const tag = node.tagName.toLowerCase();
-  if(["script","style","noscript","svg","nav"].includes(tag)) return;
-  if(node.id === "downloadReportBtn" || node.id === "tlDeeperInvestigationCTA") return;
-  if(node.classList?.contains("tlr-source-card") || node.id === "evidenceSourcesReference") return;
-  if(tag === "button" && !node.classList?.contains("tlr-citation")) return;
-
-  if(/^h[1-6]$/.test(tag)){
-    const runs = tlPdfInlineRuns(node, registry);
-    const text = tlPdfCleanInlineText(node.textContent).trim();
-    if(text) content.push({text:runs.length ? runs : [text], style: tag === "h2" ? "sectionHeading" : "subHeading", margin:tag === "h2" ? [0,12,0,7] : [0,7,0,4], keepWithNext:true});
-    return;
-  }
-  if(tag === "p"){
-    tlPdfPushParagraph(content, tlPdfInlineRuns(node, registry));
-    return;
-  }
-  if(tag === "li"){
-    const runs = tlPdfInlineRuns(node, registry);
-    if(runs.length) content.push({text:runs, style:"bodyText", bullet:{indent:12}, margin:[10,0,0,5]});
-    return;
-  }
-  if(tag === "ul" || tag === "ol"){
-    Array.from(node.children).forEach(child=>tlPdfCollectBlocks(child, content, registry));
-    return;
-  }
-  if(tag === "br") return;
-
-  const hasBlockChildren = Array.from(node.children || []).some(child=>
-    /^(div|section|p|ul|ol|li|h1|h2|h3|h4|h5|h6)$/.test(child.tagName.toLowerCase())
-  );
-  if(hasBlockChildren){
-    node.childNodes.forEach(child=>tlPdfCollectBlocks(child, content, registry));
-  }else{
-    tlPdfPushParagraph(content, tlPdfInlineRuns(node, registry));
-  }
-}
-
-function buildTruthLoopPdfDefinition(report, registry, reportMode){
-  const generatedDate = new Date().toLocaleDateString(undefined, {year:"numeric",month:"long",day:"numeric"});
-  const isDirect = reportMode === "direct";
-  const safeSubjectUrl = tlPdfSafeUrl(investigationSource || "");
-  const content = [
-    {text:"TRUTHLOOP AI", style:"brand"},
-    {text:"Public Profile Investigation Report", style:"documentTitle"},
-    {text:"Not Answers. Patterns.", style:"tagline"},
-    {text:`Report type: ${isDirect ? "Direct Public Profile Investigation" : "Guided Loop 1-7 Investigation"}`, style:"metaLine"},
-    {text:`Generated: ${generatedDate}`, style:"metaLine"},
-    {text:"Investigation source", style:"sectionHeading", margin:[0,16,0,5]},
-    safeSubjectUrl
-      ? {text:safeSubjectUrl, link:safeSubjectUrl, color:"#1769aa", decoration:"underline", fontSize:9, margin:[0,0,0,10]}
-      : {text:String(investigationSource || "Not provided"), style:"bodyText", margin:[0,0,0,10]},
-    {text:"Investigation basis", style:"subHeading", margin:[0,5,0,3]},
-    {text:isDirect
-      ? "This report is based on accessible public evidence from the submitted profile or website. No Loop 1-6 conversation was used."
-      : "This report combines the Loop 1-6 guided investigation with publicly available evidence from the submitted investigation source.", style:"bodyText", margin:[0,0,0,12]}
-  ];
-
-  const verdict = report.querySelector(".tlr-verdict-title");
-  if(verdict && verdict.textContent.trim()){
-    content.push({text:"Overall Pattern", style:"sectionHeading", margin:[0,12,0,4]});
-    content.push({text:tlPdfCleanInlineText(verdict.textContent).trim(), style:"verdict", margin:[0,0,0,6]});
-  }
-  const confidence = report.querySelector(".tlr-confidence");
-  if(confidence){
-    const confidenceText = tlPdfCleanInlineText(confidence.textContent).trim();
-    if(confidenceText) content.push({text:confidenceText, style:"confidence", margin:[0,0,0,12]});
-  }
-
-  const preface = report.querySelector(".tlr-report-preface");
-  if(preface){
-    content.push({text:"Investigation context", style:"sectionHeading", margin:[0,12,0,5]});
-    tlPdfCollectBlocks(preface, content, registry);
+<style id="truthloop-profile-card-mobile-width-fix">
+  /* Targeted fix: keep Profile Card within the active Loop panel on narrow screens. */
+  #outputBox .tl-loop-panel-body #patternProfile,
+  #outputBox #patternProfile {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
   }
 
-  const sections = Array.from(report.querySelectorAll(":scope > .tlr-report-section, :scope > section.tlr-report-section"));
-  if(sections.length){
-    sections.forEach(section=>{
-      tlPdfCollectBlocks(section, content, registry);
-    });
-  }else{
-    // Defensive fallback: preserve the visible report text if the report renderer changes its wrapper.
-    const clone = report.cloneNode(true);
-    clone.querySelectorAll("nav,button,#downloadReportBtn,#tlDeeperInvestigationCTA,#evidenceSourcesReference").forEach(el=>el.remove());
-    tlPdfCollectBlocks(clone, content, registry);
+  #outputBox .tl-loop-panel-body #patternProfile > div,
+  #outputBox #patternProfile > div {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
   }
 
-  content.push({text:"Evidence Sources", style:"sectionHeading", pageBreak:"before", margin:[0,0,0,8]});
-  content.push({text:`${registry.length} source records are mapped to this investigation. Source IDs and original public URLs below are clickable where a valid HTTP/HTTPS URL was provided.`, style:"smallNote", margin:[0,0,0,10]});
+  @media (max-width: 760px) {
+    #outputBox .tl-loop-panel-body #patternProfile,
+    #outputBox #patternProfile {
+      padding: 14px !important;
+      border-radius: 16px !important;
+    }
 
-  if(registry.length){
-    const sourceRows = registry.map((item,index)=>{
-      const sourceId = String(item?.sourceId || `SOURCE_${String(index+1).padStart(2,"0")}`).trim();
-      const url = tlPdfSafeUrl(item?.url);
-      const title = String(item?.title || "Untitled source").trim();
-      const type = String(item?.sourceType || "public_evidence").trim();
-      const published = formatLoop7EvidenceDate(item?.publishedDate);
-      const collected = item?.collectedAt ? formatLoop7EvidenceDate(item.collectedAt, "") : "";
-      const idCell = url
-        ? {text:sourceId, link:url, color:"#1769aa", bold:true, decoration:"underline", fontSize:8}
-        : {text:sourceId, color:"#26364a", bold:true, fontSize:8};
-      const details = [
-        {text:title, bold:true, fontSize:8.5, color:"#172033"},
-        {text:`Type: ${type}  |  Published: ${published}${collected ? `  |  Collected: ${collected}` : ""}`, fontSize:7.5, color:"#526071", margin:[0,3,0,2]}
-      ];
-      if(url) details.push({text:[{text:"Open original source: ",fontSize:7.5,color:"#526071"},{text:url,link:url,color:"#1769aa",decoration:"underline",fontSize:7.5}],margin:[0,1,0,0]});
-      else details.push({text:"Original URL was not included in the source registry.",fontSize:7.5,color:"#8a5a14",italics:true});
-      return [idCell, {stack:details, margin:[0,2,0,2]}];
-    });
-    content.push({
-      table:{headerRows:1,dontBreakRows:true,keepWithHeaderRows:1,widths:[78,"*"],body:[
-        [{text:"SOURCE ID",bold:true,color:"#ffffff",fillColor:"#25334a",fontSize:8},{text:"SOURCE DETAILS",bold:true,color:"#ffffff",fillColor:"#25334a",fontSize:8}],
-        ...sourceRows
-      ]},
-      layout:{
-        hLineWidth:(i,node)=>i===0||i===1||i===node.table.body.length?0.8:0.35,
-        vLineWidth:()=>0,
-        hLineColor:()=>"#d8e0ea",
-        paddingLeft:()=>6,
-        paddingRight:()=>6,
-        paddingTop:()=>5,
-        paddingBottom:()=>5
-      },
-      margin:[0,0,0,12]
-    });
-  }else{
-    content.push({text:"No evidence source registry was returned with this report. Source IDs cannot be linked without their original URL mapping.", style:"smallNote"});
-  }
-
-  content.push({text:"Evidence and limitation note", style:"sectionHeading", margin:[0,14,0,5]});
-  content.push({text:"TruthLoop examines accessible public material. A source link allows the reader to inspect the original public page; it does not by itself establish that every claim on that page is independently verified. Findings and confidence assessments should be read with the report's stated evidence limitations.", style:"smallNote"});
-
-  return {
-    pageSize:"A4",
-    pageMargins:[42,48,42,48],
-    info:{
-      title:isDirect ? "TruthLoop Direct Public Profile Investigation" : "TruthLoop Guided Loop 1-7 Investigation",
-      author:"TruthLoop AI",
-      subject:"Public evidence investigation report with clickable source references",
-      keywords:"TruthLoop AI, public evidence, investigation, source references",
-      creator:"TruthLoop AI"
-    },
-    defaultStyle:{font:"Roboto",fontSize:9,color:"#243044",lineHeight:1.25},
-    styles:{
-      brand:{fontSize:9,bold:true,color:"#8b5cf6",characterSpacing:1.8},
-      documentTitle:{fontSize:21,bold:true,color:"#142238",margin:[0,5,0,3]},
-      tagline:{fontSize:10,color:"#64748b",italics:true,margin:[0,0,0,11]},
-      metaLine:{fontSize:8,color:"#64748b",margin:[0,0,0,3]},
-      sectionHeading:{fontSize:13,bold:true,color:"#182b46",margin:[0,12,0,6],keepWithNext:true},
-      subHeading:{fontSize:10,bold:true,color:"#334155",margin:[0,6,0,3],keepWithNext:true},
-      bodyText:{fontSize:8.8,color:"#263445",lineHeight:1.28},
-      verdict:{fontSize:11,bold:true,color:"#162b46",margin:[0,0,0,6]},
-      confidence:{fontSize:8.5,color:"#475569",background:"#f1f5f9",margin:[0,4,0,8]},
-      smallNote:{fontSize:8,color:"#526071",lineHeight:1.25},
-      sourceId:{fontSize:8,bold:true,color:"#1769aa"}
-    },
-    footer:(currentPage,pageCount)=>({
-      columns:[
-        {text:"TruthLoop AI | Not Answers. Patterns.",fontSize:7,color:"#8290a3"},
-        {text:`Page ${currentPage} of ${pageCount}`,alignment:"right",fontSize:7,color:"#8290a3"}
-      ],
-      margin:[42,18,42,0]
-    }),
-    content
-  };
-}
-
-async function downloadTruthLoopReport(button){
-  const report = document.querySelector("#outputBox .truthLoopReport") || document.querySelector(".truthLoopReport");
-  if(!report){
-    alert("The investigation report is not available for download yet. Please reopen the completed report and try again.");
-    return false;
-  }
-  const registry = Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry.slice() : [];
-  const reportMode = window.tlLoop7ReportMode === "direct" ? "direct" : "conversation";
-  const filename = reportMode === "direct"
-    ? "TruthLoop-Direct-Public-Profile-Investigation.pdf"
-    : "TruthLoop-Loop-1-to-7-Investigation-Report.pdf";
-  const originalLabel = button?.textContent || "Download PDF Report";
-  if(button){ button.disabled = true; button.textContent = "Preparing PDF…"; }
-  try{
-    const pdfMake = await ensureTruthLoopPdfMake();
-    const definition = buildTruthLoopPdfDefinition(report, registry, reportMode);
-    const pdf = pdfMake.createPdf(definition);
-    pdf.download(filename, ()=>{
-      track("report_pdf_download_created", {
-        report_mode:reportMode,
-        source_count:registry.length,
-        filename
-      });
-    });
-    track("report_pdf_download_requested", {
-      report_mode:reportMode,
-      source_count:registry.length,
-      filename
-    });
-    return true;
-  }catch(error){
-    console.error("TRUTHLOOP_PDF_EXPORT_FAILED", error);
-    alert("The PDF could not be prepared. Please check your internet connection and try Download PDF again.");
-    return false;
-  }finally{
-    if(button){
-      button.disabled = false;
-      button.textContent = originalLabel;
+    #outputBox .tl-loop-panel-body #patternProfile > div:not(:first-child),
+    #outputBox #patternProfile > div:not(:first-child) {
+      font-size: 13.5px !important;
+      line-height: 1.5 !important;
     }
   }
+</style>
+
+</head>
+    <body>
+      ${reportHeader}
+      <div class="truthLoopReport">
+        ${downloadReport}
+      </div>
+    </body>
+    </html>
+  `],{type:"text/html"});
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "TruthLoop-Investigation-Report.html";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return true;
 }
 // LOOP 7 DOWNLOAD BUTTON CLICK HANDLER
 document.addEventListener("click", function(event) {
   const button = event.target.closest("#downloadReportBtn");
+
   if (!button) return;
+
   event.preventDefault();
-  if (button.disabled) return;
-  downloadTruthLoopReport(button);
+  downloadTruthLoopReport();
 });
 /* LOOP 7 PAYWALL */
 
