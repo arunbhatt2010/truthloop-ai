@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Understand how a Pre-Due-Diligence Report can help investors examine a startup's publicly available evidence before committing significant time and resources to formal due diligence—and help founders prepare.">
+<meta name="robots" content="index,follow">
+<title>Before You Spend on Due Diligence | TruthLoop AI</title>
+<style>
+:root{--bg:#080b14;--panel:#101626;--panel2:#151e31;--text:#eef2fb;--muted:#aab5c9;--line:#27334a;--accent:#8d9cff;--accent2:#62dfc0;--white:#fff;--max:920px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.75 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+a{color:#aebaff;text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
+header{border-bottom:1px solid var(--line);background:rgba(8,11,20,.94)}
+.nav{height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-weight:750;letter-spacing:.2px;color:var(--white);font-size:18px}
+.brand span{color:var(--accent2)}
+.nav a.cta{border:1px solid #6678d8;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:650}
+.hero{padding:82px 0 54px;background:radial-gradient(ellipse at 85% 5%,rgba(98,223,192,.12),transparent 35%),radial-gradient(ellipse at 10% 0%,rgba(141,156,255,.18),transparent 40%)}
+.eyebrow{display:inline-block;color:var(--accent2);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:800}
+h1{font-size:clamp(36px,6vw,62px);line-height:1.08;letter-spacing:-1.8px;margin:18px 0 20px;max-width:850px}
+.sub{font-size:20px;line-height:1.55;color:#c5cee0;max-width:760px;margin:0}
+.hero-note{margin-top:30px;padding:18px 22px;border:1px solid var(--line);border-left:3px solid var(--accent2);background:rgba(16,22,38,.75);border-radius:12px;color:#dce5f5;max-width:780px}
+.meta{margin-top:22px;color:var(--muted);font-size:13px}
+main{padding:48px 0 80px}
+article{max-width:790px;margin:auto}
+article p{color:#d2d9e7;margin:0 0 20px}
+article h2{font-size:clamp(25px,4vw,34px);line-height:1.2;letter-spacing:-.6px;margin:58px 0 18px;color:var(--white)}
+article h3{font-size:19px;margin:28px 0 8px;color:#f4f6ff}
+.lead{font-size:19px;color:#e5eaf5}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin:0 0 42px}
+.toc strong{display:block;margin-bottom:8px;color:var(--white)}
+.toc ol{margin:0;padding-left:22px;color:var(--muted)}
+.toc li{padding:3px 0}
+.toc a{color:#c0caff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:24px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{margin:0 0 8px}
+.card p{font-size:15px;margin:0;color:var(--muted)}
+ul.check{padding-left:22px;margin:12px 0 24px;color:#d2d9e7}
+ul.check li{padding:5px 0}
+.callout{margin:30px 0;padding:24px 26px;border:1px solid #39496a;border-radius:16px;background:linear-gradient(135deg,rgba(141,156,255,.12),rgba(98,223,192,.07))}
+.callout strong{color:var(--white)}
+.callout p{margin:8px 0 0}
+.table-wrap{overflow-x:auto;margin:22px 0 28px;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:590px;background:var(--panel)}
+th,td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:#f4f6ff;background:var(--panel2);font-size:14px}
+td{color:#cbd4e4;font-size:14px}
+tr:last-child td{border-bottom:0}
+.steps{counter-reset:step;list-style:none;padding:0;margin:20px 0}
+.steps li{counter-increment:step;position:relative;padding:0 0 20px 54px;color:#d2d9e7}
+.steps li:before{content:counter(step);position:absolute;left:0;top:0;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#202b48;border:1px solid #5366b5;color:#dbe0ff;font-weight:800}
+.cta-block{text-align:center;margin:64px 0 24px;padding:34px 28px;border:1px solid #3b4a70;border-radius:18px;background:radial-gradient(ellipse at top,rgba(141,156,255,.16),transparent 70%),var(--panel)}
+.cta-block h2{margin:0 0 12px}
+.cta-block p{max-width:640px;margin:0 auto 22px}
+.button{display:inline-block;background:#aebaff;color:#101528!important;padding:13px 22px;border-radius:999px;font-weight:800}
+.disclaimer{font-size:13px!important;color:#98a5bb!important;border-top:1px solid var(--line);padding-top:18px;margin-top:34px}
+footer{border-top:1px solid var(--line);padding:24px 0;color:#8f9bb1;font-size:13px}
+@media(max-width:650px){.wrap{width:min(100% - 28px,var(--max))}.hero{padding:58px 0 40px}.sub{font-size:17px}.grid{grid-template-columns:1fr}.toc{padding:18px}.nav{height:62px}.nav a.cta{padding:7px 12px;font-size:12px}article h2{margin-top:46px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="https://truthloop.in/app" aria-label="TruthLoop AI home">TruthLoop<span> AI</span></a>
+    <a class="cta" href="https://truthloop.in/app">Investigate a Profile ↗</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Investor intelligence · Founder readiness</span>
+    <h1>Before You Spend on Due Diligence: The Case for Pre-Due-Diligence Investigation</h1>
+    <p class="sub">Get a clearer view of a startup and its founder through publicly available evidence—before committing significant time and resources to a full due-diligence process.</p>
+    <div class="hero-note"><strong>The idea:</strong> Formal due diligence is essential, but investors can first examine what is already visible in the public domain. A structured preliminary investigation can help identify useful signals, unanswered questions and areas that may deserve deeper verification.</div>
+    <div class="meta">A strategic guide for angel investors, early-stage investors, venture funds and startup founders.</div>
+  </div>
+</section>
+
+<main class="wrap">
+<article>
+  <nav class="toc" aria-label="Table of contents">
+    <strong>In this article</strong>
+    <ol>
+      <li><a href="#why">Why a step before formal due diligence matters</a></li>
+      <li><a href="#what">What investors need to understand</a></li>
+      <li><a href="#public">What public evidence can—and cannot—show</a></li>
+      <li><a href="#investors">How a Pre-Due-Diligence Report helps investors</a></li>
+      <li><a href="#founders">How founders can use it to prepare</a></li>
+      <li><a href="#limits">Pre-due-diligence is not full due diligence</a></li>
+      <li><a href="#workflow">A practical way to use the report</a></li>
+    </ol>
+  </nav>
+
+  <p class="lead">A promising pitch can create interest. But before an investor commits substantial money, time and professional fees to a full investigation, there is a practical question worth asking: <strong>what can already be learned from the founder’s and company’s publicly available footprint?</strong></p>
+
+  <p>Financial due-diligence checklists and venture-capital investment frameworks show how extensive a formal review can become. They may call for business and revenue details, historical financial statements, customer and partner information, operating metrics, ownership records, intellectual property documentation, tax records, contracts, liabilities and more.</p>
+
+  <p>That depth is necessary when an investment is being seriously evaluated. But not every opportunity needs to move immediately into an expensive, resource-intensive process. A preliminary evidence-based review can help investors decide what deserves attention next.</p>
+
+  <h2 id="why">1. Why a Step Before Formal Due Diligence Matters</h2>
+  <p>Investors often assess multiple opportunities. Each opportunity can require time from investment teams, founders, legal advisers, accountants and other specialists. A full due-diligence exercise can involve extensive document collection, review, clarification and verification.</p>
+  <p>Before entering that stage, an investor may want a structured initial understanding of the company and the people behind it:</p>
+  <ul class="check">
+    <li>What does the company say it does, and how does it position its offering?</li>
+    <li>What can be found publicly about the founder’s background and professional track record?</li>
+    <li>Which achievements, partnerships, capabilities or milestones have accessible supporting references?</li>
+    <li>Do the company’s public statements and activities appear consistent across available sources?</li>
+    <li>What important questions remain unanswered by the public information?</li>
+  </ul>
+  <p>This is the purpose of pre-due-diligence investigation: not to replace the deeper process, but to help an investor approach it with better context and more focused questions.</p>
+
+  <h2 id="what">2. What Investors Need to Understand</h2>
+  <p>Formal due-diligence frameworks examine a broad set of areas. The exact scope depends on the company, sector, stage, jurisdiction and proposed transaction. Common areas include:</p>
+  <div class="grid">
+    <div class="card"><h3>Business and market</h3><p>Business model, products and services, customer segments, market context, competitors, positioning and growth plans.</p></div>
+    <div class="card"><h3>Founder and team</h3><p>Relevant experience, roles, capabilities, professional history, responsibilities and evidence of execution.</p></div>
+    <div class="card"><h3>Traction and operations</h3><p>Customer acquisition, retention, product usage, partnerships, distribution, delivery and operational milestones.</p></div>
+    <div class="card"><h3>Financial and corporate</h3><p>Revenue, costs, cash flow, audited accounts, debt, shareholding, tax, contracts, legal matters and governance.</p></div>
+  </div>
+  <p>Some of these areas may have a public footprint. Others depend on confidential company records, direct confirmations, specialist analysis or access to a data room. A good preliminary report must make that distinction clear.</p>
+
+  <h2 id="public">3. What Public Evidence Can—and Cannot—Show</h2>
+  <p>Public information can provide useful context about how a founder and company represent themselves and what they have publicly documented. Sources may include company websites, professional profiles, public announcements, articles, public presentations, repositories and other accessible online material.</p>
+  <p>When these sources are connected and examined together, they may help surface:</p>
+  <ul class="check">
+    <li><strong>Public claims:</strong> statements about products, capabilities, milestones, partnerships and achievements.</li>
+    <li><strong>Demonstrated activity:</strong> publicly documented launches, work, updates and other visible execution signals.</li>
+    <li><strong>External references:</strong> accessible third-party mentions or corroborating material, where available.</li>
+    <li><strong>Consistency over time:</strong> how public descriptions and claims evolve across sources and dates.</li>
+    <li><strong>Evidence gaps:</strong> important claims or areas for which the collected public material does not provide sufficient support.</li>
+  </ul>
+  <div class="callout"><strong>A critical distinction</strong><p>Not finding information in the collected public sources does not prove that the underlying activity, document or relationship does not exist. It means that the available evidence was insufficient to establish it in that investigation. The next step may be to ask the company for clarification or supporting documents.</p></div>
+
+  <h2 id="investors">4. How a Pre-Due-Diligence Report Helps Investors</h2>
+  <p>A TruthLoop AI Public Profile Investigation Report is designed to examine accessible public information about a founder or company, connect relevant evidence and present findings in a structured format. Used as a pre-due-diligence input, it can help investors organise their initial assessment.</p>
+
+  <h3>A. Build an initial picture of the founder and company</h3>
+  <p>Review the publicly visible identity, positioning, professional background, business activities and documented milestones. This gives the investor context beyond a short introduction or pitch deck.</p>
+
+  <h3>B. Examine claims alongside available references</h3>
+  <p>When a company communicates a partnership, achievement, capability or milestone, the report can help identify the public material available in support of that representation. It should distinguish company-reported claims from independent corroboration rather than treating them as equivalent.</p>
+
+  <h3>C. Identify execution signals and their limits</h3>
+  <p>Publicly documented launches, product updates, professional work and company activities can offer useful signals. They do not, by themselves, establish revenue quality, customer retention, product-market fit or financial performance.</p>
+
+  <h3>D. Surface questions before deeper review</h3>
+  <p>Evidence gaps, inconsistencies or claims that remain unverified can become specific questions for the founder. This can help an investor focus subsequent conversations and document requests.</p>
+
+  <h3>E. Decide whether to proceed to the next stage</h3>
+  <p>The report can contribute to an investor’s preliminary assessment of whether an opportunity merits further exploration, additional clarification or a more comprehensive due-diligence process. The investment decision remains with the investor.</p>
+
+  <h2 id="founders">5. How Founders Can Use It to Prepare</h2>
+  <p>Pre-due-diligence investigation is not only useful to investors. Founders can examine their own public footprint before approaching investors or entering a formal review.</p>
+  <ul class="check">
+    <li><strong>Review public representation:</strong> understand what a potential investor may find about the founder and company.</li>
+    <li><strong>Check claims and references:</strong> identify which publicly stated achievements have accessible supporting evidence.</li>
+    <li><strong>Spot outdated or inconsistent information:</strong> notice differences across company pages, professional profiles and public announcements.</li>
+    <li><strong>Identify missing context:</strong> understand where an investor may need an explanation or additional documentation.</li>
+    <li><strong>Prepare for questions:</strong> organise relevant records and clear explanations before investor conversations.</li>
+  </ul>
+  <p>The objective is not to manufacture a stronger online image. It is to make genuine work, progress and achievements easier to understand—and to be prepared when public information is incomplete.</p>
+
+  <h2 id="limits">6. Pre-Due-Diligence Is Not Full Due Diligence</h2>
+  <p>This distinction matters. A public-evidence investigation has a defined scope. It cannot independently verify information that is private, unavailable or requires specialist access.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Area</th><th>What a public-evidence report can contribute</th><th>What still requires formal review</th></tr></thead>
+      <tbody>
+        <tr><td>Founder background</td><td>Examine publicly documented roles, ventures and professional activity.</td><td>Authenticate credentials, employment records and private references.</td></tr>
+        <tr><td>Company claims</td><td>Connect public statements with accessible supporting references.</td><td>Obtain direct confirmations and verify underlying records.</td></tr>
+        <tr><td>Customers and partnerships</td><td>Identify publicly announced relationships and independent mentions, where available.</td><td>Review contracts, invoices, customer confirmations and commercial terms.</td></tr>
+        <tr><td>Revenue and financial performance</td><td>Identify publicly disclosed figures and their stated sources, if available.</td><td>Examine accounting records, bank statements, audited financials and reconciliations.</td></tr>
+        <tr><td>Ownership and funding</td><td>Surface publicly disclosed funding or ownership information, where available.</td><td>Verify the current cap table, shareholder records, instruments and dilution.</td></tr>
+        <tr><td>Legal, tax and compliance</td><td>Identify relevant public disclosures or records that are accessible and collected.</td><td>Conduct jurisdiction-specific legal, tax and regulatory review.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>A report should never imply that an inaccessible document has been checked, that a public claim has been independently verified when it has not, or that the absence of a public record proves misconduct. Findings must remain tied to the evidence actually collected.</p>
+
+  <h2 id="workflow">7. A Practical Way to Use a Pre-Due-Diligence Report</h2>
+  <ol class="steps">
+    <li><strong>Start with the public profile.</strong><br>Provide the founder’s or company’s public profile or website link for investigation.</li>
+    <li><strong>Review the report and source references.</strong><br>Examine the findings, evidence links, confidence assessment and limitations—not just the summary.</li>
+    <li><strong>Separate established information from open questions.</strong><br>Note what is supported by public evidence, what is self-reported and what remains unverified.</li>
+    <li><strong>Ask focused follow-up questions.</strong><br>Request clarification or documents for the areas that matter to the proposed investment.</li>
+    <li><strong>Decide on the next level of diligence.</strong><br>If the opportunity merits further consideration, proceed with the appropriate financial, legal, commercial, technical and operational reviews.</li>
+  </ol>
+
+  <div class="callout">
+    <strong>The value is better preparation—not a shortcut around verification.</strong>
+    <p>A preliminary public-evidence investigation can help an investor understand what is visible, what needs clarification and where deeper diligence may be warranted before committing significant resources.</p>
+  </div>
+
+  <h2>Conclusion: Know More Before You Spend More</h2>
+  <p>Investors should not have to begin every evaluation with an unstructured search across dozens of public pages. Founders should not have to guess what their public footprint communicates to a potential investor.</p>
+  <p>A structured Pre-Due-Diligence Report brings accessible public information into one evidence-linked investigation. It can help investors form an initial view, prepare sharper questions and decide whether to proceed to a more resource-intensive review. It can also help founders understand and prepare their public evidence before that scrutiny begins.</p>
+  <p><strong>Formal due diligence verifies. Pre-due-diligence investigation helps you understand what may be worth verifying next.</strong></p>
+
+  <section class="cta-block">
+    <span class="eyebrow">TruthLoop AI · Pre-Due-Diligence</span>
+    <h2>Examine the Public Evidence Before the Next Decision.</h2>
+    <p>Investigate a founder or company through accessible public information. Review connected evidence, patterns and gaps in a structured Public Profile Investigation Report.</p>
+    <a class="button" href="https://truthloop.in/app">Start a Public Profile Investigation ↗</a>
+    <p style="font-size:13px;margin-top:16px"><a href="https://truthloop.in/example-public-profile-investigation.html">View an anonymised example report</a></p>
+  </section>
+
+  <p class="disclaimer"><strong>Important:</strong> TruthLoop AI provides public-profile investigation based on accessible public information. Its report is a preliminary research input, not a substitute for full financial, legal, tax, technical, commercial or operational due diligence; independent verification; professional advice; or an investment recommendation. Public-source coverage may be incomplete, and findings should be checked with the company and qualified advisers before an investment decision.</p>
+</article>
+</main>
+
+<footer>
+  <div class="wrap">© <span id="year">2026</span> TruthLoop AI · Not Answers. Patterns. · <a href="https://truthloop.in/app">Open TruthLoop AI</a></div>
+</footer>
+</body>
+</html>
