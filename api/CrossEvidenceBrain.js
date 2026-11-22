@@ -109,6 +109,150 @@ function detectPlatform(value = "") {
     }
 }
 
+const SUPPORTED_PRIMARY_SOURCE_MESSAGE =
+    "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported.";
+
+function buildPrimaryInvestigationFailure({
+    url = "",
+    platform = "unknown",
+    reasonCode = "PRIMARY_SOURCE_UNAVAILABLE",
+    httpStatus = null,
+    finalUrl = "",
+    technicalDetail = "The submitted public source could not be examined."
+} = {}) {
+    const platformLabels = {
+        facebook: "Facebook",
+        instagram: "Instagram",
+        youtube: "YouTube",
+        reddit: "Reddit",
+        medium: "Medium",
+        substack: "Substack",
+        tiktok: "TikTok",
+        threads: "Threads",
+        pinterest: "Pinterest",
+        quora: "Quora",
+        producthunt: "Product Hunt",
+        crunchbase: "Crunchbase",
+        behance: "Behance",
+        dribbble: "Dribbble",
+        devto: "Dev.to",
+        hashnode: "Hashnode",
+        gitlab: "GitLab"
+    };
+    const platformLabel = platformLabels[platform] || platform;
+    const reasonMap = {
+        INVALID_PUBLIC_URL: {
+            label: "The submitted URL is missing or invalid.",
+            message: "TruthLoop AI did not receive a valid public URL to investigate. No public content was collected and no investigation report has been generated.",
+            action: "Enter a complete, valid public website, GitHub, LinkedIn or X URL and try again."
+        },
+        UNSUPPORTED_PLATFORM: {
+            label: "This platform is not currently supported.",
+            message: `The submitted URL belongs to ${platformLabel}, which TruthLoop AI does not currently support as a direct investigation source.`,
+            action: "Submit a publicly accessible website, GitHub, LinkedIn or X URL instead."
+        },
+        COLLECTION_TEMPORARILY_PAUSED: {
+            label: "Collection for this supported platform is temporarily paused.",
+            message: `${platformLabel} is a supported source, but its primary-profile collection is temporarily paused. No usable primary profile evidence was collected for this attempt.`,
+            action: "Try again after the collection pause ends, or submit a public website or GitHub URL that represents the same subject."
+        },
+        LOGIN_REDIRECT: {
+            label: "The URL redirected to a login or authentication page.",
+            message: "The submitted URL did not return the requested public page. It redirected to a login or authentication page, so the actual public content could not be examined.",
+            action: "Check the URL and use a page that can be viewed publicly without signing in. You can also submit another supported public URL."
+        },
+        PLATFORM_ERROR_PAGE: {
+            label: "The platform returned an error page instead of the requested content.",
+            message: "The submitted URL returned a platform-generated error page instead of the requested public content. The error page is not treated as investigation evidence.",
+            action: "Check whether the URL opens correctly in a public browser session, try again later if the platform is temporarily unavailable, or submit another supported public URL."
+        },
+        GENERIC_ERROR_PAGE: {
+            label: "The submitted URL returned a generic error page.",
+            message: "The submitted URL returned an error page without enough usable public content to examine. No investigation report has been generated.",
+            action: "Check the URL and try a publicly accessible page, or submit another supported public URL."
+        },
+        HTTP_ERROR: {
+            label: "The server returned an unsuccessful response.",
+            message: `The submitted URL returned an unsuccessful HTTP response${httpStatus ? ` (HTTP ${httpStatus})` : ""}. The requested public content was not collected.`,
+            action: "Check the URL and try again. If the problem continues, submit another publicly accessible URL for the same subject."
+        },
+        ACCESS_RESTRICTED: {
+            label: "The server restricted access to the requested page.",
+            message: `The server did not provide the requested public content${httpStatus ? ` (HTTP ${httpStatus})` : ""}. The returned response indicates that access was restricted.`,
+            action: "Check that the page is publicly accessible without login or special permissions, then try again or submit another supported public URL."
+        },
+        PRIMARY_URL_NOT_FOUND: {
+            label: "The requested page could not be found.",
+            message: `The submitted URL returned HTTP ${httpStatus || 404}. The requested page could not be retrieved.`,
+            action: "Check the URL for typing errors or use another publicly accessible page for the same subject."
+        },
+        RATE_LIMITED: {
+            label: "The platform temporarily limited the request.",
+            message: "The platform returned a rate-limit response, so the requested public content was not collected.",
+            action: "Try again later, or use another supported public URL for the same subject."
+        },
+        PLATFORM_SERVER_ERROR: {
+            label: "The platform returned a server error.",
+            message: `The platform returned a server-side error${httpStatus ? ` (HTTP ${httpStatus})` : ""}. The requested public content was not collected.`,
+            action: "Try again later when the platform is responding normally, or use another supported public URL."
+        },
+        FETCH_TIMEOUT: {
+            label: "The request timed out.",
+            message: "The primary page did not respond within the collection time limit, so usable public content could not be retrieved.",
+            action: "Try again later or submit another publicly accessible URL for the same subject."
+        },
+        FETCH_REQUEST_FAILED: {
+            label: "The public page request failed.",
+            message: "TruthLoop AI could not complete the request for the submitted primary URL. No usable primary-page content was collected.",
+            action: "Check the URL and try again. If the problem continues, use another supported public URL."
+        },
+        NO_USABLE_PUBLIC_CONTENT: {
+            label: "The page did not provide usable public content.",
+            message: "The URL responded, but the page did not provide enough usable public content for a reliable investigation.",
+            action: "Try a more informative public page, such as the company homepage, an about page, a public profile, or a GitHub repository."
+        },
+        PRIMARY_SOURCE_NOT_FETCHED: {
+            label: "The primary URL did not return a collection result.",
+            message: "The primary URL did not produce a usable collection result. No investigation report has been generated.",
+            action: "Check the URL and try again, or submit another supported public URL."
+        }
+    };
+    const reason = reasonMap[reasonCode] || {
+        label: "The primary public source could not be examined.",
+        message: "TruthLoop AI could not collect usable public content from the submitted URL. No investigation report has been generated.",
+        action: "Check the URL or submit another supported public URL."
+    };
+    const failure = {
+        code: "PRIMARY_INVESTIGATION_FAILED",
+        stage: "primary_source_collection",
+        reasonCode,
+        reasonLabel: reason.label,
+        userMessage: reason.message,
+        recommendedAction: reason.action,
+        requestedUrl: normalizeUrl(url) || url || null,
+        finalUrl: normalizeUrl(finalUrl) || finalUrl || null,
+        platform,
+        platformLabel,
+        httpStatus: Number(httpStatus) || null,
+        technicalDetail: String(technicalDetail || reason.message).slice(0, 700),
+        retryable: ["COLLECTION_TEMPORARILY_PAUSED", "RATE_LIMITED", "PLATFORM_SERVER_ERROR", "FETCH_TIMEOUT", "FETCH_REQUEST_FAILED"].includes(reasonCode),
+        supportedSourcesMessage: SUPPORTED_PRIMARY_SOURCE_MESSAGE
+    };
+    return {
+        success: false,
+        investigationFailure: true,
+        packageType: "CrossEvidencePackage",
+        sourcesProcessed: 0,
+        sourcesSucceeded: 0,
+        sourcesFailed: 1,
+        confidenceScore: 0,
+        errors: [failure.userMessage],
+        failure,
+        universalPackage: null,
+        crossEvidencePackage: null
+    };
+}
+
 function uniqueUrls(values = []) {
     const seen = new Set();
     const result = [];
@@ -324,6 +468,23 @@ async function fetchWebsiteEvidence(primaryUrl) {
         profileLinks: [normalizedUrl]
     });
 
+    if (rawPackage?.investigationFailure || rawPackage?.success === false) {
+        const rawFailure = rawPackage?.failure || {};
+        return {
+            success: false,
+            investigationFailure: true,
+            failure: buildPrimaryInvestigationFailure({
+                url: rawFailure.requestedUrl || normalizedUrl,
+                finalUrl: rawFailure.finalUrl || "",
+                platform: rawFailure.platform || detectPlatform(normalizedUrl),
+                reasonCode: rawFailure.reasonCode || "PRIMARY_SOURCE_UNAVAILABLE",
+                httpStatus: rawFailure.httpStatus || null,
+                technicalDetail: rawFailure.technicalDetail || rawFailure.reason || "PCF could not collect usable primary-page content."
+            }).failure,
+            sources: []
+        };
+    }
+
     const extractedPackage = extractPublicContent(rawPackage);
 
     const packageResult = buildPublicContentPackage(
@@ -334,6 +495,40 @@ async function fetchWebsiteEvidence(primaryUrl) {
     const sources = Array.isArray(packageResult?.sources)
         ? packageResult.sources
         : [];
+    const primarySource = sources.find(source =>
+        normalizeUrl(source?.requestedUrl || source?.sourceUrl || source?.canonicalUrl || "") === normalizedUrl
+    ) || null;
+
+    if (primarySource?.fetchFailure) {
+        const rawFailure = primarySource.fetchFailure;
+        return {
+            success: false,
+            investigationFailure: true,
+            failure: buildPrimaryInvestigationFailure({
+                url: rawFailure.requestedUrl || normalizedUrl,
+                finalUrl: rawFailure.finalUrl || primarySource?.finalUrl || primarySource?.sourceUrl || "",
+                platform: rawFailure.platform || detectPlatform(normalizedUrl),
+                reasonCode: rawFailure.reasonCode || "PRIMARY_SOURCE_UNAVAILABLE",
+                httpStatus: rawFailure.httpStatus || primarySource?.status || null,
+                technicalDetail: rawFailure.technicalDetail || rawFailure.reason || "The primary page was not usable."
+            }).failure,
+            sources: []
+        };
+    }
+
+    if (!primarySource || !sources.length) {
+        return {
+            success: false,
+            investigationFailure: true,
+            failure: buildPrimaryInvestigationFailure({
+                url: normalizedUrl,
+                platform: detectPlatform(normalizedUrl),
+                reasonCode: "PRIMARY_SOURCE_NOT_FETCHED",
+                technicalDetail: "PCF did not return the submitted primary URL as a collected source."
+            }).failure,
+            sources: []
+        };
+    }
 
     return {
         success: true,
@@ -1131,13 +1326,26 @@ async function fetchGitHubDirect(url = "") {
         );
 
         if (!response.ok) {
+            const status = Number(response.status) || null;
+            const reasonCode = status === 401 || status === 403
+                ? "ACCESS_RESTRICTED"
+                : status === 404
+                    ? "PRIMARY_URL_NOT_FOUND"
+                    : status === 429
+                        ? "RATE_LIMITED"
+                        : status >= 500
+                            ? "PLATFORM_SERVER_ERROR"
+                            : "HTTP_ERROR";
             return {
                 success: false,
-                reason: `GitHub direct fetch failed (${response.status}).`,
+                reasonCode,
+                httpStatus: status,
+                reason: `GitHub direct fetch failed (HTTP ${status || "unknown"}${response.statusText ? ` ${response.statusText}` : ""}).`,
                 source: null
             };
         }
 
+        const finalUrl = normalizeUrl(response.url || normalizedUrl) || normalizedUrl;
         const title =
             extractMetaTag(html, "og:title") ||
             ((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || "")
@@ -1150,13 +1358,47 @@ async function fetchGitHubDirect(url = "") {
 
         const visibleText =
             htmlToVisibleText(html);
+        const githubPageText = `${title} ${description || ""} ${visibleText}`.toLowerCase();
+        const githubFinalPath = (() => { try { return new URL(finalUrl).pathname; } catch { return ""; } })();
+        const githubLoginRedirect = /\/(?:login|log-in|signin|sign-in|sessions)(?:\/|$)/i.test(githubFinalPath);
+        const githubStrongChallenge = /robot check|captcha|verify (?:that )?you(?:'|’)re not a robot|complete the security check|automated access|your request has been blocked|attention required[!|: ]+cloudflare|checking your browser before accessing/i.test(githubPageText);
+        const githubErrorResponse = /sorry[, ]+something went wrong|access denied|request blocked|temporarily unavailable|service unavailable|page not found/i.test(githubPageText) && (visibleText.length < 5000 || /^(error|404|page not found|sign in|attention required)$/i.test(title));
+        const githubLoginPage = /^(sign in|sign in to github|log in to github)/i.test(title) && visibleText.length < 5000;
+        const githubContentChars = visibleText.length + String(description || "").length;
+        if (githubLoginRedirect || githubStrongChallenge || githubErrorResponse || githubLoginPage || githubContentChars < 35) {
+            return {
+                success: false,
+                reasonCode: githubLoginRedirect
+                    ? "LOGIN_REDIRECT"
+                    : githubStrongChallenge
+                        ? "ACCESS_RESTRICTED"
+                        : githubErrorResponse
+                            ? "PLATFORM_ERROR_PAGE"
+                            : githubLoginPage
+                                ? "LOGIN_REDIRECT"
+                                : "NO_USABLE_PUBLIC_CONTENT",
+                httpStatus: Number(response.status) || null,
+                finalUrl,
+                finalUrl,
+                reason: githubLoginRedirect || githubLoginPage
+                    ? `GitHub returned or redirected to a login page (${finalUrl}).`
+                    : githubStrongChallenge
+                        ? `GitHub returned an automated-access or security-challenge page: ${visibleText.slice(0, 260) || title}`
+                        : githubErrorResponse
+                            ? `GitHub returned an error or unavailable page instead of usable public content: ${visibleText.slice(0, 260) || title}`
+                            : "GitHub returned no usable public profile or repository content.",
+                source: null
+            };
+        }
 
         const socialLinks = [
             normalizedUrl
         ];
 
         const source = {
-            sourceUrl: normalizedUrl,
+            requestedUrl: normalizedUrl,
+            sourceUrl: finalUrl,
+            finalUrl,
             canonicalUrl: normalizedUrl,
             sourcePlatform: "github",
             platform: "github",
@@ -1208,6 +1450,7 @@ async function fetchGitHubDirect(url = "") {
 
         return {
             success: false,
+            reasonCode: error?.name === "AbortError" ? "FETCH_TIMEOUT" : "FETCH_REQUEST_FAILED",
             reason:
                 error?.message ||
                 "GitHub direct fetch failed.",
@@ -3463,19 +3706,12 @@ console.log(
     Date.now()
 );
     if (!primaryUrl) {
-        return {
-            success: false,
-            packageType: "CrossEvidencePackage",
-            sourcesProcessed: 0,
-            sourcesSucceeded: 0,
-            sourcesFailed: 1,
-            confidenceScore: 0,
-            errors: [
-                "At least one public source URL is required."
-            ],
-            universalPackage: null,
-            crossEvidencePackage: null
-        };
+        return buildPrimaryInvestigationFailure({
+            url: "",
+            platform: "unknown",
+            reasonCode: "INVALID_PUBLIC_URL",
+            technicalDetail: "No valid primary public URL was supplied to Cross Evidence Brain."
+        });
     }
 
     console.log(
@@ -3512,14 +3748,48 @@ console.log(
     let websiteTopicCollectionStatus = {};
     let linkedinSource = null;
     let linkedinUrl = "";
+    let linkedinPrimaryFailureReason = "";
     let githubEvidence = null;
     let githubUrl = "";
+    let githubPrimaryFailureReason = "";
+    let githubPrimaryFailureCode = "FETCH_REQUEST_FAILED";
+    let githubPrimaryFailureStatus = null;
+    let githubPrimaryFinalUrl = "";
     let xEvidence = null;
     let xUrl = "";
+    let xPrimaryFailureReason = "";
     let redditEvidence = null;
     let redditUrl = "";
 
     const primaryPlatform = detectPlatform(primaryUrl);
+    const supportedPrimaryPlatforms = new Set(["website", "github", "linkedin", "x"]);
+
+    if (!supportedPrimaryPlatforms.has(primaryPlatform)) {
+        return buildPrimaryInvestigationFailure({
+            url: primaryUrl,
+            platform: primaryPlatform,
+            reasonCode: "UNSUPPORTED_PLATFORM",
+            technicalDetail: `The submitted URL resolves to ${primaryPlatform}, which is not in the current supported primary-source set.`
+        });
+    }
+
+    if (primaryPlatform === "linkedin" && !ENABLE_LINKEDIN_APIFY) {
+        return buildPrimaryInvestigationFailure({
+            url: primaryUrl,
+            platform: primaryPlatform,
+            reasonCode: "COLLECTION_TEMPORARILY_PAUSED",
+            technicalDetail: `LinkedIn primary-profile collection is paused through ${APIFY_SCRAPERS_PAUSED_THROUGH}.`
+        });
+    }
+
+    if (primaryPlatform === "x" && !ENABLE_X) {
+        return buildPrimaryInvestigationFailure({
+            url: primaryUrl,
+            platform: primaryPlatform,
+            reasonCode: "COLLECTION_TEMPORARILY_PAUSED",
+            technicalDetail: `X primary-profile collection is paused through ${APIFY_SCRAPERS_PAUSED_THROUGH}.`
+        });
+    }
 
     if (primaryPlatform === "linkedin") {
 
@@ -3551,7 +3821,56 @@ console.log(
 
         if (suppliedWebsiteSources.length > 0) {
 
-            websiteSources = suppliedWebsiteSources;
+            // Reuse upstream website collection without re-scraping, but never
+            // let a failed primary page enter the report as evidence.
+            const suppliedPrimarySource = suppliedWebsiteSources.find(source => {
+                const requested = normalizeUrl(source?.requestedUrl || "");
+                const sourceUrl = normalizeUrl(source?.sourceUrl || source?.canonicalUrl || "");
+                return requested === primaryUrl || sourceUrl === primaryUrl;
+            }) || null;
+
+            if (suppliedPrimarySource) {
+                const suppliedText = `${suppliedPrimarySource?.title || ""} ${suppliedPrimarySource?.description || ""} ${suppliedPrimarySource?.visibleText || suppliedPrimarySource?.content || ""}`.replace(/\s+/g, " ").trim();
+                const suppliedMeaningfulChars =
+                    String(suppliedPrimarySource?.description || "").length +
+                    String(suppliedPrimarySource?.visibleText || suppliedPrimarySource?.content || "").length +
+                    (Array.isArray(suppliedPrimarySource?.headings) ? suppliedPrimarySource.headings.join(" ").length : 0) +
+                    (Array.isArray(suppliedPrimarySource?.posts) ? suppliedPrimarySource.posts.reduce((sum, item) => sum + String(item?.text || item?.description || item?.title || "").length, 0) : 0) +
+                    (Array.isArray(suppliedPrimarySource?.articles) ? suppliedPrimarySource.articles.reduce((sum, item) => sum + String(item?.text || item?.description || item?.title || "").length, 0) : 0);
+                const suppliedFinalUrl = normalizeUrl(suppliedPrimarySource?.finalUrl || suppliedPrimarySource?.sourceUrl || primaryUrl) || primaryUrl;
+                let suppliedFinalPath = "";
+                try { suppliedFinalPath = new URL(suppliedFinalUrl).pathname.toLowerCase(); } catch {}
+                const suppliedLoginRedirect = /\/(?:login|log-in|signin|sign-in|checkpoint|auth)(?:\/|$)/i.test(suppliedFinalPath);
+                const suppliedErrorPage = /sorry[, ]+something went wrong|we(?:'|’)re working on getting this fixed|access denied|request blocked|temporarily unavailable|service unavailable|verify (?:that )?you are human|checking your browser|unusual traffic|this page isn(?:'|’)t available|content isn(?:'|’)t available|robot check|to discuss automated access to amazon|automated access to amazon|enter the characters you see below|type the characters you see in this image|we just need to make sure you(?:'|’)re not a robot|verify (?:that )?you(?:'|’)re not a robot|complete the security check|human verification required|your request has been blocked|attention required[!|: ]+cloudflare|checking your browser before accessing|enable javascript and cookies to continue/i.test(suppliedText);
+                const suppliedErrorTitle = /^(error|access denied|request blocked|page unavailable|service unavailable)$/i.test(String(suppliedPrimarySource?.title || "").trim());
+
+                if (suppliedPrimarySource?.fetchFailure || suppliedLoginRedirect || ((suppliedErrorPage || suppliedErrorTitle) && suppliedText.length < 2400) || suppliedMeaningfulChars < 35) {
+                    const sourceFailure = suppliedPrimarySource?.fetchFailure || {};
+                    const suppliedReasonCode = suppliedLoginRedirect
+                        ? "LOGIN_REDIRECT"
+                        : (suppliedErrorPage || suppliedErrorTitle)
+                            ? "PLATFORM_ERROR_PAGE"
+                            : "NO_USABLE_PUBLIC_CONTENT";
+                    return buildPrimaryInvestigationFailure({
+                        url: sourceFailure.requestedUrl || suppliedPrimarySource?.requestedUrl || primaryUrl,
+                        finalUrl: sourceFailure.finalUrl || suppliedFinalUrl,
+                        platform: sourceFailure.platform || primaryPlatform,
+                        reasonCode: sourceFailure.reasonCode || suppliedReasonCode,
+                        httpStatus: sourceFailure.httpStatus || suppliedPrimarySource?.status || null,
+                        technicalDetail: sourceFailure.technicalDetail || suppliedText.slice(0, 500) || "The upstream primary source did not contain enough substantive public content to investigate."
+                    });
+                }
+            }
+
+            websiteSources = suppliedWebsiteSources.filter(source => !source?.fetchFailure);
+            if (!websiteSources.length) {
+                return buildPrimaryInvestigationFailure({
+                    url: primaryUrl,
+                    platform: primaryPlatform,
+                    reasonCode: "PRIMARY_SOURCE_NOT_FETCHED",
+                    technicalDetail: "The upstream website package contained no usable primary website sources."
+                });
+            }
 
         } else {
 
@@ -3560,9 +3879,27 @@ console.log(
                     primaryUrl
                 );
 
+            if (websiteResult?.investigationFailure || websiteResult?.success === false) {
+                const failure = websiteResult?.failure || {};
+                return buildPrimaryInvestigationFailure({
+                    url: failure.requestedUrl || primaryUrl,
+                    finalUrl: failure.finalUrl || "",
+                    platform: failure.platform || primaryPlatform,
+                    reasonCode: failure.reasonCode || "PRIMARY_SOURCE_UNAVAILABLE",
+                    httpStatus: failure.httpStatus || null,
+                    technicalDetail: failure.technicalDetail || failure.userMessage || "PCF could not collect usable primary website content."
+                });
+            }
+
             if (websiteResult?.success) {
-                websiteSources =
-                    websiteResult.sources || [];
+                websiteSources = websiteResult.sources || [];
+            } else {
+                return buildPrimaryInvestigationFailure({
+                    url: primaryUrl,
+                    platform: primaryPlatform,
+                    reasonCode: "PRIMARY_SOURCE_NOT_FETCHED",
+                    technicalDetail: websiteResult?.reason || "PCF returned no usable primary website source."
+                });
             }
         }
 
@@ -3685,14 +4022,29 @@ console.log(
             githubEvidence = githubResult.source;
         } else {
             githubEvidence = null;
+            githubPrimaryFailureReason = githubResult?.reason || "No GitHub evidence returned.";
+            githubPrimaryFailureCode = githubResult?.reasonCode || "FETCH_REQUEST_FAILED";
+            githubPrimaryFailureStatus = githubResult?.httpStatus || null;
+            githubPrimaryFinalUrl = githubResult?.finalUrl || "";
             console.warn("CEB_GITHUB_DIRECT_SOURCE_UNAVAILABLE", JSON.stringify({
                 url: githubUrl,
-                reason: githubResult?.reason || "No GitHub evidence returned."
+                reason: githubPrimaryFailureReason
             }));
         }
     } else {
         githubEvidence = null;
         console.log("CEB_GITHUB_DIRECT_FETCH_SKIPPED", JSON.stringify({ reason: "No public GitHub URL discovered." }));
+    }
+
+    if (primaryPlatform === "github" && !githubEvidence) {
+        return buildPrimaryInvestigationFailure({
+            url: primaryUrl,
+            finalUrl: githubPrimaryFinalUrl,
+            platform: "github",
+            reasonCode: githubPrimaryFailureCode,
+            httpStatus: githubPrimaryFailureStatus,
+            technicalDetail: githubPrimaryFailureReason || "The submitted GitHub URL did not return usable GitHub profile or repository content."
+        });
     }
 
     /* ------------------------------------------------------------
@@ -3719,6 +4071,7 @@ console.log(
         if (apifyResult?.success && apifyResult?.source) {
             linkedinSource = apifyResult.source;
         } else if (apifyResult?.reason) {
+            linkedinPrimaryFailureReason = apifyResult.reason;
             console.error(
                 "CEB_LINKEDIN_APIFY_SOURCE_UNAVAILABLE",
                 apifyResult.reason
@@ -3741,6 +4094,15 @@ console.log(
         );
     }
 
+    if (primaryPlatform === "linkedin" && !linkedinSource) {
+        return buildPrimaryInvestigationFailure({
+            url: primaryUrl,
+            platform: "linkedin",
+            reasonCode: "FETCH_REQUEST_FAILED",
+            technicalDetail: linkedinPrimaryFailureReason || "The submitted LinkedIn profile URL did not produce usable profile evidence."
+        });
+    }
+
     // X is the only social Actor collector configured in CEB. Reddit is disabled.
     const socialTasks = [];
     if (ENABLE_X && xUrl) {
@@ -3753,8 +4115,18 @@ console.log(
             if (platform === "x") xEvidence = result.source;
             if (platform === "reddit") redditEvidence = result.source;
         } else {
+            if (platform === "x") xPrimaryFailureReason = result?.reason || "No X profile evidence returned.";
             console.warn(`CEB_${platform.toUpperCase()}_APIFY_UNAVAILABLE`, result?.reason || "No social evidence returned.");
         }
+    }
+
+    if (primaryPlatform === "x" && !xEvidence) {
+        return buildPrimaryInvestigationFailure({
+            url: primaryUrl,
+            platform: "x",
+            reasonCode: "FETCH_REQUEST_FAILED",
+            technicalDetail: xPrimaryFailureReason || "The submitted X profile URL did not produce usable public profile evidence."
+        });
     }
 
     /*
