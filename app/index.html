@@ -3706,23 +3706,24 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
     tlReportPaywallDiagnostic("01 REQUEST_SENT_TO_CHAT_JS");
     const data = await fetchLoop7Investigation(profileLink, "direct");
     if(handleLoop7InvestigationFailure(data)) return;
-    latestTruthLoopReport = data.reply || JSON.stringify(data);
-    tlReportPaywallDiagnostic("02 FINAL_REPORT_RECEIVED", {replyChars:String(latestTruthLoopReport || "").length, hasReply:!!(data && data.reply)});
-    directFinalReplyReceived = !!(data && typeof data.reply === "string" && data.reply.trim());
+    const returnedReportText = getLoop7FinalReportText(data);
+    latestTruthLoopReport = returnedReportText;
+    tlReportPaywallDiagnostic("02 FINAL_REPORT_RECEIVED", {replyChars:String(latestTruthLoopReport || "").length, hasReply:!!returnedReportText, payloadKeys:data && typeof data === "object" ? Object.keys(data) : []});
+    directFinalReplyReceived = !!returnedReportText.trim();
     if(typeof latestTruthLoopReport === "string" && latestTruthLoopReport.trim()){
       document.body.classList.remove("tl-report-not-ready");
     }
-    if(data && typeof data.reply === "string" && data.reply.trim()){
+    if(returnedReportText.trim()){
       track("loop7_report_generated", {loop: 7, report_mode: "direct"});
       track("direct_report_generated", {report_mode: "direct", loop: 7});
     }
     saveJourney();
     tlReportPaywallDiagnostic("03 REPORT_SAVED_TO_JOURNEY");
 
-    if(data.reply){
+    if(returnedReportText.trim()){
       captureEvidenceSourceRegistry(data);
       tlReportPaywallDiagnostic("04 EVIDENCE_REGISTRY_CAPTURED", {sourceCount:evidenceSourceRegistry.length});
-      validateLoop7ReportReady(data.reply);
+      validateLoop7ReportReady(returnedReportText);
       tlReportPaywallDiagnostic("05 REPORT_VALIDATION_PASSED");
       updateLoop7ProcessingSources(evidenceSourceRegistry);
       setLoop7ProcessingStep("evidence", "done");
@@ -3736,7 +3737,7 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
         await showPaywall();
         tlReportPaywallDiagnostic("14 SHOW_PAYWALL_RESOLVED");
       }else{
-        outputBox.innerHTML = renderLoop7Report(data.reply);
+        outputBox.innerHTML = renderLoop7Report(returnedReportText);
         reflectionInput.classList.add("tl-post-report-input");
         document.getElementById("tlReflectionComposer").style.display = "block";
         reflectionInput.style.display = "block";
@@ -3901,11 +3902,22 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   // - non-streaming JSON responses continue to include evidenceRegistry.
   // Persist the report as soon as that final payload is received, rather than
   // waiting for the streaming connection to close (which can stall on mobile).
+  const getLoop7FinalReportText = payload => {
+    const candidates = [payload?.reply, payload?.analysis, payload?.report, payload?.data?.reply, payload?.data?.analysis];
+    for(const candidate of candidates){
+      if(typeof candidate === "string" && candidate.trim()) return candidate;
+    }
+    return "";
+  };
+
   const preserveLoop7FinalPayload = (payload, transport) => {
     if(payload?.investigationFailure === true || payload?.type === "investigation_failure") return false;
-    const reportText = typeof payload?.reply === "string" ? payload.reply : "";
+    const reportText = getLoop7FinalReportText(payload);
     if(!reportText.trim()) return false;
 
+    // Normalize compatibility payloads to the one field consumed by the
+    // existing report renderer and paywall.
+    if(typeof payload.reply !== "string" || !payload.reply.trim()) payload.reply = reportText;
     latestTruthLoopReport = reportText;
     try {
       captureEvidenceSourceRegistry(payload);
@@ -3946,7 +3958,7 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
         recoveredInvestigationFailure = payload;
         return;
       }
-      if(payload && (payload.reply || payload.final === true || payload.type === "final")){
+      if(payload && (payload.reply || payload.analysis || payload.report || payload.final === true || payload.type === "final")){
         if(preserveLoop7FinalPayload(payload, "non_streaming_fallback")){
           recoveredFinalPayload = payload;
         }
