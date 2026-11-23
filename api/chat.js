@@ -1993,19 +1993,28 @@ const loop7ReasoningEnabled = false;
 
 /* =========================================================
    LOOP 7 PROVIDER SETTINGS
-   Primary: Qwen Flash (exact Velona catalog code: qwen-flash).
-   Fallback 1: Gemini 2.5 Flash Lite.
-   Fallback 2: DeepSeek Chat V3.1.
-   All providers use the same Velona native gateway, investigation
-   instructions, and evidence payload. Loops 1–6 remain unchanged.
+   Primary: nabh.cloud GPT-OSS 20B (OpenAI-compatible API).
+   Fallback 1: Qwen Flash via Velona.
+   Fallback 2: Gemini 2.5 Flash Lite via Velona.
+   Fallback 3: DeepSeek Chat V3.1 via Velona.
+   Existing three Velona providers are deliberately retained as fallbacks.
+   Loops 1–6 remain unchanged.
    ========================================================= */
 const LOOP7_PROVIDER_ORDER = [
+  "nabh_gpt_oss",
   "qwen_flash",
   "gemini",
   "deepseek"
 ];
 
 const LOOP7_PROVIDER_SETTINGS = {
+  nabh_gpt_oss: {
+    apiKey: process.env.NABH_API_KEY,
+    endpoint: "https://api.nabh.cloud/v1/chat/completions",
+    model: "gpt-oss-20b",
+    temperature: 0.3,
+    maxTokens
+  },
   qwen_flash: {
     apiKey: process.env.VELONA_API_KEY,
     endpoint: "https://velona.in/gateway/v1/inference/run",
@@ -2060,7 +2069,7 @@ let loop7NativeOutput = "";
 try {
 
   /* =========================
-       LOOP 7 → QWEN FLASH → GEMINI → DEEPSEEK FALLBACK
+       LOOP 7 → NABH GPT-OSS 20B → QWEN → GEMINI → DEEPSEEK
        Retry on HTTP, network, malformed, or empty responses
      OTHER LOOPS → GROQ
   ========================= */
@@ -2100,24 +2109,38 @@ try {
       let providerErrorBody = "";
       let providerOutput = "";
       try {
+        const isNabhProvider = providerName === "nabh_gpt_oss";
+        const providerRequestBody = isNabhProvider
+          ? {
+              model: settings.model,
+              messages: [
+                { role: "system", content: loop7Instruction },
+                { role: "user", content: JSON.stringify(loop7AiUserPayload) }
+              ],
+              stream: true,
+              temperature: settings.temperature,
+              max_tokens: settings.maxTokens
+            }
+          : {
+              model: settings.model,
+              turns: [
+                { role: "system", content: loop7Instruction },
+                { role: "user", content: JSON.stringify(loop7AiUserPayload) }
+              ],
+              stream: true,
+              config: {
+                temperature: settings.temperature,
+                max_tokens: settings.maxTokens
+              }
+            };
+
         providerResponse = await fetch(settings.endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + settings.apiKey
           },
-          body: JSON.stringify({
-            model: settings.model,
-            turns: [
-              { role: "system", content: loop7Instruction },
-              { role: "user", content: JSON.stringify(loop7AiUserPayload) }
-            ],
-            stream: true,
-            config: {
-              temperature: settings.temperature,
-              max_tokens: settings.maxTokens
-            }
-          })
+          body: JSON.stringify(providerRequestBody)
         });
         response = providerResponse;
       } catch (fetchError) {
@@ -2175,7 +2198,11 @@ try {
             if (!line || line.startsWith(":") || !line.startsWith("data:")) return;
 
             const dataText = line.slice(5).trim();
-            if (!dataText || dataText === "[DONE]") return;
+            if (!dataText) return;
+            if (dataText === "[DONE]") {
+              streamDone = true;
+              return;
+            }
 
             let event;
             try {
@@ -2186,6 +2213,21 @@ try {
 
             if (event?.request_id && !streamRequestId) {
               streamRequestId = event.request_id;
+            }
+
+            // nabh.cloud follows OpenAI SSE: choices[].delta.content + [DONE].
+            // Velona fallback providers retain their native event/delta format.
+            if (Array.isArray(event?.choices)) {
+              const choice = event.choices[0];
+              const delta = choice?.delta?.content;
+              if (typeof delta === "string" && delta.length) {
+                if (firstDeltaAt === null) firstDeltaAt = Date.now();
+                providerOutput += delta;
+                deltaCount += 1;
+              }
+              if (event?.usage) nativeUsage = event.usage;
+              if (choice?.finish_reason) nativeFinishReason = choice.finish_reason;
+              return;
             }
 
             if (event?.event === "delta") {
