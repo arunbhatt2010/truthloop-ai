@@ -1254,40 +1254,6 @@ RETURN EXACTLY THESE 8 HEADINGS, EACH ON ITS OWN LINE, IN THIS ORDER:
 07. Reliability, Accountability & Risk Signals
 08. Overall Pattern & Future Readiness
 
-FINDING-LEVEL DEPTH AND LANGUAGE UPGRADE — MANDATORY
-The eight report sections are fixed containers, not the unit of analysis. The unit of analysis is each distinct, material finding inside a section. Do not aim for one finding per section, and do not treat a section summary as a finding.
-
-For every material finding, write a case-specific analytical statement with this internal sequence (combine naturally into prose; do not print these as a repetitive template):
-1. OBSERVATION: name the actual company/person, product, customer/partner, stated claim, action, deliverable, figure, date or event shown in the retained evidence. Be precise about what the source literally establishes.
-2. EVIDENCE: cite the exact SOURCE_XX immediately after the supported statement. Identify whether it is an official-website/company statement, founder statement, platform record, filing, customer/partner statement or other external record. Do not blur attribution.
-3. ANALYSIS: explain the concrete relationship, change, execution implication, discrepancy or pattern revealed by this evidence. Connect sources only when they concern the same identifiable subject, claim, scope and relevant time period. State what the connection adds that a reader would not see by reading each source separately.
-4. SIGNIFICANCE: explain why this particular observation matters to evaluating this subject's claims, execution, capability, customer evidence, relationships, consistency or accountability. Avoid generic investor commentary that could be pasted into another company's report.
-5. BOUNDARY: state the precise unresolved point or limitation only when material. Distinguish what is established, what is reasonably inferred, and what remains unverified.
-
-SPECIFICITY TEST — APPLY TO EVERY FINDING
-- A finding must contain at least one identifiable case detail beyond the subject's name: a named product, customer, partner, project, role, public claim, concrete output, metric, date, period, repository, release, contract, filing or clearly described event, if such detail exists in the evidence.
-- Prefer exact figures, units, periods, dates, named counterparties and deliverables over adjectives. Preserve the source's units and reporting period. Never manufacture precision where the source is vague.
-- Replace generic statements such as "the company has a strong online presence", "the founder demonstrates leadership", "this suggests growth potential", "there is evidence of innovation", or "more research is needed" with the actual observation and its specific implication. If no concrete observation supports a claim, omit it.
-- Do not merely paraphrase a source page. Explain the material fact it establishes, how it relates to another relevant record (if any), and why that relationship matters in this case.
-- Do not repeat a fact in several sections to create apparent depth. Reuse it only when a later section adds a genuinely different analytical implication.
-- A source count, page count, character count, scrape success, posting frequency, follower count or volume of web content is not itself a business achievement, customer traction, execution proof or corroboration.
-- A positive finding must be as specific and evidence-grounded as an adverse finding. Name the delivered outcome, independently supported relationship, working product evidence, repeatable milestone or other favorable fact; do not hide it behind neutral language.
-- A risk finding must name the concrete exposure or unresolved contradiction and its evidence. Do not turn missing public disclosure, a lack of collected records or a single unverified allegation into a negative conclusion.
-- Do not use vague hedging ("may suggest", "could indicate", "appears to show") as a substitute for analysis. Use calibrated language only to describe a real uncertainty, and state exactly what is uncertain and why.
-- Do not infer revenue, profitability, retention, customer usage, unit economics, ownership, audit status, founder responsibility or investment outcomes from indirect proxies. If the necessary evidence is absent, state the bounded gap once, clearly and without padding.
-- Use direct, professional analyst language: specific subject + observable action/claim/result + evidence-backed implication. Prefer short, information-dense sentences. Avoid promotional praise, dramatic warnings, filler transitions, repetitive caveats and AI-sounding boilerplate.
-- The report must read as if an analyst examined this exact evidence package. If a sentence could be copied unchanged into reports about many unrelated companies, rewrite it around the actual case detail or remove it.
-
-FINDING ACCEPTANCE CHECK
-Before finalizing, silently test every finding:
-(a) Does it identify a concrete fact, claim, action, output, relationship, change or discrepancy?
-(b) Does the cited source directly support the factual part?
-(c) Is the interpretation proportionate and clearly separated from the fact?
-(d) Does it add a case-specific insight rather than repeat source wording?
-(e) Does it explain why this fact matters here?
-(f) Are uncertainty and missing evidence described precisely without turning absence into an accusation?
-If any answer is no, rewrite or remove that finding. Do not add generic filler to make a section look complete.
-
 BEST FINDINGS EXPERIENCE — ANALYTICAL QUALITY STANDARD
 - Do not write a generic company summary or merely paraphrase page descriptions. Surface the strongest, most useful findings that the collected evidence actually supports.
 - Each existing section may contain multiple distinct findings. Eight report sections do NOT mean eight findings. Include every material finding that changes an investor's or investigator's understanding, but do not force a fixed finding count or pad the report with weak observations.
@@ -2023,7 +1989,7 @@ const cleanMessages = messages
 const maxTokens =
   loopLevel === 7 ? 16000 : 320; // Raised from the legacy OpenRouter-era 12,000 cap.
 
-const loop7ReasoningEnabled = true;
+const loop7ReasoningEnabled = false;
 
 /* =========================================================
    LOOP 7 PROVIDER SETTINGS
@@ -2045,24 +2011,21 @@ const LOOP7_PROVIDER_SETTINGS = {
     endpoint: "https://velona.in/gateway/v1/inference/run",
     model: "qwen-flash",
     temperature: 0.3,
-    maxTokens,
-    reasoningConfig: { enable_thinking: true }
+    maxTokens
   },
   gemini: {
     apiKey: process.env.VELONA_API_KEY,
     endpoint: "https://velona.in/gateway/v1/inference/run",
     model: "google/gemini-2.5-flash-lite",
     temperature: 0.3,
-    maxTokens,
-    reasoningConfig: { thinkingConfig: { thinkingBudget: 4096 } }
+    maxTokens
   },
   deepseek: {
     apiKey: process.env.VELONA_API_KEY,
     endpoint: "https://velona.in/gateway/v1/inference/run",
     model: "deepseek/deepseek-chat-v3.1",
     temperature: 0.3,
-    maxTokens,
-    reasoningConfig: { chat_template_kwargs: { thinking: true } }
+    maxTokens
   }
 };
 
@@ -2152,8 +2115,7 @@ try {
             stream: true,
             config: {
               temperature: settings.temperature,
-              max_tokens: settings.maxTokens,
-              ...settings.reasoningConfig
+              max_tokens: settings.maxTokens
             }
           })
         });
@@ -2313,15 +2275,6 @@ try {
         }
 
         if (!providerErrorBody && providerOutput.trim()) {
-          // Do not expose internal reasoning markers in the customer-facing report.
-          const finalProviderOutput = providerOutput
-            .replace(/<think>[\s\S]*?<\/think>/gi, "")
-            // DeepSeek-V3.1 can emit an untagged reasoning prefix ending at </think>.
-            .replace(/^[\s\S]*?<\/think>/i, "")
-            .trim();
-          if (!finalProviderOutput) {
-            throw new Error("Provider returned reasoning content without a final answer.");
-          }
           // Normalize the fully collected native SSE response. The provider
           // stream is consumed exactly once and never parsed again downstream.
           const nativeUsage =
@@ -2336,7 +2289,7 @@ try {
             choices: [{
               message: {
                 role: "assistant",
-                content: finalProviderOutput
+                content: providerOutput.trim()
               },
               finish_reason: nativeFinishReason
             }],
@@ -2345,11 +2298,11 @@ try {
 
           selectedLoop7Provider = providerName;
           loop7NativeResponseData = providerBody;
-          loop7NativeOutput = finalProviderOutput;
+          loop7NativeOutput = providerOutput.trim();
           console.log("LOOP7_PROVIDER_SELECTED", JSON.stringify({
             provider: providerName,
             model: settings.model,
-            replyChars: finalProviderOutput.length,
+            replyChars: providerOutput.trim().length,
             durationMs: Date.now() - providerStartedAt,
             normalized: !!normalizedData?.choices?.[0]?.message?.content,
             streaming: true
@@ -3236,15 +3189,11 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
 
 }
-    // Do not JSON.stringify the Fetch Response object here: Response instances
-    // have no enumerable payload fields and therefore misleadingly log as {}.
-    // The actual normalized model content is logged separately by
-    // LOOP7_FINAL_RESPONSE / LOOP7_REPORT_PAYLOAD below.
-    console.log("FINAL_RETURN_REACHED", JSON.stringify({
-      loopLevel,
-      provider: loopLevel === 7 ? selectedLoop7Provider : null,
-      normalizedReplyChars: String(reply || "").length
-    }));
+    console.log(
+  "FINAL_RESPONSE",
+  JSON.stringify(response, null, 2)
+);
+console.log("FINAL RETURN REACHED");
 
 const finalEvidenceRegistry =
   loopLevel === 7
@@ -3406,49 +3355,21 @@ const finalPayload = {
     loopLevel === 6 ? 6 : undefined
 };
 
-console.log("FINAL_RESPONSE_PAYLOAD_AUDIT", JSON.stringify({
-  loopLevel,
-  payloadKeys: Object.keys(finalPayload),
-  replyChars: String(finalPayload.reply || "").length,
-  analysisMatchesReply: typeof finalPayload.analysis === "string" && finalPayload.analysis === finalPayload.reply,
-  evidenceRegistryCount: finalEvidenceRegistry.length,
-  streamMode: !!loop7StreamStarted
-}));
-
 if (loop7StreamStarted) {
-  // Loop 7's `analysis` and `reply` are the same 8-section report. The
-  // progress stream previously serialized both fields, doubling report text
-  // in the terminal frame (e.g. ~23 KB for an ~11.5 KB report). The browser's
-  // Loop 7 contract consumes `reply`; send that canonical field only. The
-  // complete evidence registry was already sent in the compression progress
-  // event, so retain only its count here. Non-streaming JSON stays unchanged.
-  const streamFinalPayload = loopLevel === 7
-    ? {
-        reply: String(finalPayload.reply || ""),
-        evidenceRegistryCount: finalEvidenceRegistry.length,
-        evidenceRegistryDeliveredInProgress: true
-      }
-    : { ...finalPayload };
-
-  const finalStreamEvent = {
+  const finalWriteAccepted = sendLoop7Progress({
     type: "final",
     final: true,
-    ...streamFinalPayload
-  };
-  const finalFrameJson = JSON.stringify(finalStreamEvent);
-  const finalWriteAccepted = sendLoop7Progress(finalStreamEvent);
+    ...finalPayload
+  });
   console.log(
    "LOOP7_FINAL_STREAM_SENT",
    JSON.stringify({
       final: true,
-      replyChars: String(finalPayload.reply || "").length,
-      analysisDuplicatedInFinalFrame: false,
+      replyChars: (finalPayload.reply || "").length,
       registryCount: finalEvidenceRegistry.length,
-      registryRepeatedInFinalFrame: false,
-      finalFrameBytes: Buffer.byteLength(finalFrameJson, "utf8"),
+      finalFrameBytes: Buffer.byteLength(JSON.stringify({ type: "final", final: true, ...finalPayload }), "utf8"),
       serverWriteQueued: finalWriteAccepted,
       backpressurePending: loop7StreamPendingDrain || res.writableNeedDrain === true,
-      writableLengthAtFinalWrite: Number(res.writableLength || 0),
       clientDisconnected: loop7ClientDisconnected,
       streamWriteFailure: loop7StreamWriteFailure
    })
