@@ -1254,6 +1254,40 @@ RETURN EXACTLY THESE 8 HEADINGS, EACH ON ITS OWN LINE, IN THIS ORDER:
 07. Reliability, Accountability & Risk Signals
 08. Overall Pattern & Future Readiness
 
+FINDING-LEVEL DEPTH AND LANGUAGE UPGRADE — MANDATORY
+The eight report sections are fixed containers, not the unit of analysis. The unit of analysis is each distinct, material finding inside a section. Do not aim for one finding per section, and do not treat a section summary as a finding.
+
+For every material finding, write a case-specific analytical statement with this internal sequence (combine naturally into prose; do not print these as a repetitive template):
+1. OBSERVATION: name the actual company/person, product, customer/partner, stated claim, action, deliverable, figure, date or event shown in the retained evidence. Be precise about what the source literally establishes.
+2. EVIDENCE: cite the exact SOURCE_XX immediately after the supported statement. Identify whether it is an official-website/company statement, founder statement, platform record, filing, customer/partner statement or other external record. Do not blur attribution.
+3. ANALYSIS: explain the concrete relationship, change, execution implication, discrepancy or pattern revealed by this evidence. Connect sources only when they concern the same identifiable subject, claim, scope and relevant time period. State what the connection adds that a reader would not see by reading each source separately.
+4. SIGNIFICANCE: explain why this particular observation matters to evaluating this subject's claims, execution, capability, customer evidence, relationships, consistency or accountability. Avoid generic investor commentary that could be pasted into another company's report.
+5. BOUNDARY: state the precise unresolved point or limitation only when material. Distinguish what is established, what is reasonably inferred, and what remains unverified.
+
+SPECIFICITY TEST — APPLY TO EVERY FINDING
+- A finding must contain at least one identifiable case detail beyond the subject's name: a named product, customer, partner, project, role, public claim, concrete output, metric, date, period, repository, release, contract, filing or clearly described event, if such detail exists in the evidence.
+- Prefer exact figures, units, periods, dates, named counterparties and deliverables over adjectives. Preserve the source's units and reporting period. Never manufacture precision where the source is vague.
+- Replace generic statements such as "the company has a strong online presence", "the founder demonstrates leadership", "this suggests growth potential", "there is evidence of innovation", or "more research is needed" with the actual observation and its specific implication. If no concrete observation supports a claim, omit it.
+- Do not merely paraphrase a source page. Explain the material fact it establishes, how it relates to another relevant record (if any), and why that relationship matters in this case.
+- Do not repeat a fact in several sections to create apparent depth. Reuse it only when a later section adds a genuinely different analytical implication.
+- A source count, page count, character count, scrape success, posting frequency, follower count or volume of web content is not itself a business achievement, customer traction, execution proof or corroboration.
+- A positive finding must be as specific and evidence-grounded as an adverse finding. Name the delivered outcome, independently supported relationship, working product evidence, repeatable milestone or other favorable fact; do not hide it behind neutral language.
+- A risk finding must name the concrete exposure or unresolved contradiction and its evidence. Do not turn missing public disclosure, a lack of collected records or a single unverified allegation into a negative conclusion.
+- Do not use vague hedging ("may suggest", "could indicate", "appears to show") as a substitute for analysis. Use calibrated language only to describe a real uncertainty, and state exactly what is uncertain and why.
+- Do not infer revenue, profitability, retention, customer usage, unit economics, ownership, audit status, founder responsibility or investment outcomes from indirect proxies. If the necessary evidence is absent, state the bounded gap once, clearly and without padding.
+- Use direct, professional analyst language: specific subject + observable action/claim/result + evidence-backed implication. Prefer short, information-dense sentences. Avoid promotional praise, dramatic warnings, filler transitions, repetitive caveats and AI-sounding boilerplate.
+- The report must read as if an analyst examined this exact evidence package. If a sentence could be copied unchanged into reports about many unrelated companies, rewrite it around the actual case detail or remove it.
+
+FINDING ACCEPTANCE CHECK
+Before finalizing, silently test every finding:
+(a) Does it identify a concrete fact, claim, action, output, relationship, change or discrepancy?
+(b) Does the cited source directly support the factual part?
+(c) Is the interpretation proportionate and clearly separated from the fact?
+(d) Does it add a case-specific insight rather than repeat source wording?
+(e) Does it explain why this fact matters here?
+(f) Are uncertainty and missing evidence described precisely without turning absence into an accusation?
+If any answer is no, rewrite or remove that finding. Do not add generic filler to make a section look complete.
+
 BEST FINDINGS EXPERIENCE — ANALYTICAL QUALITY STANDARD
 - Do not write a generic company summary or merely paraphrase page descriptions. Surface the strongest, most useful findings that the collected evidence actually supports.
 - Each existing section may contain multiple distinct findings. Eight report sections do NOT mean eight findings. Include every material finding that changes an investor's or investigator's understanding, but do not force a fixed finding count or pad the report with weak observations.
