@@ -1940,19 +1940,17 @@ if (loopLevel === 7) {
 
 
   if (wantsLoop7Progress) {
-    const reportEvidenceRegistry =
-      Array.isArray(
-        compressedEvidencePackage?.loop7Package?.sourceRegistry
-      )
-        ? compressedEvidencePackage.loop7Package.sourceRegistry
-        : loop7EvidenceSourceIndexCompact;
-
+    // The complete registry was already sent once with the compression phase.
+    // Do not resend the same 40+ source objects in the report-phase progress
+    // event: it adds tens of KB to the mobile SSE stream and can trigger
+    // backpressure without providing any new information to the frontend.
     sendLoop7Progress({
       type: "progress",
       phase: "report",
       message: "Generating final investigation.",
-      evidenceRegistry: reportEvidenceRegistry,
-      evidenceRegistryCount: reportEvidenceRegistry.length
+      evidenceRegistryCount: Array.isArray(compressedEvidencePackage?.loop7Package?.sourceRegistry)
+        ? compressedEvidencePackage.loop7Package.sourceRegistry.length
+        : loop7EvidenceSourceIndexCompact.length
     });
   }
 
@@ -3418,18 +3416,29 @@ const finalPayload = {
 };
 
 if (loop7StreamStarted) {
-  const finalWriteAccepted = sendLoop7Progress({
+  // The registry is sent once in the earlier compression progress event.
+  // The browser preserves that in-memory registry when the terminal event
+  // contains only evidenceRegistryCount. Keep the full registry on the
+  // non-streaming JSON response below for backward compatibility.
+  const {
+    evidenceRegistry: _streamOmittedEvidenceRegistry,
+    ...streamFinalPayload
+  } = finalPayload;
+  const streamFinalEvent = {
     type: "final",
     final: true,
-    ...finalPayload
-  });
+    ...streamFinalPayload,
+    evidenceRegistryCount: finalEvidenceRegistry.length
+  };
+  const finalWriteAccepted = sendLoop7Progress(streamFinalEvent);
   console.log(
    "LOOP7_FINAL_STREAM_SENT",
    JSON.stringify({
       final: true,
-      replyChars: (finalPayload.reply || "").length,
+      replyChars: (streamFinalPayload.reply || "").length,
       registryCount: finalEvidenceRegistry.length,
-      finalFrameBytes: Buffer.byteLength(JSON.stringify({ type: "final", final: true, ...finalPayload }), "utf8"),
+      registryIncludedInFinal: false,
+      finalFrameBytes: Buffer.byteLength(JSON.stringify(streamFinalEvent), "utf8"),
       serverWriteQueued: finalWriteAccepted,
       backpressurePending: loop7StreamPendingDrain || res.writableNeedDrain === true,
       clientDisconnected: loop7ClientDisconnected,
