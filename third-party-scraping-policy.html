@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Third-Party Public Profile Collection Policy | TruthLoop</title>
+<meta name="description" content="How TruthLoop collects and analyses publicly accessible profile content using its internal PCF system and selected third-party collection services." />
+<link rel="canonical" href="https://truthloop.in/third-party-scraping-policy.html" />
+<meta name="robots" content="index,follow" />
+<style>
+:root{color-scheme:dark;--bg:#0b0b0b;--panel:#111;--line:#292929;--text:#e8e8e8;--muted:#aaa;--accent:#ff8c00;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.75 Arial,Helvetica,sans-serif;padding:24px 16px}main{max-width:880px;margin:0 auto}.brand{color:var(--accent);font-weight:700;letter-spacing:.3px;text-decoration:none}.tagline{color:var(--muted);font-size:13px;margin:3px 0 22px}h1{font-size:clamp(28px,5vw,38px);line-height:1.2;margin:10px 0}h2{font-size:21px;color:var(--accent);margin:30px 0 8px}p,li{color:#d6d6d6}ul{padding-left:23px}a{color:var(--accent);text-underline-offset:3px}.meta{color:var(--muted);font-size:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin:20px 0}.notice{border-left:3px solid var(--accent);padding:12px 15px;background:#17130d;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:12px 18px;border-top:1px solid var(--line);padding-top:18px;margin-top:34px;font-size:14px}.footer{color:#888;font-size:13px;margin:24px 0 8px}.small{font-size:14px;color:var(--muted)}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:520px}th,td{text-align:left;vertical-align:top;padding:12px;border-bottom:1px solid var(--line)}th{color:var(--accent)}
+@media(max-width:560px){body{padding:18px 14px}.panel{padding:17px}h2{font-size:19px}}
+</style>
+</head>
+<body>
+<main>
+<a class="brand" href="https://truthloop.in/app/">TruthLoop</a>
+<p class="tagline">Not Answers. Patterns.</p>
+<h1>Third-Party Public Profile Collection Policy</h1>
+<div class="panel notice"><strong>Scope:</strong> TruthLoop is designed to investigate material available through public profile and content URLs. PCF is TruthLoop's own collection component. When enabled, the configuration may also use selected Apify-hosted Actors for public LinkedIn and X content. This policy does not claim that any social platform authorises or endorses automated collection.</div>
+
+<h2>1. Purpose</h2>
+<p>This policy explains how TruthLoop may retrieve, organise, reference and analyse publicly accessible information associated with profile URLs, posts, articles, websites and other public content submitted for an investigation. It supplements our <a href="/privacy.html">Privacy Policy</a>.</p>
+
+<h2>2. Collection Architecture</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Component</th><th>Role</th><th>Disclosure</th></tr></thead>
+<tbody>
+<tr><td><strong>PCF — PublicContentFetcher</strong></td><td>TruthLoop's internal collection component</td><td>PCF is operated as part of TruthLoop's own system. It is not an external scraping vendor.</td></tr>
+<tr><td><strong>Apify platform and selected Actors</strong></td><td>Third-party infrastructure/automation for public LinkedIn and X content</td><td>Used when enabled, alongside PCF, subject to availability, applicable law and platform restrictions.</td></tr>
+</tbody></table></div>
+<p>Apify Actors may be enabled as part of the collection workflow. The exact Actor selection and collection scope may vary. We will update this notice if the actual providers or material data flows materially change.</p>
+
+<h2>3. Types of Public Material</h2>
+<p>Depending on the URL submitted, available platform access and the investigation workflow, collection may include:</p>
+<ul>
+<li>public profile details and biography information;</li>
+<li>public posts, articles, captions, descriptions and other published text;</li>
+<li>publicly linked websites, blogs, publications and content pages;</li>
+<li>public source URLs, timestamps or visible publication metadata;</li>
+<li>public company, project, portfolio or repository information where supported by the submitted source; and</li>
+<li>other publicly viewable information returned by the source or collection process.</li>
+</ul>
+<p>The exact information available depends on the source and its access settings. A submitted URL does not guarantee that the page can be accessed or that all content will be retrieved.</p>
+
+<h2>4. Public Availability and Access Limits</h2>
+<p>TruthLoop's intended collection scope is content available through public-facing URLs. Public availability does not automatically grant unlimited rights to copy, process, republish or reuse that content. Laws, platform terms, copyright, privacy rights, database rights and technical restrictions may still apply.</p>
+<p>TruthLoop does not ask users to provide another person's password or private account credentials for a public-profile investigation. Do not submit stolen credentials, session cookies, private account links or material that you are not authorised to provide. A page that requires login, permission, payment or other access may be unavailable for collection. A technical workaround or an Actor's ability to retrieve a page must not be treated as legal permission to access it.</p>
+<p>Collection may be limited, paused or discontinued where a source blocks access, platform rules change, a legal request is received, or we identify a material compliance concern. TruthLoop does not represent that LinkedIn, X or any other source platform sponsors, approves, partners with or endorses TruthLoop.</p>
+
+<h2>5. Use of Apify and Third-Party Actors</h2>
+<p>When the Apify workflow is enabled, a submitted public profile URL and the technical inputs needed to run a collection task may be sent to the Apify platform and the selected Actor. Retrieved data or task results may pass through Apify infrastructure before being processed by TruthLoop.</p>
+<p>Apify explains that third-party Actor creators may receive or have access to personal data in connection with an Actor's functionality, depending on the Actor's permissions and configuration. For this reason, the specific Actor and its permission settings matter. We will use selected Actors for the intended public-content collection workflow and will review their descriptions, permissions and relevant terms before deployment. Users and affected individuals should also review the provider information where relevant.</p>
+<p>Apify resources: <a href="https://docs.apify.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> · <a href="https://docs.apify.com/legal/acceptable-use-policy" target="_blank" rel="noopener noreferrer">Acceptable Use Policy</a> · <a href="https://apify.com/store" target="_blank" rel="noopener noreferrer">Apify Store / Actor listings</a>.</p>
+
+<h2>6. AI Analysis and Report Generation</h2>
+<p>Collected source material may be organised into evidence packages and sent to AI services used by TruthLoop to prepare summaries, observations, cross-source analysis and investigation reports. Current AI infrastructure includes Groq, the Velona inference gateway and Google Gemini services; the model used can vary by workflow or fallback. AI outputs can contain errors, omissions or misinterpretations and should be checked against the cited source material.</p>
+<p>TruthLoop aims to distinguish source-backed observations from analytical interpretation and uncertainty. A report is not a certification that every statement in a profile is true, a legal finding, a background-check certificate, investment advice or a guarantee of future conduct or performance.</p>
+
+<h2>7. Permitted and Prohibited Uses</h2>
+<p>TruthLoop is intended for legitimate research, professional evaluation and understanding of public information. Users must have a lawful purpose and must not use TruthLoop or a report to:</p>
+<ul>
+<li>harass, threaten, stalk, intimidate, doxx or unlawfully surveil a person;</li>
+<li>access private accounts, bypass authentication, defeat access controls or obtain information through stolen credentials;</li>
+<li>infringe copyright, privacy, publicity, database or other third-party rights;</li>
+<li>discriminate unlawfully or infer sensitive personal traits such as health, religion, caste, ethnicity, political opinions or sexuality;</li>
+<li>make a high-impact decision about a person solely on the basis of an AI-generated report without appropriate independent verification and human review; or</li>
+<li>use collected content in a way that violates applicable law or relevant platform/provider terms.</li>
+</ul>
+
+<h2>8. Accuracy, Context and Source References</h2>
+<p>Public content can be incomplete, outdated, edited, removed, satirical, misleading or presented without full context. Automated collection can also miss content or return only a subset of what is visible on a platform. TruthLoop does not guarantee complete coverage, uninterrupted source access or error-free extraction.</p>
+<p>Where a report displays source references, users should open and review the original sources before relying on a conclusion. An absence of information in the retrieved material does not prove that an activity never occurred. Reports should be treated as research assistance, not as the sole basis for consequential decisions.</p>
+
+<h2>9. Requests, Corrections and Concerns</h2>
+<p>If you believe that public information about you has been collected in error, attributed incorrectly, taken out of context or used in a way that raises a legitimate concern, email <a href="mailto:arunbhatt2010@gmail.com">arunbhatt2010@gmail.com</a>. Include the relevant public URL, the TruthLoop report reference if available, the specific passage or source ID, and the reason for your request. We will review the request and take appropriate action where warranted or required by law.</p>
+<p>TruthLoop cannot edit or remove content hosted by LinkedIn, X or another third-party website. You may also need to contact the relevant platform or publisher about content on its service.</p>
+
+<h2>10. Changes to This Policy</h2>
+<p>We may revise this policy if collection sources, Actors, processing workflows or legal requirements change. Material changes to data flows will be reflected in the relevant privacy disclosures.</p>
+
+<h2>11. Contact and Grievances</h2>
+<p>For questions or complaints about third-party collection, email <a href="mailto:arunbhatt2010@gmail.com">arunbhatt2010@gmail.com</a>. We will review and respond to messages as appropriate and in accordance with applicable law.</p>
+<div class="panel">
+<p><strong>TruthLoop Service Operator and Contact Details</strong></p>
+<p>Founder / Service Operator: <strong>Arun Prakash Bhatt</strong><br>
+Correspondence location: <strong>Uttarkashi, Uttarakhand, India – 249193</strong><br>
+Contact number: <a href="tel:+919548103325">+91 9548103325</a><br>
+Email: <a href="mailto:arunbhatt2010@gmail.com">arunbhatt2010@gmail.com</a></p>
+<p><strong>Contact for questions and complaints:</strong> Arun Prakash Bhatt, Founder. Please use the email or phone number above.</p>
+<p class="small">The address above reflects the correspondence location and PIN supplied by the operator; it does not include a street, house number or building name.</p>
+</div>
+
+<nav class="links" aria-label="Legal pages"><a href="/privacy.html">Privacy Policy</a><a href="/cookie-policy.html">Cookie Policy</a><a href="/refund.html">Refund Policy</a><a href="https://truthloop.in/app/">Return to TruthLoop</a><a href="/terms.html">Terms &amp; Conditions</a></nav>
+<p class="footer">TruthLoop © 2026</p>
+</main>
+</body>
+</html>
