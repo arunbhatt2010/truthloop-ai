@@ -2674,11 +2674,10 @@ if (loopLevel === 7 && !response?.ok) {
 
 if (loopLevel === 7) {
 
-  // Every Loop 7 provider (Qwen, Gemini, DeepSeek) uses the same Velona
-  // native gateway. Its response body was parsed exactly once inside the
-  // provider-attempt loop and normalized before provider selection.
-  // Re-reading response.json()/text() here caused the Qwen crash:
-  // "Body is unusable: Body has already been read".
+  // Loop 7 providers use two compatible transport shapes: NABH uses
+  // OpenAI-compatible SSE; the retained Velona fallbacks use Velona-native SSE.
+  // Both are normalized once inside the provider-attempt loop. Do not re-read
+  // response.json()/text() here because the streaming body has already been consumed.
   const providerData = loop7NativeResponseData || {};
 
   if (!normalizedData?.choices?.[0]?.message?.content) {
@@ -2688,7 +2687,7 @@ if (loopLevel === 7) {
     );
   }
 
-  console.log("LOOP7_VELONA_NATIVE_RESPONSE_NORMALIZED", JSON.stringify({
+  console.log("LOOP7_PROVIDER_RESPONSE_NORMALIZED", JSON.stringify({
     provider: selectedLoop7Provider,
     replyChars: loop7NativeOutput.length,
     outputType: typeof providerData?.data?.output,
