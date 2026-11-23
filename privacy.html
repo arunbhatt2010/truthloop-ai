@@ -3,97 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Privacy Policy | TruthLoop</title>
-
-<meta name="description"
-content="TruthLoop Privacy Policy explaining how local storage, analytics, and payments are handled while keeping user privacy first.">
-
-<link rel="canonical"
-href="https://truthloop.in/privacy.html">
-
+<meta name="description" content="TruthLoop's Privacy Policy explains the information used for public-profile investigations, AI reports, analytics, browser storage and payments." />
+<link rel="canonical" href="https://truthloop.in/privacy.html" />
+<meta name="robots" content="index,follow" />
 <style>
-body{
-background:#0b0b0b;
-color:#e5e5e5;
-font-family:Arial,sans-serif;
-max-width:800px;
-margin:auto;
-padding:24px;
-line-height:1.8;
-}
-
-h1{
-color:#ff8c00;
-text-align:center;
-}
-
-a{
-color:#ff8c00;
-text-decoration:none;
-}
-
-.box{
-background:#111;
-border:1px solid #222;
-border-radius:12px;
-padding:24px;
-margin-top:20px;
-}
-
-.footer{
-margin-top:40px;
-text-align:center;
-font-size:13px;
-color:#777;
-}
+:root{color-scheme:dark;--bg:#0b0b0b;--panel:#111;--line:#292929;--text:#e8e8e8;--muted:#aaa;--accent:#ff8c00;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.75 Arial,Helvetica,sans-serif;padding:24px 16px}main{max-width:880px;margin:0 auto}.brand{color:var(--accent);font-weight:700;letter-spacing:.3px;text-decoration:none}.tagline{color:var(--muted);font-size:13px;margin:3px 0 22px}h1{font-size:clamp(28px,5vw,38px);line-height:1.2;margin:10px 0}h2{font-size:21px;color:var(--accent);margin:30px 0 8px}p,li{color:#d6d6d6}ul{padding-left:23px}a{color:var(--accent);text-underline-offset:3px}.meta{color:var(--muted);font-size:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin:20px 0}.notice{border-left:3px solid var(--accent);padding:12px 15px;background:#17130d;border-radius:7px}.links{display:flex;flex-wrap:wrap;gap:12px 18px;border-top:1px solid var(--line);padding-top:18px;margin-top:34px;font-size:14px}.footer{color:#888;font-size:13px;margin:24px 0 8px}.small{font-size:14px;color:var(--muted)}
+@media(max-width:560px){body{padding:18px 14px}.panel{padding:17px}h2{font-size:19px}}
 </style>
 </head>
-
 <body>
-
+<main>
+<a class="brand" href="https://truthloop.in/app/">TruthLoop</a>
+<p class="tagline">Not Answers. Patterns.</p>
 <h1>Privacy Policy</h1>
+<div class="panel notice"><strong>Important:</strong> TruthLoop does not require an account for the core experience, but it does process information needed to investigate a public profile, generate an AI-assisted report, measure site usage and process payments. “No login” does not mean “no data processing”.</div>
 
-<div class="box">
+<h2>1. About This Policy</h2>
+<p>This Privacy Policy explains how TruthLoop handles information when you visit or use <a href="https://truthloop.in/">truthloop.in</a>, including the application at <a href="https://truthloop.in/app/">truthloop.in/app</a>, submit a public profile URL, use a guided journey, generate or access a report, or contact support.</p>
+<p>The core experience does not require you to create a TruthLoop account or sign in. You may nevertheless provide information directly or cause information about a third party to be processed by submitting a public profile URL.</p>
 
-<h1>Privacy Policy</h1>
+<h2>2. Information We May Process</h2>
+<ul>
+<li><strong>Information you submit:</strong> public profile URLs, website or content links, investigation inputs, prompts, text entered during a guided journey, and information you include in a support message.</li>
+<li><strong>Publicly accessible source information:</strong> content retrieved from public profile pages, posts, articles, websites, blogs and supported public-source pages. Depending on source availability, this may include names or profile identifiers, biographies, public statements, post text, links, public metadata and other material visible at the source.</li>
+<li><strong>Journey and browser information:</strong> selected journey or pattern, current loop/stage, active conversation state and related interface information. Some of this may be stored in your browser's local storage.</li>
+<li><strong>Technical and analytics information:</strong> IP address or network information, browser/device characteristics, pages visited, referral information, event interactions, timestamps, diagnostics and security logs, as made available by the relevant hosting, analytics or security services.</li>
+<li><strong>Payment information:</strong> transaction reference, amount, currency, payment status and limited checkout information needed to confirm a purchase or investigate a payment issue. Payment credentials such as full card numbers, CVV or UPI PIN are intended to be entered with the payment provider, not into TruthLoop's report forms.</li>
+</ul>
 
-<p>Last Updated: May 2026</p>
+<h2>3. How We Use Information</h2>
+<p>Information may be used to:</p>
+<ul>
+<li>retrieve and organise publicly accessible material associated with a submitted profile or source URL;</li>
+<li>prepare evidence packages, source references, analytical observations and AI-assisted investigation reports;</li>
+<li>operate guided journeys, preserve progress and deliver purchased report access;</li>
+<li>process payments, detect payment errors, prevent abuse and maintain system security;</li>
+<li>measure site performance, traffic sources, campaign results and usability;</li>
+<li>respond to support, privacy, correction or grievance requests; and</li>
+<li>meet legal obligations or protect rights, safety and the integrity of the service.</li>
+</ul>
 
-<p>
-TruthLoop is designed around privacy, clarity, and minimal data collection.
-We do not require users to create accounts, provide email addresses,
-or submit personal information to access the core TruthLoop experience.
-</p>
+<h2>4. Public-Profile Investigation and Third-Party Content</h2>
+<p>TruthLoop is designed to analyse material available through public URLs. Public accessibility does not automatically mean that every form of automated collection or reuse is permitted. Collection is subject to applicable laws, platform restrictions, source availability and the limits described in our <a href="/third-party-scraping-policy.html">Third-Party Public Profile Collection Policy</a>.</p>
+<p>PCF (PublicContentFetcher) is TruthLoop's internally operated collection component. When enabled, the collection setup may also use selected Apify-hosted Actors for public LinkedIn and X content alongside PCF. The actual sources and amount of content available can vary. Some source pages may be unavailable, incomplete, changed, removed, restricted or technically inaccessible.</p>
 
-<p>
-To improve usability, TruthLoop may store limited journey information
-inside your browser using local storage. This may include your selected
-pattern category, loop progress, and conversation history from an active
-session. This information remains on your device and is not used to
-personally identify you.
-</p>
+<h2>5. AI Processing and Service Providers</h2>
+<p>To generate conversations and investigation reports, relevant user inputs and retrieved source material may be transmitted to external AI infrastructure. The current system configuration includes Groq, the Velona inference gateway and Google Gemini services. Depending on the workflow and fallback path, models may include Qwen, Gemini and DeepSeek variants. These providers process request content to return model outputs. Their own terms, privacy notices, security practices and retention arrangements also apply.</p>
+<p>TruthLoop may also use the following service providers or provider categories. Depending on the provider and infrastructure used, some processing may take place outside India:</p>
+<ul>
+<li><strong>Apify:</strong> used, when enabled, for LinkedIn and X public-content collection through selected Actors, alongside PCF. Apify's platform and, depending on Actor permissions and configuration, an Actor publisher may process information supplied to or generated by an Actor.</li>
+<li><strong>Microsoft Clarity:</strong> website usability analytics and interaction/session recordings.</li>
+<li><strong>Google Analytics and Google tags:</strong> traffic, event and campaign/conversion measurement.</li>
+<li><strong>Razorpay and payment networks:</strong> checkout, transaction processing, fraud prevention and payment confirmation. PayPal may be available through checkout for eligible international transactions where displayed.</li>
+<li><strong>Hosting and infrastructure providers, including Vercel:</strong> to run the website, backend functions, security, logs and report-generation workflows.</li>
+</ul>
+<p>We use providers for defined service functions and do not sell personal information. Information sent to a provider may be processed, logged or retained by that provider under its own terms, technical setup and privacy practices. We cannot control every independent processing activity or retention period of an external provider.</p>
+<p>Provider notices: <a href="https://docs.apify.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">Apify</a> · <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Groq</a> · <a href="https://velona.in/privacy" target="_blank" rel="noopener noreferrer">Velona</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google</a> · <a href="https://privacy.microsoft.com/" target="_blank" rel="noopener noreferrer">Microsoft</a> · <a href="https://razorpay.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Razorpay</a>.</p>
 
-<p>
-TruthLoop uses trusted third-party services such as Microsoft Clarity,
-Razorpay, and PayPal. These providers may collect technical information
-according to their own privacy policies.
-</p>
+<h2>6. Cookies, Analytics and Browser Storage</h2>
+<p>TruthLoop uses browser local storage to preserve journey state. The application also includes Google Analytics/Google tags and Microsoft Clarity. These technologies may collect or generate information about visits, browser/device characteristics and interactions. Payment checkout may use its own cookies or similar technologies. More detail is provided in our <a href="/cookie-policy.html">Cookie & Local Storage Policy</a>.</p>
 
-<p>
-We do not sell, rent, or share personal data for advertising purposes.
-By using TruthLoop, you agree to this Privacy Policy.
-</p>
+<h2>7. Sharing and Disclosure</h2>
+<p>We may disclose information to the service providers described above where necessary to operate the service; to payment, security or infrastructure partners; when required by applicable law, court order or valid legal process; to address fraud, security incidents or misuse; or to protect the rights, safety and property of TruthLoop, users or others. We do not sell personal information.</p>
 
-<p>
-Contact: arunbhatt2010@email.com
-</p>
+<h2>8. Retention and Security</h2>
+<p>We seek to retain information only for as long as reasonably necessary for report generation and delivery, journey continuity, service operation, security, dispute handling and legal obligations. Browser-local information may remain until you clear it. Operational logs, backups and information held by external providers may be retained according to their respective systems, contracts and retention policies; TruthLoop does not control every provider-side retention period.</p>
+<p>We use reasonable technical and organisational measures intended to protect information. No website, transmission method or storage system can be guaranteed to be completely secure.</p>
 
+<h2>9. Your Choices and Requests</h2>
+<p>You can clear local storage and cookies through your browser settings. You may contact us to ask about information you submitted, raise a privacy concern, or request review of information about a public profile. Please provide the relevant URL, report reference (if available) and a clear explanation. We will review requests and take steps where appropriate and legally required. We cannot alter or delete material on a third-party website that we do not control, and a request may not require deletion of records that must be retained for legal, security or dispute purposes.</p>
+<p>Do not send passwords, full card details, CVV, UPI PINs or government identity documents by email.</p>
+
+<h2>10. Children</h2>
+<p>TruthLoop is not designed to be used by children to investigate other people. Do not submit a child's profile or personal information unless you have the authority and a lawful reason to do so. If you believe information about a child has been submitted improperly, contact us for review.</p>
+
+<h2>11. Legal Framework and Updates</h2>
+<p>We handle information in accordance with laws that apply to the service and the relevant processing. Provisions of India's Digital Personal Data Protection Act, 2023 and its Rules have phased commencement; this policy will be reviewed as relevant provisions become applicable and as the service changes. This page is not a legal opinion or a guarantee that every provider's practices are identical.</p>
+<p>We may revise this policy when data flows, service providers, collection methods or legal requirements change.</p>
+
+<h2>12. Contact and Grievances</h2>
+<p>For privacy questions, complaints, correction requests or other grievances, email <a href="mailto:arunbhatt2010@gmail.com">arunbhatt2010@gmail.com</a>. Please include “Privacy Request” or “Grievance” in the subject line and provide enough detail for us to identify the issue. We will review and respond to messages as appropriate and in accordance with applicable law.</p>
+<div class="panel">
+<p><strong>TruthLoop Service Operator and Contact Details</strong></p>
+<p>Founder / Service Operator: <strong>Arun Prakash Bhatt</strong><br>
+Correspondence location: <strong>Uttarkashi, Uttarakhand, India – 249193</strong><br>
+Contact number: <a href="tel:+919548103325">+91 9548103325</a><br>
+Email: <a href="mailto:arunbhatt2010@gmail.com">arunbhatt2010@gmail.com</a></p>
+<p><strong>Contact for questions and complaints:</strong> Arun Prakash Bhatt, Founder. Please use the email or phone number above.</p>
+<p class="small">The address above reflects the correspondence location and PIN supplied by the operator; it does not include a street, house number or building name.</p>
 </div>
 
-<div class="footer">
-TruthLoop © 2026
-</div>
-
+<nav class="links" aria-label="Legal pages"><a href="/cookie-policy.html">Cookie Policy</a><a href="/refund.html">Refund Policy</a><a href="/third-party-scraping-policy.html">Third-Party Collection Policy</a><a href="https://truthloop.in/app/">Return to TruthLoop</a><a href="/terms.html">Terms &amp; Conditions</a></nav>
+<p class="footer">TruthLoop © 2026</p>
+</main>
 </body>
 </html>
