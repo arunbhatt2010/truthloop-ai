@@ -1720,12 +1720,12 @@ body{background:radial-gradient(circle at 82% 7%,rgba(168,85,247,.12),transparen
 .tl-brand{display:flex!important;align-items:center!important;gap:15px!important;min-width:0}
 .tl-brand-name{font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(20px,2vw,30px)!important;font-weight:800!important;letter-spacing:-.025em!important;color:#f8fafc!important;white-space:nowrap}
 .tl-trust{font-size:clamp(10px,1.15vw,16px)!important;font-weight:600!important;color:#a7acbf!important;white-space:nowrap}
-
-
-
-
-
-
+.tl-menu-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:58px!important;height:58px!important;min-width:58px!important;margin:0!important;padding:0!important;border-radius:17px!important;background:rgba(255,255,255,.045)!important;border:1px solid rgba(168,85,247,.25)!important;color:#f2f2fa!important;font-family:Arial,sans-serif!important;font-size:30px!important;line-height:1!important;box-shadow:0 0 0 1px rgba(255,255,255,.025) inset!important;cursor:pointer!important}
+.tl-menu-btn:hover{border-color:rgba(168,85,247,.55)!important;background:rgba(168,85,247,.08)!important}
+.tl-quick-menu{position:absolute;z-index:1000;right:clamp(18px,3.9vw,60px);top:88px;display:flex;flex-direction:column;min-width:190px;padding:8px;border:1px solid rgba(168,85,247,.25);border-radius:14px;background:#0b1120;box-shadow:0 20px 55px rgba(0,0,0,.55)}
+.tl-quick-menu[hidden]{display:none!important}
+.tl-quick-menu a{padding:10px 12px;border-radius:8px;color:#dbe3f1;text-decoration:none;font:600 13px/1.3 Arial,sans-serif}
+.tl-quick-menu a:hover{background:rgba(168,85,247,.1);color:#fff}
 #initialInvestigationCard.tl-entry-card{position:relative!important;display:block!important;width:100%!important;max-width:1192px!important;margin:36px auto 18px!important;padding:34px!important;box-sizing:border-box!important;border-radius:36px!important;background:linear-gradient(145deg,rgba(10,16,31,.99),rgba(7,12,24,.99))!important;border:1px solid rgba(111,67,170,.32)!important;box-shadow:0 22px 70px rgba(0,0,0,.34),inset 0 0 40px rgba(168,85,247,.025)!important;z-index:2}
 #initialInvestigationCard.tl-entry-card.is-collapsed{display:none!important;max-height:none!important;opacity:1!important;transform:none!important;overflow:visible!important;padding:0!important;margin:0!important}
 #loopIndicator{display:none!important}
@@ -1773,9 +1773,9 @@ body{background:radial-gradient(circle at 82% 7%,rgba(168,85,247,.12),transparen
   .tl-topbar{min-height:44px!important;padding:0 0 13px!important;gap:10px!important}
   .tl-brand{gap:10px!important}
   .tl-brand-name{font-size:19px!important}
-
+  .tl-menu-btn{width:43px!important;height:43px!important;min-width:43px!important;border-radius:12px!important;font-size:23px!important}
   .tl-trust{font-size:9px!important;letter-spacing:-.02em!important}
-
+  .tl-quick-menu{top:63px;right:14px}
   #initialInvestigationCard.tl-entry-card{margin:17px auto 12px!important;padding:18px 17px!important;border-radius:23px!important}
   .tl-entry-kicker{font-size:9px;letter-spacing:1.45px}
   .tl-preloop-progress{gap:6px;margin:9px 0 23px!important}
@@ -1852,6 +1852,8 @@ body{background:radial-gradient(circle at 82% 7%,rgba(168,85,247,.12),transparen
 #tlFounderStartBtn{display:block;width:100%!important;min-height:48px!important;margin:0!important;padding:13px 16px!important;border:0!important;border-radius:13px!important;background:linear-gradient(100deg,#ff7b14,#ffa31a)!important;color:#101014!important;font:900 14px/1.2 Arial,Helvetica,sans-serif!important;box-shadow:0 10px 25px rgba(255,140,0,.18)!important;cursor:pointer!important}
 #tlFounderStartBtn:hover,#tlFounderStartBtn:focus-visible{filter:brightness(1.06);outline:2px solid rgba(255,179,71,.6);outline-offset:3px}
 .tl-founder-note{margin:8px 0 0!important;color:#7f8aa0!important;font:400 10px/1.3 Arial,Helvetica,sans-serif!important;text-align:center}
+/* Menu is present before Loop 1, hidden during investigation, and restored with the final report. */
+#tlMenuBtn.tl-menu-hidden-during-investigation{display:none!important}
 /* The share card is intentionally suppressed; the actual investigation/report flow remains unchanged. */
 #shareBox{display:none!important}
 @media(max-width:760px){
@@ -2322,10 +2324,18 @@ START NEW PATTERN
 <div class="container">
   <div class="tl-topbar">
     <div class="tl-brand tl-brand-textonly">
+      <button id="tlMenuBtn" class="tl-menu-btn" type="button" aria-expanded="false" aria-controls="tlQuickMenu" aria-label="Open TruthLoop menu"><span aria-hidden="true">☰</span></button>
       <div class="tl-brand-name">TruthLoop AI</div>
     </div>
     <div class="tl-trust">No Signup <span>•</span> No Login <span>•</span> Privacy First</div>
   </div>
+  <nav id="tlQuickMenu" class="tl-quick-menu" hidden aria-label="TruthLoop links">
+    <a href="/TruthLoop_AI_Pre_Due_Diligence_Article.html" target="_blank" rel="noopener">Pre-Due-Diligence Guide for Investors &amp; Founders</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/refund.html">Refund Policy</a>
+    <a href="/cookie-policy.html">Cookie Policy</a>
+  </nav>
 
   <!-- Permanent first-screen welcome: pre-existing markup prevents a blank landing
        while the direct-investigation bridge is initialized by the app script. -->
@@ -2542,6 +2552,17 @@ let activeLoopBody = null;
 window.loop7BridgeShown = false;
 window.tlLoop7ReportMode = "conversation";
 
+
+window.setTruthLoopMenuVisibility = function(visible){
+  const menuButton = document.getElementById("tlMenuBtn");
+  const quickMenu = document.getElementById("tlQuickMenu");
+  if(!menuButton) return;
+  menuButton.classList.toggle("tl-menu-hidden-during-investigation", !visible);
+  if(!visible && quickMenu){
+    quickMenu.hidden = true;
+    menuButton.setAttribute("aria-expanded", "false");
+  }
+};
 
 if(mainInput && inputCounter){ const syncCounter=()=>inputCounter.textContent=`${mainInput.value.length} / 500`; mainInput.addEventListener("input",syncCounter); syncCounter(); }
 [mainInput, reflectionInput].filter(Boolean).forEach(languageInput=>{
@@ -3467,6 +3488,7 @@ async function recoverLoop7ReportAfterUiError(error, context){
     if(article) article.style.display = "block";
     if(paywallBox) paywallBox.style.display = "none";
     if(nextBtn) nextBtn.style.display = "none";
+    if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
     saveJourney();
   } catch(uiError) {
     console.warn("LOOP7_POST_REPORT_UI_RECOVERY_PARTIAL", uiError);
@@ -3722,6 +3744,7 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
         reflectionInput.placeholder = "What do you think about this report?";
         track("loop7_report_viewed", {access_method: "already_unlocked", report_mode: "direct"});
         track("direct_report_viewed", {report_mode: "direct", access_method: "already_unlocked"});
+        if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
         nextBtn.style.display = "none";
       }
     }else{
@@ -3778,6 +3801,7 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
           }
           const composer = document.getElementById("tlReflectionComposer");
           if(composer) composer.style.display = "block";
+          if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
         }catch(recoveryUiError){
           console.warn("DIRECT_LOOP7_POST_REPORT_UI_RECOVERY_ERROR", recoveryUiError);
         }
@@ -5734,6 +5758,7 @@ function unlockLoop7Report(method){
       track("direct_report_viewed", {report_mode: "direct", access_method: method});
     }
     document.getElementById("articleBlock").style.display="block";
+    if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
     saveJourney();
   }
 }
@@ -6105,6 +6130,7 @@ window.loop7BridgeShown = false;
 window.loop7Started = false;
 
 showLoop1Indicator();
+if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(false);
 hidePreInvestigationUI();
 const profileEl = document.getElementById("patternProfile");
 if(profileEl) profileEl.classList.remove("tl-visible");
@@ -6269,6 +6295,7 @@ if (loopLevel === 7) {
         reflectionInput.style.display = "block";
         reflectionInput.placeholder = "What do you think about this report?";
         track("loop7_report_viewed", {access_method: "already_unlocked"});
+        if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
         nextBtn.style.display = "none";
       }
     }
@@ -6373,6 +6400,7 @@ document.getElementById("profileBelief").innerText =
       reflectionInput.style.display = "block";
       reflectionInput.placeholder = "What do you think about this report?";
       track("loop7_report_viewed", {access_method: "already_unlocked"});
+      if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
       nextBtn.style.display = "none";
     }
   
@@ -6515,6 +6543,7 @@ if(loopLevel === 7 && latestTruthLoopReport.trim()){
     reflectionInput.style.display = "block";
     reflectionInput.placeholder = "What do you think about this report?";
     nextBtn.style.display = "none";
+    if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
   } else {
     try {
       validateLoop7ReportReady(latestTruthLoopReport);
@@ -6772,6 +6801,7 @@ if(loopLevel === 7 && latestTruthLoopReport.trim()){
     document.getElementById("tlReflectionComposer").style.display = "block";
     reflectionInput.style.display = "block";
     reflectionInput.placeholder = "What do you think about this report?";
+    if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
   } else {
     // A saved, completed report should remain on the Journey Found screen
     // until the user taps Continue Journey. Do not render the paywall on load.
@@ -6877,6 +6907,8 @@ async function startLinkedInOAuth() {
   const input = document.getElementById('mainInput');
   const submit = document.getElementById('getBtn');
   const counter = document.getElementById('inputCounter');
+  const menuButton = document.getElementById('tlMenuBtn');
+  const quickMenu = document.getElementById('tlQuickMenu');
   if(!screen1 || !screen2 || !founderScreen || !card || !input || !submit) return;
 
   let founderReturnScreen = screen2;
@@ -6891,6 +6923,7 @@ async function startLinkedInOAuth() {
     screen2.hidden = false;
     founderScreen.hidden = true;
     if(wasHidden) track("screen2_viewed", {entry_source: "screen1_or_founder"});
+    if(menuButton) menuButton.setAttribute('aria-label','Open TruthLoop menu');
   }
 
   function showFounderIntro(){
@@ -6900,6 +6933,9 @@ async function startLinkedInOAuth() {
     screen1.hidden = true;
     screen2.hidden = true;
     founderScreen.hidden = false;
+    if(menuButton){
+      menuButton.setAttribute('aria-label','Open TruthLoop menu');
+    }
     try{
       history.pushState({tlFounderIntro:true}, '', location.pathname + location.search + '#founder-intro');
       founderHistoryOpen = true;
@@ -6952,6 +6988,7 @@ async function startLinkedInOAuth() {
     screen1.hidden = true;
     screen2.hidden = true;
     founderScreen.hidden = true;
+    if(menuButton) menuButton.setAttribute('aria-label','Open TruthLoop menu');
 
     /* Start a clean public-footprint report without the Loop 1–6 case package. */
     clearJourney();
@@ -6992,6 +7029,23 @@ async function startLinkedInOAuth() {
     if(!founderScreen.hidden) restoreScreenAfterFounderBack();
   });
 
+  if(menuButton && quickMenu){
+    menuButton.addEventListener('click', function(){
+      if(menuButton.classList.contains('tl-menu-hidden-during-investigation')) return;
+      const opening = quickMenu.hidden;
+      quickMenu.hidden = !opening;
+      menuButton.setAttribute('aria-expanded', String(opening));
+    });
+    /* Keep the menu open until the user explicitly toggles it closed.
+       Do not auto-hide on outside taps: this was causing legal links to
+       disappear during mobile navigation attempts. */
+    quickMenu.addEventListener('click', function(event){
+      const link = event.target.closest('a[href]');
+      if(!link || !quickMenu.contains(link)) return;
+      /* Let the browser follow the selected legal-page link normally. */
+    });
+  }
+
   input.addEventListener('input', function(){
     window.tlPreLoopManual = true;
     window.tlPreLoopSituation = input.value;
@@ -7029,6 +7083,16 @@ async function startLinkedInOAuth() {
     window.tlPreLoopSituation = input.value;
     if(window.tlPreLoopManual !== false) window.tlPreLoopManual = true;
   }, true);
+
+  /* Restored journeys: keep the menu hidden while the investigation is already in progress. */
+  const continueJourney = document.getElementById('continueJourneyBtn');
+  if(continueJourney){
+    continueJourney.addEventListener('click', function(){
+      const currentLoop = Number((document.getElementById('restoreLoop')?.textContent || '').match(/Loop (\d+)/)?.[1] || 1);
+      if(currentLoop > 1) window.setTruthLoopMenuVisibility?.(false);
+      else window.setTruthLoopMenuVisibility?.(true);
+    });
+  }
 
   /* Entry routing:
      - First-time visitors see the Direct Profile Investigation bridge.
