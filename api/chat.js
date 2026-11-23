@@ -3251,7 +3251,12 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
     console.log(
   "FINAL_RESPONSE",
-  JSON.stringify(response, null, 2)
+  JSON.stringify({
+    loop: loopLevel,
+    provider: loopLevel === 7 ? selectedLoop7Provider : "groq",
+    hasReply: !!String(data?.choices?.[0]?.message?.content || "").trim(),
+    replyChars: String(data?.choices?.[0]?.message?.content || "").length
+  })
 );
 console.log("FINAL RETURN REACHED");
 
@@ -3451,6 +3456,19 @@ if (loop7StreamStarted) {
 
 if (loopAiFallbackUsed) {
   finalPayload.aiFallbackUsed = true;
+}
+
+if (loopLevel === 7) {
+  console.log("LOOP7_JSON_FINAL_RESPONSE_READY", JSON.stringify({
+    provider: selectedLoop7Provider,
+    hasReply: !!String(finalPayload.reply || "").trim(),
+    replyChars: String(finalPayload.reply || "").length,
+    evidenceRegistryCount: Array.isArray(finalPayload.evidenceRegistry)
+      ? finalPayload.evidenceRegistry.length
+      : 0,
+    expectedSections: 8,
+    transport: "application/json"
+  }));
 }
 
 return res.status(200).json(finalPayload);
