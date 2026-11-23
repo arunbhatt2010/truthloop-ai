@@ -3261,6 +3261,23 @@ function handleLoop7ProgressPayload(payload){
   }
 }
 
+// Shared report-text extractor: used by both the transport reader and the
+// direct-report completion handler. Keep it at page scope so callers outside
+// fetchLoop7Investigation can safely read the normalized final payload.
+function getLoop7FinalReportText(payload){
+  const candidates = [
+    payload?.reply,
+    payload?.analysis,
+    payload?.report,
+    payload?.data?.reply,
+    payload?.data?.analysis
+  ];
+  for(const candidate of candidates){
+    if(typeof candidate === "string" && candidate.trim()) return candidate;
+  }
+  return "";
+}
+
 async function fetchLoop7Investigation(profileLink, reportMode = "conversation"){
   const directMode = reportMode === "direct";
   const response = await fetch(API_URL,{
@@ -3295,14 +3312,6 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   // - non-streaming JSON responses continue to include evidenceRegistry.
   // Persist the report as soon as that final payload is received, rather than
   // waiting for the streaming connection to close (which can stall on mobile).
-  const getLoop7FinalReportText = payload => {
-    const candidates = [payload?.reply, payload?.analysis, payload?.report, payload?.data?.reply, payload?.data?.analysis];
-    for(const candidate of candidates){
-      if(typeof candidate === "string" && candidate.trim()) return candidate;
-    }
-    return "";
-  };
-
   const preserveLoop7FinalPayload = (payload, transport) => {
     if(payload?.investigationFailure === true || payload?.type === "investigation_failure") return false;
     const reportText = getLoop7FinalReportText(payload);
