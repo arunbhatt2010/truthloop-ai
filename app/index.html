@@ -3292,7 +3292,10 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
       profileLink,
       currentCategory: directMode ? "" : currentCategory,
       reportMode: directMode ? "direct" : "conversation",
-      progress:true,
+      // Direct public reports use one completed JSON response. This avoids
+      // mobile-browser SSE final-frame delivery issues after the long Loop 7 run.
+      // Guided/conversation Loop 7 keeps its existing progress stream.
+      progress: directMode ? false : true,
       uiLanguage
     })
   });
