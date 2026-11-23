@@ -2023,7 +2023,7 @@ const cleanMessages = messages
 const maxTokens =
   loopLevel === 7 ? 16000 : 320; // Raised from the legacy OpenRouter-era 12,000 cap.
 
-const loop7ReasoningEnabled = false;
+const loop7ReasoningEnabled = true;
 
 /* =========================================================
    LOOP 7 PROVIDER SETTINGS
@@ -2045,21 +2045,24 @@ const LOOP7_PROVIDER_SETTINGS = {
     endpoint: "https://velona.in/gateway/v1/inference/run",
     model: "qwen-flash",
     temperature: 0.3,
-    maxTokens
+    maxTokens,
+    reasoningConfig: { enable_thinking: true }
   },
   gemini: {
     apiKey: process.env.VELONA_API_KEY,
     endpoint: "https://velona.in/gateway/v1/inference/run",
     model: "google/gemini-2.5-flash-lite",
     temperature: 0.3,
-    maxTokens
+    maxTokens,
+    reasoningConfig: { thinkingConfig: { thinkingBudget: 4096 } }
   },
   deepseek: {
     apiKey: process.env.VELONA_API_KEY,
     endpoint: "https://velona.in/gateway/v1/inference/run",
     model: "deepseek/deepseek-chat-v3.1",
     temperature: 0.3,
-    maxTokens
+    maxTokens,
+    reasoningConfig: { chat_template_kwargs: { thinking: true } }
   }
 };
 
@@ -2149,7 +2152,8 @@ try {
             stream: true,
             config: {
               temperature: settings.temperature,
-              max_tokens: settings.maxTokens
+              max_tokens: settings.maxTokens,
+              ...settings.reasoningConfig
             }
           })
         });
@@ -2309,6 +2313,15 @@ try {
         }
 
         if (!providerErrorBody && providerOutput.trim()) {
+          // Do not expose internal reasoning markers in the customer-facing report.
+          const finalProviderOutput = providerOutput
+            .replace(/<think>[\s\S]*?<\/think>/gi, "")
+            // DeepSeek-V3.1 can emit an untagged reasoning prefix ending at </think>.
+            .replace(/^[\s\S]*?<\/think>/i, "")
+            .trim();
+          if (!finalProviderOutput) {
+            throw new Error("Provider returned reasoning content without a final answer.");
+          }
           // Normalize the fully collected native SSE response. The provider
           // stream is consumed exactly once and never parsed again downstream.
           const nativeUsage =
@@ -2323,7 +2336,7 @@ try {
             choices: [{
               message: {
                 role: "assistant",
-                content: providerOutput.trim()
+                content: finalProviderOutput
               },
               finish_reason: nativeFinishReason
             }],
@@ -2332,11 +2345,11 @@ try {
 
           selectedLoop7Provider = providerName;
           loop7NativeResponseData = providerBody;
-          loop7NativeOutput = providerOutput.trim();
+          loop7NativeOutput = finalProviderOutput;
           console.log("LOOP7_PROVIDER_SELECTED", JSON.stringify({
             provider: providerName,
             model: settings.model,
-            replyChars: providerOutput.trim().length,
+            replyChars: finalProviderOutput.length,
             durationMs: Date.now() - providerStartedAt,
             normalized: !!normalizedData?.choices?.[0]?.message?.content,
             streaming: true
