@@ -2291,6 +2291,27 @@ try {
             );
           }
 
+          // OpenAI-compatible SSE providers (including NABH) terminate with
+          // data: [DONE] and do not necessarily emit a separate "done" event.
+          // In that path providerBody remains null, even though deltas were
+          // collected successfully. Build the normalized native envelope before
+          // attaching usage/finish metadata.
+          if (!providerBody || typeof providerBody !== "object") {
+            providerBody = {
+              request_id: streamRequestId,
+              status: "success",
+              data: {
+                output: providerOutput
+              }
+            };
+          } else if (!providerBody.data || typeof providerBody.data !== "object") {
+            providerBody.data = {
+              output: providerOutput
+            };
+          } else if (typeof providerBody.data.output !== "string") {
+            providerBody.data.output = providerOutput;
+          }
+
           providerBody.data.usage = nativeUsage;
           providerBody.data.finish = nativeFinishReason;
 
