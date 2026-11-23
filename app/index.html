@@ -3707,7 +3707,7 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
     tlReportPaywallDiagnostic("01 REQUEST_SENT_TO_CHAT_JS");
     const data = await fetchLoop7Investigation(profileLink, "direct");
     if(handleLoop7InvestigationFailure(data)) return;
-    const returnedReportText = getLoop7FinalReportText(data);
+    const returnedReportText = String(data?.reply || data?.analysis || data?.report || data?.data?.reply || data?.data?.analysis || "");
     latestTruthLoopReport = returnedReportText;
     tlReportPaywallDiagnostic("02 FINAL_REPORT_RECEIVED", {replyChars:String(latestTruthLoopReport || "").length, hasReply:!!returnedReportText, payloadKeys:data && typeof data === "object" ? Object.keys(data) : []});
     directFinalReplyReceived = !!returnedReportText.trim();
