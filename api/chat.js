@@ -767,7 +767,13 @@ let investigationState = {
           sendLoop7Progress({
             type: "progress",
             phase: "cross_evidence",
-            message: "Cross-evidence package built."
+            message: "Cross-evidence package built.",
+            sourceCount: crossEvidencePackage?.sourcesProcessed != null && Number.isFinite(Number(crossEvidencePackage.sourcesProcessed))
+              ? Number(crossEvidencePackage.sourcesProcessed)
+              : null,
+            sourcesSucceeded: crossEvidencePackage?.sourcesSucceeded != null && Number.isFinite(Number(crossEvidencePackage.sourcesSucceeded))
+              ? Number(crossEvidencePackage.sourcesSucceeded)
+              : null
           });
         }
 
@@ -912,7 +918,8 @@ let investigationState = {
             phase: "compression",
             message: "Evidence package ready.",
             evidenceRegistry: registry,
-            evidenceRegistryCount: registry.length
+            evidenceRegistryCount: registry.length,
+            sourceCount: registry.length
           });
         }
 
