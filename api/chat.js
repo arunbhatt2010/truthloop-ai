@@ -23,7 +23,6 @@ export default async function handler(req, res) {
   let loop7HeartbeatTimer = null;
   let loop7ClientDisconnected = false;
   let loop7StreamWriteFailure = null;
-  let loop7StreamPendingDrain = false;
 
   // Values needed by the outer crash guard must live outside the try block.
   // Otherwise the catch block cannot access try-scoped let/const bindings.
@@ -547,17 +546,12 @@ let investigationState = {
         // stream. It does not prove that the browser has received the frame.
         const accepted = res.write(`data: ${JSON.stringify(payload)}\n\n`);
         if (accepted === false) {
-          // Node has queued this frame, but its writable buffer is full.
-          // Do not end the SSE response until the queued bytes drain.
-          loop7StreamPendingDrain = true;
           console.warn("LOOP7_STREAM_BACKPRESSURE", JSON.stringify({
             type: payload?.type || null,
-            phase: payload?.phase || null,
-            writableLength: Number(res.writableLength || 0),
-            writableHighWaterMark: Number(res.writableHighWaterMark || 0)
+            phase: payload?.phase || null
           }));
         }
-        return true; // The frame was queued; delivery/flush is tracked separately.
+        return true;
       } catch (error) {
         loop7StreamWriteFailure = String(error?.message || error);
         loop7ClientDisconnected = true;
@@ -590,13 +584,6 @@ let investigationState = {
       // run. Without bytes on the SSE connection, mobile networks/proxies may
       // retire the idle stream before the final report is ready. SSE comments
       // are ignored by the frontend parser but keep the connection active.
-      res.on?.("drain", () => {
-        loop7StreamPendingDrain = false;
-        console.log("LOOP7_STREAM_DRAINED", JSON.stringify({
-          writableLength: Number(res.writableLength || 0)
-        }));
-      });
-
       res.once?.("close", () => {
         if (!res.writableEnded) {
           loop7ClientDisconnected = true;
@@ -623,8 +610,7 @@ let investigationState = {
           return;
         }
         try {
-          const heartbeatAccepted = res.write(": tl-heartbeat\n\n");
-          if (heartbeatAccepted === false) loop7StreamPendingDrain = true;
+          res.write(": tl-heartbeat\n\n");
         } catch (error) {
           loop7StreamWriteFailure = String(error?.message || error);
           loop7ClientDisconnected = true;
@@ -642,104 +628,17 @@ let investigationState = {
       });
     };
 
-    const waitForLoop7StreamDrain = (timeoutMs = 5000) => {
-      if (!loop7StreamPendingDrain && res.writableNeedDrain !== true) {
-        return Promise.resolve({ drained: true, reason: "not_pending" });
-      }
-
-      return new Promise(resolve => {
-        let settled = false;
-        const cleanup = () => {
-          clearTimeout(timer);
-          res.removeListener?.("drain", onDrain);
-          res.removeListener?.("close", onClose);
-          res.removeListener?.("error", onError);
-        };
-        const finish = result => {
-          if (settled) return;
-          settled = true;
-          cleanup();
-          resolve(result);
-        };
-        const onDrain = () => {
-          loop7StreamPendingDrain = false;
-          finish({ drained: true, reason: "drain_event" });
-        };
-        const onClose = () => finish({ drained: false, reason: "response_closed" });
-        const onError = error => finish({ drained: false, reason: String(error?.message || error) });
-        const timer = setTimeout(() => finish({ drained: false, reason: "drain_timeout" }), timeoutMs);
-        res.once?.("drain", onDrain);
-        res.once?.("close", onClose);
-        res.once?.("error", onError);
-
-        // The drain event may have fired between the write and waiter setup.
-        if (!loop7StreamPendingDrain && res.writableNeedDrain !== true) {
-          finish({ drained: true, reason: "already_drained" });
-        }
-      });
-    };
-
-    const waitForLoop7StreamFinish = (timeoutMs = 3000) => {
-      if (res.writableFinished === true) {
-        return Promise.resolve({ finished: true, reason: "already_finished" });
-      }
-      return new Promise(resolve => {
-        let settled = false;
-        const cleanup = () => {
-          clearTimeout(timer);
-          res.removeListener?.("finish", onFinish);
-          res.removeListener?.("close", onClose);
-          res.removeListener?.("error", onError);
-        };
-        const finish = result => {
-          if (settled) return;
-          settled = true;
-          cleanup();
-          resolve(result);
-        };
-        const onFinish = () => finish({ finished: true, reason: "finish_event" });
-        const onClose = () => finish({ finished: !!res.writableFinished, reason: "response_closed" });
-        const onError = error => finish({ finished: false, reason: String(error?.message || error) });
-        const timer = setTimeout(() => finish({ finished: !!res.writableFinished, reason: "finish_timeout" }), timeoutMs);
-        res.once?.("finish", onFinish);
-        res.once?.("close", onClose);
-        res.once?.("error", onError);
-      });
-    };
-
-    endLoop7ProgressStream = async () => {
+    endLoop7ProgressStream = () => {
       if (loop7HeartbeatTimer) {
         clearInterval(loop7HeartbeatTimer);
         loop7HeartbeatTimer = null;
       }
       if (!loop7StreamStarted) return;
-
-      // Critical reliability guard: a large final report can exceed the
-      // ServerResponse high-water mark. Wait for Node/Vercel to drain queued
-      // SSE bytes before ending the response; otherwise mobile clients can
-      // receive progress but miss the final report event.
-      const drainResult = await waitForLoop7StreamDrain();
-      console.log("LOOP7_STREAM_DRAIN_RESULT", JSON.stringify({
-        ...drainResult,
-        writableLength: Number(res.writableLength || 0),
-        writableNeedDrain: res.writableNeedDrain === true,
-        clientDisconnected: loop7ClientDisconnected
-      }));
-
-      if (loop7ClientDisconnected || res.destroyed) {
-        loop7StreamStarted = false;
-        return;
-      }
-
-      const finishPromise = waitForLoop7StreamFinish();
       try {
         if (!res.writableEnded && !res.destroyed) res.end();
       } catch (error) {
         console.error("LOOP7_STREAM_END_FAILED", String(error?.message || error));
       }
-      const finishResult = await finishPromise;
-      console.log("LOOP7_STREAM_FINISH_RESULT", JSON.stringify(finishResult));
-      loop7StreamPendingDrain = false;
       loop7StreamStarted = false;
     };
 
@@ -821,7 +720,7 @@ let investigationState = {
           console.warn("LOOP7_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null, requestedUrl: failurePayload.failure.requestedUrl || profileLink || null }));
           if (wantsLoop7Progress && loop7StreamStarted) {
             sendLoop7Progress(failurePayload);
-            await endLoop7ProgressStream();
+            endLoop7ProgressStream();
             return;
           }
           return res.status(200).json(failurePayload);
@@ -899,7 +798,7 @@ let investigationState = {
           console.warn("LOOP7_ECB_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null }));
           if (wantsLoop7Progress && loop7StreamStarted) {
             sendLoop7Progress(failurePayload);
-            await endLoop7ProgressStream();
+            endLoop7ProgressStream();
             return;
           }
           return res.status(200).json(failurePayload);
@@ -1042,7 +941,7 @@ let investigationState = {
             error: String(e?.message || e).slice(0, 1000),
             stage: "LOOP7_EVIDENCE_PIPELINE"
           });
-          await endLoop7ProgressStream();
+          endLoop7ProgressStream();
           return;
         }
         throw e;
@@ -1940,17 +1839,19 @@ if (loopLevel === 7) {
 
 
   if (wantsLoop7Progress) {
-    // The complete registry was already sent once with the compression phase.
-    // Do not resend the same 40+ source objects in the report-phase progress
-    // event: it adds tens of KB to the mobile SSE stream and can trigger
-    // backpressure without providing any new information to the frontend.
+    const reportEvidenceRegistry =
+      Array.isArray(
+        compressedEvidencePackage?.loop7Package?.sourceRegistry
+      )
+        ? compressedEvidencePackage.loop7Package.sourceRegistry
+        : loop7EvidenceSourceIndexCompact;
+
     sendLoop7Progress({
       type: "progress",
       phase: "report",
       message: "Generating final investigation.",
-      evidenceRegistryCount: Array.isArray(compressedEvidencePackage?.loop7Package?.sourceRegistry)
-        ? compressedEvidencePackage.loop7Package.sourceRegistry.length
-        : loop7EvidenceSourceIndexCompact.length
+      evidenceRegistry: reportEvidenceRegistry,
+      evidenceRegistryCount: reportEvidenceRegistry.length
     });
   }
 
@@ -1985,18 +1886,17 @@ const cleanMessages = messages
   .filter(message => message.content.trim());
 
 const maxTokens =
-  loopLevel === 7 ? 16000 : 320; // Raised from the legacy OpenRouter-era 12,000 cap.
+  loopLevel === 7 ? 12000 : 320;
 
 const loop7ReasoningEnabled = false;
 
 /* =========================================================
    LOOP 7 PROVIDER SETTINGS
-   Primary: nabh.cloud GPT-OSS 20B (OpenAI-compatible API).
-   Fallback 1: Qwen Flash via Velona.
-   Fallback 2: Gemini 2.5 Flash Lite via Velona.
-   Fallback 3: DeepSeek Chat V3.1 via Velona.
-   Existing three Velona providers are deliberately retained as fallbacks.
-   Loops 1–6 remain unchanged.
+   Primary: Qwen Flash (exact Velona catalog code: qwen-flash).
+   Fallback 1: Gemini 2.5 Flash Lite.
+   Fallback 2: DeepSeek Chat V3.1.
+   All providers use the same Velona native gateway, investigation
+   instructions, and evidence payload. Loops 1–6 remain unchanged.
    ========================================================= */
 const LOOP7_PROVIDER_ORDER = [
   "nabh_gpt_oss",
@@ -2067,7 +1967,7 @@ let loop7NativeOutput = "";
 try {
 
   /* =========================
-       LOOP 7 → NABH GPT-OSS 20B → QWEN → GEMINI → DEEPSEEK
+       LOOP 7 → NABH GPT-OSS-20B → QWEN FLASH → GEMINI → DEEPSEEK FALLBACK
        Retry on HTTP, network, malformed, or empty responses
      OTHER LOOPS → GROQ
   ========================= */
@@ -2104,41 +2004,39 @@ try {
 
       let providerResponse;
       let providerBody = null;
-      let providerErrorBody = "";
       let providerOutput = "";
+      let providerErrorBody = "";
+
       try {
         const isNabhProvider = providerName === "nabh_gpt_oss";
-        const providerRequestBody = isNabhProvider
-          ? {
-              model: settings.model,
-              messages: [
-                { role: "system", content: loop7Instruction },
-                { role: "user", content: JSON.stringify(loop7AiUserPayload) }
-              ],
-              stream: true,
-              temperature: settings.temperature,
-              max_tokens: settings.maxTokens
-            }
-          : {
-              model: settings.model,
-              turns: [
-                { role: "system", content: loop7Instruction },
-                { role: "user", content: JSON.stringify(loop7AiUserPayload) }
-              ],
-              stream: true,
-              config: {
-                temperature: settings.temperature,
-                max_tokens: settings.maxTokens
-              }
-            };
-
         providerResponse = await fetch(settings.endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + settings.apiKey
           },
-          body: JSON.stringify(providerRequestBody)
+          body: JSON.stringify(isNabhProvider
+            ? {
+                model: settings.model,
+                messages: [
+                  { role: "system", content: loop7Instruction },
+                  { role: "user", content: JSON.stringify(loop7AiUserPayload) }
+                ],
+                temperature: settings.temperature,
+                max_tokens: settings.maxTokens,
+                stream: false
+              }
+            : {
+                model: settings.model,
+                turns: [
+                  { role: "system", content: loop7Instruction },
+                  { role: "user", content: JSON.stringify(loop7AiUserPayload) }
+                ],
+                config: {
+                  temperature: settings.temperature,
+                  max_tokens: settings.maxTokens
+                }
+              })
         });
         response = providerResponse;
       } catch (fetchError) {
@@ -2156,6 +2054,7 @@ try {
         continue;
       }
 
+      const providerDurationMs = Date.now() - providerStartedAt;
       const providerRequestId =
         providerResponse.headers?.get("x-request-id") ||
         providerResponse.headers?.get("request-id") ||
@@ -2167,190 +2066,51 @@ try {
         status: providerResponse.status,
         statusText: providerResponse.statusText,
         ok: providerResponse.ok,
+        durationMs: providerDurationMs,
         requestId: providerRequestId,
         contentType: providerResponse.headers?.get("content-type") || null,
-        retryAfter: providerResponse.headers?.get("retry-after") || null,
-        upstreamStreaming: true,
-        maxTokens: settings.maxTokens
+        retryAfter: providerResponse.headers?.get("retry-after") || null
       }));
 
       if (providerResponse.ok) {
         try {
-          if (!providerResponse.body || typeof providerResponse.body.getReader !== "function") {
-            throw new Error("Provider returned no readable SSE response body.");
-          }
-
-          const reader = providerResponse.body.getReader();
-          const decoder = new TextDecoder();
-          let sseBuffer = "";
-          let streamDone = false;
-          let streamError = null;
-          let nativeUsage = null;
-          let nativeFinishReason = null;
-          let streamRequestId = providerRequestId;
-          let firstDeltaAt = null;
-          let deltaCount = 0;
-
-          const consumeProviderSseLine = (rawLine) => {
-            const line = rawLine.trim();
-            if (!line || line.startsWith(":") || !line.startsWith("data:")) return;
-
-            const dataText = line.slice(5).trim();
-            if (!dataText) return;
-            if (dataText === "[DONE]") {
-              streamDone = true;
-              return;
-            }
-
-            let event;
-            try {
-              event = JSON.parse(dataText);
-            } catch (parseError) {
-              throw new Error("Invalid provider SSE JSON: " + String(parseError?.message || parseError));
-            }
-
-            if (event?.request_id && !streamRequestId) {
-              streamRequestId = event.request_id;
-            }
-
-            // nabh.cloud follows OpenAI SSE: choices[].delta.content + [DONE].
-            // Velona fallback providers retain their native event/delta format.
-            if (Array.isArray(event?.choices)) {
-              const choice = event.choices[0];
-              const delta = choice?.delta?.content;
-              if (typeof delta === "string" && delta.length) {
-                if (firstDeltaAt === null) firstDeltaAt = Date.now();
-                providerOutput += delta;
-                deltaCount += 1;
-              }
-              if (event?.usage) nativeUsage = event.usage;
-              if (choice?.finish_reason) nativeFinishReason = choice.finish_reason;
-              return;
-            }
-
-            if (event?.event === "delta") {
-              const delta = event?.data?.delta;
-              if (typeof delta === "string" && delta.length) {
-                if (firstDeltaAt === null) firstDeltaAt = Date.now();
-                providerOutput += delta;
-                deltaCount += 1;
-              }
-              return;
-            }
-
-            if (event?.event === "done") {
-              streamDone = true;
-              nativeUsage = event?.data?.usage || null;
-              nativeFinishReason = event?.data?.finish || null;
-              providerBody = {
-                request_id: streamRequestId,
-                status: "success",
-                data: {
-                  output: providerOutput,
-                  usage: nativeUsage,
-                  finish: nativeFinishReason
-                }
-              };
-              return;
-            }
-
-            if (event?.event === "error") {
-              streamError = event?.data || event?.error || event;
-              throw new Error(
-                "Provider SSE error: " +
-                String(streamError?.message || streamError?.error?.message || JSON.stringify(streamError))
-              );
-            }
-          };
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            sseBuffer += decoder.decode(value, { stream: true });
-            let newlineIndex;
-            while ((newlineIndex = sseBuffer.indexOf("\n")) !== -1) {
-              const line = sseBuffer.slice(0, newlineIndex).replace(/\r$/, "");
-              sseBuffer = sseBuffer.slice(newlineIndex + 1);
-              consumeProviderSseLine(line);
-            }
-          }
-
-          sseBuffer += decoder.decode();
-          if (sseBuffer.trim()) consumeProviderSseLine(sseBuffer);
-
-          if (streamError) {
-            throw new Error("Provider stream ended with an error event.");
-          }
-          if (!streamDone) {
-            throw new Error(
-              "Provider SSE closed before its done event. Partial output chars: " +
-              providerOutput.length
-            );
-          }
-
-          // OpenAI-compatible SSE providers (including NABH) terminate with
-          // data: [DONE] and do not necessarily emit a separate "done" event.
-          // In that path providerBody remains null, even though deltas were
-          // collected successfully. Build the normalized native envelope before
-          // attaching usage/finish metadata.
-          if (!providerBody || typeof providerBody !== "object") {
-            providerBody = {
-              request_id: streamRequestId,
-              status: "success",
-              data: {
-                output: providerOutput
-              }
-            };
-          } else if (!providerBody.data || typeof providerBody.data !== "object") {
-            providerBody.data = {
-              output: providerOutput
-            };
-          } else if (typeof providerBody.data.output !== "string") {
-            providerBody.data.output = providerOutput;
-          }
-
-          providerBody.data.usage = nativeUsage;
-          providerBody.data.finish = nativeFinishReason;
-
-          console.log("LOOP7_PROVIDER_STREAM_COMPLETE", JSON.stringify({
-            provider: providerName,
-            model: settings.model,
-            requestId: streamRequestId,
-            deltaCount,
-            replyChars: providerOutput.length,
-            firstDeltaMs: firstDeltaAt === null ? null : firstDeltaAt - providerStartedAt,
-            durationMs: Date.now() - providerStartedAt,
-            finish: nativeFinishReason,
-            usage: nativeUsage
-          }));
-        } catch (streamError) {
-          providerErrorBody = String(streamError?.message || streamError);
-          console.error("LOOP7_PROVIDER_STREAM_ERROR", JSON.stringify({
-            provider: providerName,
-            model: settings.model,
-            durationMs: Date.now() - providerStartedAt,
-            partialOutputChars: providerOutput.length,
-            error: providerErrorBody
-          }));
+          providerBody = await providerResponse.json();
+        } catch (parseError) {
+          providerErrorBody = "Invalid JSON response: " + String(parseError?.message || parseError);
         }
 
-        if (!providerErrorBody && providerOutput.trim()) {
-          // Normalize the fully collected native SSE response. The provider
-          // stream is consumed exactly once and never parsed again downstream.
+        const rawOutput = providerName === "nabh_gpt_oss"
+          ? providerBody?.choices?.[0]?.message?.content
+          : providerBody?.data?.output;
+        if (typeof rawOutput === "string") {
+          providerOutput = rawOutput.trim();
+        } else if (typeof rawOutput?.text === "string") {
+          providerOutput = rawOutput.text.trim();
+        } else if (typeof rawOutput?.content === "string") {
+          providerOutput = rawOutput.content.trim();
+        } else if (Array.isArray(rawOutput)) {
+          providerOutput = rawOutput.map(part =>
+            typeof part === "string" ? part : (part?.text || part?.content || "")
+          ).join("").trim();
+        }
+
+        if (providerOutput) {
+          // Normalize the already-parsed native response while it is still
+          // inside the provider attempt. The response body is a one-shot
+          // stream: never call response.json()/text() again downstream.
           const nativeUsage =
             providerBody?.data?.usage || providerBody?.usage || null;
           const nativeFinishReason =
-            providerBody?.data?.finish ||
             providerBody?.data?.finish_reason ||
             providerBody?.data?.finishReason ||
+            providerBody?.choices?.[0]?.finish_reason ||
             null;
 
           normalizedData = {
             choices: [{
               message: {
                 role: "assistant",
-                content: providerOutput.trim()
+                content: providerOutput
               },
               finish_reason: nativeFinishReason
             }],
@@ -2359,28 +2119,25 @@ try {
 
           selectedLoop7Provider = providerName;
           loop7NativeResponseData = providerBody;
-          loop7NativeOutput = providerOutput.trim();
+          loop7NativeOutput = providerOutput;
           console.log("LOOP7_PROVIDER_SELECTED", JSON.stringify({
             provider: providerName,
             model: settings.model,
-            replyChars: providerOutput.trim().length,
-            durationMs: Date.now() - providerStartedAt,
-            normalized: !!normalizedData?.choices?.[0]?.message?.content,
-            streaming: true
+            replyChars: providerOutput.length,
+            durationMs: providerDurationMs,
+            normalized: !!normalizedData?.choices?.[0]?.message?.content
           }));
           break;
         }
 
-        if (!providerErrorBody) {
-          providerErrorBody =
-            "Provider stream completed but returned an empty output.";
-        }
+        providerErrorBody = providerErrorBody ||
+          "Provider returned HTTP success but data.output was empty or unsupported.";
         console.error("LOOP7_PROVIDER_EMPTY_OUTPUT", JSON.stringify({
           provider: providerName,
           model: settings.model,
-          replyChars: providerOutput.length,
           responseKeys: Object.keys(providerBody || {}),
-          dataKeys: Object.keys(providerBody?.data || {})
+          dataKeys: Object.keys(providerBody?.data || {}),
+          outputType: typeof rawOutput
         }));
       } else {
         try {
@@ -2389,8 +2146,6 @@ try {
           providerErrorBody = "Failed to read provider error: " + String(readError?.message || readError);
         }
       }
-
-      const providerDurationMs = Date.now() - providerStartedAt;
 
       loop7LastProviderErrorBody = String(providerErrorBody).slice(0, 6000);
       loop7LastProviderError = {
@@ -2588,7 +2343,7 @@ try {
         error: "PROVIDER_REQUEST_FAILED",
         stage: "LOOP7_AI_FETCH"
       });
-      await endLoop7ProgressStream();
+      endLoop7ProgressStream();
       return;
     }
 
@@ -2650,7 +2405,7 @@ if (loopLevel === 7 && !response?.ok) {
       stage: "LOOP7_AI_HTTP",
       provider: selectedLoop7Provider
     });
-    await endLoop7ProgressStream();
+    endLoop7ProgressStream();
     return;
   }
 
@@ -2672,10 +2427,11 @@ if (loopLevel === 7 && !response?.ok) {
 
 if (loopLevel === 7) {
 
-  // Loop 7 providers use two compatible transport shapes: NABH uses
-  // OpenAI-compatible SSE; the retained Velona fallbacks use Velona-native SSE.
-  // Both are normalized once inside the provider-attempt loop. Do not re-read
-  // response.json()/text() here because the streaming body has already been consumed.
+  // Every Loop 7 provider (Qwen, Gemini, DeepSeek) uses the same Velona
+  // native gateway. Its response body was parsed exactly once inside the
+  // provider-attempt loop and normalized before provider selection.
+  // Re-reading response.json()/text() here caused the Qwen crash:
+  // "Body is unusable: Body has already been read".
   const providerData = loop7NativeResponseData || {};
 
   if (!normalizedData?.choices?.[0]?.message?.content) {
@@ -2685,7 +2441,7 @@ if (loopLevel === 7) {
     );
   }
 
-  console.log("LOOP7_PROVIDER_RESPONSE_NORMALIZED", JSON.stringify({
+  console.log("LOOP7_VELONA_NATIVE_RESPONSE_NORMALIZED", JSON.stringify({
     provider: selectedLoop7Provider,
     replyChars: loop7NativeOutput.length,
     outputType: typeof providerData?.data?.output,
@@ -3251,12 +3007,7 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
     console.log(
   "FINAL_RESPONSE",
-  JSON.stringify({
-    loop: loopLevel,
-    provider: loopLevel === 7 ? selectedLoop7Provider : "groq",
-    hasReply: !!String(data?.choices?.[0]?.message?.content || "").trim(),
-    replyChars: String(data?.choices?.[0]?.message?.content || "").length
-  })
+  JSON.stringify(response, null, 2)
 );
 console.log("FINAL RETURN REACHED");
 
@@ -3383,21 +3134,24 @@ const finalPayload = {
 
   ...(loopLevel === 7
     ? {
-        // Send one compact canonical registry. The previous response repeated
-        // the same registry under three compatibility aliases plus another
-        // projected array, multiplying the size of the final SSE frame.
-        evidenceRegistry: finalEvidenceRegistry.map(source => ({
-          sourceId: String(source?.sourceId || ""),
-          sourceType: String(source?.sourceType || ""),
-          title: String(source?.title || ""),
-          url: String(source?.url || ""),
-          date: source?.date || null,
-          publishedDate: source?.publishedDate || source?.publishedAt || source?.datePublished || null,
-          collectedAt: source?.collectedAt || source?.fetchTimestamp || null,
-          evidenceStream: source?.evidenceStream || null,
-          pageCategory: source?.pageCategory || null
+        evidenceRegistry: finalEvidenceRegistry,
+        loop7EvidenceRegistry: finalEvidenceRegistry,
+        evidenceSourceRegistry: finalEvidenceRegistry,
+        evidenceSourceIndex: finalEvidenceRegistry.map(({
+          sourceId, sourceType, title, url, date, publishedDate, collectedAt, evidenceStream, pageCategory
+        }) => ({
+          sourceId,
+          sourceType,
+          title,
+          url,
+          date,
+          publishedDate: publishedDate || null,
+          collectedAt: collectedAt || null,
+          evidenceStream: evidenceStream || null,
+          pageCategory: pageCategory || null
         })),
-        evidenceRegistryCount: finalEvidenceRegistry.length
+        evidenceRegistryCount:
+          finalEvidenceRegistry.length
       }
     : {}),
 
@@ -3421,54 +3175,27 @@ const finalPayload = {
 };
 
 if (loop7StreamStarted) {
-  // The registry is sent once in the earlier compression progress event.
-  // The browser preserves that in-memory registry when the terminal event
-  // contains only evidenceRegistryCount. Keep the full registry on the
-  // non-streaming JSON response below for backward compatibility.
-  const {
-    evidenceRegistry: _streamOmittedEvidenceRegistry,
-    ...streamFinalPayload
-  } = finalPayload;
-  const streamFinalEvent = {
+  const finalWriteAccepted = sendLoop7Progress({
     type: "final",
     final: true,
-    ...streamFinalPayload,
-    evidenceRegistryCount: finalEvidenceRegistry.length
-  };
-  const finalWriteAccepted = sendLoop7Progress(streamFinalEvent);
+    ...finalPayload
+  });
   console.log(
    "LOOP7_FINAL_STREAM_SENT",
    JSON.stringify({
       final: true,
-      replyChars: (streamFinalPayload.reply || "").length,
-      registryCount: finalEvidenceRegistry.length,
-      registryIncludedInFinal: false,
-      finalFrameBytes: Buffer.byteLength(JSON.stringify(streamFinalEvent), "utf8"),
-      serverWriteQueued: finalWriteAccepted,
-      backpressurePending: loop7StreamPendingDrain || res.writableNeedDrain === true,
+      replyChars: (finalPayload.reply || "").length,
+      serverWriteAccepted: finalWriteAccepted,
       clientDisconnected: loop7ClientDisconnected,
       streamWriteFailure: loop7StreamWriteFailure
    })
   );
-  await endLoop7ProgressStream();
+  endLoop7ProgressStream();
   return;
 }
 
 if (loopAiFallbackUsed) {
   finalPayload.aiFallbackUsed = true;
-}
-
-if (loopLevel === 7) {
-  console.log("LOOP7_JSON_FINAL_RESPONSE_READY", JSON.stringify({
-    provider: selectedLoop7Provider,
-    hasReply: !!String(finalPayload.reply || "").trim(),
-    replyChars: String(finalPayload.reply || "").length,
-    evidenceRegistryCount: Array.isArray(finalPayload.evidenceRegistry)
-      ? finalPayload.evidenceRegistry.length
-      : 0,
-    expectedSections: 8,
-    transport: "application/json"
-  }));
 }
 
 return res.status(200).json(finalPayload);
@@ -3490,7 +3217,7 @@ return res.status(200).json(finalPayload);
         error: error?.message || String(error),
         stage: "SERVER_CRASH"
       });
-      await endLoop7ProgressStream();
+      endLoop7ProgressStream();
       return;
     }
 
