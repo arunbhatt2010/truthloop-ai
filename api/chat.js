@@ -1097,6 +1097,10 @@ let investigationState = {
         evidenceStream: source.evidenceStream
       }));
 
+      // Resolve the canonical Loop 7 package before source inventory logic uses it.
+      const originalLoop7Package = compressedEvidencePackage?.loop7Package || {};
+      const originalEvidenceUniverse = originalLoop7Package?.evidenceUniverse || {};
+
       // Derive a factual source inventory from the exact records sent to Loop 7.
       // This does not treat an external domain as corroboration; it only tells
       // the model which source types/domains are actually present.
@@ -1184,9 +1188,6 @@ let investigationState = {
       // ECB's canonical analysis fields are at loop7Package top level.
       // Keep those exact paths because the Loop 7 prompt refers to them by name.
       // Remove only duplicate mirrors from evidenceUniverse and transport metadata.
-      const originalLoop7Package = compressedEvidencePackage?.loop7Package || {};
-      const originalEvidenceUniverse = originalLoop7Package?.evidenceUniverse || {};
-
       const modelFacingEvidenceUniverse = { ...originalEvidenceUniverse };
       // Canonical source registry is loop7Package.sourceRegistry.
       // sourceLinks are duplicate URL indexes; sourceRegistry carries traceable IDs.
