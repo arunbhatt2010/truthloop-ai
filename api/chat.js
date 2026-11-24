@@ -23,6 +23,7 @@ export default async function handler(req, res) {
   let loop7HeartbeatTimer = null;
   let loop7ClientDisconnected = false;
   let loop7StreamWriteFailure = null;
+  let loop7StreamPendingDrain = false;
 
   // Values needed by the outer crash guard must live outside the try block.
   // Otherwise the catch block cannot access try-scoped let/const bindings.
@@ -546,12 +547,17 @@ let investigationState = {
         // stream. It does not prove that the browser has received the frame.
         const accepted = res.write(`data: ${JSON.stringify(payload)}\n\n`);
         if (accepted === false) {
+          // Node has queued this frame, but its writable buffer is full.
+          // Do not end the SSE response until the queued bytes drain.
+          loop7StreamPendingDrain = true;
           console.warn("LOOP7_STREAM_BACKPRESSURE", JSON.stringify({
             type: payload?.type || null,
-            phase: payload?.phase || null
+            phase: payload?.phase || null,
+            writableLength: Number(res.writableLength || 0),
+            writableHighWaterMark: Number(res.writableHighWaterMark || 0)
           }));
         }
-        return true;
+        return true; // The frame was queued; delivery/flush is tracked separately.
       } catch (error) {
         loop7StreamWriteFailure = String(error?.message || error);
         loop7ClientDisconnected = true;
@@ -584,6 +590,13 @@ let investigationState = {
       // run. Without bytes on the SSE connection, mobile networks/proxies may
       // retire the idle stream before the final report is ready. SSE comments
       // are ignored by the frontend parser but keep the connection active.
+      res.on?.("drain", () => {
+        loop7StreamPendingDrain = false;
+        console.log("LOOP7_STREAM_DRAINED", JSON.stringify({
+          writableLength: Number(res.writableLength || 0)
+        }));
+      });
+
       res.once?.("close", () => {
         if (!res.writableEnded) {
           loop7ClientDisconnected = true;
@@ -610,7 +623,8 @@ let investigationState = {
           return;
         }
         try {
-          res.write(": tl-heartbeat\n\n");
+          const heartbeatAccepted = res.write(": tl-heartbeat\n\n");
+          if (heartbeatAccepted === false) loop7StreamPendingDrain = true;
         } catch (error) {
           loop7StreamWriteFailure = String(error?.message || error);
           loop7ClientDisconnected = true;
@@ -628,17 +642,104 @@ let investigationState = {
       });
     };
 
-    endLoop7ProgressStream = () => {
+    const waitForLoop7StreamDrain = (timeoutMs = 5000) => {
+      if (!loop7StreamPendingDrain && res.writableNeedDrain !== true) {
+        return Promise.resolve({ drained: true, reason: "not_pending" });
+      }
+
+      return new Promise(resolve => {
+        let settled = false;
+        const cleanup = () => {
+          clearTimeout(timer);
+          res.removeListener?.("drain", onDrain);
+          res.removeListener?.("close", onClose);
+          res.removeListener?.("error", onError);
+        };
+        const finish = result => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve(result);
+        };
+        const onDrain = () => {
+          loop7StreamPendingDrain = false;
+          finish({ drained: true, reason: "drain_event" });
+        };
+        const onClose = () => finish({ drained: false, reason: "response_closed" });
+        const onError = error => finish({ drained: false, reason: String(error?.message || error) });
+        const timer = setTimeout(() => finish({ drained: false, reason: "drain_timeout" }), timeoutMs);
+        res.once?.("drain", onDrain);
+        res.once?.("close", onClose);
+        res.once?.("error", onError);
+
+        // The drain event may have fired between the write and waiter setup.
+        if (!loop7StreamPendingDrain && res.writableNeedDrain !== true) {
+          finish({ drained: true, reason: "already_drained" });
+        }
+      });
+    };
+
+    const waitForLoop7StreamFinish = (timeoutMs = 3000) => {
+      if (res.writableFinished === true) {
+        return Promise.resolve({ finished: true, reason: "already_finished" });
+      }
+      return new Promise(resolve => {
+        let settled = false;
+        const cleanup = () => {
+          clearTimeout(timer);
+          res.removeListener?.("finish", onFinish);
+          res.removeListener?.("close", onClose);
+          res.removeListener?.("error", onError);
+        };
+        const finish = result => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve(result);
+        };
+        const onFinish = () => finish({ finished: true, reason: "finish_event" });
+        const onClose = () => finish({ finished: !!res.writableFinished, reason: "response_closed" });
+        const onError = error => finish({ finished: false, reason: String(error?.message || error) });
+        const timer = setTimeout(() => finish({ finished: !!res.writableFinished, reason: "finish_timeout" }), timeoutMs);
+        res.once?.("finish", onFinish);
+        res.once?.("close", onClose);
+        res.once?.("error", onError);
+      });
+    };
+
+    endLoop7ProgressStream = async () => {
       if (loop7HeartbeatTimer) {
         clearInterval(loop7HeartbeatTimer);
         loop7HeartbeatTimer = null;
       }
       if (!loop7StreamStarted) return;
+
+      // Critical reliability guard: a large final report can exceed the
+      // ServerResponse high-water mark. Wait for Node/Vercel to drain queued
+      // SSE bytes before ending the response; otherwise mobile clients can
+      // receive progress but miss the final report event.
+      const drainResult = await waitForLoop7StreamDrain();
+      console.log("LOOP7_STREAM_DRAIN_RESULT", JSON.stringify({
+        ...drainResult,
+        writableLength: Number(res.writableLength || 0),
+        writableNeedDrain: res.writableNeedDrain === true,
+        clientDisconnected: loop7ClientDisconnected
+      }));
+
+      if (loop7ClientDisconnected || res.destroyed) {
+        loop7StreamStarted = false;
+        return;
+      }
+
+      const finishPromise = waitForLoop7StreamFinish();
       try {
         if (!res.writableEnded && !res.destroyed) res.end();
       } catch (error) {
         console.error("LOOP7_STREAM_END_FAILED", String(error?.message || error));
       }
+      const finishResult = await finishPromise;
+      console.log("LOOP7_STREAM_FINISH_RESULT", JSON.stringify(finishResult));
+      loop7StreamPendingDrain = false;
       loop7StreamStarted = false;
     };
 
@@ -701,6 +802,31 @@ let investigationState = {
         if (truthLoopPackage) crossEvidenceInput.truthLoopPackage = truthLoopPackage;
 
         const crossEvidencePackage = await loadCrossEvidenceBrain(crossEvidenceInput);
+
+        if (crossEvidencePackage?.investigationFailure === true) {
+          const failurePayload = {
+            type: "investigation_failure",
+            final: true,
+            investigationFailure: true,
+            failure: crossEvidencePackage.failure || {
+              code: "PRIMARY_INVESTIGATION_FAILED",
+              stage: "cross_evidence_collection",
+              reasonCode: "PRIMARY_SOURCE_UNAVAILABLE",
+              reasonLabel: "The primary public source could not be examined.",
+              userMessage: "TruthLoop AI could not collect usable public content from the submitted URL. No investigation report has been generated.",
+              recommendedAction: "Check the URL or submit another supported public URL.",
+              supportedSourcesMessage: "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported."
+            }
+          };
+          console.warn("LOOP7_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null, requestedUrl: failurePayload.failure.requestedUrl || profileLink || null }));
+          if (wantsLoop7Progress && loop7StreamStarted) {
+            sendLoop7Progress(failurePayload);
+            await endLoop7ProgressStream();
+            return;
+          }
+          return res.status(200).json(failurePayload);
+        }
+
         if (!crossEvidencePackage || crossEvidencePackage.success !== true) {
           throw new Error(
             `CEB_FAILED: ${JSON.stringify({
@@ -754,6 +880,30 @@ let investigationState = {
         compressedEvidencePackage = await loadEvidenceCompressionBrain({
           publicEvidencePackage
         });
+
+        if (compressedEvidencePackage?.investigationFailure === true) {
+          const failurePayload = {
+            type: "investigation_failure",
+            final: true,
+            investigationFailure: true,
+            failure: compressedEvidencePackage.failure || {
+              code: "PRIMARY_INVESTIGATION_FAILED",
+              stage: "evidence_compression",
+              reasonCode: "PRIMARY_SOURCE_UNAVAILABLE",
+              reasonLabel: "The primary public source could not be examined.",
+              userMessage: "TruthLoop AI could not collect usable public content from the submitted URL. No investigation report has been generated.",
+              recommendedAction: "Check the URL or submit another supported public URL.",
+              supportedSourcesMessage: "TruthLoop AI currently supports investigations through public websites, GitHub, LinkedIn and X. Other platforms are not currently supported."
+            }
+          };
+          console.warn("LOOP7_ECB_PRIMARY_INVESTIGATION_ABORTED", JSON.stringify({ reasonCode: failurePayload.failure.reasonCode || null, stage: failurePayload.failure.stage || null }));
+          if (wantsLoop7Progress && loop7StreamStarted) {
+            sendLoop7Progress(failurePayload);
+            await endLoop7ProgressStream();
+            return;
+          }
+          return res.status(200).json(failurePayload);
+        }
 
         if (!compressedEvidencePackage || compressedEvidencePackage.success !== true) {
           throw new Error(
@@ -892,7 +1042,7 @@ let investigationState = {
             error: String(e?.message || e).slice(0, 1000),
             stage: "LOOP7_EVIDENCE_PIPELINE"
           });
-          endLoop7ProgressStream();
+          await endLoop7ProgressStream();
           return;
         }
         throw e;
@@ -903,6 +1053,7 @@ let investigationState = {
     let loop7EvidenceSourceIndexCompact = [];
     let loop7EvidenceRegistryCompact = [];
     let loop7AiUserPayload = null;
+    let loop7SourceInventorySummary = null;
 
     if (loopLevel === 7) {
       loop7EvidenceRegistryCompact = Array.isArray(
@@ -946,13 +1097,97 @@ let investigationState = {
         evidenceStream: source.evidenceStream
       }));
 
+      // Resolve the canonical Loop 7 package before source inventory logic uses it.
+      const originalLoop7Package = compressedEvidencePackage?.loop7Package || {};
+      const originalEvidenceUniverse = originalLoop7Package?.evidenceUniverse || {};
+
+      // Derive a factual source inventory from the exact records sent to Loop 7.
+      // This does not treat an external domain as corroboration; it only tells
+      // the model which source types/domains are actually present.
+      const normalizeEvidenceHost = value => {
+        try {
+          return new URL(String(value || "")).hostname
+            .toLowerCase()
+            .replace(/^www\./, "");
+        } catch (_) {
+          return "";
+        }
+      };
+      const socialProfileHosts = new Set([
+        "linkedin.com", "x.com", "twitter.com", "facebook.com",
+        "instagram.com", "youtube.com", "youtu.be"
+      ]);
+      const isSocialProfileHost = host => [...socialProfileHosts].some(
+        socialHost => host === socialHost || host.endsWith("." + socialHost)
+      );
+      const requestedHost = normalizeEvidenceHost(profileLink);
+      const firstCollectedWebsiteUrl = Array.isArray(originalEvidenceUniverse?.websiteSources)
+        ? originalEvidenceUniverse.websiteSources
+            .map(source => source?.url || source?.canonicalUrl || source?.sourceUrl || "")
+            .find(Boolean) || ""
+        : "";
+      const subjectWebsiteHost = requestedHost && !isSocialProfileHost(requestedHost)
+        ? requestedHost
+        : normalizeEvidenceHost(firstCollectedWebsiteUrl);
+      const sourceTypeCounts = {};
+      const sourceHostCounts = {};
+      const publishedYearCounts = {};
+      let externalOrOtherDomainRecordCount = 0;
+      let unparsedSourceUrlCount = 0;
+      for (const source of loop7EvidenceSourceIndexCompact) {
+        const type = String(source?.sourceType || "unknown").trim().toLowerCase() || "unknown";
+        sourceTypeCounts[type] = (sourceTypeCounts[type] || 0) + 1;
+        const host = normalizeEvidenceHost(source?.url);
+        if (host) {
+          sourceHostCounts[host] = (sourceHostCounts[host] || 0) + 1;
+          const sameSubjectDomain = !!subjectWebsiteHost &&
+            (host === subjectWebsiteHost || host.endsWith("." + subjectWebsiteHost));
+          if (!sameSubjectDomain || type !== "website") externalOrOtherDomainRecordCount += 1;
+        } else {
+          unparsedSourceUrlCount += 1;
+          externalOrOtherDomainRecordCount += 1;
+        }
+        const publishedDate = String(source?.publishedDate || "");
+        const yearMatch = publishedDate.match(/\b(19|20)\d{2}\b/);
+        const yearKey = yearMatch ? yearMatch[0] : "date_unavailable";
+        publishedYearCounts[yearKey] = (publishedYearCounts[yearKey] || 0) + 1;
+      }
+      const publishedYears = Object.keys(publishedYearCounts)
+        .filter(year => /^\d{4}$/.test(year))
+        .map(Number)
+        .sort((a, b) => a - b);
+      const missingPublishedYears = [];
+      for (let year = publishedYears[0]; year && year < publishedYears[publishedYears.length - 1]; year += 1) {
+        if (!publishedYears.includes(year + 1)) missingPublishedYears.push(year + 1);
+      }
+      loop7SourceInventorySummary = {
+        totalSourceRecords: loop7EvidenceSourceIndexCompact.length,
+        sourceTypeCounts,
+        sourceHostCounts,
+        subjectWebsiteHost: subjectWebsiteHost || null,
+        recordsOnSubjectWebsite: subjectWebsiteHost
+          ? loop7EvidenceSourceIndexCompact.filter(source => {
+              const host = normalizeEvidenceHost(source?.url);
+              const type = String(source?.sourceType || "").toLowerCase();
+              return !!host &&
+                (host === subjectWebsiteHost || host.endsWith("." + subjectWebsiteHost)) &&
+                type === "website";
+            }).length
+          : null,
+        externalOrOtherDomainRecordCount,
+        unparsedSourceUrlCount,
+        publishedYearCounts,
+        missingPublishedYears,
+        allRecordsAreSubjectWebsiteOnly: !!subjectWebsiteHost &&
+          loop7EvidenceSourceIndexCompact.length > 0 &&
+          externalOrOtherDomainRecordCount === 0 &&
+          unparsedSourceUrlCount === 0
+      };
+
       // Build a model-facing projection aligned to ECB v27 output contract.
       // ECB's canonical analysis fields are at loop7Package top level.
       // Keep those exact paths because the Loop 7 prompt refers to them by name.
       // Remove only duplicate mirrors from evidenceUniverse and transport metadata.
-      const originalLoop7Package = compressedEvidencePackage?.loop7Package || {};
-      const originalEvidenceUniverse = originalLoop7Package?.evidenceUniverse || {};
-
       const modelFacingEvidenceUniverse = { ...originalEvidenceUniverse };
       // Canonical source registry is loop7Package.sourceRegistry.
       // sourceLinks are duplicate URL indexes; sourceRegistry carries traceable IDs.
@@ -980,12 +1215,14 @@ let investigationState = {
       loop7AiUserPayload = {
         compressedEvidencePackage: modelFacingCompressedEvidencePackage,
         sourceCitationIndex: loop7SourceCitationIndex,
+        sourceInventorySummary: loop7SourceInventorySummary,
         ...(reportMode === "conversation" ? { truthLoopPackage } : {})
       };
 
       const originalModelPayloadChars = JSON.stringify({
         compressedEvidencePackage,
         sourceCitationIndex: loop7SourceCitationIndex,
+        sourceInventorySummary: loop7SourceInventorySummary,
         ...(reportMode === "conversation" ? { truthLoopPackage } : {})
       }).length;
       const optimizedModelPayloadChars = JSON.stringify(loop7AiUserPayload).length;
@@ -999,6 +1236,7 @@ let investigationState = {
           removedChars: Math.max(0, originalModelPayloadChars - optimizedModelPayloadChars),
           sourceRegistryCount: loop7EvidenceRegistryCompact.length,
           sourceCitationIndexCount: loop7SourceCitationIndex.length,
+          sourceInventorySummary: loop7SourceInventorySummary,
           sourcesWithPublishedDate: loop7SourceCitationIndex.filter(source => !!source.publishedDate).length,
           sourcesWithoutPublishedDate: loop7SourceCitationIndex.filter(source => !source.publishedDate).length,
           websiteSourceCount: Array.isArray(originalEvidenceUniverse.websiteSources)
@@ -1033,6 +1271,10 @@ let investigationState = {
     loop7Instruction = `
 LOOP 7 — FINAL TRUTHLOOP INVESTIGATION
 
+SOURCE INVENTORY FOR THIS RUN — COMPUTED FROM THE CURRENT SOURCE REGISTRY
+${JSON.stringify(loop7SourceInventorySummary)}
+Use these counts and dates as factual inventory metadata. Source type or domain diversity is not itself independent corroboration; verify the actual source ownership and content before calling anything independent.
+
 ROLE
 You are producing a specific, evidence-led investigation of this exact subject. This is not a generic personality analysis, generic company profile, motivational summary, or advice article. Every conclusion must arise from identifiable evidence in this case.
 
@@ -1066,6 +1308,10 @@ NO ARTIFICIAL SOURCE QUOTAS OR EXCLUSIVITY
 - A NOT FOUND result is limited to the pages and records actually collected or inspected. It does not prove that the information, activity, customer, capability or relationship does not exist elsewhere.
 - Never invent a source, source ID, URL, date, independent corroboration, fact, quotation, metric or evidence to fill a gap. Truthfulness and accurate attribution take priority over completeness or report symmetry.
 
+RETAINED PRIORITY DATA AREAS NOT FULLY REPLACED BY THE CENTRE POINTS
+1. CAPITAL EFFICIENCY SIGNALS: Review only publicly disclosed revenue, funding, costs, pricing and business model, margins, CAC, LTV, payback, burn/runway, audited accounts and unit economics. Pricing alone is not capital efficiency. Never estimate undisclosed figures or infer efficiency from funding, headcount or growth claims. Place supported evidence in its relevant existing section; do not create a separate heading.
+2. INVESTOR / FOUNDER TRACK RECORD: Review founders' prior ventures, roles, launches, delivered outcomes and exits, and investors' publicly documented portfolio or investment history where collected. Distinguish self-reported biographies from independent records. Do not attribute a company outcome to an individual unless the source establishes that person's role. Place supported evidence in the relevant existing section; do not create a separate heading.
+
 EVIDENCE ALIGNMENT, POSITIVE FINDINGS AND CONTRADICTION INTEGRITY
 - TruthLoop is an evidence-based assessment engine, not a risk-only or accusation engine. Examine and report credible positive evidence with the same care as adverse evidence.
 - When the official website's relevant claim is consistent with supporting public records, identify the specific alignment and cite all relevant source IDs. Where the aligned evidence supports a genuinely favorable capability, achievement, delivery, relationship or outcome, give it clear positive recognition (for example, Positive Finding or Good Evidence). Do not downgrade or omit a supported positive finding merely because the investigation also identifies risks.
@@ -1076,22 +1322,10 @@ EVIDENCE ALIGNMENT, POSITIVE FINDINGS AND CONTRADICTION INTEGRITY
 - Missing information is not a contradiction, misconduct, failure, lack of capability, or proof that a claim is false. Use NOT FOUND IN COLLECTED OFFICIAL WEBSITE EVIDENCE, NOT FOUND IN COLLECTED SUPPORTING EVIDENCE, or INSUFFICIENT EVIDENCE as appropriate.
 - Never invent a contradiction, positive finding, risk signal, motive, allegation or certainty. Do not imply deception, fraud, dishonesty or intent unless the collected evidence directly establishes the specific claim and its attribution.
 
-FOUR PRIORITY INVESTIGATION TOPICS — REQUIRED EVIDENCE REVIEW
-These four topics are additional analytical priorities within the existing eight report sections. They do NOT create new report headings and must not replace the eight fixed headings.
-1. BUYER EVIDENCE → primarily Section 05, Independent Validation & Relationships. Examine customer/client case studies, named buyers, testimonials, reviews, usage/adoption disclosures, repeat purchases, customer references and documented partnerships. Distinguish company-published claims from independently published buyer evidence. A logo, testimonial or customer count alone does not prove active usage, satisfaction or retention.
-2. EXECUTION REPEATABILITY → primarily Sections 03 and 04, Actions & Demonstrated Track Record and Capability & Execution Evidence. Examine dated releases, changelogs, delivery milestones, implementation/workflow documentation, repeated launches, operational processes and repeated outcomes. Distinguish repeated observable delivery from posting frequency, plans or isolated activity.
-3. CAPITAL EFFICIENCY SIGNALS → primarily Sections 02, 05, 06 and 07, with synthesis in Section 08. Examine only publicly disclosed revenue, funding, costs, pricing/business model, margins, CAC, LTV, payback, burn/runway, audited accounts and unit economics. Pricing alone is not capital efficiency. Never estimate undisclosed figures or infer efficiency from funding, headcount or growth claims.
-4. INVESTOR / FOUNDER TRACK RECORD → primarily Sections 01, 03 and 05, with dated changes in Section 06. Examine founders' prior ventures, roles, launches, delivered outcomes, exits and investor portfolio/investment history. Distinguish self-reported biographies from independent records. Do not attribute a company outcome to an individual unless the source establishes that person's role.
-
-OFFICIAL WEBSITE AND SUPPORTING EVIDENCE — REQUIRED EXAMINATION
-- Examine every retained evidenceUniverse.websiteSources and evidenceUniverse.websiteScraperSources item. Review actual page content and relevant structuredData. Use pageCategory, title, URL, content, metadata, structuredData, collectionPurpose, topicKey and topicLabel where present, but treat labels and relevance scores only as discovery hints, never as proof.
+RETAINED SOURCE REVIEW
+- Examine every retained evidenceUniverse.websiteSources and evidenceUniverse.websiteScraperSources item. Review actual page content and relevant structuredData; treat pageCategory, title, URL, metadata, collectionPurpose, topicKey, topicLabel and relevance scores only as discovery hints, never as proof.
 - Review evidenceUniverse.websiteTopicCollectionStatus where present. A not_found status means no directly relevant page was returned by that collection attempt; it does not prove the information does not exist on the live website or elsewhere.
-- Identify which collected pages belong to the subject's official website and which are external. Do not treat a third-party site or social profile as an official website page.
-- On the official website, look for identity, leadership, team roles, products/services, customer and case-study claims, pricing/business model, partnerships, careers/hiring, operations, delivery evidence, financial disclosures, governance and founder/investor history.
-- Treat company-published statements as company claims or disclosures. A case study, logo, testimonial, customer count, partner badge, certification badge or success statement on the official website is not independent validation by itself. State precisely what the page does and does not establish.
-- Examine retained LinkedIn, X, GitHub and other supporting public records only for relevant corroboration, contradiction or additional dated context. Attribute each record to its platform and source ID. Do not relabel supporting evidence as official-website evidence.
-- If relevant website content was not collected, say that it was not available in the collected evidence; do not claim to have inspected the live page. If a collected crawl explicitly returned no relevant result, use the bounded wording NOT FOUND IN COLLECTED OFFICIAL WEBSITE EVIDENCE.
-- Use only information actually present in retained source content or structuredData. Missing information is an evidence gap, not a negative finding. Do not infer confidential information, revenue, customer counts, funding, traction, retention or performance when not publicly evidenced.
+- Where collected, examine official-site disclosures about careers/hiring, pricing and business model, financial matters, governance, and leadership; place each supported observation only in its relevant existing report section.
 
 RETURN EXACTLY THESE 8 HEADINGS, EACH ON ITS OWN LINE, IN THIS ORDER:
 
@@ -1107,38 +1341,54 @@ RETURN EXACTLY THESE 8 HEADINGS, EACH ON ITS OWN LINE, IN THIS ORDER:
 BEST FINDINGS EXPERIENCE — ANALYTICAL QUALITY STANDARD
 - Do not write a generic company summary or merely paraphrase page descriptions. Surface the strongest, most useful findings that the collected evidence actually supports.
 - Each existing section may contain multiple distinct findings. Eight report sections do NOT mean eight findings. Include every material finding that changes an investor's or investigator's understanding, but do not force a fixed finding count or pad the report with weak observations.
-- For each material finding, make the reasoning easy to follow: (1) the precise observation or pattern; (2) the direct SOURCE_XX evidence; (3) whether another genuinely independent record corroborates, qualifies or contradicts it; (4) why the observation matters; and (5) the confidence, unresolved uncertainty or scope limitation.
 - Keep finding statements specific: identify the company/person, action/claim/output, relevant time period, scale or measure when evidenced, and what can or cannot be concluded. Avoid vague labels such as “strong execution”, “good traction”, “weak governance” or “high risk” unless the cited evidence explains exactly why.
 - Separate fact from interpretation. State the observable fact first, then a proportionate interpretation. A source's own claim is evidence that the claim was made, not automatic proof that the claimed result occurred.
 - Distinguish source count from source independence. Ten pages on one official domain may expand subject coverage but do not constitute ten independent confirmations. Multiple copies or syndicated versions of one record are not independent corroboration.
 - Where evidence is mixed, show the positive and adverse sides fairly. Explain whether the difference is a confirmed contradiction, a potential inconsistency, a time-based change, or simply an evidence gap.
 - Do not repeat the same point across sections unless the new section adds a materially different implication. When a section has no material finding, state the bounded evidence limitation rather than inventing a finding.
-- Use compact finding labels such as POSITIVE FINDING, ALIGNED EVIDENCE, CONFIRMED CONTRADICTION, POTENTIAL INCONSISTENCY, or INSUFFICIENT EVIDENCE only when the evidence warrants them. These are labels within the eight sections, not new report sections.
+
+COMMERCIAL INTERPRETATION FRAMEWORK — EVIDENCE FIRST, BUSINESS RELEVANCE CLEAR
+The report must explain not only what the collected evidence says, but what that evidence reasonably means for the subject's business or commercial position. Commercial interpretation must make the evidence more useful to a reader; it must never turn an unverified claim into a fact or manufacture a commercial narrative.
+
+Use these three cross-cutting commercial pillars wherever the actual evidence makes them relevant:
+- GROWTH POTENTIAL: evidence-backed indicators of market opportunity, customer demand, value proposition, differentiation, adoption, expansion or repeatable growth. Describe observable drivers and constraints; do not forecast growth or claim market demand from promotional language alone.
+- BUSINESS EXECUTION: evidence of the subject converting stated intentions and commitments into delivered products, services, milestones, operating processes, customer outcomes or measurable progress. Distinguish plans, activity, outputs and achieved commercial outcomes.
+- RISK EXPOSURE: evidence-backed vulnerabilities or uncertainties that could materially affect customers, partners, operations, continuity, obligations, reputation or commercial outcomes. Explain the actual exposure and its evidence boundary. Do not manufacture a risk from a policy, disclosure, missing detail or allegation alone.
+
+Do not force all three pillars into every section or report. Apply a pillar only when it adds a grounded and decision-relevant interpretation. These are analytical lenses, not additional report headings, scores or mandatory finding quotas.
+
+For each material finding, make the reasoning clear in this order, without adding a new template or heading:
+1. EVIDENCE / OBSERVATION: state what the actual collected source or conversation input establishes, with provenance and the required SOURCE_XX citation for public evidence.
+2. COMMERCIAL INTERPRETATION: explain the narrow business meaning that reasonably follows from that observation. Clearly distinguish a subject's own claim from independently corroborated evidence.
+3. BUSINESS / DECISION RELEVANCE: explain why the finding matters to a customer, business partner, founder or investor assessing this subject, where that relevance is supported by the case context.
+4. EVIDENCE STRENGTH AND LIMITS: state what remains unverified, unknown or outside the collected evidence. Calibrate the conclusion to the strength of the evidence.
+
+Use commercially meaningful language, not promotional or sales language. Explain the mechanism and practical implication; do not add generic advice, investment recommendations, invented financial implications or unsupported predictions. A fact can be commercially relevant without being positive or negative. A verified achievement does not automatically prove commercial success, and a disclosed risk does not automatically prove business failure.
 
 SECTION-SPECIFIC INVESTIGATION REQUIREMENTS
-01. Identity & Self-Representation
-Examine how the subject represents itself publicly: identity, background, roles, stated credentials, capabilities, affiliations, cross-platform identity consistency, and differences between claims and available evidence. Use official-website evidence as the primary basis. Use supporting records only to verify or qualify specific claims, and distinguish self-description from independently established facts.
+01. Identity & Self-Representation — IDENTITY, MARKET POSITIONING, VALUE PROPOSITION & DIFFERENTIATION
+Examine how the subject identifies and presents itself: what it is, whom it serves, the market or customer problem it says it addresses, its positioning, claimed value proposition, stated differentiation, leadership and relevant capabilities. Identify what distinguishes its offer from alternatives only when the collected evidence describes a concrete difference; do not invent competitor comparisons. Use official-website evidence as the primary basis and supporting records to verify or qualify specific claims. Clearly separate the subject's own positioning and value claims from independently established facts. Explain the commercial significance of the positioning only to the extent the evidence supports it.
 
-02. Claims, Commitments & Intentions
-Examine explicit public claims, objectives, promises, commitments and declared values, starting with what the official website actually says. Assess specificity, time-bounds, verifiability, and what evidence supports or does not support each material claim. Use supporting records to corroborate or challenge a specific website claim where relevant. Do not infer intention from vague promotional language.
+02. Claims, Commitments & Intentions — STRATEGIC INTENT TO COMMERCIAL IMPACT
+Examine the subject's explicit strategic objectives, public claims, promises, commitments, intended markets, product or service plans, partnerships and declared priorities. Assess how specific, time-bound and verifiable they are, and what evidence shows about their intended commercial direction or plausible implications for customer acquisition, revenue opportunities, partnerships, market expansion or competitive positioning. Explain the link between a stated intention and its potential commercial relevance without treating the intention as an achieved result. Identify observable steps toward the stated intent only where evidence supports them; assess completed actions and outcomes primarily in Section 03. Do not infer strategy or intent from vague promotional language.
 
-03. Actions & Demonstrated Track Record
-Examine observable actions, documented work, outputs, milestones, repeated activities and execution over time, prioritizing dated work and outcomes documented on the official website. Use supporting records to verify, qualify or challenge specific website claims. Compare what the subject said it would do with what the evidence shows it did, where the records permit that comparison. Do not convert posting frequency into achievement.
+03. Actions & Demonstrated Track Record — DEMONSTRATED EXECUTION & COMMERCIAL OUTCOMES
+Examine actual actions, completed work, delivered products or services, dated milestones, launches, implementations, customer delivery, measurable outputs and progress over time. Compare stated commitments with what the evidence shows was actually done, where the records permit that comparison. Explain what the demonstrated execution establishes about progress and commercial outcomes, such as delivery, adoption, customer acquisition or revenue, only when those outcomes are directly evidenced. Distinguish activity from completed output, completed output from customer or market impact, and isolated achievement from repeatable commercial performance. Do not treat posting frequency, announcements or plans as execution results.
 
-04. Capability & Execution Evidence
-Examine demonstrated skills and expertise through actual work samples, products, projects, technical or operational outputs, and evidence of execution quality or consistency. Use official-website evidence as the primary account of the company's stated and documented capabilities; use supporting records to verify specific outputs or provide additional context. Separate claimed capability from demonstrated capability. Do not infer competence from titles, polished websites, or tool mentions alone.
+04. Capability & Execution Evidence — DEMONSTRATED CAPABILITY, OPERATIONAL CAPACITY & SCALABILITY
+Examine demonstrated skills, product or service capability, technical and operational outputs, delivery processes, people and infrastructure where evidenced, execution quality, repeatability and signs of capacity to serve additional demand. Distinguish what the subject says it can do from what retained evidence shows it has done. Assess scalability only when evidence supports repeatable delivery, operating capacity, usage or comparable indicators; state what remains unknown. A technology, tool, team title, polished website, repository or stated capability alone does not prove operational competence, delivery quality or scalability.
 
-05. Independent Validation & Relationships
-Examine the relationships and validation claims described on the official website, then use genuinely external supporting records to test whether customers, users, partners, investors, certifications, awards or outcomes are independently corroborated. Assess whether each source is genuinely independent, what exactly it validates, and any conflicts or limitations. A self-published partner logo or testimonial is not independent corroboration. If no external validation record was collected, state NOT FOUND IN COLLECTED SUPPORTING EVIDENCE; do not fabricate validation.
+05. Independent Validation & Relationships — INDEPENDENT MARKET VALIDATION & COMMERCIAL RELATIONSHIPS
+Examine customer and buyer evidence, users, client relationships, partnerships, investors, distribution relationships, certifications, awards and other market validation claims. Start with what the official website says, then use genuinely external records to establish what is independently corroborated and exactly what each record validates. Explain the commercial significance of verified relationships or buyer evidence without overstating it. A logo, testimonial, partner badge, investor name or announced relationship does not by itself prove an active commercial relationship, revenue, deal value, product usage, customer satisfaction, retention, repeat purchase or investment performance. Distinguish existence of a relationship from its scope, activity and measurable result. If no suitable external record was collected, state NOT FOUND IN COLLECTED SUPPORTING EVIDENCE.
 
-06. Consistency & Evolution Over Time
-Examine dated historical and recent official-website statements, commitments, decisions and activities as the primary timeline. Use dated supporting records to corroborate or qualify the timeline. Identify substantiated continuity, progress, reversals, changed direction or unexplained shifts. Do not claim a trend from a single timestamp or compare undated records as if chronology were established. A change over time is not automatically a contradiction.
+06. Consistency & Evolution Over Time — BUSINESS EVOLUTION, STRATEGIC CONSISTENCY & GROWTH TRAJECTORY
+Examine dated evidence of the subject's business model, positioning, products, markets, commitments, execution, customer or partner activity and disclosed performance over time. Identify substantiated continuity, strategic change, delivery progress, expansion, contraction or unexplained shifts. Explain what the timeline indicates about business evolution and growth trajectory, while distinguishing actual dated progress from announcements or aspirations. A growth trajectory requires comparable dated evidence; do not infer growth from a single snapshot, undated claims, website refreshes or posting frequency. A strategic change is not automatically a contradiction or a risk; explain its commercial implication only where the evidence supports one.
 
-07. Reliability, Accountability & Risk Signals
-Examine documented disputes, failures, complaints, corrections, responses to problems, accountability, repeated unresolved issues and material contradictions. Start with relevant official-website disclosures and responses; use supporting records to verify or challenge them. Do not turn absence of complaints into proof of reliability, or allegations into established facts. Attribute contested claims, distinguish confirmed contradictions from potential inconsistencies, and explain their status.
+07. Reliability, Accountability & Risk Signals — BUSINESS RELIABILITY, ACCOUNTABILITY & COMMERCIAL RISK EXPOSURE
+Examine evidence relevant to the subject's ability to meet stated obligations, deliver consistently, address customer or stakeholder problems, maintain operational continuity and manage material commercial, governance or disclosure risks. Review documented disputes, complaints, failures, corrections, responses, unresolved issues, terms and relevant policies in their actual context. Explain who may be exposed, what the possible business consequence is, and whether the issue is established, alleged, unresolved or simply not evidenced. A restrictive refund or cancellation term alone does not establish unreliability or misconduct; a privacy policy or third-party data-collection disclosure alone does not prove misuse, a breach or a complaint; absence of public complaints does not prove reliability. Do not convert policy wording, missing information, isolated allegations or ordinary limitations into a risk finding without a supported mechanism and proportionate explanation.
 
-08. Overall Pattern & Future Readiness
-Synthesize only the findings already established in Sections 1–7. Explain where official-website representation is aligned with, corroborated by or challenged by supporting records. Give fair recognition to verified positive findings and clearly identify substantiated contradictions, unresolved questions and evidence gaps. State demonstrated strengths, limitations and observable indicators to watch. Do not collect new sources or introduce new facts. You may repeat the already established SOURCE_XX citations when needed to keep each summarized finding traceable; do not introduce new source IDs.
+08. Overall Pattern & Future Readiness — INTEGRATED BUSINESS ASSESSMENT, GROWTH POTENTIAL & FUTURE READINESS
+Synthesize only the material findings already established in Sections 01–07. Integrate the three commercial pillars where relevant: (a) evidence-backed growth potential and its constraints, (b) demonstrated business execution and the gap between intention and delivery, and (c) substantiated risk exposure and unresolved commercial uncertainties. Explain the subject's overall business position and future readiness in proportion to the available evidence. Distinguish demonstrated strengths from unverified claims, execution capability from commercial outcomes, and observable growth indicators from forecasts. Do not introduce new facts, sources, risks or conclusions in this section. Do not present future readiness as a guarantee, investment recommendation or prediction. Keep the report-level Confidence Score clearly separate: it measures evidence strength, not the subject's business quality, growth potential or readiness.
 
 CONFIDENCE SCORE — EVIDENCE STRENGTH, NOT A VERDICT
 The score is a 0–100 assessment of how strongly and reliably the collected public evidence supports the report's factual findings and bounded interpretations. It is NOT a score of the founder's trustworthiness, the company's quality, investment attractiveness, probability of success, fraud risk, or future performance. It is also not a percentage probability that the report is correct.
@@ -1159,8 +1409,8 @@ Also distinguish confidence in directly observed facts from confidence in interp
 
 At the end of this section, include a compact "Confidence Breakdown" with all six dimensions as earned points / maximum, one concise reason per dimension, the total, and the case-specific +10 / -10 comparison. Then include a separate exact final line: "Confidence Score: NN/100".
 
-SEVEN ADDITIONAL FINDINGS — INCLUDE ONLY WHEN SUPPORTED BY COLLECTED EVIDENCE
-These are additional investigation findings to be incorporated within the existing eight report sections. They are NOT new report sections. Do not rename, reorder, remove, split, or add to the eight required headings above.
+ADDITIONAL EVIDENCE CHECKS — INTEGRATE ONLY INTO THE EXISTING EIGHT SECTIONS
+These are evidence checks, not separately printed findings or report headings. Integrate supported facts only into their relevant existing section. Do not rename, reorder, remove, split, or add to the eight required headings above.
 Examine the retained NEW Loop 7 collected evidence and include any of the following seven findings that the actual source content supports:
 1. REVENUE, PROFIT AND CASH FLOW: Include publicly disclosed revenue, profit/loss, cash-flow figures, financial periods, growth or financial milestones. Identify the reporting period and whether the information is company-reported, independently corroborated, or drawn from an accessible financial filing. Do not estimate undisclosed figures.
 2. CUSTOMER RETENTION AND CHURN: Include disclosed retention, renewal, repeat-purchase, cohort, customer-loss or churn metrics, with periods and definitions where available. Customer logos, testimonials, customer counts or ongoing social-media activity do not establish retention or churn.
@@ -1173,13 +1423,13 @@ Examine the retained NEW Loop 7 collected evidence and include any of the follow
 PLACEMENT WITHIN THE EXISTING REPORT
 Integrate each supported finding naturally into the most relevant existing section(s): claims and disclosed figures primarily in Section 02; delivered milestones and founder execution in Section 03; product and operational evidence in Section 04; independent customer, financial or audit corroboration in Section 05; dated financial, ownership and traction changes in Section 06; material financial, governance, accountability or disclosure limitations in Section 07; and a concise synthesis of already established findings in Section 08. Section 01 remains focused on identity and self-representation. This is guidance for placement, not permission to create additional headings or repeat the same finding unnecessarily.
 
-AVAILABILITY AND EVIDENCE RULES FOR THESE SEVEN FINDINGS
+AVAILABILITY AND EVIDENCE RULES FOR THESE CHECKS
 - Use only relevant evidence actually present in the retained collected source package for this NEW Loop 7 investigation. Do not assume that a source exists merely because a category is listed here.
 - Include a finding only to the extent the collected evidence supports it. If a category has no supporting evidence, do not invent, estimate, extrapolate, or fill it with generic commentary.
 - When useful, state that the information was not found in the collected public evidence or that the available material is insufficient to verify it. This is a bounded evidence limitation, not proof that the underlying business activity or information does not exist.
 - Clearly distinguish independently corroborated information, company/founder-reported claims, unaudited disclosures, third-party statements, and information that remains unverified.
 - Cite every factual finding with the actual SOURCE_XX ID or IDs that directly support it. The same source ID may be reused across sections when relevant; there is no allocation quota or source exclusivity. Never fabricate source IDs or treat a source's mere existence as proof of a metric.
-- These seven findings are additional areas of examination, not mandatory fields that must all be populated. Their absence must not by itself cause the investigation or report to be refused, cancelled, or withheld. Complete the eight-section report using the evidence that is actually available, while accurately stating material evidence gaps.
+- These checks are not mandatory fields that must all be populated. Their absence must not by itself cause the investigation or report to be refused, cancelled, or withheld. Complete the eight-section report using the evidence that is actually available, while accurately stating material evidence gaps.
 
 CASE-SPECIFIC ANALYSIS — NO GENERIC FILLER
 - Name the actual subject, actual claim, actual action, actual output, actual relationship, actual date, or actual discrepancy wherever the evidence supplies it.
@@ -1200,7 +1450,6 @@ SOURCE TRACEABILITY — EVERY FINDING MUST BE CHECKABLE
 - Before returning the report, silently audit Sections 1–7: confirm that every factual finding has a valid citation, every cited ID exists in sourceCitationIndex, and every cited source's actual content supports the nearby claim. If support is unavailable, narrow the statement or label it NOT ESTABLISHED / INSUFFICIENT EVIDENCE; never invent a citation to fill a gap.
 - A source's published date is only the date stored in its explicit publishedDate field. Do not present fetchTimestamp, collectedAt, updatedAt, crawl time or an ambiguous generic timestamp as a publication date. If publishedDate is null, state that the publication date is unavailable.
 - Never fabricate a source date or infer a publication date from a URL, filename, copyright year or the date on which the website was fetched.
-- Put the citation immediately after the statement it supports. The cited source's actual content must directly support the nearby claim; a title, URL, metadata field, platform label or source existence alone is not proof of page content.
 - When comparing aligned evidence or a contradiction, cite every material record used in the comparison. For a contradiction, cite both the website-side claim and the supporting-source-side claim, not just one side.
 - A source ID may appear in multiple sections if the same record genuinely supports each cited finding. Never reuse an ID to support a claim that the source does not establish.
 - Keep source provenance explicit in the prose: official-website/company-published, LinkedIn, X, GitHub, other third-party, or independently published. Do not call a company-published claim independent validation. Use sourceCitationIndex to preserve the exact SOURCE ID next to the related observation.
@@ -1790,19 +2039,17 @@ if (loopLevel === 7) {
 
 
   if (wantsLoop7Progress) {
-    const reportEvidenceRegistry =
-      Array.isArray(
-        compressedEvidencePackage?.loop7Package?.sourceRegistry
-      )
-        ? compressedEvidencePackage.loop7Package.sourceRegistry
-        : loop7EvidenceSourceIndexCompact;
-
+    // The complete registry was already sent once with the compression phase.
+    // Do not resend the same 40+ source objects in the report-phase progress
+    // event: it adds tens of KB to the mobile SSE stream and can trigger
+    // backpressure without providing any new information to the frontend.
     sendLoop7Progress({
       type: "progress",
       phase: "report",
       message: "Generating final investigation.",
-      evidenceRegistry: reportEvidenceRegistry,
-      evidenceRegistryCount: reportEvidenceRegistry.length
+      evidenceRegistryCount: Array.isArray(compressedEvidencePackage?.loop7Package?.sourceRegistry)
+        ? compressedEvidencePackage.loop7Package.sourceRegistry.length
+        : loop7EvidenceSourceIndexCompact.length
     });
   }
 
@@ -1837,17 +2084,17 @@ const cleanMessages = messages
   .filter(message => message.content.trim());
 
 const maxTokens =
-  loopLevel === 7 ? 12000 : 320;
+  loopLevel === 7 ? 16000 : 320; // Raised from the legacy OpenRouter-era 12,000 cap.
 
 const loop7ReasoningEnabled = false;
 
 /* =========================================================
    LOOP 7 PROVIDER SETTINGS
-   Primary: Qwen Flash (exact Velona catalog code: qwen-flash).
-   Fallback 1: Gemini 2.5 Flash Lite.
-   Fallback 2: DeepSeek Chat V3.1.
-   All providers use the same Velona native gateway, investigation
-   instructions, and evidence payload. Loops 1–6 remain unchanged.
+   Primary: Qwen Flash via Velona.
+   Fallback 1: Gemini 2.5 Flash Lite via Velona.
+   Fallback 2: DeepSeek Chat V3.1 via Velona.
+   Original Velona provider chain retained.
+   Loops 1–6 remain unchanged.
    ========================================================= */
 const LOOP7_PROVIDER_ORDER = [
   "qwen_flash",
@@ -1910,7 +2157,7 @@ let loop7NativeOutput = "";
 try {
 
   /* =========================
-       LOOP 7 → QWEN FLASH → GEMINI → DEEPSEEK FALLBACK
+       LOOP 7 → QWEN → GEMINI → DEEPSEEK
        Retry on HTTP, network, malformed, or empty responses
      OTHER LOOPS → GROQ
   ========================= */
@@ -1947,27 +2194,29 @@ try {
 
       let providerResponse;
       let providerBody = null;
-      let providerOutput = "";
       let providerErrorBody = "";
-
+      let providerOutput = "";
       try {
+        const providerRequestBody = {
+          model: settings.model,
+          turns: [
+            { role: "system", content: loop7Instruction },
+            { role: "user", content: JSON.stringify(loop7AiUserPayload) }
+          ],
+          stream: true,
+          config: {
+            temperature: settings.temperature,
+            max_tokens: settings.maxTokens
+          }
+        };
+
         providerResponse = await fetch(settings.endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + settings.apiKey
           },
-          body: JSON.stringify({
-            model: settings.model,
-            turns: [
-              { role: "system", content: loop7Instruction },
-              { role: "user", content: JSON.stringify(loop7AiUserPayload) }
-            ],
-            config: {
-              temperature: settings.temperature,
-              max_tokens: settings.maxTokens
-            }
-          })
+          body: JSON.stringify(providerRequestBody)
         });
         response = providerResponse;
       } catch (fetchError) {
@@ -1985,7 +2234,6 @@ try {
         continue;
       }
 
-      const providerDurationMs = Date.now() - providerStartedAt;
       const providerRequestId =
         providerResponse.headers?.get("x-request-id") ||
         providerResponse.headers?.get("request-id") ||
@@ -1997,39 +2245,166 @@ try {
         status: providerResponse.status,
         statusText: providerResponse.statusText,
         ok: providerResponse.ok,
-        durationMs: providerDurationMs,
         requestId: providerRequestId,
         contentType: providerResponse.headers?.get("content-type") || null,
-        retryAfter: providerResponse.headers?.get("retry-after") || null
+        retryAfter: providerResponse.headers?.get("retry-after") || null,
+        upstreamStreaming: true,
+        maxTokens: settings.maxTokens
       }));
 
       if (providerResponse.ok) {
         try {
-          providerBody = await providerResponse.json();
-        } catch (parseError) {
-          providerErrorBody = "Invalid JSON response: " + String(parseError?.message || parseError);
+          if (!providerResponse.body || typeof providerResponse.body.getReader !== "function") {
+            throw new Error("Provider returned no readable SSE response body.");
+          }
+
+          const reader = providerResponse.body.getReader();
+          const decoder = new TextDecoder();
+          let sseBuffer = "";
+          let streamDone = false;
+          let streamError = null;
+          let nativeUsage = null;
+          let nativeFinishReason = null;
+          let streamRequestId = providerRequestId;
+          let firstDeltaAt = null;
+          let deltaCount = 0;
+
+          const consumeProviderSseLine = (rawLine) => {
+            const line = rawLine.trim();
+            if (!line || line.startsWith(":") || !line.startsWith("data:")) return;
+
+            const dataText = line.slice(5).trim();
+            if (!dataText) return;
+            if (dataText === "[DONE]") {
+              streamDone = true;
+              return;
+            }
+
+            let event;
+            try {
+              event = JSON.parse(dataText);
+            } catch (parseError) {
+              throw new Error("Invalid provider SSE JSON: " + String(parseError?.message || parseError));
+            }
+
+            if (event?.request_id && !streamRequestId) {
+              streamRequestId = event.request_id;
+            }
+
+            // Velona native SSE uses event/delta and event/done records.
+            if (event?.event === "delta") {
+              const delta = event?.data?.delta;
+              if (typeof delta === "string" && delta.length) {
+                if (firstDeltaAt === null) firstDeltaAt = Date.now();
+                providerOutput += delta;
+                deltaCount += 1;
+              }
+              return;
+            }
+
+            if (event?.event === "done") {
+              streamDone = true;
+              nativeUsage = event?.data?.usage || null;
+              nativeFinishReason = event?.data?.finish || null;
+              providerBody = {
+                request_id: streamRequestId,
+                status: "success",
+                data: {
+                  output: providerOutput,
+                  usage: nativeUsage,
+                  finish: nativeFinishReason
+                }
+              };
+              return;
+            }
+
+            if (event?.event === "error") {
+              streamError = event?.data || event?.error || event;
+              throw new Error(
+                "Provider SSE error: " +
+                String(streamError?.message || streamError?.error?.message || JSON.stringify(streamError))
+              );
+            }
+          };
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            sseBuffer += decoder.decode(value, { stream: true });
+            let newlineIndex;
+            while ((newlineIndex = sseBuffer.indexOf("\n")) !== -1) {
+              const line = sseBuffer.slice(0, newlineIndex).replace(/\r$/, "");
+              sseBuffer = sseBuffer.slice(newlineIndex + 1);
+              consumeProviderSseLine(line);
+            }
+          }
+
+          sseBuffer += decoder.decode();
+          if (sseBuffer.trim()) consumeProviderSseLine(sseBuffer);
+
+          if (streamError) {
+            throw new Error("Provider stream ended with an error event.");
+          }
+          if (!streamDone) {
+            throw new Error(
+              "Provider SSE closed before its done event. Partial output chars: " +
+              providerOutput.length
+            );
+          }
+
+          // Preserve the native Velona stream envelope and collected output.
+          // In that path providerBody remains null, even though deltas were
+          // collected successfully. Build the normalized native envelope before
+          // attaching usage/finish metadata.
+          if (!providerBody || typeof providerBody !== "object") {
+            providerBody = {
+              request_id: streamRequestId,
+              status: "success",
+              data: {
+                output: providerOutput
+              }
+            };
+          } else if (!providerBody.data || typeof providerBody.data !== "object") {
+            providerBody.data = {
+              output: providerOutput
+            };
+          } else if (typeof providerBody.data.output !== "string") {
+            providerBody.data.output = providerOutput;
+          }
+
+          providerBody.data.usage = nativeUsage;
+          providerBody.data.finish = nativeFinishReason;
+
+          console.log("LOOP7_PROVIDER_STREAM_COMPLETE", JSON.stringify({
+            provider: providerName,
+            model: settings.model,
+            requestId: streamRequestId,
+            deltaCount,
+            replyChars: providerOutput.length,
+            firstDeltaMs: firstDeltaAt === null ? null : firstDeltaAt - providerStartedAt,
+            durationMs: Date.now() - providerStartedAt,
+            finish: nativeFinishReason,
+            usage: nativeUsage
+          }));
+        } catch (streamError) {
+          providerErrorBody = String(streamError?.message || streamError);
+          console.error("LOOP7_PROVIDER_STREAM_ERROR", JSON.stringify({
+            provider: providerName,
+            model: settings.model,
+            durationMs: Date.now() - providerStartedAt,
+            partialOutputChars: providerOutput.length,
+            error: providerErrorBody
+          }));
         }
 
-        const rawOutput = providerBody?.data?.output;
-        if (typeof rawOutput === "string") {
-          providerOutput = rawOutput.trim();
-        } else if (typeof rawOutput?.text === "string") {
-          providerOutput = rawOutput.text.trim();
-        } else if (typeof rawOutput?.content === "string") {
-          providerOutput = rawOutput.content.trim();
-        } else if (Array.isArray(rawOutput)) {
-          providerOutput = rawOutput.map(part =>
-            typeof part === "string" ? part : (part?.text || part?.content || "")
-          ).join("").trim();
-        }
-
-        if (providerOutput) {
-          // Normalize the already-parsed native response while it is still
-          // inside the provider attempt. The response body is a one-shot
-          // stream: never call response.json()/text() again downstream.
+        if (!providerErrorBody && providerOutput.trim()) {
+          // Normalize the fully collected native SSE response. The provider
+          // stream is consumed exactly once and never parsed again downstream.
           const nativeUsage =
             providerBody?.data?.usage || providerBody?.usage || null;
           const nativeFinishReason =
+            providerBody?.data?.finish ||
             providerBody?.data?.finish_reason ||
             providerBody?.data?.finishReason ||
             null;
@@ -2038,7 +2413,7 @@ try {
             choices: [{
               message: {
                 role: "assistant",
-                content: providerOutput
+                content: providerOutput.trim()
               },
               finish_reason: nativeFinishReason
             }],
@@ -2047,25 +2422,28 @@ try {
 
           selectedLoop7Provider = providerName;
           loop7NativeResponseData = providerBody;
-          loop7NativeOutput = providerOutput;
+          loop7NativeOutput = providerOutput.trim();
           console.log("LOOP7_PROVIDER_SELECTED", JSON.stringify({
             provider: providerName,
             model: settings.model,
-            replyChars: providerOutput.length,
-            durationMs: providerDurationMs,
-            normalized: !!normalizedData?.choices?.[0]?.message?.content
+            replyChars: providerOutput.trim().length,
+            durationMs: Date.now() - providerStartedAt,
+            normalized: !!normalizedData?.choices?.[0]?.message?.content,
+            streaming: true
           }));
           break;
         }
 
-        providerErrorBody = providerErrorBody ||
-          "Provider returned HTTP success but data.output was empty or unsupported.";
+        if (!providerErrorBody) {
+          providerErrorBody =
+            "Provider stream completed but returned an empty output.";
+        }
         console.error("LOOP7_PROVIDER_EMPTY_OUTPUT", JSON.stringify({
           provider: providerName,
           model: settings.model,
+          replyChars: providerOutput.length,
           responseKeys: Object.keys(providerBody || {}),
-          dataKeys: Object.keys(providerBody?.data || {}),
-          outputType: typeof rawOutput
+          dataKeys: Object.keys(providerBody?.data || {})
         }));
       } else {
         try {
@@ -2074,6 +2452,8 @@ try {
           providerErrorBody = "Failed to read provider error: " + String(readError?.message || readError);
         }
       }
+
+      const providerDurationMs = Date.now() - providerStartedAt;
 
       loop7LastProviderErrorBody = String(providerErrorBody).slice(0, 6000);
       loop7LastProviderError = {
@@ -2271,7 +2651,7 @@ try {
         error: "PROVIDER_REQUEST_FAILED",
         stage: "LOOP7_AI_FETCH"
       });
-      endLoop7ProgressStream();
+      await endLoop7ProgressStream();
       return;
     }
 
@@ -2333,7 +2713,7 @@ if (loopLevel === 7 && !response?.ok) {
       stage: "LOOP7_AI_HTTP",
       provider: selectedLoop7Provider
     });
-    endLoop7ProgressStream();
+    await endLoop7ProgressStream();
     return;
   }
 
@@ -2355,11 +2735,10 @@ if (loopLevel === 7 && !response?.ok) {
 
 if (loopLevel === 7) {
 
-  // Every Loop 7 provider (Qwen, Gemini, DeepSeek) uses the same Velona
-  // native gateway. Its response body was parsed exactly once inside the
-  // provider-attempt loop and normalized before provider selection.
-  // Re-reading response.json()/text() here caused the Qwen crash:
-  // "Body is unusable: Body has already been read".
+  // Loop 7 providers use two compatible transport shapes: NABH uses
+  // OpenAI-compatible SSE; the retained Velona fallbacks use Velona-native SSE.
+  // Both are normalized once inside the provider-attempt loop. Do not re-read
+  // response.json()/text() here because the streaming body has already been consumed.
   const providerData = loop7NativeResponseData || {};
 
   if (!normalizedData?.choices?.[0]?.message?.content) {
@@ -2369,7 +2748,7 @@ if (loopLevel === 7) {
     );
   }
 
-  console.log("LOOP7_VELONA_NATIVE_RESPONSE_NORMALIZED", JSON.stringify({
+  console.log("LOOP7_PROVIDER_RESPONSE_NORMALIZED", JSON.stringify({
     provider: selectedLoop7Provider,
     replyChars: loop7NativeOutput.length,
     outputType: typeof providerData?.data?.output,
@@ -2444,6 +2823,202 @@ console.log(
 let reply =
   data?.choices?.[0]?.message?.content || "";
 
+// Deterministic enforcement of the existing Section 05 evidence rule:
+// a subject's own website cannot independently validate its own customer claims.
+// Apply only when every registry record is verifiably on the requested subject
+// website and all are typed as website records. No additional provider call.
+if (
+  loopLevel === 7 &&
+  loop7SourceInventorySummary?.allRecordsAreSubjectWebsiteOnly === true &&
+  loop7SourceInventorySummary?.externalOrOtherDomainRecordCount === 0
+) {
+  const section05Pattern = /(^|\n)([^\n]*?\b05\.\s*Independent\s+Validation\s*&\s*Relationships\b[^\n]*)([\s\S]*?)(?=\n\s*[^\n]*?\b06\.\s*Consistency\s*&\s*Evolution\s+Over\s+Time\b)/i;
+  const section05Match = String(reply || "").match(section05Pattern);
+  if (section05Match) {
+    const knownIds = new Set(
+      (Array.isArray(loop7EvidenceSourceIndexCompact) ? loop7EvidenceSourceIndexCompact : [])
+        .map(source => String(source?.sourceId || "").toUpperCase())
+        .filter(Boolean)
+    );
+    const section05Ids = [...new Set(
+      [...String(section05Match[3] || "").matchAll(/\[?(SOURCE_\d{1,3})\]?/gi)]
+        .map(match => String(match[1] || "").toUpperCase())
+        .filter(id => knownIds.has(id))
+    )];
+    const citedCaseStudyRecords = section05Ids.length
+      ? ` ${section05Ids.map(id => `[${id}]`).join(" ")}`
+      : "";
+    const correctedSection05 = [
+      `The collected Loop 7 source registry contains ${loop7SourceInventorySummary.totalSourceRecords} records, all from the subject's own website (${loop7SourceInventorySummary.subjectWebsiteHost}); no external supporting-source records were collected.`,
+      `The cited case studies and named brand examples are therefore company-published evidence of what the subject reports, not independent buyer confirmation.${citedCaseStudyRecords}`,
+      `Independent buyer, customer or partner validation is NOT FOUND IN COLLECTED SUPPORTING EVIDENCE. The collected records do not independently establish the scope or activity of customer relationships, customer satisfaction, retention, repeat purchase or the reported commercial outcomes.`,
+      `This is a limitation of the collected evidence, not proof that the relationships or outcomes do not exist.`
+    ].join("\n\n");
+    reply = String(reply).replace(
+      section05Pattern,
+      (_match, linePrefix, sectionHeading) =>
+        `${linePrefix}${sectionHeading}\n\n${correctedSection05}\n`
+    );
+    console.log("LOOP7_SECTION05_SOURCE_GATE", JSON.stringify({
+      applied: true,
+      sourceRecords: loop7SourceInventorySummary.totalSourceRecords,
+      subjectWebsiteHost: loop7SourceInventorySummary.subjectWebsiteHost,
+      independentSupportingSourceRecords: 0,
+      section05CitationIdsRetained: section05Ids
+    }));
+  } else {
+    console.warn("LOOP7_SECTION05_SOURCE_GATE_SKIPPED", JSON.stringify({
+      reason: "section_05_heading_not_found",
+      sourceRecords: loop7SourceInventorySummary.totalSourceRecords
+    }));
+  }
+
+  // Apply short, section-local evidence qualifications only when all collected
+  // records are from the subject's own website. These enforce existing Centre
+  // Points; they do not create headings or add another report section.
+  const appendEvidenceQualification = (startPattern, endPattern, note, skipPattern, eventName) => {
+    const sectionPattern = new RegExp(
+      `(^|\\n)([^\\n]*?${startPattern}[^\\n]*)([\\s\\S]*?)(?=\\n\\s*[^\\n]*?${endPattern})`,
+      "i"
+    );
+    const match = String(reply || "").match(sectionPattern);
+    if (!match || (skipPattern && skipPattern.test(match[3] || ""))) return false;
+    const knownIds = new Set(
+      (Array.isArray(loop7EvidenceSourceIndexCompact) ? loop7EvidenceSourceIndexCompact : [])
+        .map(source => String(source?.sourceId || "").toUpperCase())
+        .filter(Boolean)
+    );
+    const ids = [...new Set(
+      [...String(match[3] || "").matchAll(/\[?(SOURCE_\d{1,3})\]?/gi)]
+        .map(item => String(item[1] || "").toUpperCase())
+        .filter(id => knownIds.has(id))
+    )];
+    const citations = ids.length ? ` ${ids.map(id => `[${id}]`).join(" ")}` : "";
+    reply = String(reply).replace(
+      sectionPattern,
+      (_all, prefix, heading, body) => `${prefix}${heading}${String(body || "").trimEnd()}\n\n${note}${citations}\n`
+    );
+    console.log(eventName, JSON.stringify({ applied: true, retainedCitations: ids }));
+    return true;
+  };
+
+  appendEvidenceQualification(
+    "03\\.\\s*Actions\\s*&\\s*Demonstrated\\s+Track\\s+Record",
+    "04\\.\\s*Capability\\s*&\\s*Execution\\s+Evidence",
+    "The campaign and case-study outcomes in this section are reported in the subject's own published materials. They establish what the company reports about those campaigns, but no external supporting-source records in this investigation independently corroborate the stated commercial outcomes.",
+    /company[- ]reported|self[- ]published|not independently corroborat/i,
+    "LOOP7_SECTION03_SOURCE_QUALIFICATION"
+  );
+  appendEvidenceQualification(
+    "04\\.\\s*Capability\\s*&\\s*Execution\\s+Evidence",
+    "05\\.\\s*Independent\\s+Validation\\s*&\\s*Relationships",
+    "The technical and operational capabilities described here are company-published claims. Without external supporting records, they do not independently establish repeatable customer delivery, operational capacity or scalability.",
+    /not independently|company[- ]reported|scalability remains|operational capacity remains/i,
+    "LOOP7_SECTION04_SOURCE_QUALIFICATION"
+  );
+  if (Array.isArray(loop7SourceInventorySummary?.missingPublishedYears) && loop7SourceInventorySummary.missingPublishedYears.length) {
+    appendEvidenceQualification(
+      "06\\.\\s*Consistency\\s*&\\s*Evolution\\s+Over\\s+Time",
+      "07\\.\\s*Reliability\\s*,?\\s*Accountability\\s*&\\s*Risk\\s+Signals",
+      `The collected dated publications have gaps in ${loop7SourceInventorySummary.missingPublishedYears.join(", ")}. The records establish activity at the cited publication dates, but do not by themselves establish continuous operations or sustained growth between those dates.`,
+      /gaps in .*continuous operations|do not.*continuous operations|continuous operating history/i,
+      "LOOP7_SECTION06_TIMELINE_QUALIFICATION"
+    );
+  }
+  appendEvidenceQualification(
+    "07\\.\\s*Reliability\\s*,?\\s*Accountability\\s*&\\s*Risk\\s+Signals",
+    "08\\.\\s*Overall\\s+Pattern\\s*&\\s*Future\\s+Readiness",
+    "The absence of adverse information in the subject's own collected website pages is not affirmative evidence of reliability and does not establish that no complaints, disputes or operational issues exist elsewhere. No external risk or accountability records were collected in this run.",
+    /absence of .*not (?:proof|evidence)|does not (?:prove|establish) reliability/i,
+    "LOOP7_SECTION07_ABSENCE_QUALIFICATION"
+  );
+  const section08Pattern = /(^|\n)([^\n]*?\b08\.\s*Overall\s+Pattern\s*&\s*Future\s+Readiness\b[^\n]*)([\s\S]*?)(?=\n\s*(?:Confidence\s+Breakdown|Confidence\s+Score|(?:📚\s*)?Evidence\s+Sources))/i;
+  const section08Match = String(reply || "").match(section08Pattern);
+  if (section08Match) {
+    let section08Body = String(section08Match[3] || "");
+    section08Body = section08Body
+      .replace(/\brobust technical foundation\b/gi, "company-described technical foundation")
+      .replace(/\bproven track record\b/gi, "company-published case-study record")
+      .replace(/\bstrong execution capabilities\b/gi, "company-reported execution capabilities")
+      .replace(/\bclear future trajectory\b/gi, "future trajectory not independently established")
+      .replace(/\breadiness for scaling\b/gi, "scaling readiness not independently established");
+    if (!/independent market validation and future scaling readiness are not established/i.test(section08Body)) {
+      const knownIds = new Set(loop7EvidenceSourceIndexCompact.map(source => String(source?.sourceId || "").toUpperCase()));
+      const localIds = [...section08Body.matchAll(/\[?(SOURCE_\d{1,3})\]?/gi)]
+        .map(item => String(item[1] || "").toUpperCase())
+        .filter(id => knownIds.has(id));
+      const reportIds = [...String(reply || "").matchAll(/\[?(SOURCE_\d{1,3})\]?/gi)]
+        .map(item => String(item[1] || "").toUpperCase())
+        .filter(id => knownIds.has(id));
+      const ids = [...new Set(localIds.length ? localIds : reportIds)].slice(0, 4);
+      const citations = ids.length ? ` ${ids.map(id => `[${id}]`).join(" ")}` : "";
+      section08Body = `${section08Body.trimEnd()}\n\nAll ${loop7SourceInventorySummary.totalSourceRecords} collected public source records are from the subject's own website, and no external supporting-source records were collected. Company-published case studies and technical descriptions are not independent proof of buyer outcomes, current operating scale or repeatable commercial performance. Independent market validation and future scaling readiness are not established by this collected public record; this is an evidence limitation, not proof that the business lacks those capabilities.${citations}`;
+      reply = String(reply).replace(
+        section08Pattern,
+        (_all, prefix, heading) => `${prefix}${heading}\n${section08Body}\n`
+      );
+      console.log("LOOP7_SECTION08_SOURCE_QUALIFICATION", JSON.stringify({ applied: true, retainedCitations: ids }));
+    }
+  }
+}
+
+// Keep the model's six earned dimension values intact, but make the published
+// confidence total arithmetically consistent with those values and the UI score.
+if (loopLevel === 7) {
+  const confidenceDimensionKeys = [
+    "source provenance",
+    "relevance and specificity",
+    "independent corroboration",
+    "recency and temporal depth",
+    "investigation coverage",
+    "interpretive reliability"
+  ];
+  const confidenceRows = new Map();
+  for (const line of String(reply || "").split("\n")) {
+    const lowerLine = line.toLowerCase();
+    const dimension = confidenceDimensionKeys.find(key => lowerLine.includes(key));
+    if (!dimension || confidenceRows.has(dimension)) continue;
+    const cells = line.split("|").map(cell => cell.trim()).filter(Boolean);
+    const earned = Number(cells[1]);
+    const maximum = Number(cells[2]);
+    if (Number.isInteger(earned) && Number.isInteger(maximum) && maximum >= 0 && earned >= 0 && earned <= maximum) {
+      confidenceRows.set(dimension, { earned, maximum });
+    }
+  }
+  if (confidenceRows.size === confidenceDimensionKeys.length) {
+    const earnedTotal = [...confidenceRows.values()].reduce((sum, row) => sum + row.earned, 0);
+    const maximumTotal = [...confidenceRows.values()].reduce((sum, row) => sum + row.maximum, 0);
+    if (maximumTotal === 100) {
+      const originalReply = String(reply || "");
+      let reconciledReply = originalReply.replace(
+        /^(\s*\|?\s*Total\s*\|\s*)\d+(\s*\|\s*)\d+(\s*\|?.*)$/im,
+        (_match, left, middle, right) => `${left}${earnedTotal}${middle}${maximumTotal}${right}`
+      );
+      reconciledReply = reconciledReply.replace(
+        /((?:overall\s+)?Confidence\s+Score\s*[:—-]\s*)\d{1,3}(\s*\/\s*100)/gi,
+        (_match, prefix, suffix) => `${prefix}${earnedTotal}${suffix}`
+      );
+      reply = reconciledReply;
+      console.log("LOOP7_CONFIDENCE_ARITHMETIC_AUDIT", JSON.stringify({
+        dimensionCount: confidenceRows.size,
+        earnedDimensionTotal: earnedTotal,
+        maximumDimensionTotal: maximumTotal,
+        scoreTextChanged: reconciledReply !== originalReply,
+        originalScoreText: (originalReply.match(/(?:overall\s+)?Confidence\s+Score\s*[:—-]\s*\d{1,3}\s*\/\s*100/i) || [])[0] || null
+      }));
+    } else {
+      console.warn("LOOP7_CONFIDENCE_ARITHMETIC_SKIPPED", JSON.stringify({
+        reason: "dimension_maxima_do_not_sum_to_100",
+        dimensionMaximumTotal: maximumTotal
+      }));
+    }
+  } else {
+    console.log("LOOP7_CONFIDENCE_ARITHMETIC_SKIPPED", JSON.stringify({
+      reason: "all_six_confidence_rows_not_found",
+      foundDimensions: [...confidenceRows.keys()]
+    }));
+  }
+}
 
 /* ==========================================
    LOOP 7 REPORT PAYLOAD
@@ -2935,7 +3510,12 @@ analysis = lines.slice(0,-1).join("\n").trim();
 }
     console.log(
   "FINAL_RESPONSE",
-  JSON.stringify(response, null, 2)
+  JSON.stringify({
+    loop: loopLevel,
+    provider: loopLevel === 7 ? selectedLoop7Provider : "groq",
+    hasReply: !!String(data?.choices?.[0]?.message?.content || "").trim(),
+    replyChars: String(data?.choices?.[0]?.message?.content || "").length
+  })
 );
 console.log("FINAL RETURN REACHED");
 
@@ -3062,24 +3642,21 @@ const finalPayload = {
 
   ...(loopLevel === 7
     ? {
-        evidenceRegistry: finalEvidenceRegistry,
-        loop7EvidenceRegistry: finalEvidenceRegistry,
-        evidenceSourceRegistry: finalEvidenceRegistry,
-        evidenceSourceIndex: finalEvidenceRegistry.map(({
-          sourceId, sourceType, title, url, date, publishedDate, collectedAt, evidenceStream, pageCategory
-        }) => ({
-          sourceId,
-          sourceType,
-          title,
-          url,
-          date,
-          publishedDate: publishedDate || null,
-          collectedAt: collectedAt || null,
-          evidenceStream: evidenceStream || null,
-          pageCategory: pageCategory || null
+        // Send one compact canonical registry. The previous response repeated
+        // the same registry under three compatibility aliases plus another
+        // projected array, multiplying the size of the final SSE frame.
+        evidenceRegistry: finalEvidenceRegistry.map(source => ({
+          sourceId: String(source?.sourceId || ""),
+          sourceType: String(source?.sourceType || ""),
+          title: String(source?.title || ""),
+          url: String(source?.url || ""),
+          date: source?.date || null,
+          publishedDate: source?.publishedDate || source?.publishedAt || source?.datePublished || null,
+          collectedAt: source?.collectedAt || source?.fetchTimestamp || null,
+          evidenceStream: source?.evidenceStream || null,
+          pageCategory: source?.pageCategory || null
         })),
-        evidenceRegistryCount:
-          finalEvidenceRegistry.length
+        evidenceRegistryCount: finalEvidenceRegistry.length
       }
     : {}),
 
@@ -3103,27 +3680,54 @@ const finalPayload = {
 };
 
 if (loop7StreamStarted) {
-  const finalWriteAccepted = sendLoop7Progress({
+  // The registry is sent once in the earlier compression progress event.
+  // The browser preserves that in-memory registry when the terminal event
+  // contains only evidenceRegistryCount. Keep the full registry on the
+  // non-streaming JSON response below for backward compatibility.
+  const {
+    evidenceRegistry: _streamOmittedEvidenceRegistry,
+    ...streamFinalPayload
+  } = finalPayload;
+  const streamFinalEvent = {
     type: "final",
     final: true,
-    ...finalPayload
-  });
+    ...streamFinalPayload,
+    evidenceRegistryCount: finalEvidenceRegistry.length
+  };
+  const finalWriteAccepted = sendLoop7Progress(streamFinalEvent);
   console.log(
    "LOOP7_FINAL_STREAM_SENT",
    JSON.stringify({
       final: true,
-      replyChars: (finalPayload.reply || "").length,
-      serverWriteAccepted: finalWriteAccepted,
+      replyChars: (streamFinalPayload.reply || "").length,
+      registryCount: finalEvidenceRegistry.length,
+      registryIncludedInFinal: false,
+      finalFrameBytes: Buffer.byteLength(JSON.stringify(streamFinalEvent), "utf8"),
+      serverWriteQueued: finalWriteAccepted,
+      backpressurePending: loop7StreamPendingDrain || res.writableNeedDrain === true,
       clientDisconnected: loop7ClientDisconnected,
       streamWriteFailure: loop7StreamWriteFailure
    })
   );
-  endLoop7ProgressStream();
+  await endLoop7ProgressStream();
   return;
 }
 
 if (loopAiFallbackUsed) {
   finalPayload.aiFallbackUsed = true;
+}
+
+if (loopLevel === 7) {
+  console.log("LOOP7_JSON_FINAL_RESPONSE_READY", JSON.stringify({
+    provider: selectedLoop7Provider,
+    hasReply: !!String(finalPayload.reply || "").trim(),
+    replyChars: String(finalPayload.reply || "").length,
+    evidenceRegistryCount: Array.isArray(finalPayload.evidenceRegistry)
+      ? finalPayload.evidenceRegistry.length
+      : 0,
+    expectedSections: 8,
+    transport: "application/json"
+  }));
 }
 
 return res.status(200).json(finalPayload);
@@ -3145,7 +3749,7 @@ return res.status(200).json(finalPayload);
         error: error?.message || String(error),
         stage: "SERVER_CRASH"
       });
-      endLoop7ProgressStream();
+      await endLoop7ProgressStream();
       return;
     }
 
