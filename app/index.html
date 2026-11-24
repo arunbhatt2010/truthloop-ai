@@ -715,7 +715,7 @@ box-shadow:
 #paywallBox .tl-strategic-free-finding{margin:14px 0 16px;padding:14px;border:1px solid rgba(52,211,153,.28);border-radius:13px;background:linear-gradient(145deg,rgba(16,185,129,.075),rgba(59,130,246,.045));text-align:left;}
 #paywallBox .tl-strategic-free-finding-label{font-size:10px;font-weight:900;letter-spacing:1px;color:#6ee7b7;margin-bottom:7px;}
 #paywallBox .tl-strategic-free-finding-title{font-size:14px;font-weight:900;line-height:1.4;color:#f8fafc;margin:0 0 9px;}
-#paywallBox .tl-strategic-free-finding-body{font-size:12px;line-height:1.65;color:#e2e8f0;overflow-wrap:anywhere;} #paywallBox .tl-paywall-finding-sources{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 4px;padding-top:9px;border-top:1px solid rgba(148,163,184,.18);text-align:left;} #paywallBox .tl-paywall-finding-sources-label{width:100%;font-size:9px;font-weight:850;letter-spacing:.9px;color:#94a3b8;} #paywallBox .tl-paywall-finding-sources-empty{font-size:10px;line-height:1.45;color:#fbbf24;}
+#paywallBox .tl-strategic-free-finding-body{font-size:12px;line-height:1.65;color:#e2e8f0;overflow-wrap:anywhere;} #paywallBox .tl-paywall-finding-sources{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;margin:10px 0 4px;padding-top:9px;border-top:1px solid rgba(148,163,184,.18);text-align:left;white-space:nowrap;overflow-x:auto;}
 /* Allow visitors to select and copy the investigation finding preview. */
 #paywallBox .tl-strategic-free-finding-body,
 #paywallBox .tl-strategic-free-finding-body *{user-select:text !important;-webkit-user-select:text !important;-webkit-touch-callout:default;}
@@ -5189,26 +5189,27 @@ function selectPaywallFreeFinding(reportText){
   ];
   const parsed = parseLoop7ReportSections(reportText, sections);
 
-  // A candidate must contain substantive analysis plus evidence anchors and
-  // section-specific analytical signals. This avoids treating generic copy as an Aha finding.
+  // Only these sections may supply the free finding. The order is intentional:
+  // 05 → 06 → 07 → 03 → 04. Never fall back to an unrelated section.
   const criteria = {
     4: /independent|corroborat|third[- ]party|not independently|self[- ]published|unverified|validation|relationship|partner|not found|supporting evidence/gi,
     5: /over time|historical|evolution|consistent|consistency|contradict|inconsisten|dated|timeline|shift|trend|not provided|no material/gi,
     6: /risk|limitation|not found|complaint|dispute|regulatory|security|accountab|reliance|self[- ]reported|unverified|not independently/gi,
-    3: /capability|execution|demonstrat|technical|implementation|deployment|architecture|operational|documented|evidence/gi,
-    2: /action|track record|dated|contribution|release|delivered|published|milestone|evidence|not found/gi
+    2: /action|track record|dated|contribution|release|delivered|published|milestone|evidence|not found/gi,
+    3: /capability|execution|demonstrat|technical|implementation|deployment|architecture|operational|documented|evidence/gi
   };
-  const priority = [4,5,6,3,2]; // Sections 5, 6, 7, 4, 3 in the requested order.
+  const priority = [4,5,6,2,3];
   const countMatches = (text, regex) => (String(text || '').match(regex) || []).length;
   const isAhaCandidate = (body, sectionIndex) => {
     const text = String(body || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     if(text.length < 180) return false;
-    const sourceRefs = new Set((text.match(/SOURCE_\d{1,3}/gi) || []).map(x => x.toUpperCase()));
+    const sourceRefs = new Set((text.match(/\bSOURCE_\d{1,3}\b/gi) || []).map(x => x.toUpperCase()));
     const signalCount = countMatches(text, criteria[sectionIndex]);
     const hasEvidenceAnchor = sourceRefs.size >= 1 || /https?:\/\/|dated evidence|public record|source reference/i.test(text);
     return hasEvidenceAnchor && signalCount >= 3;
   };
 
+  // First take the strongest qualifying section in the requested priority order.
   for(const index of priority){
     const body = parsed.bodies[index] || '';
     if(isAhaCandidate(body, index)){
@@ -5216,10 +5217,13 @@ function selectPaywallFreeFinding(reportText){
     }
   }
 
-  // Section 1 is the only permitted final fallback; never invent a substitute.
-  const fallbackBody = parsed.bodies[0] || '';
-  if(fallbackBody.trim()){
-    return {index:0, title:sections[0].title, body:fallbackBody, fallback:true};
+  // If none meets the Aha threshold, use the first non-empty section from the
+  // same permitted priority list. This is a real report finding, not invented copy.
+  for(const index of priority){
+    const body = parsed.bodies[index] || '';
+    if(body.trim()){
+      return {index, title:sections[index].title, body, fallback:true};
+    }
   }
   return null;
 }
@@ -5227,29 +5231,45 @@ function selectPaywallFreeFinding(reportText){
 function renderPaywallFreeFinding(reportText){
   const selected = selectPaywallFreeFinding(reportText);
   if(!selected) return '';
-  const safeBody = decorateLoop7Citations(
-    escapeHtml(String(selected.body || ''))
-      .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\n/g, '<br>')
-  );
+
+  const rawFinding = String(selected.body || '');
   const citedIds = [...new Set(
-    (String(selected.body || '').match(/SOURCE_\\d{1,3}/gi) || [])
-      .map(id => id.toUpperCase())
+    (rawFinding.match(/\bSOURCE_(\d{1,3})\b/gi) || [])
+      .map(id => {
+        const digits = id.match(/\d{1,3}/)?.[0] || '';
+        return digits ? `SOURCE_${digits.padStart(2, '0')}` : '';
+      })
+      .filter(Boolean)
   )];
   const validSources = citedIds
     .map(id => getLoop7EvidenceSource(id))
     .filter(source => source && source.url);
+
+  // Keep source IDs out of the finding text; render their clickable references
+  // together underneath it, in one horizontal row.
+  const findingWithoutSourceIds = rawFinding
+    .replace(/\s*\[?SOURCE_\d{1,3}\]?\s*/gi, ' ')
+    .replace(/\s+([,.;:])/g, '$1')
+    .replace(/([,;:])\s*([,;:])/g, '$1')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+
+  const safeBody = escapeHtml(findingWithoutSourceIds)
+    .replace(/\[\[highlight\]\]([\s\S]*?)\[\[end\]\]/gi, '<span class="truthHighlight">$1</span>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+
   const sourceLinksHtml = validSources.length
-    ? `<div class="tl-paywall-finding-sources"><div class="tl-paywall-finding-sources-label">SUPPORTING SOURCES</div>${validSources.map(source => `<button type="button" class="tlr-citation" data-source-id="${escapeHtml(source.sourceId)}" title="${escapeHtml(source.title || source.url)}">${escapeHtml(source.sourceId)}</button>`).join(" ")}</div>`
-    : `<div class="tl-paywall-finding-sources tl-paywall-finding-sources-empty">No valid supporting Source IDs were returned for this finding.</div>`;
+    ? `<div class="tl-paywall-finding-sources" aria-label="Supporting source links">${validSources.map(source => `<button type="button" class="tlr-citation" data-source-id="${escapeHtml(source.sourceId)}" title="${escapeHtml(source.title || source.url)}">${escapeHtml(source.sourceId)}</button>`).join('')}</div>`
+    : '';
+
   return `<section class="tl-strategic-free-finding">
     <div class="tl-strategic-free-finding-label">INVESTIGATION FINDING PREVIEW</div>
     <h3 class="tl-strategic-free-finding-title">${escapeHtml(selected.title)}</h3>
     <div class="tl-strategic-free-finding-body">${safeBody}</div>
     ${sourceLinksHtml}
-    <div class="tl-strategic-free-finding-note">${selected.fallback ? 'This is the available first-section preview from your investigation.' : 'This evidence-led finding is included in your complete report. Unlock the full report to explore all eight sections and the complete source analysis.'}</div>
+    <div class="tl-strategic-free-finding-note">This evidence-led finding is included in your complete report. Unlock the full report to explore all eight sections and the complete source analysis.</div>
   </section>`;
 }
 
