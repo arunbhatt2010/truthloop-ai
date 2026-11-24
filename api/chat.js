@@ -4,6 +4,24 @@ import { loadEvidenceCompressionBrain }
 from "./EvidenceCompressionBrain.js";
 import { loadCrossEvidenceBrain }
 from "./CrossEvidenceBrain.js";
+
+// Best-effort per-instance cooldown keyed only by normalized website URL.
+// Applies only to Direct Report and final Loop 7 report requests (loopLevel 7).
+const TL_REPORT_COOLDOWN_MS = 5 * 60 * 1000;
+const tlReportCooldowns = new Map();
+
+function normalizeTlReportUrl(value) {
+  try {
+    const parsed = new URL(String(value || "").trim());
+    parsed.hash = "";
+    parsed.search = "";
+    parsed.hostname = parsed.hostname.toLowerCase();
+    parsed.pathname = parsed.pathname.replace(/\/+$/, "") || "/";
+    return parsed.toString().replace(/\/$/, "");
+  } catch (_) {
+    return String(value || "").trim().replace(/[?#].*$/, "").replace(/\/+$/, "").toLowerCase();
+  }
+}
 export default async function handler(req, res) {
 
   /* =========================
@@ -123,6 +141,41 @@ Use this report as the public-evidence foundation for this conversation. Ground 
     const reportMode = String(requestedReportMode || "conversation").toLowerCase() === "direct"
       ? "direct"
       : "conversation";
+
+    // Protect only the two expensive report-generation paths. Ordinary Loop 1-6
+    // conversation requests are deliberately excluded. The lock is keyed ONLY
+    // by normalized website URL; IP, User-Agent, user/session and report mode
+    // do not affect this website-level cooldown.
+    if (loopLevel === 7 && (reportMode === "direct" || reportMode === "conversation") && profileLink) {
+      const normalizedReportUrl = normalizeTlReportUrl(profileLink);
+      const cooldownKey = normalizedReportUrl;
+      const now = Date.now();
+
+      // Opportunistically clear expired entries to keep the map bounded.
+      for (const [key, startedAt] of tlReportCooldowns) {
+        if (now - startedAt >= TL_REPORT_COOLDOWN_MS) tlReportCooldowns.delete(key);
+      }
+
+      const previousStartedAt = tlReportCooldowns.get(cooldownKey);
+      if (Number.isFinite(previousStartedAt) && now - previousStartedAt < TL_REPORT_COOLDOWN_MS) {
+        const retryAfterSeconds = Math.max(1, Math.ceil((TL_REPORT_COOLDOWN_MS - (now - previousStartedAt)) / 1000));
+        console.warn("TL_REPORT_COOLDOWN_BLOCKED", JSON.stringify({
+          loopLevel, reportMode, requestedUrl: normalizedReportUrl, retryAfterSeconds
+        }));
+        return res.setHeader("Retry-After", String(retryAfterSeconds)).status(429).json({
+          reply: "A report for this website was already requested recently. Please wait a few minutes before trying again.",
+          duplicateReportRequest: true,
+          retryAfterSeconds
+        });
+      }
+
+      // Start the five-minute window on the first accepted request.
+      tlReportCooldowns.set(cooldownKey, now);
+      console.info("TL_REPORT_COOLDOWN_ACCEPTED", JSON.stringify({
+        loopLevel, reportMode, requestedUrl: normalizedReportUrl
+      }));
+    }
+
     if (!Array.isArray(messages)) messages = [];
     if (!messages.length && !(loopLevel === 7 && reportMode === "direct" && profileLink)) {
       return res.status(400).json({ reply: "No input provided" });
