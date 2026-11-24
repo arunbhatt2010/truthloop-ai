@@ -1,5 +1,5 @@
 /* =========================================================
-   EVIDENCE COMPRESSION BRAIN v28.1 — SOURCE TRACEABILITY + PUBLISHED-DATE PRESERVATION
+   EVIDENCE COMPRESSION BRAIN v28.2 — PUBLIC-WEB PROVENANCE PRESERVATION
    TruthLoop AI
 
    CONTRACT — downstream names intentionally preserved:
@@ -1124,6 +1124,25 @@ async function loadEvidenceCompressionBrain({
     reddit: { enabled: false, accepted: false }
   }));
 
+  const publicWebSourcesSelected = websiteSourcesInput.filter(source =>
+    source?.sourceRole === "external_public_web" ||
+    source?.discoveryOrigin === "public_web_search"
+  );
+  const publicWebSourcesAvailable = websiteInput.filter(source =>
+    source?.sourceRole === "external_public_web" ||
+    source?.discoveryOrigin === "public_web_search"
+  );
+
+  console.log("ECB_PUBLIC_WEB_SOURCE_AUDIT", JSON.stringify({
+    available: publicWebSourcesAvailable.length,
+    selected: publicWebSourcesSelected.length,
+    omittedBySelectionLimit: Math.max(0, publicWebSourcesAvailable.length - publicWebSourcesSelected.length),
+    providers: [...new Set(publicWebSourcesSelected.map(source => source.discoveryProvider || source.searchProvider).filter(Boolean))],
+    domains: [...new Set(publicWebSourcesSelected.map(source => source.sourceDomain).filter(Boolean))],
+    rejectionByDomain: false,
+    provenancePreserved: true
+  }));
+
   console.log(
     "ECB_SELECTION_AUDIT",
     JSON.stringify({
@@ -1615,7 +1634,16 @@ async function loadEvidenceCompressionBrain({
       topicEvidenceStatus: source.topicEvidenceStatus || null,
       topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
       sourceDomain: source.sourceDomain || null,
-      sourceIndependence: source.sourceIndependence || null
+      sourceIndependence: source.sourceIndependence || null,
+      // Preserve public-web discovery provenance through ECB. Domain is
+      // descriptive metadata only; it is never a rejection criterion.
+      sourceRole: source.sourceRole || null,
+      discoveryOrigin: source.discoveryOrigin || null,
+      discoveryProvider: source.discoveryProvider || source.searchProvider || null,
+      discoveryQuery: source.discoveryQuery || source.searchQuery || null,
+      discoveryUrl: source.discoveryUrl || source.searchResultUrl || null,
+      independenceStatus: source.independenceStatus || null,
+      duplicateCheck: source.duplicateCheck || null
     });
   }
 
@@ -1815,7 +1843,14 @@ async function loadEvidenceCompressionBrain({
       topicEvidenceStatus: source.topicEvidenceStatus || null,
       topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
       sourceDomain: source.sourceDomain || null,
-      sourceIndependence: source.sourceIndependence || null
+      sourceIndependence: source.sourceIndependence || null,
+      sourceRole: source.sourceRole || null,
+      discoveryOrigin: source.discoveryOrigin || null,
+      discoveryProvider: source.discoveryProvider || null,
+      discoveryQuery: source.discoveryQuery || null,
+      discoveryUrl: source.discoveryUrl || null,
+      independenceStatus: source.independenceStatus || null,
+      duplicateCheck: source.duplicateCheck || null
     }));
 
     const website = websiteSources.map((source, index) => {
@@ -1849,6 +1884,13 @@ async function loadEvidenceCompressionBrain({
         topicEvidenceSignals: Array.isArray(source.topicEvidenceSignals) ? source.topicEvidenceSignals.slice(0, 8) : [],
         sourceDomain: source.sourceDomain || null,
         sourceIndependence: source.sourceIndependence || null,
+        sourceRole: source.sourceRole || null,
+        discoveryOrigin: source.discoveryOrigin || null,
+        discoveryProvider: source.discoveryProvider || source.searchProvider || null,
+        discoveryQuery: source.discoveryQuery || source.searchQuery || null,
+        discoveryUrl: source.discoveryUrl || source.searchResultUrl || null,
+        independenceStatus: source.independenceStatus || null,
+        duplicateCheck: source.duplicateCheck || null,
         metadata: source.metadata ?? null,
         structuredData: source.structuredData ?? null
       };
@@ -2069,8 +2111,11 @@ const redditPostsCompact = buildSocialPostCompact(redditPosts, "reddit", MAX_RED
       evidenceConfidence,
       crossEvidenceIntelligence:
         universalPackage?.crossEvidenceIntelligence || null,
+      publicWebSearch: universalPackage?.websiteEvidence?.publicWebSearch || universalPackage?.websiteEvidence?.webSearchDiscovery || {},
       evidenceCoverage: {
         websiteSourcesRetained: website.length,
+        publicWebSourcesAvailable: publicWebSourcesAvailable.length,
+        publicWebSourcesRetained: website.filter(source => source?.sourceRole === "external_public_web" || source?.discoveryOrigin === "public_web_search").length,
         pcfWebsiteSourcesRetained: website.length,
         pcfWebsitePagesAvailable: websitePageSelection.available,
         pcfWebsitePagesOmitted: websitePageSelection.omitted,
