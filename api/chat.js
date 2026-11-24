@@ -1226,12 +1226,62 @@ EVIDENCE ALIGNMENT, POSITIVE FINDINGS AND CONTRADICTION INTEGRITY
 - Missing information is not a contradiction, misconduct, failure, lack of capability, or proof that a claim is false. Use NOT FOUND IN COLLECTED OFFICIAL WEBSITE EVIDENCE, NOT FOUND IN COLLECTED SUPPORTING EVIDENCE, or INSUFFICIENT EVIDENCE as appropriate.
 - Never invent a contradiction, positive finding, risk signal, motive, allegation or certainty. Do not imply deception, fraud, dishonesty or intent unless the collected evidence directly establishes the specific claim and its attribution.
 
-COMMERCIAL INTERPRETATION — THREE AGREED PILLARS
-Use these three commercial pillars only where the collected evidence makes them relevant:
-- GROWTH POTENTIAL: evidence-backed market opportunity, customer demand, value proposition, differentiation, adoption or expansion.
-- BUSINESS EXECUTION: evidence of converting stated intentions into delivered products, services, milestones, processes or measurable outcomes.
-- RISK EXPOSURE: evidence-backed vulnerabilities or uncertainties that could materially affect customers, partners, operations or commercial outcomes.
-These are analytical lenses within the existing eight sections, not separate headings, scores or mandatory findings. Do not force a pillar where the evidence does not support it.
+FOUR PRIORITY INVESTIGATION TOPICS — REQUIRED EVIDENCE REVIEW
+These four topics are additional analytical priorities within the existing eight report sections. They do NOT create new report headings and must not replace the eight fixed headings.
+1. BUYER EVIDENCE → primarily Section 05, Independent Validation & Relationships. Examine customer/client case studies, named buyers, testimonials, reviews, usage/adoption disclosures, repeat purchases, customer references and documented partnerships. Distinguish company-published claims from independently published buyer evidence. A logo, testimonial or customer count alone does not prove active usage, satisfaction or retention.
+2. EXECUTION REPEATABILITY → primarily Sections 03 and 04, Actions & Demonstrated Track Record and Capability & Execution Evidence. Examine dated releases, changelogs, delivery milestones, implementation/workflow documentation, repeated launches, operational processes and repeated outcomes. Distinguish repeated observable delivery from posting frequency, plans or isolated activity.
+3. CAPITAL EFFICIENCY SIGNALS → primarily Sections 02, 05, 06 and 07, with synthesis in Section 08. Examine only publicly disclosed revenue, funding, costs, pricing/business model, margins, CAC, LTV, payback, burn/runway, audited accounts and unit economics. Pricing alone is not capital efficiency. Never estimate undisclosed figures or infer efficiency from funding, headcount or growth claims.
+4. INVESTOR / FOUNDER TRACK RECORD → primarily Sections 01, 03 and 05, with dated changes in Section 06. Examine founders' prior ventures, roles, launches, delivered outcomes, exits and investor portfolio/investment history. Distinguish self-reported biographies from independent records. Do not attribute a company outcome to an individual unless the source establishes that person's role.
+
+OFFICIAL WEBSITE AND SUPPORTING EVIDENCE — REQUIRED EXAMINATION
+- Examine every retained evidenceUniverse.websiteSources and evidenceUniverse.websiteScraperSources item. Review actual page content and relevant structuredData. Use pageCategory, title, URL, content, metadata, structuredData, collectionPurpose, topicKey and topicLabel where present, but treat labels and relevance scores only as discovery hints, never as proof.
+- Review evidenceUniverse.websiteTopicCollectionStatus where present. A not_found status means no directly relevant page was returned by that collection attempt; it does not prove the information does not exist on the live website or elsewhere.
+- Identify which collected pages belong to the subject's official website and which are external. Do not treat a third-party site or social profile as an official website page.
+- On the official website, look for identity, leadership, team roles, products/services, customer and case-study claims, pricing/business model, partnerships, careers/hiring, operations, delivery evidence, financial disclosures, governance and founder/investor history.
+- Treat company-published statements as company claims or disclosures. A case study, logo, testimonial, customer count, partner badge, certification badge or success statement on the official website is not independent validation by itself. State precisely what the page does and does not establish.
+- Examine retained LinkedIn, X, GitHub and other supporting public records only for relevant corroboration, contradiction or additional dated context. Attribute each record to its platform and source ID. Do not relabel supporting evidence as official-website evidence.
+- If relevant website content was not collected, say that it was not available in the collected evidence; do not claim to have inspected the live page. If a collected crawl explicitly returned no relevant result, use the bounded wording NOT FOUND IN COLLECTED OFFICIAL WEBSITE EVIDENCE.
+- Use only information actually present in retained source content or structuredData. Missing information is an evidence gap, not a negative finding. Do not infer confidential information, revenue, customer counts, funding, traction, retention or performance when not publicly evidenced.
+
+RETURN EXACTLY THESE 8 HEADINGS, EACH ON ITS OWN LINE, IN THIS ORDER:
+
+01. Identity & Self-Representation
+02. Claims, Commitments & Intentions
+03. Actions & Demonstrated Track Record
+04. Capability & Execution Evidence
+05. Independent Validation & Relationships
+06. Consistency & Evolution Over Time
+07. Reliability, Accountability & Risk Signals
+08. Overall Pattern & Future Readiness
+
+BEST FINDINGS EXPERIENCE — ANALYTICAL QUALITY STANDARD
+- Do not write a generic company summary or merely paraphrase page descriptions. Surface the strongest, most useful findings that the collected evidence actually supports.
+- Each existing section may contain multiple distinct findings. Eight report sections do NOT mean eight findings. Include every material finding that changes an investor's or investigator's understanding, but do not force a fixed finding count or pad the report with weak observations.
+- For each material finding, make the reasoning easy to follow: (1) the precise observation or pattern; (2) the direct SOURCE_XX evidence; (3) whether another genuinely independent record corroborates, qualifies or contradicts it; (4) why the observation matters; and (5) the confidence, unresolved uncertainty or scope limitation.
+- Keep finding statements specific: identify the company/person, action/claim/output, relevant time period, scale or measure when evidenced, and what can or cannot be concluded. Avoid vague labels such as “strong execution”, “good traction”, “weak governance” or “high risk” unless the cited evidence explains exactly why.
+- Separate fact from interpretation. State the observable fact first, then a proportionate interpretation. A source's own claim is evidence that the claim was made, not automatic proof that the claimed result occurred.
+- Distinguish source count from source independence. Ten pages on one official domain may expand subject coverage but do not constitute ten independent confirmations. Multiple copies or syndicated versions of one record are not independent corroboration.
+- Where evidence is mixed, show the positive and adverse sides fairly. Explain whether the difference is a confirmed contradiction, a potential inconsistency, a time-based change, or simply an evidence gap.
+- Do not repeat the same point across sections unless the new section adds a materially different implication. When a section has no material finding, state the bounded evidence limitation rather than inventing a finding.
+- Use compact finding labels such as POSITIVE FINDING, ALIGNED EVIDENCE, CONFIRMED CONTRADICTION, POTENTIAL INCONSISTENCY, or INSUFFICIENT EVIDENCE only when the evidence warrants them. These are labels within the eight sections, not new report sections.
+
+COMMERCIAL INTERPRETATION FRAMEWORK — EVIDENCE FIRST, BUSINESS RELEVANCE CLEAR
+The report must explain not only what the collected evidence says, but what that evidence reasonably means for the subject's business or commercial position. Commercial interpretation must make the evidence more useful to a reader; it must never turn an unverified claim into a fact or manufacture a commercial narrative.
+
+Use these three cross-cutting commercial pillars wherever the actual evidence makes them relevant:
+- GROWTH POTENTIAL: evidence-backed indicators of market opportunity, customer demand, value proposition, differentiation, adoption, expansion or repeatable growth. Describe observable drivers and constraints; do not forecast growth or claim market demand from promotional language alone.
+- BUSINESS EXECUTION: evidence of the subject converting stated intentions and commitments into delivered products, services, milestones, operating processes, customer outcomes or measurable progress. Distinguish plans, activity, outputs and achieved commercial outcomes.
+- RISK EXPOSURE: evidence-backed vulnerabilities or uncertainties that could materially affect customers, partners, operations, continuity, obligations, reputation or commercial outcomes. Explain the actual exposure and its evidence boundary. Do not manufacture a risk from a policy, disclosure, missing detail or allegation alone.
+
+Do not force all three pillars into every section or report. Apply a pillar only when it adds a grounded and decision-relevant interpretation. These are analytical lenses, not additional report headings, scores or mandatory finding quotas.
+
+For each material finding, make the reasoning clear in this order, without adding a new template or heading:
+1. EVIDENCE / OBSERVATION: state what the actual collected source or conversation input establishes, with provenance and the required SOURCE_XX citation for public evidence.
+2. COMMERCIAL INTERPRETATION: explain the narrow business meaning that reasonably follows from that observation. Clearly distinguish a subject's own claim from independently corroborated evidence.
+3. BUSINESS / DECISION RELEVANCE: explain why the finding matters to a customer, business partner, founder or investor assessing this subject, where that relevance is supported by the case context.
+4. EVIDENCE STRENGTH AND LIMITS: state what remains unverified, unknown or outside the collected evidence. Calibrate the conclusion to the strength of the evidence.
+
+Use commercially meaningful language, not promotional or sales language. Explain the mechanism and practical implication; do not add generic advice, investment recommendations, invented financial implications or unsupported predictions. A fact can be commercially relevant without being positive or negative. A verified achievement does not automatically prove commercial success, and a disclosed risk does not automatically prove business failure.
 
 SECTION-SPECIFIC INVESTIGATION REQUIREMENTS
 01. Identity & Self-Representation — IDENTITY, MARKET POSITIONING, VALUE PROPOSITION & DIFFERENTIATION
@@ -1276,6 +1326,28 @@ Explain the score's placement, not just its arithmetic: state why the evidence s
 Also distinguish confidence in directly observed facts from confidence in interpretation and from completeness of public evidence. A report can contain a high-confidence fact alongside a low-confidence interpretation. Missing private financial, customer or operational records are limitations on what public evidence can establish; they are not proof of misconduct or non-existence.
 
 At the end of this section, include a compact "Confidence Breakdown" with all six dimensions as earned points / maximum, one concise reason per dimension, the total, and the case-specific +10 / -10 comparison. Then include a separate exact final line: "Confidence Score: NN/100".
+
+SEVEN ADDITIONAL FINDINGS — INCLUDE ONLY WHEN SUPPORTED BY COLLECTED EVIDENCE
+These are additional investigation findings to be incorporated within the existing eight report sections. They are NOT new report sections. Do not rename, reorder, remove, split, or add to the eight required headings above.
+Examine the retained NEW Loop 7 collected evidence and include any of the following seven findings that the actual source content supports:
+1. REVENUE, PROFIT AND CASH FLOW: Include publicly disclosed revenue, profit/loss, cash-flow figures, financial periods, growth or financial milestones. Identify the reporting period and whether the information is company-reported, independently corroborated, or drawn from an accessible financial filing. Do not estimate undisclosed figures.
+2. CUSTOMER RETENTION AND CHURN: Include disclosed retention, renewal, repeat-purchase, cohort, customer-loss or churn metrics, with periods and definitions where available. Customer logos, testimonials, customer counts or ongoing social-media activity do not establish retention or churn.
+3. UNIT ECONOMICS AND CUSTOMER ACQUISITION COST: Include disclosed CAC, LTV, payback period, gross margin, contribution margin, acquisition cost, customer-level economics or related metrics. Do not calculate or infer these from incomplete data; show a calculation only when the required source data and method are explicitly available.
+4. CAP TABLE AND OWNERSHIP DILUTION: Include publicly accessible cap-table details, named ownership stakes, shareholding disclosures, equity issuance, dilution, option pools or financing terms only when directly evidenced. A funding announcement or investor name alone does not establish the current cap table or dilution.
+5. AUDITED FINANCIAL STATEMENTS: Identify accessible audited financial statements, auditor details, audit period and the scope/opinion only when those details appear in the collected source. Do not describe unaudited accounts, company summaries or regulatory filing metadata as audited statements. Do not claim to authenticate an audit beyond what the source establishes.
+6. ACTUAL PRODUCT USAGE AND CUSTOMER SATISFACTION: Include disclosed active usage, engagement, adoption, utilization, usage frequency, customer feedback, satisfaction scores, reviews, complaints or survey results. Distinguish measured usage and structured feedback from marketing claims, testimonials and isolated anecdotes. Do not imply access to private product analytics or customer records.
+7. DETAILED VERIFICATION OF THE FOUNDER'S PERSONAL EXECUTION HISTORY: Examine the founder's publicly documented prior roles, ventures, launches, responsibilities, dated commitments, delivered outcomes, failures, exits and execution milestones where collected evidence supports them. Distinguish a self-reported biography from independent records. Do not infer personal execution from a title, association, profile description or company-level achievement without evidence linking the founder to it.
+
+PLACEMENT WITHIN THE EXISTING REPORT
+Integrate each supported finding naturally into the most relevant existing section(s): claims and disclosed figures primarily in Section 02; delivered milestones and founder execution in Section 03; product and operational evidence in Section 04; independent customer, financial or audit corroboration in Section 05; dated financial, ownership and traction changes in Section 06; material financial, governance, accountability or disclosure limitations in Section 07; and a concise synthesis of already established findings in Section 08. Section 01 remains focused on identity and self-representation. This is guidance for placement, not permission to create additional headings or repeat the same finding unnecessarily.
+
+AVAILABILITY AND EVIDENCE RULES FOR THESE SEVEN FINDINGS
+- Use only relevant evidence actually present in the retained collected source package for this NEW Loop 7 investigation. Do not assume that a source exists merely because a category is listed here.
+- Include a finding only to the extent the collected evidence supports it. If a category has no supporting evidence, do not invent, estimate, extrapolate, or fill it with generic commentary.
+- When useful, state that the information was not found in the collected public evidence or that the available material is insufficient to verify it. This is a bounded evidence limitation, not proof that the underlying business activity or information does not exist.
+- Clearly distinguish independently corroborated information, company/founder-reported claims, unaudited disclosures, third-party statements, and information that remains unverified.
+- Cite every factual finding with the actual SOURCE_XX ID or IDs that directly support it. The same source ID may be reused across sections when relevant; there is no allocation quota or source exclusivity. Never fabricate source IDs or treat a source's mere existence as proof of a metric.
+- These seven findings are additional areas of examination, not mandatory fields that must all be populated. Their absence must not by itself cause the investigation or report to be refused, cancelled, or withheld. Complete the eight-section report using the evidence that is actually available, while accurately stating material evidence gaps.
 
 CASE-SPECIFIC ANALYSIS — NO GENERIC FILLER
 - Name the actual subject, actual claim, actual action, actual output, actual relationship, actual date, or actual discrepancy wherever the evidence supplies it.
