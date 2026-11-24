@@ -533,6 +533,7 @@ async function fetchWebsiteEvidence(primaryUrl) {
     return {
         success: true,
         sourceUrl: normalizedUrl,
+        publicWebSearch: rawPackage?.webSearchDiscovery || {},
         sources
     };
 }
@@ -3382,6 +3383,7 @@ function buildSecondarySignalFetcher({
 function buildUniversalPackage({
     primaryUrl = "",
     websiteSources = [],
+    publicWebSearch = {},
     websiteScraperSources = [],
     websiteTopicCollectionStatus = {},
     linkedinSource = null,
@@ -3559,7 +3561,10 @@ function buildUniversalPackage({
 
         websiteEvidence: {
             sources: universalWebsiteSources,
-            sourceUrls: websiteSourceUrls
+            sourceUrls: websiteSourceUrls,
+            publicWebSearch: publicWebSearch && typeof publicWebSearch === "object"
+                ? { ...publicWebSearch }
+                : {}
         },
 
         websiteScraperEvidence: {
@@ -3684,6 +3689,7 @@ export async function loadCrossEvidenceBrain({
    
     profileLinks = [],
     footprintPackage = {},
+    publicContentPackage = null,
     truthLoopPackage = {}
 } = {}) {
 
@@ -3744,6 +3750,7 @@ console.log(
      */
 
     let websiteSources = [];
+    let publicWebSearch = {};
     let websiteScraperSources = [];
     let websiteTopicCollectionStatus = {};
     let linkedinSource = null;
@@ -3813,11 +3820,20 @@ console.log(
          * Only fetch website evidence if nothing was supplied.
          */
         const suppliedWebsiteSources =
-            Array.isArray(footprintPackage?.websiteEvidence?.sources)
-                ? footprintPackage.websiteEvidence.sources
-                : Array.isArray(footprintPackage?.sources)
-                    ? footprintPackage.sources
-                    : [];
+            Array.isArray(publicContentPackage?.sources)
+                ? publicContentPackage.sources
+                : Array.isArray(footprintPackage?.websiteEvidence?.sources)
+                    ? footprintPackage.websiteEvidence.sources
+                    : Array.isArray(footprintPackage?.sources)
+                        ? footprintPackage.sources
+                        : [];
+
+        const suppliedPublicWebSearch =
+            publicContentPackage?.webSearchDiscovery && typeof publicContentPackage.webSearchDiscovery === "object"
+                ? publicContentPackage.webSearchDiscovery
+                : footprintPackage?.websiteEvidence?.publicWebSearch && typeof footprintPackage.websiteEvidence.publicWebSearch === "object"
+                    ? footprintPackage.websiteEvidence.publicWebSearch
+                    : {};
 
         if (suppliedWebsiteSources.length > 0) {
 
@@ -3863,6 +3879,7 @@ console.log(
             }
 
             websiteSources = suppliedWebsiteSources.filter(source => !source?.fetchFailure);
+            publicWebSearch = suppliedPublicWebSearch;
             if (!websiteSources.length) {
                 return buildPrimaryInvestigationFailure({
                     url: primaryUrl,
@@ -3893,6 +3910,7 @@ console.log(
 
             if (websiteResult?.success) {
                 websiteSources = websiteResult.sources || [];
+                publicWebSearch = websiteResult.publicWebSearch || {};
             } else {
                 return buildPrimaryInvestigationFailure({
                     url: primaryUrl,
@@ -4154,6 +4172,7 @@ console.log(
         buildUniversalPackage({
             primaryUrl,
             websiteSources,
+            publicWebSearch,
             websiteScraperSources,
             websiteTopicCollectionStatus,
             linkedinSource,
@@ -4185,6 +4204,8 @@ console.log(
                     .websiteEvidence
                     .sources
                     .length,
+            externalPublicWebSources: universalPackage.websiteEvidence.sources.filter(source => source?.sourceRole === "external_public_web" || source?.discoveryOrigin === "public_web_search").length,
+            publicWebSearch: universalPackage.websiteEvidence.publicWebSearch || {},
             websiteScraperSources:
                 universalPackage.websiteScraperEvidence?.sources?.length || 0,
 
