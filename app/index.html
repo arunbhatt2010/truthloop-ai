@@ -3146,6 +3146,15 @@ async function startDirectLoop7Report(profileLinkOverride = ""){
       throw new Error("The investigation returned no report content.");
     }
   }catch(error){
+    if(isTlDuplicateReportError(error)){
+      console.warn("DIRECT_LOOP7_DUPLICATE_SUPPRESSED", { retryAfterSeconds:error.retryAfterSeconds || 300 });
+      stopLoop7ReportAnimation();
+      const duplicateBox = document.getElementById("loop7Processing");
+      if(duplicateBox){
+        duplicateBox.innerHTML = `<div class="lp7-title">⏳ Investigation already requested</div><div class="lp7-sub">A report for this website has already been requested. Please wait before starting another investigation.</div>`;
+      }
+      return;
+    }
     tlReportPaywallDiagnostic("DIRECT_LOOP7_ERROR", error);
     console.error("DIRECT_LOOP7_ERROR", error);
 
@@ -3279,8 +3288,57 @@ function getLoop7FinalReportText(payload){
   return "";
 }
 
+// URL-only client guard for expensive report generation. Persists across refreshes
+// and tabs in the same browser profile. Loop 1–6 requests never use this guard.
+const TL_REPORT_CLIENT_COOLDOWN_MS = 5 * 60 * 1000;
+function normalizeTlClientReportUrl(value){
+  try{
+    const parsed = new URL(String(value || "").trim());
+    parsed.hash = "";
+    parsed.search = "";
+    parsed.hostname = parsed.hostname.toLowerCase();
+    parsed.pathname = parsed.pathname.replace(/\/+$/, "") || "/";
+    return parsed.toString().replace(/\/$/, "");
+  }catch(_){
+    return String(value || "").trim().replace(/[?#].*$/, "").replace(/\/+$/, "").toLowerCase();
+  }
+}
+function acquireTlReportClientLock(profileLink){
+  const normalizedUrl = normalizeTlClientReportUrl(profileLink);
+  if(!normalizedUrl) return { allowed:false, reason:"invalid_url" };
+  const key = "truthloop_report_cooldown_v1:" + normalizedUrl;
+  const now = Date.now();
+  try{
+    const previous = Number(localStorage.getItem(key) || 0);
+    if(previous && now - previous < TL_REPORT_CLIENT_COOLDOWN_MS){
+      return { allowed:false, retryAfterSeconds:Math.max(1, Math.ceil((TL_REPORT_CLIENT_COOLDOWN_MS - (now - previous))/1000)), key };
+    }
+    // Write synchronously before fetch so a refresh/new tab sees the lock.
+    localStorage.setItem(key, String(now));
+    return { allowed:true, key, startedAt:now };
+  }catch(storageError){
+    console.warn("TL_REPORT_CLIENT_LOCK_STORAGE_UNAVAILABLE", storageError);
+    // Keep same-page protection even when browser storage is unavailable.
+    window.__tlReportInFlightUrls = window.__tlReportInFlightUrls || new Set();
+    if(window.__tlReportInFlightUrls.has(normalizedUrl)) return { allowed:false, retryAfterSeconds:300, key:null };
+    window.__tlReportInFlightUrls.add(normalizedUrl);
+    return { allowed:true, key:null, startedAt:now, memoryOnly:true, normalizedUrl };
+  }
+}
+function isTlDuplicateReportError(error){
+  return error?.code === "TL_DUPLICATE_REPORT_COOLDOWN";
+}
+
 async function fetchLoop7Investigation(profileLink, reportMode = "conversation"){
   const directMode = reportMode === "direct";
+  const reportLock = acquireTlReportClientLock(profileLink);
+  if(!reportLock.allowed){
+    const duplicateError = new Error("A report for this website was already requested. Please wait before trying again.");
+    duplicateError.code = "TL_DUPLICATE_REPORT_COOLDOWN";
+    duplicateError.retryAfterSeconds = reportLock.retryAfterSeconds || 300;
+    console.warn("TL_REPORT_CLIENT_COOLDOWN_BLOCKED", { url:normalizeTlClientReportUrl(profileLink), retryAfterSeconds:duplicateError.retryAfterSeconds, reportMode });
+    throw duplicateError;
+  }
   const response = await fetch(API_URL,{
     method:"POST",
     headers:{
