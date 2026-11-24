@@ -5,7 +5,7 @@ from "./EvidenceCompressionBrain.js";
 import { loadCrossEvidenceBrain }
 from "./CrossEvidenceBrain.js";
 
-// Best-effort per-instance cooldown keyed only by normalized website URL.
+// Best-effort per-instance URL-only cooldown for expensive public investigation reports.
 // Applies only to Direct Report and final Loop 7 report requests (loopLevel 7).
 const TL_REPORT_COOLDOWN_MS = 5 * 60 * 1000;
 const tlReportCooldowns = new Map();
@@ -143,11 +143,11 @@ Use this report as the public-evidence foundation for this conversation. Ground 
       : "conversation";
 
     // Protect only the two expensive report-generation paths. Ordinary Loop 1-6
-    // conversation requests are deliberately excluded. The lock is keyed ONLY
-    // by normalized website URL; IP, User-Agent, user/session and report mode
-    // do not affect this website-level cooldown.
+    // conversation requests are deliberately excluded. Direct and conversation
+    // Loop 7 share the same lock for the same requester + normalized website.
     if (loopLevel === 7 && (reportMode === "direct" || reportMode === "conversation") && profileLink) {
       const normalizedReportUrl = normalizeTlReportUrl(profileLink);
+      // The requested rule is URL-only: no IP, user-agent, or requester identity.
       const cooldownKey = normalizedReportUrl;
       const now = Date.now();
 
@@ -169,7 +169,8 @@ Use this report as the public-evidence foundation for this conversation. Ground 
         });
       }
 
-      // Start the five-minute window on the first accepted request.
+      // Start the five-minute window on the first accepted request, regardless
+      // of whether generation completes early or takes the full timeout.
       tlReportCooldowns.set(cooldownKey, now);
       console.info("TL_REPORT_COOLDOWN_ACCEPTED", JSON.stringify({
         loopLevel, reportMode, requestedUrl: normalizedReportUrl
@@ -3817,6 +3818,15 @@ if (loopLevel === 7) {
     expectedSections: 8,
     transport: "application/json"
   }));
+}
+
+if (loopLevel === 7 && !String(finalPayload?.reply || finalPayload?.analysis || finalPayload?.report || "").trim()) {
+  console.error("LOOP7_FINAL_REPORT_NOT_DELIVERED", JSON.stringify({ reportMode, hasFinalPayload:!!finalPayload }));
+  return res.status(502).json({
+    reportGenerationFailed: true,
+    reply: "The investigation did not produce a complete report. No report has been delivered.",
+    retryAfterSeconds: 0
+  });
 }
 
 return res.status(200).json(finalPayload);
