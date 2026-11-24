@@ -5780,7 +5780,8 @@ async function showPaywall(){
     });
     const count = completedProcessingShell.querySelector("#loop7ProcessingSourceCount");
     if(count && Array.isArray(evidenceSourceRegistry)){
-      count.textContent = "Evidence review complete";
+      const registeredCount = new Set(evidenceSourceRegistry.map(item => String(item?.sourceId || item?.id || "").trim()).filter(Boolean)).size;
+      count.textContent = `${registeredCount} source IDs registered · Evidence review complete`;
     }
     const note = completedProcessingShell.querySelector("#loop7ProcessingLiveNote");
     if(note) note.textContent = "All eight report sections have been assembled";
@@ -6597,8 +6598,15 @@ async function detectCountry(){
   if(countryDetectionPromise) return countryDetectionPromise;
 
   countryDetectionPromise = (async function(){
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timeoutId = setTimeout(() => {
+      try{ controller?.abort(); }catch(_){}
+    }, 4500);
     try{
-      const res = await fetch("https://ipapi.co/json/", {cache:"no-store"});
+      const res = await fetch("https://ipapi.co/json/", {
+        cache:"no-store",
+        ...(controller ? {signal:controller.signal} : {})
+      });
       if(!res.ok) throw new Error("Country lookup failed: " + res.status);
       const data = await res.json();
       if(data && data.country_code){
@@ -6612,6 +6620,8 @@ async function detectCountry(){
       userCountry = "UNKNOWN";
       userCountryStatus = "unknown";
       console.warn("TRUTHLOOP_COUNTRY_DETECTION_FAILED", e);
+    }finally{
+      clearTimeout(timeoutId);
     }
     return userCountry;
   })();
