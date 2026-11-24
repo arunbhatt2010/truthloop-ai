@@ -210,13 +210,23 @@ console.log(
     let crossEvidence = null;
 
     try {
+        console.log("DFB_PCF_TO_CEB_HANDOFF", JSON.stringify({
+            pcfSuccess: publicContentPackage?.success === true,
+            pcfSourceCount: Array.isArray(publicContentPackage?.sources) ? publicContentPackage.sources.length : 0,
+            pcfExternalPublicWebSources: Array.isArray(publicContentPackage?.sources)
+                ? publicContentPackage.sources.filter(source => source?.sourceRole === "external_public_web" || source?.discoveryOrigin === "public_web_search").length
+                : 0,
+            searchCandidateCount: publicContentPackage?.webSearchDiscovery?.candidateCount || 0,
+            searchFetchedCount: publicContentPackage?.webSearchDiscovery?.fetchedSourceCount || 0
+        }));
 
         crossEvidence =
 await loadCrossEvidenceBrain({
     profileLinks:
         sourceLinks.slice(0,20),
 
-    footprintPackage
+    footprintPackage,
+    publicContentPackage
 });
     } catch (error) {
 
