@@ -1,9 +1,9 @@
 /* ============================================================
-   PUBLIC CONTENT FETCHER v6 — INVESTIGATION PAGE COVERAGE + FULL CONTENT HANDOFF
+   PUBLIC CONTENT FETCHER v7 — PUBLIC WEB DISCOVERY + FIRST-PARTY/EXTERNAL EVIDENCE
    TruthLoop Universal Public Evidence Pipeline
 
    Responsibility:
-   Fetch -> Discover -> Crawl -> Clean -> Extract -> Export
+   Fetch -> Discover -> Search -> Crawl -> Deduplicate -> Clean -> Extract -> Export
 
    Design rules:
    - No OAuth
@@ -13,8 +13,10 @@
    - No Ranking of people/entities
    - No Report Generation
    - Preserve source-backed public evidence
-   - Discover public content, public profile links and sitemaps
-   - Fetch discovered public sources, not only the initial URL
+   - Discover first-party content, public profile links and sitemaps
+   - Search the public web for external subject-related sources
+   - Fetch original pages; never treat search snippets as evidence
+   - Deduplicate external pages against first-party website content
    - Prefer visible public content over metadata-only evidence
    - Keep output compatible with CrossEvidenceBrain
    ============================================================ */
@@ -740,7 +742,8 @@ function isWebsitePostSource(source = {}, rootUrl = "") {
 
     try {
         const path = new URL(normalized).pathname.toLowerCase();
-        if (path === "/app" || path === "/app/" || path === "/" || path === "") return false;
+        const isPrimaryHost = rootNormalized && isSameHost(normalized, rootNormalized);
+        if (isPrimaryHost && (path === "/app" || path === "/app/" || path === "/" || path === "")) return false;
     } catch {}
 
     const visibleLength = Number(source?.visibleText?.length || 0);
@@ -766,6 +769,7 @@ function scoreWebsitePostSource(source = {}, rootUrl = "") {
     let score = classification.categoryPriority;
 
     if (isSameHost(url, rootUrl)) score += 20;
+    if (source?.sourceRole === "external_public_web" || source?.discoveryOrigin === "public_web_search") score += 55;
     if (looksLikeContentUrl(url)) score += 8; // Useful discovery hint, not a blanket blog preference.
     if (visibleText.length >= 2500) score += 35;
     else if (visibleText.length >= 1200) score += 25;
@@ -805,47 +809,73 @@ function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
     }) || null;
     const rootSource = rootSourceRaw ? classifySource(rootSourceRaw) : null;
 
-    // Every eligible same-host public page may be considered, not only blog/article URLs.
-    // Page categories create investigation coverage; they are discovery metadata, not proof.
-    const websitePostCandidates = deduped
-        .filter(source =>
-            (source?.sourcePlatform || source?.platform || detectPlatform(source?.sourceUrl || "")) === "website"
-        )
+    // External public-web pages follow the user's two-rule filtration:
+    // (1) unrelated to the investigated subject, or (2) duplicate information
+    // already present on the submitted first-party website. Domain difference
+    // is never a rejection reason. Search hits were already relevance-screened;
+    // repeat a content-level identity check on fetched pages before retaining.
+    const allWebsiteSources = deduped.filter(source =>
+        (source?.sourcePlatform || source?.platform || detectPlatform(source?.sourceUrl || "")) === "website"
+    );
+    const externalCandidates = allWebsiteSources
+        .filter(source => source?.sourceRole === "external_public_web" || source?.discoveryOrigin === "public_web_search")
+        .filter(source => {
+            const { identity, terms } = getSearchRelevanceTerms(rootSource || {}, rootUrl);
+            const haystack = `${source?.title || ""} ${source?.description || ""} ${source?.visibleText || ""} ${source?.sourceUrl || ""}`.toLowerCase();
+            const matched = terms.filter(term => haystack.includes(term));
+            const relevant = !!identity.subject && (haystack.includes(identity.subject.toLowerCase()) || matched.length >= Math.min(2, terms.length));
+            if (!relevant) console.log("PCF_EXTERNAL_SOURCE_FILTERED_UNRELATED", JSON.stringify({ url: source?.sourceUrl || null, subject: identity.subject || null }));
+            return relevant;
+        })
+        .map(source => ({ source: classifySource(source), score: scoreWebsitePostSource(source, rootUrl) }));
+
+    // First-party internal pages retain the existing coverage-based selection.
+    const firstPartyCandidates = allWebsiteSources
+        .filter(source => source?.sourceRole !== "external_public_web" && source?.discoveryOrigin !== "public_web_search")
         .filter(source => isWebsitePostSource(source, rootUrl))
-        .map(source => ({
-            source: classifySource(source),
-            index: 0,
-            score: scoreWebsitePostSource(source, rootUrl)
-        }))
+        .map(source => ({ source: classifySource(source), score: scoreWebsitePostSource(source, rootUrl) }))
         .sort((a, b) => b.score - a.score);
+    const websitePostCandidates = [...externalCandidates, ...firstPartyCandidates];
 
-    const limit = Math.max(0, MAX_SOURCES - (rootSource ? 1 : 0));
-    const selected = [];
-    const selectedUrls = new Set();
-    const categoryWinners = new Map();
+    const selectByCategoryAndScore = (candidates, limit) => {
+        const selected = [];
+        const selectedUrls = new Set();
+        const categoryWinners = new Map();
+        for (const candidate of candidates) {
+            const category = candidate.source.pageCategory || "general_company_information";
+            const current = categoryWinners.get(category);
+            if (!current || candidate.score > current.score) categoryWinners.set(category, candidate);
+        }
+        const categoryOrder = [...categoryWinners.values()].sort((a, b) => b.score - a.score);
+        for (const candidate of categoryOrder) {
+            const url = normalizeUrl(candidate.source?.sourceUrl || candidate.source?.canonicalUrl || "");
+            if (!url || selectedUrls.has(url) || selected.length >= limit) continue;
+            selected.push(candidate.source);
+            selectedUrls.add(url);
+        }
+        for (const candidate of candidates) {
+            const url = normalizeUrl(candidate.source?.sourceUrl || candidate.source?.canonicalUrl || "");
+            if (!url || selectedUrls.has(url) || selected.length >= limit) continue;
+            selected.push(candidate.source);
+            selectedUrls.add(url);
+        }
+        return selected;
+    };
 
-    for (const candidate of websitePostCandidates) {
-        const category = candidate.source.pageCategory || "general_company_information";
-        const current = categoryWinners.get(category);
-        if (!current || candidate.score > current.score) categoryWinners.set(category, candidate);
-    }
+    // Reserve room for public-web discoveries. The website's own pages remain
+    // included, but a large first-party sitemap cannot crowd out all external
+    // evidence. External domains are not automatically treated as independent;
+    // their relationship is marked unverified for downstream analysis.
+    const availableAfterRoot = Math.max(0, MAX_SOURCES - (rootSource ? 1 : 0));
+    const selectedExternalSources = externalCandidates
+        .slice(0, Math.min(MAX_EXTERNAL_EVIDENCE_SOURCES, availableAfterRoot))
+        .map(candidate => candidate.source);
+    const firstPartyLimit = Math.max(0, availableAfterRoot - selectedExternalSources.length);
+    const selectedFirstPartySources = selectByCategoryAndScore(firstPartyCandidates, firstPartyLimit);
+    const selected = [...selectedExternalSources, ...selectedFirstPartySources];
 
-    const categoryOrder = [...categoryWinners.values()].sort((a, b) => b.score - a.score);
-    for (const candidate of categoryOrder) {
-        const url = normalizeUrl(candidate.source?.sourceUrl || candidate.source?.canonicalUrl || "");
-        if (!url || selectedUrls.has(url) || selected.length >= limit) continue;
-        selected.push(candidate.source);
-        selectedUrls.add(url);
-    }
-
-    for (const candidate of websitePostCandidates) {
-        const url = normalizeUrl(candidate.source?.sourceUrl || candidate.source?.canonicalUrl || "");
-        if (!url || selectedUrls.has(url) || selected.length >= limit) continue;
-        selected.push(candidate.source);
-        selectedUrls.add(url);
-    }
-
-    // The root page is retained separately; category-aware ranking chooses the other pages.
+    // The root page is retained separately; external sources receive reserved
+    // capacity before the remaining slots are allocated to same-host pages.
     const selectedWebsiteSources = [
         ...(rootSource ? [rootSource] : []),
         ...selected
@@ -871,6 +901,8 @@ function filterWebsiteEvidenceSources(sources = [], rootUrl = "") {
         originalSourceCount: deduped.length,
         websitePostCandidateCount: websitePostCandidates.length,
         websitePostSelectedCount: selected.length,
+        externalWebSourceCount: selectedExternalSources.length,
+        firstPartyWebsiteSourceCount: selectedFirstPartySources.length + (rootSource ? 1 : 0),
         filteredSourceCount: finalSelected.length,
         filteredOutSourceCount: Math.max(0, deduped.length - finalSelected.length),
         filteredSourceUrls: finalSelected.map(source => source?.sourceUrl).filter(Boolean),
@@ -1271,6 +1303,513 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_M
     }
 }
 
+// ------------------------------------------------------------
+// PUBLIC-WEB SEARCH DISCOVERY
+// Search-engine hits are discovery leads, never evidence by
+// themselves. PCF fetches the original public page before it is
+// added to the evidence package.
+// ------------------------------------------------------------
+const PCF_WEB_SEARCH_ENABLED = String(process.env.PCF_WEB_SEARCH_ENABLED || "true").toLowerCase() !== "false";
+const MAX_WEB_SEARCH_QUERIES = 4;
+const MAX_WEB_SEARCH_RESULTS_PER_QUERY = 8;
+const MAX_WEB_SEARCH_CANDIDATES = 24;
+const MAX_EXTERNAL_EVIDENCE_FETCHES = 12;
+const MAX_EXTERNAL_EVIDENCE_SOURCES = 12;
+const SEARCH_TIMEOUT_MS = 6500;
+const EXTERNAL_PAGE_TIMEOUT_MS = 9000;
+const EXTERNAL_FETCH_CONCURRENCY = 4;
+
+const SEARCH_SOCIAL_HOSTS = /(^|\.)(?:linkedin\.com|facebook\.com|instagram\.com|x\.com|twitter\.com|youtube\.com|youtu\.be|reddit\.com|threads\.net|tiktok\.com|pinterest\.com|github\.com|gitlab\.com|medium\.com|substack\.com|quora\.com|dev\.to|hashnode\.com)$/i;
+const SEARCH_ENGINE_HOSTS = /(^|\.)(?:google\.[a-z.]+|bing\.com|duckduckgo\.com|search\.brave\.com)$/i;
+
+function htmlToPlainText(value = "") {
+    return decodeHtml(String(value || "")
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")).trim();
+}
+
+function getHtmlAttribute(tag = "", name = "") {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const match = String(tag).match(new RegExp(`\\b${escaped}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, "i"));
+    return decodeHtml(match ? (match[1] || match[2] || match[3] || "") : "");
+}
+
+function unwrapSearchRedirect(rawUrl = "") {
+    const candidate = decodeHtml(String(rawUrl || "").replace(/&amp;/g, "&")).trim();
+    if (!candidate) return "";
+    try {
+        const parsed = new URL(candidate, "https://www.google.com");
+        const host = parsed.hostname.toLowerCase();
+        if (host.includes("duckduckgo.com")) {
+            const target = parsed.searchParams.get("uddg") || parsed.searchParams.get("url");
+            if (target) return normalizeUrl(target);
+        }
+        if (host === "google.com" || host.endsWith(".google.com") || host.startsWith("google.")) {
+            if (parsed.pathname === "/url") {
+                const target = parsed.searchParams.get("q") || parsed.searchParams.get("url");
+                if (target) return normalizeUrl(target);
+            }
+        }
+        if (host === "bing.com" || host.endsWith(".bing.com")) {
+            const encoded = parsed.searchParams.get("u") || "";
+            if (encoded.startsWith("a1")) {
+                try {
+                    const decoded = Buffer.from(encoded.slice(2), "base64").toString("utf8");
+                    if (/^https?:\/\//i.test(decoded)) return normalizeUrl(decoded);
+                } catch {}
+            }
+        }
+        return normalizeUrl(parsed.toString());
+    } catch {
+        return normalizeUrl(candidate);
+    }
+}
+
+function parseHtmlSearchResults(engine, html = "", query = "") {
+    const results = [];
+    const add = (rawUrl, title, snippet = "") => {
+        const url = unwrapSearchRedirect(rawUrl);
+        if (!url || !title) return;
+        let host = "";
+        try { host = new URL(url).hostname.toLowerCase(); } catch { return; }
+        if (SEARCH_ENGINE_HOSTS.test(host)) return;
+        if (!/^https?:$/.test(new URL(url).protocol)) return;
+        if (results.some(item => item.url === url)) return;
+        results.push({
+            url,
+            title: htmlToPlainText(title).slice(0, 400),
+            snippet: htmlToPlainText(snippet).slice(0, 900),
+            query,
+            provider: engine,
+            publishedAt: null
+        });
+    };
+
+    if (engine === "duckduckgo") {
+        const anchors = String(html).match(/<a\b[^>]*>[\s\S]*?<\/a>/gi) || [];
+        for (const anchor of anchors) {
+            if (!/class\s*=\s*["'][^"']*result__a/i.test(anchor)) continue;
+            const tag = anchor.match(/^<a\b[^>]*>/i)?.[0] || "";
+            const href = getHtmlAttribute(tag, "href");
+            const title = anchor.replace(/^<a\b[^>]*>/i, "").replace(/<\/a>$/i, "");
+            add(href, title, "");
+            if (results.length >= MAX_WEB_SEARCH_RESULTS_PER_QUERY) break;
+        }
+        // DDG snippets are separate sibling elements; retain them only as
+        // discovery metadata, not as collected evidence.
+        const snippets = String(html).match(/<a\b[^>]*class=["'][^"']*result__snippet[^"']*["'][^>]*>[\s\S]*?<\/a>/gi) || [];
+        for (let i = 0; i < Math.min(results.length, snippets.length); i++) {
+            results[i].snippet = htmlToPlainText(snippets[i]).slice(0, 900);
+        }
+    } else if (engine === "bing") {
+        const blocks = String(html).match(/<li\b[^>]*class=["'][^"']*b_algo[^"']*["'][^>]*>[\s\S]*?<\/li>/gi) || [];
+        for (const block of blocks) {
+            const anchor = block.match(/<a\b[^>]*>[\s\S]*?<\/a>/i)?.[0] || "";
+            const tag = anchor.match(/^<a\b[^>]*>/i)?.[0] || "";
+            const href = getHtmlAttribute(tag, "href");
+            const title = anchor.replace(/^<a\b[^>]*>/i, "").replace(/<\/a>$/i, "");
+            const snippet = block.match(/<p\b[^>]*>[\s\S]*?<\/p>/i)?.[0] || "";
+            add(href, title, snippet);
+            if (results.length >= MAX_WEB_SEARCH_RESULTS_PER_QUERY) break;
+        }
+    } else if (engine === "google") {
+        const anchors = String(html).match(/<a\b[^>]*>[\s\S]*?<\/a>/gi) || [];
+        for (const anchor of anchors) {
+            if (!/<h3\b/i.test(anchor)) continue;
+            const tag = anchor.match(/^<a\b[^>]*>/i)?.[0] || "";
+            const href = getHtmlAttribute(tag, "href");
+            const title = anchor.match(/<h3\b[^>]*>[\s\S]*?<\/h3>/i)?.[0] || anchor;
+            add(href, title, "");
+            if (results.length >= MAX_WEB_SEARCH_RESULTS_PER_QUERY) break;
+        }
+    }
+    return results;
+}
+
+function derivePublicSubject(rootSource = {}, rootUrl = "") {
+    const title = htmlToPlainText(rootSource?.title || rootSource?.ogTitle || "");
+    const firstSegment = title.split(/\s+[|–—:]\s+|\s+-\s+/)[0].trim();
+    const firstHeading = htmlToPlainText(Array.isArray(rootSource?.headings) ? rootSource.headings[0] || "" : "");
+    let hostLabel = "";
+    let host = "";
+    try {
+        host = new URL(rootUrl).hostname.replace(/^www\./i, "").toLowerCase();
+        hostLabel = host.split(".")[0].replace(/[-_]+/g, " ").trim();
+    } catch {}
+    const generic = /^(home|homepage|welcome|official website|website|index|landing page|untitled)$/i;
+    const cleanCandidate = value => String(value || "")
+        .replace(/^(?:welcome to|the official (?:website|site) of|official website of)\s+/i, "")
+        .replace(/\s+(?:official website|official site|home page|homepage)$/i, "")
+        .trim();
+    const candidates = [firstSegment, firstHeading, hostLabel].map(cleanCandidate);
+    const subject = candidates.find(value => value && value.length >= 2 && value.length <= 90 && !generic.test(value)) || hostLabel;
+    return { subject: subject.slice(0, 90), host, hostLabel };
+}
+
+function buildPublicWebSearchQueries(rootSource = {}, rootUrl = "") {
+    const identity = derivePublicSubject(rootSource, rootUrl);
+    if (!identity.subject) return [];
+    const subject = identity.subject.replace(/["\\]/g, " ").trim();
+    const host = identity.host;
+    const hostClause = host ? ` -site:${host}` : "";
+    const queries = [
+        `"${subject}"${hostClause}`,
+        `"${subject}" (customer OR client OR partner OR "case study")${hostClause}`,
+        `"${subject}" (news OR media OR interview OR "press release")${hostClause}`,
+        `"${subject}" (funding OR revenue OR financial OR filing OR lawsuit OR complaint OR regulatory)${hostClause}`
+    ];
+    return [...new Set(queries.map(q => q.trim()))].slice(0, MAX_WEB_SEARCH_QUERIES);
+}
+
+function getSearchRelevanceTerms(rootSource = {}, rootUrl = "") {
+    const identity = derivePublicSubject(rootSource, rootUrl);
+    const terms = String(identity.subject || "").toLowerCase().split(/[^a-z0-9]+/i)
+        .filter(term => term.length >= 3);
+    if (identity.hostLabel) {
+        for (const term of identity.hostLabel.toLowerCase().split(/[^a-z0-9]+/i)) {
+            if (term.length >= 3 && !terms.includes(term)) terms.push(term);
+        }
+    }
+    return { identity, terms: [...new Set(terms)] };
+}
+
+function normalizeSearchHit(hit = {}, provider = "unknown", query = "") {
+    const url = unwrapSearchRedirect(hit.url || hit.link || hit.href || "");
+    if (!url) return null;
+    let parsed;
+    try { parsed = new URL(url); } catch { return null; }
+    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    if (SEARCH_ENGINE_HOSTS.test(host) || SEARCH_SOCIAL_HOSTS.test(host)) return null;
+    if (/\.(?:css|js|mjs|map|png|jpe?g|gif|webp|svg|ico|woff2?|ttf|eot|mp4|mp3|wav|zip|rar|7z|pdf)(?:$|\?)/i.test(url)) return null;
+    return {
+        url,
+        title: htmlToPlainText(hit.title || "").slice(0, 400),
+        snippet: htmlToPlainText(hit.snippet || hit.description || "").slice(0, 900),
+        query,
+        provider,
+        publishedAt: hit.publishedAt || hit.page_age || hit.date || null
+    };
+}
+
+function isRelevantSearchHit(hit, rootSource, rootUrl) {
+    const { identity, terms } = getSearchRelevanceTerms(rootSource, rootUrl);
+    const haystack = `${hit?.title || ""} ${hit?.snippet || ""} ${hit?.url || ""}`.toLowerCase();
+    const matched = terms.filter(term => haystack.includes(term));
+    if (!matched.length) return false;
+    if (terms.length >= 2 && matched.length === 1 && matched[0].length < 5) return false;
+    try {
+        const hitHost = new URL(hit.url).hostname.replace(/^www\./i, "").toLowerCase();
+        if (identity.host && (hitHost === identity.host || hitHost.endsWith(`.${identity.host}`))) return false;
+    } catch { return false; }
+    return true;
+}
+
+async function searchWithDuckDuckGo(query) {
+    const endpoint = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    const response = await fetchWithTimeout(endpoint, {
+        method: "GET",
+        redirect: "follow",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (compatible; TruthLoopPublicEvidence/1.0; +https://truthloop.in)",
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "en-US,en;q=0.8"
+        }
+    }, SEARCH_TIMEOUT_MS);
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
+    return parseHtmlSearchResults("duckduckgo", await response.text(), query);
+}
+
+async function searchWithBingHtml(query) {
+    const endpoint = `https://www.bing.com/search?q=${encodeURIComponent(query)}&count=10`;
+    const response = await fetchWithTimeout(endpoint, {
+        method: "GET",
+        redirect: "follow",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "en-US,en;q=0.8"
+        }
+    }, SEARCH_TIMEOUT_MS);
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
+    return parseHtmlSearchResults("bing", await response.text(), query);
+}
+
+async function searchWithGoogleHtml(query) {
+    const endpoint = `https://www.google.com/search?q=${encodeURIComponent(query)}&num=10`;
+    const response = await fetchWithTimeout(endpoint, {
+        method: "GET",
+        redirect: "follow",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml",
+            "Accept-Language": "en-US,en;q=0.8"
+        }
+    }, SEARCH_TIMEOUT_MS);
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
+    return parseHtmlSearchResults("google", await response.text(), query);
+}
+
+async function searchWithBraveApi(query) {
+    const token = process.env.BRAVE_SEARCH_API_KEY || "";
+    if (!token) return [];
+    const country = String(process.env.PCF_SEARCH_COUNTRY || "").trim().toUpperCase();
+    const countryParam = /^[A-Z]{2}$/.test(country) ? `&country=${encodeURIComponent(country)}` : "";
+    const endpoint = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=8&search_lang=en${countryParam}`;
+    const response = await fetchWithTimeout(endpoint, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "X-Subscription-Token": token
+        }
+    }, SEARCH_TIMEOUT_MS);
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
+    const payload = await response.json();
+    return (payload?.web?.results || []).map(item => normalizeSearchHit({
+        url: item.url,
+        title: item.title,
+        snippet: item.description,
+        publishedAt: item.page_age || null
+    }, "brave_api", query)).filter(Boolean);
+}
+
+async function searchWithGoogleCse(query) {
+    const key = process.env.GOOGLE_CSE_API_KEY || "";
+    const cx = process.env.GOOGLE_CSE_CX || "";
+    if (!key || !cx) return [];
+    const endpoint = `https://www.googleapis.com/customsearch/v1?key=${encodeURIComponent(key)}&cx=${encodeURIComponent(cx)}&q=${encodeURIComponent(query)}&num=8`;
+    const response = await fetchWithTimeout(endpoint, { method: "GET", headers: { "Accept": "application/json" } }, SEARCH_TIMEOUT_MS);
+    if (!response.ok) throw new Error(`HTTP_${response.status}`);
+    const payload = await response.json();
+    return (payload?.items || []).map(item => normalizeSearchHit({
+        url: item.link,
+        title: item.title,
+        snippet: item.snippet
+    }, "google_cse_api", query)).filter(Boolean);
+}
+
+async function discoverPublicWebSearchHits(rootSource, rootUrl) {
+    const queries = buildPublicWebSearchQueries(rootSource, rootUrl);
+    const providerCounts = {};
+    const providerErrors = {};
+    const tasks = [];
+    for (const query of queries) {
+        tasks.push({ provider: "duckduckgo", query, run: () => searchWithDuckDuckGo(query) });
+        tasks.push({ provider: "bing", query, run: () => searchWithBingHtml(query) });
+        tasks.push({ provider: "google", query, run: () => searchWithGoogleHtml(query) });
+        if (process.env.BRAVE_SEARCH_API_KEY) tasks.push({ provider: "brave_api", query, run: () => searchWithBraveApi(query) });
+        if (process.env.GOOGLE_CSE_API_KEY && process.env.GOOGLE_CSE_CX) tasks.push({ provider: "google_cse_api", query, run: () => searchWithGoogleCse(query) });
+    }
+    const settled = await Promise.allSettled(tasks.map(task => task.run()));
+    const hits = [];
+    settled.forEach((result, index) => {
+        const task = tasks[index];
+        if (result.status === "fulfilled") {
+            providerCounts[task.provider] = (providerCounts[task.provider] || 0) + result.value.length;
+            hits.push(...result.value);
+        } else {
+            providerErrors[task.provider] = (providerErrors[task.provider] || 0) + 1;
+        }
+    });
+
+    const unique = new Map();
+    for (const rawHit of hits) {
+        const hit = normalizeSearchHit(rawHit, rawHit.provider, rawHit.query);
+        if (!hit || !isRelevantSearchHit(hit, rootSource, rootUrl)) continue;
+        const key = normalizeUrl(hit.url);
+        if (!key) continue;
+        const existing = unique.get(key);
+        if (existing) {
+            existing.providers = [...new Set([...(existing.providers || [existing.provider]), hit.provider])];
+            existing.queries = [...new Set([...(existing.queries || [existing.query]), hit.query])];
+            if (!existing.snippet && hit.snippet) existing.snippet = hit.snippet;
+            continue;
+        }
+        unique.set(key, { ...hit, providers: [hit.provider], queries: [hit.query] });
+    }
+
+    const ranked = [...unique.values()].map(hit => {
+        const haystack = `${hit.title} ${hit.snippet} ${hit.url}`.toLowerCase();
+        const { terms } = getSearchRelevanceTerms(rootSource, rootUrl);
+        const relevance = terms.filter(term => haystack.includes(term)).length;
+        return { ...hit, relevanceScore: relevance * 10 + (hit.providers?.length || 1) * 4 + Math.min(5, Math.floor((hit.snippet || "").length / 150)) };
+    }).sort((a, b) => b.relevanceScore - a.relevanceScore);
+
+    // Avoid letting a single directory or news domain dominate the collection.
+    const selected = [];
+    const hostCounts = new Map();
+    for (const hit of ranked) {
+        let host = "";
+        try { host = new URL(hit.url).hostname.replace(/^www\./i, "").toLowerCase(); } catch {}
+        const current = hostCounts.get(host) || 0;
+        if (current >= 2) continue;
+        selected.push(hit);
+        hostCounts.set(host, current + 1);
+        if (selected.length >= MAX_WEB_SEARCH_CANDIDATES) break;
+    }
+    return { queries, hits: selected, providerCounts, providerErrors };
+}
+
+function isPublicHttpUrl(value = "") {
+    let url;
+    try { url = new URL(value); } catch { return false; }
+    if (!/^https?:$/.test(url.protocol)) return false;
+    const host = url.hostname.replace(/^\[|\]$/g, "").toLowerCase();
+    if (!host || host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal")) return false;
+    if (host.includes(":")) {
+        // Block loopback, unique-local, link-local and IPv4-mapped IPv6 ranges.
+        if (host === "::1" || host === "::" || /^f[cd]/i.test(host) || /^fe[89ab]/i.test(host) || host.startsWith("::ffff:")) return false;
+    } else if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) {
+        const parts = host.split(".").map(Number);
+        if (parts.some(part => part < 0 || part > 255)) return false;
+        const [a, b] = parts;
+        if (a === 0 || a === 10 || a === 127 || a >= 224) return false;
+        if (a === 169 && b === 254) return false;
+        if (a === 172 && b >= 16 && b <= 31) return false;
+        if (a === 192 && b === 168) return false;
+        if (a === 100 && b >= 64 && b <= 127) return false;
+        if (a === 198 && (b === 18 || b === 19)) return false;
+    }
+    return true;
+}
+
+async function fetchPublicUrlWithRedirects(initialUrl, options = {}, timeoutMs = EXTERNAL_PAGE_TIMEOUT_MS, maxRedirects = 4) {
+    let currentUrl = normalizeUrl(initialUrl);
+    for (let hop = 0; hop <= maxRedirects; hop++) {
+        if (!currentUrl || !isPublicHttpUrl(currentUrl)) throw new Error("BLOCKED_NON_PUBLIC_URL");
+        const response = await fetchWithTimeout(currentUrl, { ...options, redirect: "manual" }, timeoutMs);
+        if (![301, 302, 303, 307, 308].includes(Number(response.status))) return response;
+        const location = response.headers?.get?.("location");
+        if (!location) return response;
+        currentUrl = normalizeUrl(location, currentUrl);
+        if (!currentUrl || !isPublicHttpUrl(currentUrl)) throw new Error("BLOCKED_REDIRECT_TARGET");
+    }
+    throw new Error("TOO_MANY_REDIRECTS");
+}
+
+async function mapWithConcurrency(items, limit, worker) {
+    const results = new Array(items.length);
+    let nextIndex = 0;
+    const workers = Array.from({ length: Math.min(Math.max(1, limit), items.length) }, async () => {
+        while (true) {
+            const index = nextIndex++;
+            if (index >= items.length) return;
+            try { results[index] = await worker(items[index], index); }
+            catch (error) { results[index] = { error: error?.message || String(error) }; }
+        }
+    });
+    await Promise.all(workers);
+    return results;
+}
+
+async function fetchExternalSearchEvidence(hits, rootUrl) {
+    const selectedHits = (Array.isArray(hits) ? hits : []).slice(0, MAX_EXTERNAL_EVIDENCE_FETCHES);
+    const results = await mapWithConcurrency(selectedHits, EXTERNAL_FETCH_CONCURRENCY, async hit => {
+        const url = normalizeUrl(hit?.url || "");
+        if (!url) return null;
+        try {
+            if (!isPublicHttpUrl(url)) return null;
+            const response = await fetchPublicUrlWithRedirects(url, {
+                method: "GET",
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.5",
+                    "Accept-Language": "en-US,en;q=0.8"
+                }
+            }, EXTERNAL_PAGE_TIMEOUT_MS);
+            const finalUrl = normalizeUrl(response.url || url);
+            if (!response.ok) return null;
+            if (!finalUrl || isSameHost(finalUrl, rootUrl)) return null;
+            let finalHost = "";
+            try { finalHost = new URL(finalUrl).hostname.toLowerCase(); } catch {}
+            if (SEARCH_SOCIAL_HOSTS.test(finalHost) || SEARCH_ENGINE_HOSTS.test(finalHost)) return null;
+            const contentType = String(response.headers?.get?.("content-type") || "").toLowerCase();
+            if (contentType && !/(text\/html|application\/xhtml\+xml|text\/plain)/i.test(contentType)) return null;
+            const html = await response.text();
+            const source = buildSource({ url, response, html });
+            source.fetchFailure = detectPageCollectionFailure({ requestedUrl: url, response, source });
+            if (source.fetchFailure || String(source.visibleText || "").trim().length < 280) return null;
+            source.detectedSourcePlatform = source.sourcePlatform || source.platform || "website";
+            // All non-social search discoveries are treated as public web pages
+            // by the website evidence filter, even when a known publisher host
+            // has its own platform label (for example, a company database).
+            source.platform = "website";
+            source.sourcePlatform = "website";
+            source.discoveryOrigin = "public_web_search";
+            source.sourceRole = "external_public_web";
+            source.firstParty = false;
+            source.domainRelationship = "external_domain_not_yet_independence_verified";
+            source.independenceStatus = "not_yet_verified";
+            source.sourceDomain = finalHost.replace(/^www\./i, "");
+            source.sourceIndependence = "external_domain_not_yet_verified";
+            source.searchResultTitle = hit.title || null;
+            source.searchResultSnippet = hit.snippet || null;
+            source.searchResultPublishedAt = hit.publishedAt || null;
+            source.searchProviders = hit.providers || [hit.provider || "unknown"];
+            source.searchQueries = hit.queries || [hit.query || ""];
+            source.searchRelevanceScore = Number(hit.relevanceScore || 0);
+            source.metadata = {
+                ...(source.metadata && typeof source.metadata === "object" ? source.metadata : {}),
+                pcfDiscovery: {
+                    origin: source.discoveryOrigin,
+                    sourceRole: source.sourceRole,
+                    firstParty: source.firstParty,
+                    domainRelationship: source.domainRelationship,
+                    independenceStatus: source.independenceStatus,
+                    detectedSourcePlatform: source.detectedSourcePlatform,
+                    searchProviders: source.searchProviders,
+                    searchQueries: source.searchQueries,
+                    searchResultTitle: source.searchResultTitle,
+                    searchResultPublishedAt: source.searchResultPublishedAt,
+                    relevanceScore: source.searchRelevanceScore
+                }
+            };
+            return source;
+        } catch (error) {
+            return null;
+        }
+    });
+    return results.filter(Boolean);
+}
+
+function similarityTokens(source = {}) {
+    const text = `${source?.title || ""} ${source?.description || ""} ${source?.visibleText || ""}`.toLowerCase();
+    const stop = new Set(["the", "and", "for", "that", "this", "with", "from", "have", "has", "are", "was", "were", "will", "your", "you", "our", "their", "they", "them", "about", "into", "also", "than", "then", "but", "not", "all", "can", "its", "who", "what", "when", "where", "how", "why", "which", "while", "more", "most", "other", "over", "under", "after", "before", "such", "each", "per", "via", "www", "http", "https", "com"]);
+    return new Set(text.match(/[a-z0-9]{3,}/g)?.filter(token => !stop.has(token)) || []);
+}
+
+function removeSearchDuplicatesAgainstFirstParty(externalSources = [], firstPartySources = [], rootUrl = "") {
+    const referenceSources = (Array.isArray(firstPartySources) ? firstPartySources : [])
+        .filter(source => !source?.fetchFailure && isSameHost(source?.sourceUrl || source?.canonicalUrl || "", rootUrl) && String(source?.visibleText || "").length >= 450);
+    const referenceTokens = referenceSources.map(source => ({ source, tokens: similarityTokens(source) }))
+        .filter(item => item.tokens.size >= 25);
+    const kept = [];
+    const duplicateAudit = [];
+    for (const source of Array.isArray(externalSources) ? externalSources : []) {
+        const tokens = similarityTokens(source);
+        let duplicateOf = null;
+        if (tokens.size >= 25) {
+            for (const reference of referenceTokens) {
+                let intersection = 0;
+                for (const token of tokens) if (reference.tokens.has(token)) intersection++;
+                const smaller = Math.min(tokens.size, reference.tokens.size);
+                const containment = smaller ? intersection / smaller : 0;
+                const union = tokens.size + reference.tokens.size - intersection;
+                const jaccard = union ? intersection / union : 0;
+                if (containment >= 0.94 || jaccard >= 0.88) {
+                    duplicateOf = reference.source?.sourceUrl || reference.source?.canonicalUrl || null;
+                    break;
+                }
+            }
+        }
+        if (duplicateOf) duplicateAudit.push({ sourceUrl: source.sourceUrl || null, duplicateOf });
+        else kept.push(source);
+    }
+    return { sources: kept, duplicateAudit };
+}
+
+
 function shouldQueueUrl(url, rootUrl) {
     if (!url) return false;
 
@@ -1444,7 +1983,63 @@ export async function acquirePublicContent({
         }
     }
 
-    const finalSources = dedupeSources(sources).slice(0, MAX_FETCH_ATTEMPTS);
+    // Public-web discovery starts only after the submitted first-party site
+    // has been fetched. Search hits are candidates; only successfully fetched
+    // original pages are retained as evidence sources.
+    let webSearchDiscovery = {
+        enabled: PCF_WEB_SEARCH_ENABLED && detectPlatform(rootUrl) === "website",
+        queries: [],
+        providerResultCounts: {},
+        providerErrors: {},
+        candidateCount: 0,
+        fetchedSourceCount: 0,
+        duplicateCount: 0,
+        duplicateAudit: []
+    };
+
+    const firstPartyRoot = sources.find(source =>
+        normalizeUrl(source?.requestedUrl || source?.sourceUrl || "") === rootUrl && !source?.fetchFailure
+    ) || null;
+
+    if (webSearchDiscovery.enabled && firstPartyRoot) {
+        try {
+            const discovered = await discoverPublicWebSearchHits(firstPartyRoot, rootUrl);
+            const fetchedExternalSources = await fetchExternalSearchEvidence(discovered.hits, rootUrl);
+            const deduplicated = removeSearchDuplicatesAgainstFirstParty(fetchedExternalSources, sources, rootUrl);
+            sources.push(...deduplicated.sources);
+            webSearchDiscovery = {
+                ...webSearchDiscovery,
+                queries: discovered.queries,
+                providerResultCounts: discovered.providerCounts,
+                providerErrors: discovered.providerErrors,
+                candidateCount: discovered.hits.length,
+                fetchedSourceCount: deduplicated.sources.length,
+                duplicateCount: deduplicated.duplicateAudit.length,
+                duplicateAudit: deduplicated.duplicateAudit
+            };
+            console.log("PCF_PUBLIC_WEB_SEARCH_COMPLETE", JSON.stringify({
+                subject: derivePublicSubject(firstPartyRoot, rootUrl).subject,
+                queryCount: webSearchDiscovery.queries.length,
+                providers: webSearchDiscovery.providerResultCounts,
+                providerErrors: webSearchDiscovery.providerErrors,
+                candidateCount: webSearchDiscovery.candidateCount,
+                pagesFetched: fetchedExternalSources.length,
+                duplicatePagesRemoved: webSearchDiscovery.duplicateCount,
+                externalPagesRetained: webSearchDiscovery.fetchedSourceCount
+            }));
+        } catch (error) {
+            webSearchDiscovery.error = error?.message || String(error);
+            console.warn("PCF_PUBLIC_WEB_SEARCH_FAILED", webSearchDiscovery.error);
+        }
+    } else {
+        console.log("PCF_PUBLIC_WEB_SEARCH_SKIPPED", JSON.stringify({
+            enabled: webSearchDiscovery.enabled,
+            firstPartyRootAvailable: !!firstPartyRoot,
+            reason: !PCF_WEB_SEARCH_ENABLED ? "PCF_WEB_SEARCH_DISABLED" : "PRIMARY_SOURCE_UNAVAILABLE_OR_NON_WEBSITE"
+        }));
+    }
+
+    const finalSources = dedupeSources(sources);
     const primarySource = sources.find(source =>
         normalizeUrl(source?.requestedUrl || source?.sourceUrl || "") === rootUrl
     ) || null;
@@ -1495,6 +2090,9 @@ export async function acquirePublicContent({
             originalSourceCount: filteredEvidence.originalSourceCount,
             websitePostCandidateCount: filteredEvidence.websitePostCandidateCount,
             websitePostSelectedCount: filteredEvidence.websitePostSelectedCount,
+            externalWebSourceCount: filteredEvidence.externalWebSourceCount,
+            firstPartyWebsiteSourceCount: filteredEvidence.firstPartyWebsiteSourceCount,
+            webSearchDiscovery,
             targetWebsitePageCount: MAX_SOURCES,
             websitePageCategoryCounts: filteredEvidence.websitePageCategoryCounts,
             maxFetchAttempts: MAX_FETCH_ATTEMPTS,
@@ -1515,6 +2113,9 @@ export async function acquirePublicContent({
         filteredSourceCount: filteredEvidence.filteredSourceCount,
         websitePostCandidateCount: filteredEvidence.websitePostCandidateCount,
         websitePostSelectedCount: filteredEvidence.websitePostSelectedCount,
+        externalWebSourceCount: filteredEvidence.externalWebSourceCount,
+        firstPartyWebsiteSourceCount: filteredEvidence.firstPartyWebsiteSourceCount,
+        webSearchDiscovery,
         targetWebsitePageCount: MAX_SOURCES,
         websitePageCategoryCounts: filteredEvidence.websitePageCategoryCounts,
         maxFetchAttempts: MAX_FETCH_ATTEMPTS,
@@ -1870,6 +2471,10 @@ const contentInventoryPackage = buildContentInventoryPackage(sources);
             source.visibleText?.length ||
             0,
         sourceCount: sources.length,
+        originalSourceCount: rawPackage?.originalSourceCount ?? sources.length,
+        externalWebSourceCount: rawPackage?.externalWebSourceCount ?? sources.filter(item => item?.sourceRole === "external_public_web" || item?.discoveryOrigin === "public_web_search").length,
+        firstPartyWebsiteSourceCount: rawPackage?.firstPartyWebsiteSourceCount ?? null,
+        webSearchDiscovery: rawPackage?.webSearchDiscovery || {},
         sources
     };
 }
