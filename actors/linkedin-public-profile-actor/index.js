@@ -1,16 +1,16 @@
 /**
- * TruthLoop LinkedIn Public Profile Actor — prototype v0.1.2
+ * TruthLoop LinkedIn Public Profile Actor — prototype v0.2.0
  * Auth-free, cookie-free public-page retrieval. No login-wall bypass.
  * Node.js 18+ (native fetch). No additional dependencies.
  */
 
-const ACTOR_VERSION = '0.1.2';
+const ACTOR_VERSION = '0.2.0';
 const ALLOWED_HOSTS = new Set(['linkedin.com', 'www.linkedin.com', 'm.linkedin.com']);
 const DEFAULT_TIMEOUT_MS = 12000;
 const MAX_HTML_BYTES = 2_000_000;
 const MAX_TEXT_CHARS = 30_000;
 const MAX_DIAGNOSTIC_CHARS = 1200;
-const USER_AGENT = 'Mozilla/5.0 (compatible; TruthLoopPublicEvidenceBot/0.1.2; +https://truthloop.in)';
+const USER_AGENT = 'Mozilla/5.0 (compatible; TruthLoopPublicEvidenceBot/0.2.0; +https://truthloop.in)';
 
 function decodeEntities(s = '') {
   return String(s).replace(/&amp;/g, '&').replace(/&quot;/g, '"')
@@ -73,31 +73,97 @@ function collectLinks(html, base) {
   }
   return [...new Map(links.map(x => [x.url, x])).values()];
 }
+
+function useful(value) {
+  const v = stripTags(String(value ?? '')).replace(/\s+/g, ' ').trim();
+  return v && !/^[,.\s|·•\-–—]+$/.test(v) ? v : '';
+}
+function firstUseful(...values) {
+  for (const value of values) { const v = useful(value); if (v && v.length > 1) return v; }
+  return '';
+}
+function flattenJsonLd(value, out = []) {
+  if (!value || typeof value !== 'object') return out;
+  if (Array.isArray(value)) { for (const x of value) flattenJsonLd(x, out); return out; }
+  out.push(value);
+  if (value['@graph']) flattenJsonLd(value['@graph'], out);
+  return out;
+}
+function extractDateFromBlock(block) {
+  const timeTag = block.match(/<time\b[^>]*>/i)?.[0] || '';
+  const datetime = attr(timeTag, 'datetime');
+  if (datetime && !Number.isNaN(Date.parse(datetime))) return new Date(datetime).toISOString();
+  const dateMeta = block.match(/<meta\b[^>]*(?:property|name)=["'](?:article:published_time|datePublished|date|publish-date)["'][^>]*>/i)?.[0] || '';
+  const content = attr(dateMeta, 'content');
+  if (content && !Number.isNaN(Date.parse(content))) return new Date(content).toISOString();
+  return null;
+}
+function extractContentBlock(html, href) {
+  const escaped = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`<a\\b(?=[^>]*href\\s*=\\s*["']${escaped}["'])[^>]*>[\\s\\S]*?</a>`, 'i');
+  const m = html.match(re);
+  if (!m || m.index == null) return { text: '', publishedDate: null };
+  const before = html.slice(Math.max(0, m.index - 3500), m.index);
+  const li = before.lastIndexOf('<li');
+  const article = before.lastIndexOf('<article');
+  const div = before.lastIndexOf('<div');
+  const start = Math.max(li, article, div, 0);
+  const end = Math.min(html.length, m.index + 6500);
+  const block = html.slice(start, end);
+  const text = stripTags(block).slice(0, 5000);
+  return { text, publishedDate: extractDateFromBlock(block) };
+}
 function extractProfile(html, finalUrl) {
   const meta = parseMeta(html);
-  const jsonld = parseJsonLd(html);
+  const jsonld = flattenJsonLd(parseJsonLd(html));
   const person = jsonld.find(x => /person|profilepage/i.test(String(x['@type'] || '')) || x.mainEntity) || {};
   const main = person.mainEntity || person;
-  const title = stripTags(meta['og:title'] || meta['twitter:title'] || (html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1] || ''));
-  const description = stripTags(meta['og:description'] || meta.description || meta['twitter:description'] || '');
-  const name = stripTags(main.name || (meta['profile:first_name'] && `${meta['profile:first_name']} ${meta['profile:last_name'] || ''}`) || title.split(/\s+[|–-]\s+/)[0]);
-  const headline = stripTags(main.jobTitle || meta['profile:username'] || description);
-  const image = main.image?.url || main.image || meta['og:image'] || '';
-  const text = stripTags(html).slice(0, MAX_TEXT_CHARS);
+  const title = firstUseful(meta['og:title'], meta['twitter:title'], html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
+  const description = firstUseful(meta['og:description'], meta.description, meta['twitter:description']);
+  const name = firstUseful(main.name,
+    meta['profile:first_name'] && `${meta['profile:first_name']} ${meta['profile:last_name'] || ''}`,
+    title.split(/\s+[|–-]\s+/)[0]);
+  const headline = firstUseful(main.jobTitle, meta['og:description'], meta.description, meta['twitter:description']);
+  const image = (typeof main.image === 'object' ? main.image?.url : main.image) || meta['og:image'] || '';
+  const visibleText = stripTags(html).slice(0, MAX_TEXT_CHARS);
   const links = collectLinks(html, finalUrl);
-  const activityLinks = links.filter(x => /linkedin\.com\/(?:posts|pulse|feed\/update)/i.test(x.url)).slice(0, 9);
-  const articleLinks = links.filter(x => /linkedin\.com\/pulse\//i.test(x.url)).slice(0, 10);
+  const postLinks = links.filter(x => /linkedin\.com\/(?:posts\/|feed\/update\/)/i.test(x.url))
+    .filter(x => !/\/pulse\//i.test(x.url)).slice(0, 20);
+  const articleLinks = links.filter(x => /linkedin\.com\/pulse\//i.test(x.url)).slice(0, 15);
+  const posts = postLinks.map(x => {
+    const block = extractContentBlock(html, x.url);
+    return { url: x.url, text: firstUseful(block.text, x.label) || null,
+      publishedDate: block.publishedDate, date: block.publishedDate,
+      engagement: null, extraction: block.text ? 'nearby_public_html_block' : (x.label ? 'link_label' : 'url_only') };
+  });
+  const articles = articleLinks.map(x => {
+    const block = extractContentBlock(html, x.url);
+    return { url: x.url, title: firstUseful(x.label, block.text) || null,
+      text: block.text || null, publishedDate: block.publishedDate, date: block.publishedDate };
+  });
+  const getValues = key => jsonld.flatMap(x => {
+    const v = x[key]; return v == null ? [] : (Array.isArray(v) ? v : [v]);
+  });
+  const experience = [...new Set([
+    ...getValues('worksFor'), ...getValues('hasOccupation')
+  ].map(x => typeof x === 'string' ? useful(x) : firstUseful(x.name, x.title, x.jobTitle)).filter(Boolean))].slice(0, 30);
+  const education = [...new Set([
+    ...getValues('alumniOf'), ...getValues('education')
+  ].map(x => typeof x === 'string' ? useful(x) : firstUseful(x.name, x.legalName)).filter(Boolean))].slice(0, 30);
+  const skills = [...new Set([
+    ...getValues('knowsAbout'), ...getValues('skills')
+  ].flatMap(x => typeof x === 'string' ? [useful(x)] : [firstUseful(x.name)]).filter(Boolean))].slice(0, 60);
   const blocked = /authwall|sign in to linkedin|join linkedin|security verification|challenge\/|checkpoint/i.test(html.slice(0, 500000));
   return {
     profile: { name: name || null, headline: headline || null, profileUrl: finalUrl, imageUrl: image || null,
-      about: description || null, location: main.address?.addressLocality || null,
-      currentPosition: null, experience: [], education: [], skills: [] },
-    activity: { posts: activityLinks.map(x => ({ url: x.url, text: x.label || null, date: null, engagement: null })),
-      articles: articleLinks.map(x => ({ url: x.url, title: x.label || null, date: null })) },
-    page: { title: title || null, description: description || null, visibleText: text, linksFound: links.length },
+      about: description || null, location: firstUseful(main.address?.addressLocality, main.address?.addressRegion, main.address?.addressCountry) || null,
+      currentPosition: experience[0] || null, experience, education, skills },
+    activity: { posts, articles },
+    page: { title: title || null, description: description || null, visibleText, linksFound: links.length },
     blocked
   };
 }
+
 function safeDiagnostics(response, body = '') {
   const names = ['date', 'content-type', 'server', 'retry-after', 'x-li-uuid', 'x-li-fabric', 'location'];
   const headers = {};
@@ -186,8 +252,8 @@ export async function runLinkedInPublicProfileActor(input = {}, options = {}) {
     availability: { name: !!minimum.name, headline: !!minimum.headline, about: !!minimum.about,
       experience: extracted.profile.experience.length > 0, education: extracted.profile.education.length > 0,
       skills: extracted.profile.skills.length > 0, posts: extracted.activity.posts.length > 0,
-      articles: extracted.activity.articles.length > 0 },
-    limitations: ['Only fields present in the unauthenticated public response are extracted.', 'Missing fields are not inferred or fabricated.'],
+      articles: extracted.activity.articles.length > 0, visibleText: extracted.page.visibleText.length > 0 },
+    limitations: ['Only fields present in the unauthenticated public response are extracted.', 'Experience, education, skills, post text and published dates may remain empty when the public HTML does not expose them.', 'Post and article dates are taken only from explicit public time or published-date metadata.', 'Missing fields are not inferred or fabricated.'],
     source: { url: finalUrl, contentType: response.headers.get('content-type'), retrievalMethod: 'unauthenticated_public_http' }
   };
 }
