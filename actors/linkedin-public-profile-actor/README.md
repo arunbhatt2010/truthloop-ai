@@ -1,4 +1,4 @@
-# TruthLoop LinkedIn Public Profile Actor — prototype v0.1.2
+# TruthLoop LinkedIn Public Profile Actor — prototype v0.2.0
 
 Auth-free, cookie-free public-page collector. Node.js 18+; no additional npm dependencies.
 
@@ -10,7 +10,7 @@ node actors/linkedin-public-profile-actor/cli.js https://www.linkedin.com/in/<pu
 
 Or import `runLinkedInPublicProfileActor({ profileUrl })` from `index.js`.
 
-## v0.1.2 changes
+## v0.2.0 changes
 
 - Removes invisible Unicode format characters (including U+2060 WORD JOINER) from profile URLs before validation. The Bill Gates test URL contained an encoded U+2060 at the end of the profile slug; the normalized URL is `https://www.linkedin.com/in/williamhgates/`.
 - Classifies HTTP 429 as `rate_limited`, 403 as `access_denied`, 401 as `authentication_required`, and 404 as `profile_not_found_or_hidden`.
@@ -40,3 +40,13 @@ Standalone prototype only. It is not wired into TruthLoop's production CEB/ECB o
 ## Next validation
 
 Re-run once with a clean profile URL after a reasonable cooldown. If LinkedIn continues returning 429, stop repeated tests and record the public unauthenticated endpoint as unavailable for that test window. Validate URL normalization independently using a local/no-network test; do not interpret a normalized URL as a guarantee that LinkedIn will permit collection.
+
+
+## v0.2.0 extraction fields
+
+The result preserves the original profile, post, and article URLs. Posts and articles include
+`publishedDate` (ISO-8601 string or `null`) and a compatibility `date` field. Dates are
+populated only from explicit public `<time datetime>` or published-date metadata in the
+associated HTML block. Profile experience, education, and skills are extracted only when
+present in public JSON-LD. `page.visibleText` remains available (up to 30,000 characters).
+No missing field is fabricated; extraction quality must be validated across multiple profiles.
