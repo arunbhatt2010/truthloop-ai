@@ -1,0 +1,45 @@
+
+name: Test LinkedIn Public Profile Actor
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile_url:
+        description: "Public LinkedIn profile URL"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  test-actor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run LinkedIn Actor
+        env:
+          PROFILE_URL: ${{ inputs.profile_url }}
+        run: |
+          node actors/linkedin-public-profile-actor/cli.js "$PROFILE_URL" > actor-result.json 2>&1
+          RESULT=$?
+          cat actor-result.json
+          exit $RESULT
+
+      - name: Upload Actor Result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linkedin-actor-test-result
+          path: actor-result.json
+          if-no-files-found: ignore
+          retention-days: 7
