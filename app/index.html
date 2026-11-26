@@ -3,117 +3,6 @@
 <head>    
 <meta charset="UTF-8" />    
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<!-- TruthLoop background bot protection: Turnstile Invisible + signed server session. -->
-<style>
-  .tl-cloudflare-trust { display:inline-flex; align-items:center; gap:5px; color:#91a6bd; font-size:10px; font-weight:650; white-space:nowrap; opacity:.82; }
-  .tl-cloudflare-trust svg { width:13px; height:13px; flex:0 0 auto; }
-  #tl-turnstile-host { position:fixed; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none; left:-10000px; top:-10000px; }
-</style>
-<script>
-(function () {
-  'use strict';
-  const SITE_KEY = '0x4AAAAAAFT495__ICBuGUHA';
-  const API_PATH = '/api/chat';
-  const ACTION = 'truthloop_chat';
-  const nativeFetch = window.fetch.bind(window);
-  let apiReadyResolve, apiReadyReject, widgetId = null, widgetPromise = null;
-  let tokenWaiter = null, tokenTimer = null, queue = Promise.resolve();
-  let initialCheckStarted = false, initialCheckPromise = null;
-  const apiReady = new Promise((resolve, reject) => { apiReadyResolve = resolve; apiReadyReject = reject; });
-  const loadTimer = setTimeout(() => apiReadyReject(new Error('Turnstile load timeout')), 20000);
-
-  function resolveToken(token) {
-    if (!tokenWaiter) return;
-    const resolve = tokenWaiter; tokenWaiter = null; clearTimeout(tokenTimer); tokenTimer = null; resolve(token);
-  }
-  function rejectToken(error) {
-    if (!tokenWaiter) return;
-    const reject = tokenWaiter; tokenWaiter = null; clearTimeout(tokenTimer); tokenTimer = null; reject(error || new Error('Turnstile verification failed'));
-  }
-  function ensureWidget() {
-    if (widgetId !== null) return Promise.resolve(widgetId);
-    if (widgetPromise) return widgetPromise;
-    widgetPromise = apiReady.then(() => new Promise((resolve, reject) => {
-      const render = () => {
-        try {
-          let host = document.getElementById('tl-turnstile-host');
-          if (!host) { host = document.createElement('div'); host.id = 'tl-turnstile-host'; document.body.appendChild(host); }
-          widgetId = window.turnstile.render(host, {
-            sitekey: SITE_KEY, action: ACTION, execution: 'execute', appearance: 'execute',
-            callback: resolveToken,
-            'error-callback': () => rejectToken(new Error('Turnstile error')),
-            'expired-callback': () => rejectToken(new Error('Turnstile token expired')),
-            'timeout-callback': () => rejectToken(new Error('Turnstile timeout')),
-            'unsupported-callback': () => rejectToken(new Error('Turnstile unsupported'))
-          });
-          resolve(widgetId);
-        } catch (e) { widgetPromise = null; reject(e); }
-      };
-      if (document.body) render(); else document.addEventListener('DOMContentLoaded', render, {once:true});
-    })).catch(e => { widgetPromise = null; throw e; });
-    return widgetPromise;
-  }
-  function freshToken() {
-    return ensureWidget().then(id => new Promise((resolve, reject) => {
-      if (!window.turnstile) return reject(new Error('Turnstile unavailable'));
-      tokenWaiter = resolve;
-      tokenTimer = setTimeout(() => rejectToken(new Error('Turnstile token timeout')), 120000);
-      try { window.turnstile.reset(id); window.turnstile.execute(id); } catch (e) { rejectToken(e); }
-    }));
-  }
-  function queuedToken() {
-    const task = queue.then(freshToken); queue = task.catch(() => undefined); return task;
-  }
-  async function verifyFirstVisit() {
-    if (initialCheckStarted) return initialCheckPromise;
-    initialCheckStarted = true;
-    initialCheckPromise = (async () => {
-      const token = await queuedToken();
-      const response = await nativeFetch(API_PATH, {
-        method:'POST', credentials:'same-origin',
-        headers:{'Content-Type':'application/json','X-Turnstile-Verify-Only':'1','X-Turnstile-Token':token},
-        body:JSON.stringify({__turnstileVerifyOnly:true})
-      });
-      if (!response.ok) throw new Error('Initial security verification failed');
-      const data = await response.json().catch(() => ({}));
-      if (data.turnstileVerified !== true) throw new Error('Server did not confirm verification');
-      return true;
-    })();
-    return initialCheckPromise;
-  }
-  window.tlTurnstileApiReady = function () {
-    clearTimeout(loadTimer); apiReadyResolve();
-    // Background pre-verification. The page remains usable and no gate is shown.
-    verifyFirstVisit().catch(() => { initialCheckStarted = false; initialCheckPromise = null; });
-  };
-  window.fetch = async function (input, init) {
-    let path = '';
-    try { path = new URL(typeof input === 'string' ? input : input.url, location.href).pathname; } catch (_) {}
-    const method = String((init && init.method) || (input instanceof Request ? input.method : 'GET')).toUpperCase();
-    if (path !== API_PATH || method !== 'POST') return nativeFetch(input, init);
-    const headers = new Headers((init && init.headers) || (input instanceof Request ? input.headers : undefined));
-    // If the first-visit check has not completed, send a fresh one-use token with this request.
-    // The server validates it and issues a signed HttpOnly session cookie.
-    const nextInit = Object.assign({}, init || {}, {credentials:'same-origin', headers});
-    try {
-      if (!initialCheckStarted) {
-        const token = await queuedToken(); headers.set('X-Turnstile-Token', token);
-      } else if (initialCheckPromise) {
-        try { await initialCheckPromise; } catch (_) {
-          const token = await queuedToken(); headers.set('X-Turnstile-Token', token);
-          initialCheckStarted = false; initialCheckPromise = null;
-        }
-      }
-      nextInit.headers = headers;
-      return await nativeFetch(input, nextInit);
-    } catch (_) {
-      return new Response(JSON.stringify({reply:'Security verification could not be completed. Please retry.'}), {status:503, headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}});
-    }
-  };
-})();
-</script>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=tlTurnstileApiReady" async defer></script>
-
 <!-- Cloudflare Turnstile entry gate disabled temporarily to reduce first-visit friction. -->    
 <link rel="icon" href="/favicon.ico?v=2" type="image/x-icon">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -2430,7 +2319,6 @@ START NEW PATTERN
     <div class="tl-brand tl-brand-textonly">
       <button id="tlMenuBtn" class="tl-menu-btn" type="button" aria-expanded="false" aria-controls="tlQuickMenu" aria-label="Open TruthLoop menu"><span aria-hidden="true">☰</span></button>
       <div class="tl-brand-name">TruthLoop AI</div>
-      <span class="tl-cloudflare-trust" aria-label="Protected by Cloudflare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>Protected by Cloudflare</span>
     </div>
     <div class="tl-trust">No Signup <span>•</span> No Login <span>•</span> Privacy First</div>
   </div>
@@ -2622,9 +2510,9 @@ START NEW PATTERN
     
 const API_URL="/api/chat";
 /* Production mode: Loop 7 reports remain behind the paywall until payment is confirmed. */
-//const TL_TEMPORARY_TEST_BYPASS = false;
+const TL_TEMPORARY_TEST_BYPASS = false;
 // Temporary unlock test only: uncomment the next line and comment out the false line above.
- const TL_TEMPORARY_TEST_BYPASS = true;    
+// const TL_TEMPORARY_TEST_BYPASS = true;    
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
 const outputBox=document.getElementById("outputBox");
