@@ -1,16 +1,16 @@
 /**
- * TruthLoop LinkedIn Public Profile Actor — prototype v0.2.0
+ * TruthLoop LinkedIn Public Profile Actor — prototype v0.2.1
  * Auth-free, cookie-free public-page retrieval. No login-wall bypass.
  * Node.js 18+ (native fetch). No additional dependencies.
  */
 
-const ACTOR_VERSION = '0.2.0';
+const ACTOR_VERSION = '0.2.1';
 const ALLOWED_HOSTS = new Set(['linkedin.com', 'www.linkedin.com', 'm.linkedin.com']);
 const DEFAULT_TIMEOUT_MS = 12000;
 const MAX_HTML_BYTES = 2_000_000;
 const MAX_TEXT_CHARS = 30_000;
 const MAX_DIAGNOSTIC_CHARS = 1200;
-const USER_AGENT = 'Mozilla/5.0 (compatible; TruthLoopPublicEvidenceBot/0.2.0; +https://truthloop.in)';
+const USER_AGENT = 'Mozilla/5.0 (compatible; TruthLoopPublicEvidenceBot/0.2.1; +https://truthloop.in)';
 
 function decodeEntities(s = '') {
   return String(s).replace(/&amp;/g, '&').replace(/&quot;/g, '"')
@@ -62,18 +62,20 @@ function parseJsonLd(html) {
 }
 function collectLinks(html, base) {
   const links = [];
-  for (const tag of html.match(/<a\b[^>]*>/gi) || []) {
-    const href = attr(tag, 'href'); if (!href) continue;
+  for (const match of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const tag = `<a ${match[1]}>`;
+    const href = attr(tag, 'href');
+    if (!href) continue;
     try {
       const u = new URL(href, base);
       if (u.protocol !== 'https:') continue;
-      const text = attr(tag, 'aria-label') || attr(tag, 'title') || '';
-      links.push({ url: u.href, label: text });
+      const label = stripTags(match[2]).slice(0, 500)
+        || attr(tag, 'aria-label') || attr(tag, 'title') || '';
+      links.push({ url: u.href, label });
     } catch {}
   }
   return [...new Map(links.map(x => [x.url, x])).values()];
 }
-
 function useful(value) {
   const v = stripTags(String(value ?? '')).replace(/\s+/g, ' ').trim();
   return v && !/^[,.\s|·•\-–—]+$/.test(v) ? v : '';
@@ -99,19 +101,35 @@ function extractDateFromBlock(block) {
   return null;
 }
 function extractContentBlock(html, href) {
-  const escaped = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const re = new RegExp(`<a\\b(?=[^>]*href\\s*=\\s*["']${escaped}["'])[^>]*>[\\s\\S]*?</a>`, 'i');
-  const m = html.match(re);
-  if (!m || m.index == null) return { text: '', publishedDate: null };
-  const before = html.slice(Math.max(0, m.index - 3500), m.index);
-  const li = before.lastIndexOf('<li');
-  const article = before.lastIndexOf('<article');
-  const div = before.lastIndexOf('<div');
-  const start = Math.max(li, article, div, 0);
-  const end = Math.min(html.length, m.index + 6500);
-  const block = html.slice(start, end);
-  const text = stripTags(block).slice(0, 5000);
-  return { text, publishedDate: extractDateFromBlock(block) };
+  const target = canonicalLinkedInUrl(href);
+  if (!target) return { text: '', publishedDate: null };
+  for (const match of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const tag = `<a ${match[1]}>`;
+    let candidate;
+    try { candidate = canonicalLinkedInUrl(new URL(attr(tag, 'href'), href).href); } catch { continue; }
+    if (candidate !== target || match.index == null) continue;
+    const anchorText = stripTags(match[2]);
+    const before = html.slice(Math.max(0, match.index - 2500), match.index);
+    const li = before.lastIndexOf('<li');
+    const article = before.lastIndexOf('<article');
+    const nearest = Math.max(li, article);
+    const start = nearest >= 0 ? Math.max(0, match.index - (before.length - nearest)) : match.index;
+    const afterAnchor = match.index + match[0].length;
+    const end = Math.min(html.length, afterAnchor + 1800);
+    const block = html.slice(start, end);
+    const nearby = stripTags(block).slice(0, 2200);
+    const text = firstUseful(anchorText, nearby);
+    return { text, publishedDate: extractDateFromBlock(block) };
+  }
+  return { text: '', publishedDate: null };
+}
+function canonicalLinkedInUrl(value) {
+  try {
+    const u = new URL(value);
+    if (!['linkedin.com', 'www.linkedin.com', 'm.linkedin.com'].includes(u.hostname.toLowerCase())) return '';
+    u.hash = '';
+    return u.href.replace(/\/$/, '');
+  } catch { return ''; }
 }
 function extractProfile(html, finalUrl) {
   const meta = parseMeta(html);
@@ -123,11 +141,11 @@ function extractProfile(html, finalUrl) {
   const name = firstUseful(main.name,
     meta['profile:first_name'] && `${meta['profile:first_name']} ${meta['profile:last_name'] || ''}`,
     title.split(/\s+[|–-]\s+/)[0]);
-  const headline = firstUseful(main.jobTitle, meta['og:description'], meta.description, meta['twitter:description']);
-  const image = (typeof main.image === 'object' ? main.image?.url : main.image) || meta['og:image'] || '';
+  const headline = firstUseful(main.jobTitle, meta['profile:username'], meta['og:description'], meta.description, meta['twitter:description']);
+  const image = (typeof main.image === 'object' ? (main.image?.url || main.image?.contentUrl) : main.image) || meta['og:image'] || ''; 
   const visibleText = stripTags(html).slice(0, MAX_TEXT_CHARS);
   const links = collectLinks(html, finalUrl);
-  const postLinks = links.filter(x => /linkedin\.com\/(?:posts\/|feed\/update\/)/i.test(x.url))
+  const postLinks = links.filter(x => /linkedin\.com\/(?:posts(?:\/|\?)|feed\/update(?:\/|\?))/i.test(x.url))
     .filter(x => !/\/pulse\//i.test(x.url)).slice(0, 20);
   const articleLinks = links.filter(x => /linkedin\.com\/pulse\//i.test(x.url)).slice(0, 15);
   const posts = postLinks.map(x => {
@@ -156,7 +174,7 @@ function extractProfile(html, finalUrl) {
   const blocked = /authwall|sign in to linkedin|join linkedin|security verification|challenge\/|checkpoint/i.test(html.slice(0, 500000));
   return {
     profile: { name: name || null, headline: headline || null, profileUrl: finalUrl, imageUrl: image || null,
-      about: description || null, location: firstUseful(main.address?.addressLocality, main.address?.addressRegion, main.address?.addressCountry) || null,
+      about: description || null, location: firstUseful(typeof main.address === 'string' ? main.address : '', main.address?.addressLocality, main.address?.addressRegion, main.address?.addressCountry) || null,
       currentPosition: experience[0] || null, experience, education, skills },
     activity: { posts, articles },
     page: { title: title || null, description: description || null, visibleText, linksFound: links.length },
@@ -252,8 +270,10 @@ export async function runLinkedInPublicProfileActor(input = {}, options = {}) {
     availability: { name: !!minimum.name, headline: !!minimum.headline, about: !!minimum.about,
       experience: extracted.profile.experience.length > 0, education: extracted.profile.education.length > 0,
       skills: extracted.profile.skills.length > 0, posts: extracted.activity.posts.length > 0,
-      articles: extracted.activity.articles.length > 0, visibleText: extracted.page.visibleText.length > 0 },
-    limitations: ['Only fields present in the unauthenticated public response are extracted.', 'Experience, education, skills, post text and published dates may remain empty when the public HTML does not expose them.', 'Post and article dates are taken only from explicit public time or published-date metadata.', 'Missing fields are not inferred or fabricated.'],
+      articles: extracted.activity.articles.length > 0, visibleText: extracted.page.visibleText.length > 0,
+      linksFound: extracted.page.linksFound, postsExtracted: extracted.activity.posts.length,
+      articlesExtracted: extracted.activity.articles.length },
+    limitations: ['Only fields present in the unauthenticated public response are extracted.', 'Experience, education, skills, post text and published dates may remain empty when the public HTML does not expose them.', 'Post and article dates are taken only from explicit public time or published-date metadata.', 'Post and article text is limited to text present in nearby public HTML and may include surrounding page context.', 'Missing fields are not inferred or fabricated.'],
     source: { url: finalUrl, contentType: response.headers.get('content-type'), retrievalMethod: 'unauthenticated_public_http' }
   };
 }
