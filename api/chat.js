@@ -9,14 +9,47 @@ import { Redis } from "@upstash/redis";
 const LOOP7_RESULT_TTL_SECONDS = 2 * 60 * 60;
 let loop7RedisClient = null;
 let loop7RedisChecked = false;
+let loop7RedisHost = null;
 
 function getLoop7RedisClient() {
   if (loop7RedisChecked) return loop7RedisClient;
   loop7RedisChecked = true;
-  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "";
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
-  if (url && token) loop7RedisClient = new Redis({ url, token });
+
+  // Vercel dashboard values are sometimes pasted with a trailing newline/space.
+  // Normalize whitespace without ever logging or exposing the token.
+  const url = String(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "").trim().replace(/\/+$/, "");
+  const token = String(process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "").trim();
+  if (!url || !token) return null;
+
+  try {
+    const parsed = new URL(url);
+    loop7RedisHost = parsed.hostname || null;
+    if (parsed.protocol !== "https:") {
+      console.error("LOOP7_RESULT_STORE_CONFIG_INVALID", JSON.stringify({
+        reason: "Upstash REST URL must use HTTPS.", host: loop7RedisHost
+      }));
+      return null;
+    }
+    loop7RedisClient = new Redis({ url, token });
+  } catch (error) {
+    console.error("LOOP7_RESULT_STORE_CONFIG_INVALID", JSON.stringify({
+      reason: String(error?.message || error).slice(0, 240),
+      host: loop7RedisHost
+    }));
+  }
   return loop7RedisClient;
+}
+
+function describeLoop7StoreError(error) {
+  const cause = error?.cause || null;
+  return {
+    name: String(error?.name || "Error").slice(0, 120),
+    message: String(error?.message || error).slice(0, 300),
+    causeName: cause ? String(cause.name || "").slice(0, 120) : null,
+    causeCode: cause ? String(cause.code || cause.errno || "").slice(0, 120) : null,
+    causeMessage: cause ? String(cause.message || cause).slice(0, 300) : null,
+    host: loop7RedisHost
+  };
 }
 
 function isValidLoop7RequestId(value) {
@@ -30,20 +63,22 @@ function loop7ResultKey(requestId) {
 
 async function saveLoop7Result(requestId, record) {
   if (!isValidLoop7RequestId(requestId)) return false;
-  const redis = getLoop7RedisClient();
-  if (!redis) {
-    console.warn("LOOP7_RESULT_STORE_UNAVAILABLE", "Upstash Redis environment variables are not configured.");
-    return false;
-  }
   try {
+    const redis = getLoop7RedisClient();
+    if (!redis) {
+      console.warn("LOOP7_RESULT_STORE_UNAVAILABLE", JSON.stringify({
+        reason: "Redis REST credentials are missing or the REST URL is invalid.", host: loop7RedisHost
+      }));
+      return false;
+    }
     await redis.set(loop7ResultKey(requestId), JSON.stringify(record), { ex: LOOP7_RESULT_TTL_SECONDS });
     console.info("LOOP7_RESULT_STORE_SAVED", JSON.stringify({
-      requestId, status: record?.status || "unknown", ttlSeconds: LOOP7_RESULT_TTL_SECONDS
+      requestId, status: record?.status || "unknown", ttlSeconds: LOOP7_RESULT_TTL_SECONDS, host: loop7RedisHost
     }));
     return true;
   } catch (error) {
     console.error("LOOP7_RESULT_STORE_WRITE_FAILED", JSON.stringify({
-      requestId, status: record?.status || "unknown", error: String(error?.message || error).slice(0, 500)
+      requestId, status: record?.status || "unknown", ...describeLoop7StoreError(error)
     }));
     return false;
   }
@@ -51,16 +86,16 @@ async function saveLoop7Result(requestId, record) {
 
 async function readLoop7Result(requestId) {
   if (!isValidLoop7RequestId(requestId)) return { available: true, record: null };
-  const redis = getLoop7RedisClient();
-  if (!redis) return { available: false, record: null };
   try {
+    const redis = getLoop7RedisClient();
+    if (!redis) return { available: false, record: null };
     const value = await redis.get(loop7ResultKey(requestId));
     if (!value) return { available: true, record: null };
     const record = typeof value === "string" ? JSON.parse(value) : value;
     return { available: true, record: record && typeof record === "object" ? record : null };
   } catch (error) {
     console.error("LOOP7_RESULT_STORE_READ_FAILED", JSON.stringify({
-      requestId, error: String(error?.message || error).slice(0, 500)
+      requestId, ...describeLoop7StoreError(error)
     }));
     return { available: false, record: null };
   }
@@ -3350,6 +3385,13 @@ if (loopAiFallbackUsed) {
   finalPayload.aiFallbackUsed = true;
 }
 
+if (loopLevel === 7) {
+  console.info("LOOP7_FINAL_JSON_RESPONSE_SENT", JSON.stringify({
+    requestId: loop7ReportRequestId,
+    replyChars: String(finalPayload.reply || "").length,
+    evidenceRegistryCount: Array.isArray(finalPayload.evidenceRegistry) ? finalPayload.evidenceRegistry.length : 0
+  }));
+}
 return res.status(200).json(finalPayload);
 
   }
