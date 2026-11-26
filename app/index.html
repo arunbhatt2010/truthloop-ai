@@ -3525,6 +3525,7 @@ function showLoop7ProcessingError(error){
 
 function handleLoop7InvestigationFailure(payload){
   if(!payload || !(payload.investigationFailure === true || payload.type === "investigation_failure")) return false;
+  clearPendingLoop7Request(payload.reportRequestId || "");
 
   const failure = payload.failure && typeof payload.failure === "object" ? payload.failure : {};
   const mode = window.tlLoop7ReportMode === "direct" ? "direct" : "conversation";
@@ -3871,6 +3872,101 @@ function handleLoop7ProgressPayload(payload){
   }
 }
 
+const LOOP7_PENDING_REQUEST_STORAGE_KEY = "truthloop_loop7_pending_result_v1";
+
+function createLoop7ReportRequestId(){
+  try{
+    if(window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+    if(window.crypto && typeof window.crypto.getRandomValues === "function"){
+      const bytes = new Uint8Array(16);
+      window.crypto.getRandomValues(bytes);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = Array.from(bytes, value => value.toString(16).padStart(2,"0")).join("");
+      return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+    }
+  }catch(error){ console.warn("LOOP7_REQUEST_ID_CRYPTO_UNAVAILABLE", error); }
+  // Fallback is only for older webviews without Web Crypto.
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, char => {
+    const random = Math.floor(Math.random() * 16);
+    return (char === "x" ? random : (random & 3) | 8).toString(16);
+  });
+}
+
+function savePendingLoop7Request(request){
+  try{ localStorage.setItem(LOOP7_PENDING_REQUEST_STORAGE_KEY, JSON.stringify(request)); }
+  catch(error){ console.warn("LOOP7_PENDING_REQUEST_SAVE_FAILED", error); }
+}
+
+function readPendingLoop7Request(){
+  try{
+    const raw = localStorage.getItem(LOOP7_PENDING_REQUEST_STORAGE_KEY);
+    if(!raw) return null;
+    const value = JSON.parse(raw);
+    if(!value || typeof value !== "object" || typeof value.requestId !== "string") return null;
+    return value;
+  }catch(error){
+    console.warn("LOOP7_PENDING_REQUEST_READ_FAILED", error);
+    return null;
+  }
+}
+
+function clearPendingLoop7Request(requestId){
+  try{
+    const pending = readPendingLoop7Request();
+    if(!requestId || !pending || pending.requestId === requestId){
+      localStorage.removeItem(LOOP7_PENDING_REQUEST_STORAGE_KEY);
+    }
+  }catch(error){ console.warn("LOOP7_PENDING_REQUEST_CLEAR_FAILED", error); }
+}
+
+async function readStoredLoop7Result(requestId){
+  const url = `${API_URL}?reportRequestId=${encodeURIComponent(requestId)}`;
+  const response = await fetch(url, {method:"GET", cache:"no-store", headers:{"Accept":"application/json"}});
+  let body = null;
+  try{ body = await response.json(); }catch(_){}
+  if(response.status === 202 || body?.status === "pending") return {status:"pending"};
+  if(response.status === 503 || body?.status === "unavailable") return {status:"unavailable"};
+  if(!response.ok) return {status:"unavailable", httpStatus:response.status};
+  return body && typeof body === "object" ? body : {status:"pending"};
+}
+
+async function waitForStoredLoop7Result(requestId, maxWaitMs = 150000){
+  if(!requestId) return null;
+  const deadline = Date.now() + maxWaitMs;
+  let lastPollError = null;
+  while(Date.now() < deadline){
+    try{
+      const record = await readStoredLoop7Result(requestId);
+      if(record.status === "completed" && record.payload && typeof record.payload.reply === "string" && record.payload.reply.trim()) return record;
+      if(record.status === "failed") return record;
+      if(record.status === "unavailable") return record;
+    }catch(error){
+      lastPollError = error;
+      console.warn("LOOP7_RESULT_RECOVERY_POLL_FAILED", error);
+    }
+    await new Promise(resolve => setTimeout(resolve, 5000));
+  }
+  if(lastPollError) console.warn("LOOP7_RESULT_RECOVERY_TIMEOUT", String(lastPollError?.message || lastPollError));
+  return {status:"timeout"};
+}
+
+function applyRecoveredLoop7Report(record, transport = "redis_recovery"){
+  const payload = record?.payload;
+  const reportText = typeof payload?.reply === "string" ? payload.reply.trim() : "";
+  if(record?.status !== "completed" || !reportText) return false;
+  latestTruthLoopReport = reportText;
+  try{ captureEvidenceSourceRegistry(payload); }
+  catch(error){ console.warn("LOOP7_RECOVERED_REGISTRY_CAPTURE_FAILED", error); }
+  try{ saveJourney(); }
+  catch(error){ console.error("LOOP7_RECOVERED_JOURNEY_SAVE_FAILED", error); }
+  console.info("LOOP7_FINAL_PAYLOAD_RECOVERED_FROM_STORE", {
+    transport, replyChars:reportText.length, sourceRegistryCount:Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry.length : 0
+  });
+  clearPendingLoop7Request(record.requestId || payload.reportRequestId || "");
+  return true;
+}
+
 async function fetchLoop7Investigation(profileLink, reportMode = "conversation"){
   const normalizedUrl = normalizePublicProfileUrl(profileLink || "");
   const mode = reportMode === "direct" ? "direct" : "conversation";
@@ -3905,7 +4001,14 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
     console.warn("LOOP7_COOLDOWN_STORAGE_UNAVAILABLE", String(error?.message || error));
   }
 
-  const promise = fetchLoop7InvestigationOnce(normalizedUrl, mode);
+  const reportRequestId = createLoop7ReportRequestId();
+  savePendingLoop7Request({
+    requestId:reportRequestId,
+    url:normalizedUrl,
+    mode,
+    startedAt:Date.now()
+  });
+  const promise = fetchLoop7InvestigationOnce(normalizedUrl, mode, reportRequestId);
   loop7ApiRequestInFlight = {key:requestKey, promise};
   try{
     return await promise;
@@ -3914,7 +4017,27 @@ async function fetchLoop7Investigation(profileLink, reportMode = "conversation")
   }
 }
 
-async function fetchLoop7InvestigationOnce(profileLink, reportMode = "conversation"){
+async function fetchLoop7InvestigationOnce(profileLink, reportMode = "conversation", reportRequestId = ""){
+  try{
+    const result = await fetchLoop7InvestigationTransport(profileLink, reportMode, reportRequestId);
+    if(result && (result.reply || result.investigationFailure === true || result.type === "investigation_failure" || result.platformCard)){
+      clearPendingLoop7Request(reportRequestId);
+    }
+    return result;
+  }catch(error){
+    console.warn("LOOP7_STREAM_FAILED_STARTING_DURABLE_RECOVERY", {requestId:reportRequestId, error:String(error?.message || error)});
+    const recovered = await waitForStoredLoop7Result(reportRequestId, 150000);
+    if(applyRecoveredLoop7Report(recovered, "stream_fallback")) return recovered.payload;
+    if(recovered?.status === "failed"){
+      clearPendingLoop7Request(reportRequestId);
+      const detail = recovered.error?.message || recovered.error?.stage || "The report generation request failed.";
+      throw new Error(`Loop 7 report generation failed: ${detail}`);
+    }
+    throw error;
+  }
+}
+
+async function fetchLoop7InvestigationTransport(profileLink, reportMode = "conversation", reportRequestId = ""){
   const directMode = reportMode === "direct";
   const response = await fetch(API_URL,{
     method:"POST",
@@ -3928,6 +4051,7 @@ async function fetchLoop7InvestigationOnce(profileLink, reportMode = "conversati
       profileLink,
       currentCategory: directMode ? "" : currentCategory,
       reportMode: directMode ? "direct" : "conversation",
+      reportRequestId,
       progress:true,
       uiLanguage
     })
@@ -6518,7 +6642,7 @@ reflectionInput.value="";
 isLoading = false;
 nextBtn.disabled = false;    
 };
-document.getElementById("continueJourneyBtn").onclick = () => {
+document.getElementById("continueJourneyBtn").onclick = async () => {
 track("journey_restored",{
   loop:loopLevel
 });
@@ -6566,6 +6690,64 @@ if(loopLevel === 7 && latestTruthLoopReport.trim()){
   }
   saveJourney();
 } else if(loopLevel === 7){
+  const pendingRequest = readPendingLoop7Request();
+  const pendingUrl = normalizePublicProfileUrl(pendingRequest?.url || "");
+  const currentUrl = normalizePublicProfileUrl(investigationSource || "");
+  const pendingIsCurrent = !!pendingRequest &&
+    !!pendingRequest.requestId &&
+    !!pendingUrl &&
+    pendingUrl === currentUrl &&
+    Date.now() - Number(pendingRequest.startedAt || 0) < (2 * 60 * 60 * 1000);
+
+  if(pendingIsCurrent){
+    // Resume the same server-side report job; never submit the website again.
+    isLoading = true;
+    window.tlLoop7ReportMode = pendingRequest.mode === "direct" ? "direct" : "conversation";
+    window.loop7Started = true;
+    beginLoop7Processing(currentUrl);
+    try{
+      const storedRecord = await waitForStoredLoop7Result(pendingRequest.requestId, 150000);
+      if(applyRecoveredLoop7Report(storedRecord, "journey_resume")){
+        const recoveredPayload = storedRecord.payload;
+        if(!handleLoop7InvestigationFailure(recoveredPayload)){
+          validateLoop7ReportReady(latestTruthLoopReport);
+          updateLoop7ProcessingSources(evidenceSourceRegistry);
+          setLoop7ProcessingStep("evidence","done");
+          setLoop7ProcessingStep("cross","done");
+          setLoop7ProcessingStep("report","done");
+          finishLoop7ReportSections();
+          if(!loop7Unlocked && !TL_TEMPORARY_TEST_BYPASS){
+            await showPaywall();
+          }else{
+            outputBox.innerHTML = renderLoop7Report(latestTruthLoopReport);
+            const article = document.getElementById("articleBlock");
+            if(article) article.style.display = "block";
+            if(reflectionInput){
+              reflectionInput.classList.add("tl-post-report-input");
+              reflectionInput.style.display = "block";
+              reflectionInput.placeholder = "What do you think about this report?";
+            }
+            const composer = document.getElementById("tlReflectionComposer");
+            if(composer) composer.style.display = "block";
+            if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(true);
+          }
+          nextBtn.style.display = "none";
+          saveJourney();
+          isLoading = false;
+          return;
+        }
+      }else if(storedRecord?.status === "failed"){
+        clearPendingLoop7Request(pendingRequest.requestId);
+        showLoop7ProcessingError(new Error(storedRecord.error?.message || storedRecord.error?.stage || "The saved report request failed."));
+        isLoading = false;
+        return;
+      }
+    }catch(recoveryError){
+      console.error("LOOP7_JOURNEY_RESUME_RECOVERY_FAILED", recoveryError);
+    }
+    isLoading = false;
+  }
+
   evidenceSourceRegistry = [];
   window.loop7Started = false;
   mountLoop7Bridge(investigationSource || "", window.tlLoop7ReportMode);
@@ -6722,6 +6904,7 @@ function loadJourney() {
 
 function clearJourney() {
   localStorage.removeItem(MEMORY_KEY);
+  clearPendingLoop7Request("");
   profileCards = [];
   latestTruthLoopReport = "";
   investigationSource = "";
