@@ -3368,6 +3368,15 @@ function advanceLoop7ReportSection(){
   if(!rows.length) return;
   const current = rows.findIndex(row => row.classList.contains("active"));
   const nextIndex = current >= rows.length - 1 ? 0 : current + 1;
+  const nextRow = rows[nextIndex];
+  console.info("TL_LOOP7_PROGRESS_STAGE_DIAGNOSTIC", {
+    reportMode: window.tlLoop7ReportMode || "unknown",
+    activeSectionIndex: nextIndex + 1,
+    activeSection: nextRow?.querySelector("span:nth-child(2)")?.textContent?.trim() || "unknown",
+    elapsedMs: window.loop7ProcessingStartedAt ? Date.now() - window.loop7ProcessingStartedAt : null,
+    sourceCountText: document.getElementById("loop7ProcessingSourceCount")?.textContent?.trim() || "not_received",
+    timestamp: new Date().toISOString()
+  });
   rows.forEach((row,index)=>{
     row.classList.remove("active","done");
     const icon = row.querySelector(".lp7-report-icon");
@@ -4833,16 +4842,12 @@ if(activeLoopPanel){
 }
 
 if (loopLevel === 6) {
-    const reflectionComposer = document.getElementById("tlReflectionComposer");
-    if(reflectionComposer) reflectionComposer.style.display = "none";
     reflectionInput.style.display = "none";
     nextBtn.style.display = "none";
     nextBtn.disabled = true;
     nextBtn.innerText = "Start Loop 7";
     scheduleLoop7BridgeAfterDelay();
 } else {
-    const reflectionComposer = document.getElementById("tlReflectionComposer");
-    if(reflectionComposer) reflectionComposer.style.display = "block";
     reflectionInput.style.display = "block";
     nextBtn.style.display = "block";
     nextBtn.disabled = false;
@@ -6528,50 +6533,6 @@ reflectionInput.value="";
 isLoading = false;
 nextBtn.disabled = false;    
 };
-
-/* Loop 1–6 arrow: reuse the existing Loop 1 / Go Deeper handlers. */
-const tlReflectionSubmitBtn = document.getElementById("tlReflectionSubmitBtn");
-if(tlReflectionSubmitBtn && !tlReflectionSubmitBtn.dataset.tlLoopSubmitBound){
-  tlReflectionSubmitBtn.dataset.tlLoopSubmitBound = "1";
-  tlReflectionSubmitBtn.addEventListener("click", async function(){
-    if(isLoading || tlReflectionSubmitBtn.disabled) return;
-    const answer = String(reflectionInput?.value || "").trim();
-    if(!answer){ reflectionInput?.focus(); return; }
-    tlReflectionSubmitBtn.disabled = true;
-    try{
-      if(loopLevel === 7 && window.tlLoop7ReportMode === "direct" && String(latestTruthLoopReport || "").trim()){
-        if(answer.split(/\s+/).filter(Boolean).length < 5){
-          reflectionInput.setAttribute("aria-invalid", "true");
-          reflectionInput.focus();
-          window.setTimeout(() => reflectionInput.removeAttribute("aria-invalid"), 1000);
-          return;
-        }
-        if(!mainInput || typeof getBtn?.onclick !== "function") throw new Error("Loop 1 start handler unavailable.");
-        mainInput.value = answer;
-        if(inputCounter) inputCounter.textContent = `${answer.length} / 500`;
-        currentCategory = "pattern";
-        window.tlPreLoopManual = true;
-        window.tlPreLoopSituation = answer;
-        loopLevel = 1;
-        window.tlLoop7ReportMode = "conversation";
-        window.loop7Started = false;
-        window.loop7BridgeShown = false;
-        reflectionInput.value = "";
-        await getBtn.onclick();
-        document.getElementById("tlReflectionComposer").style.display = "block";
-      } else if(loopLevel >= 1 && loopLevel <= 5 && typeof nextBtn?.onclick === "function"){
-        await nextBtn.onclick();
-      }
-      /* Loop 6 keeps its existing final-review timer and Loop 7 bridge. */
-    }catch(error){
-      console.error("TRUTHLOOP_LOOP_ANSWER_SUBMIT_FAILED", error);
-      reflectionInput?.focus();
-    }finally{
-      tlReflectionSubmitBtn.disabled = false;
-    }
-  });
-}
-
 document.getElementById("continueJourneyBtn").onclick = () => {
 track("journey_restored",{
   loop:loopLevel
@@ -6635,16 +6596,12 @@ if(loopLevel === 7 && latestTruthLoopReport.trim()){
   /* A saved Loop 1 already has a response; restore its answer box, not the original entry screen. */
   getBtn.style.display = "none";
   mainInput.style.display = "none";
-  const reflectionComposer = document.getElementById("tlReflectionComposer");
+  reflectionInput.style.display = (loopLevel >= 1 && loopLevel <= 5) ? "block" : "none";
   if(loopLevel >= 1 && loopLevel <= 5){
-    if(reflectionComposer) reflectionComposer.style.display = "block";
-    reflectionInput.style.display = "block";
     nextBtn.style.display = "block";
     nextBtn.disabled = false;
     nextBtn.innerText = "Go deeper";
   } else if(loopLevel === 6){
-    if(reflectionComposer) reflectionComposer.style.display = "none";
-    reflectionInput.style.display = "none";
     nextBtn.style.display = "none";
     nextBtn.disabled = true;
     scheduleLoop7BridgeAfterDelay();
