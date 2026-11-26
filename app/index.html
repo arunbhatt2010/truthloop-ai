@@ -1554,42 +1554,6 @@ body{background:radial-gradient(circle at 78% 8%,rgba(168,85,247,.13),transparen
     })(window, document, "clarity", "script", "wqdq8qf8r3");    
 </script>    
 
-<style id="truthloop-planning-v4">
-/* Approved planning pass: investigation-first, no decorative clutter before action. */
-.tl-topbar{min-height:58px}
-.tl-brand-name{letter-spacing:-.02em}
-.tl-hero{padding-top:64px}
-.tl-copy{max-width:760px}
-.tl-sub{max-width:720px}
-.tl-orb{width:250px;height:250px;right:4%;top:18px;opacity:.72}
-.tl-card{margin-top:36px}
-.tl-card-head{align-items:center}
-.tl-question{max-width:760px}
-#mainInput{min-height:168px!important}
-#starterPatterns{margin-top:28px}
-#starterPatterns .categoryBtn{cursor:pointer}
-#starterPatterns .categoryBtn:active{transform:translateY(1px)}
-.tl-proof{margin-top:34px}
-.tl-footer{margin-top:44px}
-@media(max-width:760px){
-  .tl-hero{padding-top:34px}
-.tl-orb{
-width:180px;
-height:180px;
-right:-5px;
-top:0;
-opacity:.65;
-}
-  .tl-kicker{font-size:10px}
-  .tl-sub{font-size:18px}
-  .tl-card{margin-top:28px}
-  .tl-question{font-size:28px}
-  #mainInput{min-height:150px!important;font-size:17px!important}
-  .tl-proof{margin-top:30px}
-}
-</style>
-
-
 <style id="truthloop-final-ui-v5">
   :root{--tl-bg:#060a14;--tl-text:#f7f8fb;--tl-muted:#9aa6bb;--tl-purple:#a855f7;--tl-orange:#ff8c00}
   body{background:radial-gradient(circle at 78% 8%,rgba(168,85,247,.12),transparent 22%),radial-gradient(circle at 18% 22%,rgba(255,140,0,.05),transparent 24%),var(--tl-bg)!important;color:var(--tl-text)}
@@ -1685,14 +1649,12 @@ opacity:.65;
 </style>
 
 <style id="truthloop-final-profile-road-fix">
-  /* Final frozen visual + profile reliability pass */
-  #patternProfile.tl-visible{display:block!important;opacity:1!important;visibility:visible!important;position:static!important;}
-  .tl-output #patternProfile.tl-visible{order:2!important;}
-  .tl-output #loopIndicator.is-active{order:3!important;}
-  .tl-output .aiResponse{order:4!important;}
-  @media(max-width:760px){
-    .tl-hero-art{opacity:.66!important;}
-    .tl-hero-art svg{transform:scale(.98);transform-origin:center;}
+  /* Keep an explicitly revealed profile card visible; layout/order rules are owned by the main UI stylesheet. */
+  #patternProfile.tl-visible{
+    display:block!important;
+    opacity:1!important;
+    visibility:visible!important;
+    position:static!important;
   }
 </style>
 
@@ -1944,18 +1906,9 @@ body{background:radial-gradient(circle at 82% 7%,rgba(168,85,247,.12),transparen
 }
 </style>
 
-<style id="truthloop-public-investigation-test-flow">
-/* 19 Oct test flow: remove the old entry headline and both pre-loop CTAs. */
-#initialInvestigationCard,
-#tlPreLoopScreen1,
-#tlPreLoopScreen5,
-#tlFounderIntroScreen,
-.tl-hero,
-.tl-proof,
-.tl-footer { display:none !important; }
-#outputBox { display:block !important; margin-top:18px !important; }
+<style id="truthloop-loop7-followup-ui">
+/* Current Loop 7 follow-up and reflection controls only. */
 #tlLoopAccordion:empty { display:none !important; }
-#tlLoop7BridgeMount { display:block !important; width:100%; }
 .tl-deeper-investigation-cta{
   display:block;width:100%;margin:20px 0 0;padding:14px 12px;
   border:1px solid rgba(255,190,70,.55);border-radius:12px;
@@ -2006,49 +1959,6 @@ body.tl-report-not-ready #starterPatterns {
   overflow: visible !important;
   overflow-wrap: anywhere !important;
   word-break: normal !important;
-}
-#patternProfile *,
-#outputBox #patternProfile *,
-#outputBox .tl-loop-panel-body #patternProfile * {
-  box-sizing: border-box !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-}
-#profilePrimary,
-#profileTrigger,
-#profileAvoidance,
-#profileBelief {
-  display: block !important;
-  width: 100% !important;
-  line-height: 1.55 !important;
-  text-overflow: clip !important;
-}
-#outputBox,
-#outputBox .tl-loop-panel,
-#outputBox .tl-loop-panel-body,
-.tl-output,
-.tl-loop-panel-body {
-  min-width: 0 !important;
-  max-width: 100% !important;
-}
-@media (max-width: 760px) {
-  #patternProfile,
-  #outputBox #patternProfile,
-  #outputBox .tl-loop-panel-body #patternProfile {
-    padding: 14px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    border-radius: 16px !important;
-  }
-  #profilePrimary,
-  #profileTrigger,
-  #profileAvoidance,
-  #profileBelief {
-    font-size: clamp(13px, 3.6vw, 15px) !important;
-    line-height: 1.5 !important;
-  }
 }
 </style>
 
@@ -4465,6 +4375,8 @@ function mountLoop7Bridge(profileLink = "", mode = window.tlLoop7ReportMode || "
   if(directButton) directButton.addEventListener("click", () => startDirectLoop7Report());
   window.loop7BridgeShown = true;
   reflectionInput.style.display = "none";
+  const reflectionComposer = document.getElementById("tlReflectionComposer");
+  if(reflectionComposer) reflectionComposer.style.display = "none";
   getBtn.style.display = "none";
   mainInput.style.display = "none";
   shareBox.style.display = "none";
@@ -4834,11 +4746,15 @@ if(activeLoopPanel){
 
 if (loopLevel === 6) {
     reflectionInput.style.display = "none";
+    const reflectionComposer = document.getElementById("tlReflectionComposer");
+    if(reflectionComposer) reflectionComposer.style.display = "none";
     nextBtn.style.display = "none";
     nextBtn.disabled = true;
     nextBtn.innerText = "Start Loop 7";
     scheduleLoop7BridgeAfterDelay();
 } else {
+    const reflectionComposer = document.getElementById("tlReflectionComposer");
+    if(reflectionComposer) reflectionComposer.style.display = "block";
     reflectionInput.style.display = "block";
     nextBtn.style.display = "block";
     nextBtn.disabled = false;
@@ -5673,42 +5589,6 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 </style>
 
 
-<style id="truthloop-profile-card-mobile-width-fix">
-  /* Targeted fix: keep Profile Card within the active Loop panel on narrow screens. */
-  #outputBox .tl-loop-panel-body #patternProfile,
-  #outputBox #patternProfile {
-    box-sizing: border-box !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow-wrap: anywhere !important;
-  }
-
-  #outputBox .tl-loop-panel-body #patternProfile > div,
-  #outputBox #patternProfile > div {
-    box-sizing: border-box !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: normal !important;
-  }
-
-  @media (max-width: 760px) {
-    #outputBox .tl-loop-panel-body #patternProfile,
-    #outputBox #patternProfile {
-      padding: 14px !important;
-      border-radius: 16px !important;
-    }
-
-    #outputBox .tl-loop-panel-body #patternProfile > div:not(:first-child),
-    #outputBox #patternProfile > div:not(:first-child) {
-      font-size: 13.5px !important;
-      line-height: 1.5 !important;
-    }
-  }
-</style>
-
 </head>
     <body>
       ${reportHeader}
@@ -6492,23 +6372,7 @@ loopLevel
 
 saveJourney();
 
-if (loopLevel >= 7) {
-
-    typeEffect(data.reply);
-} else {
-
-    typeEffect(data.reply);
-
-}
-
-try{
-    // showShareCard(data.reply);
-}catch(e){
-    console.log("share error", e);
-}
-
-// Duplicate call bhi comment
-// showShareCard(data.reply);
+typeEffect(data.reply);
 
 if(loopLevel >= 7){
 
@@ -6589,10 +6453,14 @@ if(loopLevel === 7 && latestTruthLoopReport.trim()){
   mainInput.style.display = "none";
   reflectionInput.style.display = (loopLevel >= 1 && loopLevel <= 5) ? "block" : "none";
   if(loopLevel >= 1 && loopLevel <= 5){
+    const reflectionComposer = document.getElementById("tlReflectionComposer");
+    if(reflectionComposer) reflectionComposer.style.display = "block";
     nextBtn.style.display = "block";
     nextBtn.disabled = false;
     nextBtn.innerText = "Go deeper";
   } else if(loopLevel === 6){
+    const reflectionComposer = document.getElementById("tlReflectionComposer");
+    if(reflectionComposer) reflectionComposer.style.display = "none";
     nextBtn.style.display = "none";
     nextBtn.disabled = true;
     scheduleLoop7BridgeAfterDelay();
@@ -7104,6 +6972,58 @@ async function startLinkedInOAuth() {
     window.tlPreLoopSituation = input.value;
     if(window.tlPreLoopManual !== false) window.tlPreLoopManual = true;
   }, true);
+
+  /* Post-report arrow: start guided Loop 1 from the saved report, then reuse the existing Go Deeper handler. */
+  const reflectionInput = document.getElementById('reflectionInput');
+  const reflectionSubmit = document.getElementById('tlReflectionSubmitBtn');
+
+  function submitReflectionAnswer(){
+    if(!reflectionInput || isLoading) return;
+    const answer = reflectionInput.value.trim();
+    if(!answer){
+      reflectionInput.focus();
+      return;
+    }
+
+    if(Number(loopLevel) === 7 && String(latestTruthLoopReport || '').trim()){
+      const wordCount = answer.split(/\s+/).filter(Boolean).length;
+      if(wordCount < 5){
+        reflectionInput.setAttribute('aria-invalid','true');
+        reflectionInput.focus();
+        window.setTimeout(()=>reflectionInput.removeAttribute('aria-invalid'),1000);
+        return;
+      }
+      mainInput.value = answer;
+      reflectionInput.value = '';
+      currentCategory = 'pattern';
+      loopLevel = 1;
+      messages = [];
+      profileCards = [];
+      window.loop7Started = false;
+      window.loop7BridgeShown = false;
+      window.tlLoop7ReportMode = 'conversation';
+      if(counter) counter.textContent = mainInput.value.length + ' / 500';
+      submit.disabled = false;
+      submit.click();
+      return;
+    }
+
+    if(Number(loopLevel) >= 1 && Number(loopLevel) <= 5){
+      nextBtn.click();
+    }
+  }
+
+  if(reflectionSubmit){
+    reflectionSubmit.addEventListener('click', submitReflectionAnswer);
+  }
+  if(reflectionInput){
+    reflectionInput.addEventListener('keydown', function(event){
+      if(event.key === 'Enter' && !event.shiftKey){
+        event.preventDefault();
+        submitReflectionAnswer();
+      }
+    });
+  }
 
   /* Restored journeys: keep the menu hidden while the investigation is already in progress. */
   const continueJourney = document.getElementById('continueJourneyBtn');
