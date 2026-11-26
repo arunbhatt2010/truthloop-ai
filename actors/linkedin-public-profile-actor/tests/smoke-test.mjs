@@ -1,9 +1,0 @@
-{
-  "name": "truthloop-linkedin-public-profile-actor",
-  "version": "0.2.1",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "node tests/smoke-test.mjs"
-  }
-}
