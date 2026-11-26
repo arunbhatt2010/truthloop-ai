@@ -1298,17 +1298,11 @@ SOURCE TRACEABILITY — EVERY FINDING MUST BE CHECKABLE
 - Every material public-evidence factual claim and every positive finding, contradiction, potential inconsistency, risk signal or validation finding in Sections 1–7 MUST carry an inline citation such as [SOURCE_01] using the exact ID from sourceCitationIndex.
 - Put the citation immediately after the specific sentence it supports. Do not place all citations only at the end of a section or in the Confidence Breakdown. Every factual paragraph in Sections 1–7 must contain one or more valid inline SOURCE IDs.
 
-SECTION-LOCAL SOURCE-ID DISPLAY CONTRACT — REQUIRED IN ALL EIGHT SECTIONS
-- At the end of EACH of the eight required sections, add one separate final line in exactly this format: "Evidence IDs: [SOURCE_01], [SOURCE_07]".
-- List only the exact SOURCE IDs already present in sourceCitationIndex whose retained source content directly supports a finding in THAT specific section. IDs may repeat across sections only when the same source genuinely supports both.
-- Keep sentence-level inline citations in Sections 1–7; the final Evidence IDs line is an additional section-level index, not a replacement.
-- If no collected source directly supports a factual finding in a section, write exactly: "Evidence IDs: NONE — insufficient direct evidence". Do not borrow IDs from another section, infer relevance from a title or URL, or invent an ID to fill the line.
-- Keep this line inside its own section and before the next numbered section heading. It must not be moved into Section 08's Confidence Breakdown or the final Evidence Sources list.
 - When a paragraph contains multiple distinct factual claims, cite each claim next to its own supporting evidence; a single citation at paragraph end is acceptable only when that exact source supports every claim in the paragraph.
 - Before returning the report, silently audit Sections 1–7: confirm that every factual finding has a valid citation, every cited ID exists in sourceCitationIndex, and every cited source's actual content supports the nearby claim. If support is unavailable, narrow the statement or label it NOT ESTABLISHED / INSUFFICIENT EVIDENCE; never invent a citation to fill a gap.
 - A source's published date is only the date stored in its explicit publishedDate field. Do not present fetchTimestamp, collectedAt, updatedAt, crawl time or an ambiguous generic timestamp as a publication date. If publishedDate is null, state that the publication date is unavailable.
 - Never fabricate a source date or infer a publication date from a URL, filename, copyright year or the date on which the website was fetched.
-- Put the citation immediately after the statement it supports. The cited source's actual content must directly support the nearby claim; a title, URL, metadata field, platform label or source existence alone is not proof of page content.
+- The cited source's actual content must directly support the nearby claim; a title, URL, metadata field, platform label or source existence alone is not proof of page content.
 - When comparing aligned evidence or a contradiction, cite every material record used in the comparison. For a contradiction, cite both the website-side claim and the supporting-source-side claim, not just one side.
 - A source ID may appear in multiple sections if the same record genuinely supports each cited finding. Never reuse an ID to support a claim that the source does not establish.
 - Keep source provenance explicit in the prose: official-website/company-published, LinkedIn, X, GitHub, other third-party, or independently published. Do not call a company-published claim independent validation. Use sourceCitationIndex to preserve the exact SOURCE ID next to the related observation.
@@ -2888,9 +2882,6 @@ let emotionalDriver = "unknown";
 let avoidanceStyle = "unknown";
 let hiddenAssumption = "unknown";
 
-/* =========================
-   PROFILE PARSE
-========================= */
 if (profileData) {
   try {
 
