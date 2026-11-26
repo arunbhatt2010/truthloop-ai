@@ -3276,8 +3276,8 @@ function renderLoop7ProcessingShell(profileLink){
   const safeLink = escapeHtml(profileLink || "");
   const directMode = window.tlLoop7ReportMode === "direct";
   const processingDescription = directMode
-    ? "TruthLoop is examining publicly available evidence from your selected source, connecting findings, and preparing your investigation report. Please keep this page open."
-    : "TruthLoop is collecting evidence, connecting patterns, and preparing your final investigation. Please keep this page open.";
+    ? "TruthLoop is examining publicly available evidence from your selected source and preparing your investigation report. Please keep this page open until the completed report appears."
+    : "TruthLoop is examining public evidence, connecting patterns, and preparing your final investigation. Please keep this page open until the completed report appears.";
   const startingStepLabel = directMode
     ? "Public investigation source secured"
     : "Loop 1–6 case context secured";
@@ -3297,29 +3297,17 @@ function renderLoop7ProcessingShell(profileLink){
       <div class="lp7-progress-line active" id="loop7ProcessingStep-evidence">
         <span class="lp7-progress-icon">•</span>
         <span class="lp7-progress-dot"></span>
-        <span>Collecting public evidence</span>
-      </div>
-
-      <div class="lp7-progress-line" id="loop7ProcessingStep-cross">
-        <span class="lp7-progress-icon">○</span>
-        <span class="lp7-progress-dot"></span>
-        <span>Building cross-evidence package</span>
-      </div>
-
-      <div class="lp7-progress-line" id="loop7ProcessingStep-report">
-        <span class="lp7-progress-icon">○</span>
-        <span class="lp7-progress-dot"></span>
-        <span>Generating final investigation</span>
+        <span>Examining public evidence and preparing your report</span>
       </div>
 
       <details id="loop7ReportDetails" class="lp7-report-details" open>
-        <summary id="loop7ReportDetailsSummary">Report structure · counting sources · 8 sections</summary>
+        <summary id="loop7ReportDetailsSummary">Investigation in progress · 8 report sections</summary>
         <div id="loop7ProcessingSources" class="lp7-live-report">
           <div class="lp7-source-head">
             <div class="lp7-source-title">🔎 Evidence collection</div>
-            <div class="lp7-source-count" id="loop7ProcessingSourceCount" aria-live="polite">Waiting for source count…</div>
+            <div class="lp7-source-count" id="loop7ProcessingSourceCount" aria-live="polite">Source summary will appear with your completed report</div>
           </div>
-          <div class="lp7-live-note" id="loop7ProcessingLiveNote">Mapping evidence into the eight report sections</div>
+          <div class="lp7-live-note" id="loop7ProcessingLiveNote">Examining public evidence and preparing the eight report sections</div>
           <div class="lp7-section-list" id="loop7ProcessingSourceList" aria-live="polite">
             ${[
               "01. Identity & Self-Representation",
@@ -4043,7 +4031,7 @@ async function fetchLoop7InvestigationTransport(profileLink, reportMode = "conve
     method:"POST",
     headers:{
       "Content-Type":"application/json",
-      "Accept":"application/json, text/event-stream"
+      "Accept":"application/json"
     },
     body:JSON.stringify({
       messages: directMode ? [] : messages,
@@ -4052,7 +4040,9 @@ async function fetchLoop7InvestigationTransport(profileLink, reportMode = "conve
       currentCategory: directMode ? "" : currentCategory,
       reportMode: directMode ? "direct" : "conversation",
       reportRequestId,
-      progress:true,
+      // Loop 7 final delivery uses a normal JSON response, not SSE. This avoids
+      // mobile/proxy stream-final-event loss after the backend has generated the report.
+      progress:false,
       uiLanguage
     })
   });
