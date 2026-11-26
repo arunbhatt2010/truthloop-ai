@@ -2541,9 +2541,9 @@ START NEW PATTERN
     
 const API_URL="/api/chat";
 /* Production mode: Loop 7 reports remain behind the paywall until payment is confirmed. */
-//const TL_TEMPORARY_TEST_BYPASS = false;
+const TL_TEMPORARY_TEST_BYPASS = false;
 // Temporary unlock test only: uncomment the next line and comment out the false line above.
- const TL_TEMPORARY_TEST_BYPASS = true;    
+// const TL_TEMPORARY_TEST_BYPASS = true;    
 const RAZORPAY_KEY_ID="rzp_live_SkoC6fqjfhi4WP";    
     
 const outputBox=document.getElementById("outputBox");
@@ -5391,8 +5391,9 @@ function renderLoop7Report(report){
     const sectionHtml = sections.map((section,index) => {
       const sectionText = parsed.bodies[index] || "";
       const sectionBody = bodies[index] || `<p class="tlr-empty">${section.fallback}</p>`;
-      const sectionEvidenceIds = renderLoop7SectionEvidenceIds(sectionText, index + 1);
-      return `<section id="${section.id}" class="tlr-report-section"><h2>${section.icon} ${section.title}</h2>${sectionBody}${sectionEvidenceIds}</section>`;
+      // SOURCE IDs are already rendered inline by toSafeHtml/decorateLoop7Citations.
+      // Do not append a second Evidence IDs strip; that duplicated every citation.
+      return `<section id="${section.id}" class="tlr-report-section"><h2>${section.icon} ${section.title}</h2>${sectionBody}</section>`;
     }).join("");
     reportBodyHtml = prefaceHtml + sectionHtml;
   }
