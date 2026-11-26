@@ -2547,6 +2547,7 @@ let activeLoopPanel = null;
 let activeLoopBody = null;
 window.loop7BridgeShown = false;
 window.tlLoop7ReportMode = "conversation";
+window.tlDirectReportArchiveData = null;
 
 
 window.setTruthLoopMenuVisibility = function(visible){
@@ -5420,8 +5421,13 @@ function whatsappShare(){
 window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 
   }
- function downloadTruthLoopReport(){
-  const report = document.querySelector(".truthLoopReport");
+ function downloadTruthLoopReport(options = {}){
+  const report = options.reportRoot || document.querySelector(".truthLoopReport");
+  const reportEvidenceRegistry = Array.isArray(options.evidenceSourceRegistry)
+    ? options.evidenceSourceRegistry
+    : evidenceSourceRegistry;
+  const reportInvestigationSource = options.investigationSource || investigationSource;
+  const reportMode = options.reportMode || window.tlLoop7ReportMode;
   if(!report) return false;
 
   const generatedDate = new Date().toLocaleDateString(undefined,{
@@ -5439,10 +5445,7 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     return clone.innerHTML.trim();
   }
 
-  const sourceRows = (Array.isArray(evidenceSourceRegistry)
-    ? evidenceSourceRegistry
-    : []
-  ).map((item,index) => {
+  const sourceRows = reportEvidenceRegistry.map((item,index) => {
     const sourceId = item.sourceId || `SOURCE_${String(index + 1).padStart(2,"0")}`;
     const type = item.sourceType || "public_evidence";
     const title = item.title || "Untitled source";
@@ -5505,7 +5508,7 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     </section>
   `;
 
-  const unstructuredReportText = document.getElementById("tlr-unstructured-report");
+  const unstructuredReportText = report.querySelector("#tlr-unstructured-report");
   const unstructuredReportHtml = unstructuredReportText
     ? `<section style="margin-top:24px;"><h2>Investigation Report (original response)</h2>${unstructuredReportText.innerHTML.replace(/<h2[^>]*>[\s\S]*?<\/h2>/i, "")}</section>`
     : "";
@@ -5546,7 +5549,7 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
     </div>
   `;
 
-  const conversationBasedReport = window.tlLoop7ReportMode !== "direct";
+  const conversationBasedReport = reportMode !== "direct";
   const reportHeader = `
     <div style="
       max-width:900px;
@@ -5590,7 +5593,7 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 
         <p style="margin-top:12px;">
           <b>Investigation Source</b><br>
-          ${escapeHtml(investigationSource || "Not provided")}
+          ${escapeHtml(reportInvestigationSource || "Not provided")}
         </p>
 
         <p style="color:#999;font-size:13px;">
@@ -5739,11 +5742,30 @@ window.open(`https://wa.me/?text=${encodeURIComponent(shareText.innerText)}`);
 // LOOP 7 DOWNLOAD BUTTON CLICK HANDLER
 document.addEventListener("click", function(event) {
   const button = event.target.closest("#downloadReportBtn");
-
   if (!button) return;
 
   event.preventDefault();
-  downloadTruthLoopReport();
+  const archive = button.closest("#tlDirectReportsArchive");
+  const reportRoot = button.closest(".truthLoopReport") || document.querySelector(".truthLoopReport");
+
+  if(archive){
+    downloadTruthLoopReport({
+      reportRoot,
+      evidenceSourceRegistry: Array.isArray(archive._tlEvidenceSourceRegistry)
+        ? archive._tlEvidenceSourceRegistry
+        : [],
+      investigationSource: archive.dataset.tlInvestigationSource || "",
+      reportMode: "direct"
+    });
+    console.info("TL_DIRECT_REPORT_ARCHIVE_DOWNLOAD", {
+      sourceCount: Array.isArray(archive._tlEvidenceSourceRegistry)
+        ? archive._tlEvidenceSourceRegistry.length
+        : 0,
+      timestamp: new Date().toISOString()
+    });
+  }else{
+    downloadTruthLoopReport({reportRoot});
+  }
 });
 /* LOOP 7 PAYWALL */
 
@@ -6078,6 +6100,85 @@ document.querySelectorAll(".categoryBtn").forEach(btn=>{
   };
 });
 
+
+/* Keep the original Direct Report available after Loop 1. */
+function ensureDirectReportArchiveShell(host){
+  let fold = document.getElementById("tlDirectReportsArchive");
+  if(!fold){
+    fold = document.createElement("details");
+    fold.id = "tlDirectReportsArchive";
+    fold.style.cssText = "margin:14px 0 18px;padding:14px 16px;border:1px solid rgba(148,163,184,.28);border-left:4px solid #94a3b8;border-radius:15px;background:rgba(255,255,255,.035);color:#e5e7eb;";
+    const summary = document.createElement("summary");
+    summary.textContent = "📄 Your Direct Reports";
+    summary.style.cssText = "cursor:pointer;font-weight:800;line-height:1.5;list-style:none;";
+    const body = document.createElement("div");
+    body.className = "tl-direct-reports-content";
+    body.style.cssText = "margin-top:14px;min-width:0;";
+    fold.append(summary, body);
+    host.parentNode.insertBefore(fold, host);
+  }
+  const body = fold.querySelector(".tl-direct-reports-content");
+  return body ? {fold, body} : null;
+}
+
+function archiveDirectReportBeforeLoop1(){
+  const host = document.getElementById("outputBox");
+  if(!host?.querySelector(".truthLoopReport") || !host.parentNode) return false;
+  const shell = ensureDirectReportArchiveShell(host);
+  if(!shell) return false;
+  while(host.firstChild) shell.body.appendChild(host.firstChild);
+
+  const registry = Array.isArray(evidenceSourceRegistry) ? evidenceSourceRegistry.map(item=>({...item})) : [];
+  shell.fold._tlEvidenceSourceRegistry = registry;
+  shell.fold.dataset.tlInvestigationSource = String(investigationSource || "");
+  shell.fold.open = false;
+  window.tlDirectReportArchiveData = {
+    report: String(latestTruthLoopReport || ""),
+    investigationSource: String(investigationSource || ""),
+    evidenceSourceRegistry: registry
+  };
+  console.info("TL_DIRECT_REPORT_ARCHIVED", {
+    sourceCount:registry.length,
+    reportChars:shell.fold.querySelector(".truthLoopReport")?.textContent?.length || 0,
+    timestamp:new Date().toISOString()
+  });
+  return true;
+}
+
+function restoreSavedDirectReportArchive(){
+  const saved = window.tlDirectReportArchiveData;
+  const host = document.getElementById("outputBox");
+  if(!saved?.report || !host?.parentNode || document.getElementById("tlDirectReportsArchive")) return false;
+
+  const previousRegistry = evidenceSourceRegistry;
+  const previousSource = investigationSource;
+  const registry = Array.isArray(saved.evidenceSourceRegistry) ? saved.evidenceSourceRegistry : [];
+  const temp = document.createElement("div");
+  try{
+    evidenceSourceRegistry = registry;
+    investigationSource = saved.investigationSource || "";
+    temp.innerHTML = renderLoop7Report(saved.report);
+  }catch(error){
+    console.error("TL_DIRECT_REPORT_ARCHIVE_RESTORE_FAILED", error);
+    return false;
+  }finally{
+    evidenceSourceRegistry = previousRegistry;
+    investigationSource = previousSource;
+  }
+
+  const shell = ensureDirectReportArchiveShell(host);
+  if(!shell) return false;
+  while(temp.firstChild) shell.body.appendChild(temp.firstChild);
+  shell.fold._tlEvidenceSourceRegistry = registry.map(item=>({...item}));
+  shell.fold.dataset.tlInvestigationSource = String(saved.investigationSource || "");
+  shell.fold.open = false;
+  console.info("TL_DIRECT_REPORT_ARCHIVE_RESTORED", {
+    sourceCount:registry.length,
+    timestamp:new Date().toISOString()
+  });
+  return true;
+}
+
 /* START */
     
 getBtn.onclick = async () => {
@@ -6149,8 +6250,21 @@ messages=[{
     role:"user",
     content:text
 }];
+
+const startingFromDirectReport = window.tlLoop7ReportMode === "direct" &&
+  typeof latestTruthLoopReport === "string" && !!latestTruthLoopReport.trim();
+if(startingFromDirectReport){
+  if(!archiveDirectReportBeforeLoop1()){
+    console.error("TL_DIRECT_REPORT_ARCHIVE_FAILED", {hasReport:!!latestTruthLoopReport.trim()});
+    isLoading = false; getBtn.disabled = false; return;
+  }
+  loopLevel = 1;
+  window.tlLoop7ReportMode = "conversation";
+  console.info("TL_DIRECT_REPORT_TO_LOOP1", {loopLevel, timestamp:new Date().toISOString()});
+}
 window.loop7BridgeShown = false;
 window.loop7Started = false;
+if(startingFromDirectReport) saveJourney();
 
 showLoop1Indicator();
 if(typeof window.setTruthLoopMenuVisibility === "function") window.setTruthLoopMenuVisibility(false);
@@ -6184,6 +6298,11 @@ setTimeout(()=>{
 },100);
 
 const data=await callAPI();
+console.info("TL_LOOP1_RESPONSE_MILESTONE", {
+  hasReply:!!(data && typeof data.reply === "string" && data.reply.trim()),
+  replyChars:typeof data?.reply === "string" ? data.reply.length : 0,
+  timestamp:new Date().toISOString()
+});
 if(data && typeof data.reply === "string" && data.reply.trim()){
   track("targeted_loop1_response_received", {loop: 1});
 }
@@ -6533,6 +6652,46 @@ reflectionInput.value="";
 isLoading = false;
 nextBtn.disabled = false;    
 };
+
+/* Reuse the existing Loop 1 and Go Deeper handlers from the report composer arrow. */
+const tlReflectionSubmitBtn = document.getElementById("tlReflectionSubmitBtn");
+if(tlReflectionSubmitBtn && !tlReflectionSubmitBtn.dataset.tlHandlerBound){
+  tlReflectionSubmitBtn.dataset.tlHandlerBound = "1";
+  tlReflectionSubmitBtn.addEventListener("click", function(){
+    if(isLoading) return;
+    const answer = String(reflectionInput?.value || "").trim();
+    if(!answer){ reflectionInput?.focus(); console.info("TL_LOOP_ARROW_EMPTY",{loopLevel}); return; }
+
+    if(window.tlLoop7ReportMode === "direct" && loopLevel === 7 && latestTruthLoopReport.trim()){
+      const words = answer.split(/\s+/).filter(Boolean).length;
+      if(words < 5){
+        reflectionInput.focus();
+        reflectionInput.setAttribute("aria-invalid","true");
+        console.info("TL_DIRECT_REPORT_LOOP1_INPUT_TOO_SHORT",{words,required:5});
+        setTimeout(()=>reflectionInput.removeAttribute("aria-invalid"),1000);
+        return;
+      }
+      mainInput.value = answer;
+      mainInput.dispatchEvent(new Event("input",{bubbles:true}));
+      window.tlPreLoopManual = true;
+      window.tlPreLoopSituation = answer;
+      currentCategory = "pattern";
+      console.info("TL_DIRECT_REPORT_ARROW_SUBMIT",{destination:"Loop 1",chars:answer.length,timestamp:new Date().toISOString()});
+      getBtn.click();
+      if(isLoading) reflectionInput.value = "";
+      return;
+    }
+
+    if(loopLevel >= 1 && loopLevel <= 5){
+      console.info("TL_GO_DEEPER_ARROW_SUBMIT",{fromLoop:loopLevel,toLoop:loopLevel+1,timestamp:new Date().toISOString()});
+      nextBtn.click();
+      if(isLoading) reflectionInput.value = "";
+      return;
+    }
+    console.warn("TL_LOOP_ARROW_NO_ACTION",{loopLevel,reportMode:window.tlLoop7ReportMode || "unknown"});
+  });
+}
+
 document.getElementById("continueJourneyBtn").onclick = () => {
 track("journey_restored",{
   loop:loopLevel
@@ -6690,6 +6849,7 @@ function saveJourney() {
         evidenceSourceRegistry: Array.isArray(evidenceSourceRegistry)
           ? evidenceSourceRegistry.slice(0, 100)
           : [],
+        directReportArchive: window.tlDirectReportArchiveData || null,
         loop7Started: !!window.loop7Started,
         loop7BridgeShown: !!window.loop7BridgeShown,
         reportMode: window.tlLoop7ReportMode === "direct" ? "direct" : "conversation",
@@ -6737,6 +6897,7 @@ function loadJourney() {
 
 function clearJourney() {
   localStorage.removeItem(MEMORY_KEY);
+  window.tlDirectReportArchiveData = null;
   profileCards = [];
   latestTruthLoopReport = "";
   investigationSource = "";
@@ -6777,6 +6938,9 @@ investigationSource = restored.investigationSource || "";
 evidenceSourceRegistry = Array.isArray(restored.evidenceSourceRegistry)
   ? restored.evidenceSourceRegistry.slice(0, 100)
   : [];
+window.tlDirectReportArchiveData = restored.directReportArchive && typeof restored.directReportArchive === "object"
+  ? restored.directReportArchive
+  : null;
 window.loop7Started = !!restored.loop7Started;
 window.loop7BridgeShown = !!restored.loop7BridgeShown;
 window.tlLoop7ReportMode = restored.reportMode === "direct" ? "direct" : "conversation";
@@ -6806,6 +6970,7 @@ const messagesForRestore =
     : messages;
 const restoredBridgeIsCurrent = loopLevel === 7 || (loopLevel === 6 && !!restored.loop7BridgeShown);
 restoreLoopHistory(messagesForRestore, loopLevel, !restoredBridgeIsCurrent);
+if(window.tlDirectReportArchiveData) restoreSavedDirectReportArchive();
 if(loopLevel >= 2 && loopLevel <= 6) restoreLatestProfileCard();
 
 /* =========================================================
