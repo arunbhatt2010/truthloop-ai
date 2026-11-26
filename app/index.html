@@ -4150,14 +4150,8 @@ async function fetchLoop7InvestigationOnce(profileLink, reportMode = "conversati
       // immediately after that complete event; do not wait for reader.read()
       // to report EOF on mobile browsers or intermediary connections.
       if(finalPayload || investigationFailurePayload){
-        try {
-          const cancelResult = reader.cancel();
-          if(cancelResult && typeof cancelResult.catch === "function"){
-            cancelResult.catch(cancelError => console.warn("LOOP7_FINAL_STREAM_CANCEL_WARNING", cancelError));
-          }
-        } catch(cancelError) {
-          console.warn("LOOP7_FINAL_STREAM_CANCEL_WARNING", cancelError);
-        }
+        // The final SSE event is already complete and parsed. Do not cancel the
+        // response body here: allow chat.js to finish its drain-aware end().
         if(investigationFailurePayload){
           console.info("LOOP7_INVESTIGATION_FAILURE_STREAM_RETURNED", {
             failureReason: investigationFailurePayload?.failure?.reasonCode || "unknown"
