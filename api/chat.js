@@ -4,18 +4,90 @@ import { loadEvidenceCompressionBrain }
 from "./EvidenceCompressionBrain.js";
 import { loadCrossEvidenceBrain }
 from "./CrossEvidenceBrain.js";
+import { Redis } from "@upstash/redis";
+
+const LOOP7_RESULT_TTL_SECONDS = 2 * 60 * 60;
+let loop7RedisClient = null;
+let loop7RedisChecked = false;
+
+function getLoop7RedisClient() {
+  if (loop7RedisChecked) return loop7RedisClient;
+  loop7RedisChecked = true;
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "";
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
+  if (url && token) loop7RedisClient = new Redis({ url, token });
+  return loop7RedisClient;
+}
+
+function isValidLoop7RequestId(value) {
+  return typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function loop7ResultKey(requestId) {
+  return `truthloop:loop7:result:${requestId}`;
+}
+
+async function saveLoop7Result(requestId, record) {
+  if (!isValidLoop7RequestId(requestId)) return false;
+  const redis = getLoop7RedisClient();
+  if (!redis) {
+    console.warn("LOOP7_RESULT_STORE_UNAVAILABLE", "Upstash Redis environment variables are not configured.");
+    return false;
+  }
+  try {
+    await redis.set(loop7ResultKey(requestId), JSON.stringify(record), { ex: LOOP7_RESULT_TTL_SECONDS });
+    console.info("LOOP7_RESULT_STORE_SAVED", JSON.stringify({
+      requestId, status: record?.status || "unknown", ttlSeconds: LOOP7_RESULT_TTL_SECONDS
+    }));
+    return true;
+  } catch (error) {
+    console.error("LOOP7_RESULT_STORE_WRITE_FAILED", JSON.stringify({
+      requestId, status: record?.status || "unknown", error: String(error?.message || error).slice(0, 500)
+    }));
+    return false;
+  }
+}
+
+async function readLoop7Result(requestId) {
+  if (!isValidLoop7RequestId(requestId)) return { available: true, record: null };
+  const redis = getLoop7RedisClient();
+  if (!redis) return { available: false, record: null };
+  try {
+    const value = await redis.get(loop7ResultKey(requestId));
+    if (!value) return { available: true, record: null };
+    const record = typeof value === "string" ? JSON.parse(value) : value;
+    return { available: true, record: record && typeof record === "object" ? record : null };
+  } catch (error) {
+    console.error("LOOP7_RESULT_STORE_READ_FAILED", JSON.stringify({
+      requestId, error: String(error?.message || error).slice(0, 500)
+    }));
+    return { available: false, record: null };
+  }
+}
+
 export default async function handler(req, res) {
 
   /* =========================
      CORS + request method
   ========================= */
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method === "GET") {
+    const requestId = String(req.query?.reportRequestId || new URL(req.url || "/api/chat", "https://truthloop.in").searchParams.get("reportRequestId") || "");
+    if (!isValidLoop7RequestId(requestId)) return res.status(400).json({ status: "invalid_request_id" });
+    res.setHeader("Cache-Control", "no-store, max-age=0");
+    const stored = await readLoop7Result(requestId);
+    if (!stored.available) return res.status(503).json({ status: "unavailable", message: "Temporary report recovery storage is unavailable." });
+    if (!stored.record) return res.status(202).json({ status: "pending" });
+    return res.status(200).json(stored.record);
+  }
   if (req.method !== "POST") return res.status(405).json({ reply: "Method not allowed" });
 
+  let loop7ReportRequestId = null;
   let loop7StreamStarted = false;
   let wantsLoop7Progress = false;
   let sendLoop7Progress = () => false;
@@ -85,6 +157,16 @@ export default async function handler(req, res) {
 
     loopLevel = Number(requestedLoopLevel) || 1;
     profileLink = typeof profileLink === "string" ? profileLink.trim() : "";
+    loop7ReportRequestId = isValidLoop7RequestId(String(body?.reportRequestId || ""))
+      ? String(body.reportRequestId)
+      : null;
+    if (loopLevel === 7 && loop7ReportRequestId) {
+      await saveLoop7Result(loop7ReportRequestId, {
+        status: "running",
+        requestId: loop7ReportRequestId,
+        startedAt: new Date().toISOString()
+      });
+    }
 
     // Reuse the pre-generated report passed by the caller; do not trigger another scrape.
     const reportInput =
@@ -969,6 +1051,13 @@ let investigationState = {
           });
         }
       } catch (e) {
+        if (loop7ReportRequestId) {
+          await saveLoop7Result(loop7ReportRequestId, {
+            status: "failed", requestId: loop7ReportRequestId,
+            failedAt: new Date().toISOString(),
+            error: { stage: "LOOP7_EVIDENCE_PIPELINE", message: String(e?.message || e).slice(0, 1500) }
+          });
+        }
         console.error("LOOP7_EVIDENCE_PIPELINE_FAILED", JSON.stringify({
           stage: String(e?.message || e).startsWith("ECB_") ? "ECB" :
             String(e?.message || e).startsWith("CEB_") ? "CEB" : "CEB_ECB_INTEGRATION",
@@ -2370,6 +2459,12 @@ try {
   }
 
   if (loopLevel === 7) {
+    if (loop7ReportRequestId) {
+      await saveLoop7Result(loop7ReportRequestId, {
+        status: "failed", requestId: loop7ReportRequestId, failedAt: new Date().toISOString(),
+        error: { stage: "LOOP7_AI_FETCH", message: "LOOP7 AI request failed." }
+      });
+    }
     if (loop7StreamStarted) {
       sendLoop7Progress({
         type: "error",
@@ -2431,6 +2526,12 @@ if (loopLevel === 7 && !response?.ok) {
     );
   }
 
+  if (loop7ReportRequestId) {
+    await saveLoop7Result(loop7ReportRequestId, {
+      status: "failed", requestId: loop7ReportRequestId, failedAt: new Date().toISOString(),
+      error: { stage: "LOOP7_AI_HTTP", message: "The investigation could not be completed right now." }
+    });
+  }
   if (loop7StreamStarted) {
     sendLoop7Progress({
       type: "error",
@@ -3207,8 +3308,21 @@ const finalPayload = {
       : null,
 
   loopCompleted:
-    loopLevel === 6 ? 6 : undefined
+    loopLevel === 6 ? 6 : undefined,
+  ...(loopLevel === 7 && loop7ReportRequestId ? { reportRequestId: loop7ReportRequestId } : {})
 };
+
+// Persist the completed report before sending the final SSE frame. If the mobile
+// browser, proxy, or stream reader loses the final event, the client can recover
+// this exact report by its unguessable request ID without repeating PCF/CEB/AI work.
+if (loopLevel === 7 && loop7ReportRequestId && typeof finalPayload.reply === "string" && finalPayload.reply.trim()) {
+  await saveLoop7Result(loop7ReportRequestId, {
+    status: "completed",
+    requestId: loop7ReportRequestId,
+    completedAt: new Date().toISOString(),
+    payload: finalPayload
+  });
+}
 
 if (loop7StreamStarted) {
   const finalWriteAccepted = sendLoop7Progress({
@@ -3241,6 +3355,13 @@ return res.status(200).json(finalPayload);
   }
 
   catch (error) {
+
+    if (loopLevel === 7 && loop7ReportRequestId) {
+      await saveLoop7Result(loop7ReportRequestId, {
+        status: "failed", requestId: loop7ReportRequestId, failedAt: new Date().toISOString(),
+        error: { stage: "SERVER_CRASH", message: String(error?.message || error).slice(0, 1500) }
+      });
+    }
 
     console.error("SERVER_CRASH_NON_FATAL_GUARD", {
       loop: loopLevel,
