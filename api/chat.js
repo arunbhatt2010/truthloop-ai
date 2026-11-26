@@ -4,65 +4,6 @@ import { loadEvidenceCompressionBrain }
 from "./EvidenceCompressionBrain.js";
 import { loadCrossEvidenceBrain }
 from "./CrossEvidenceBrain.js";
-
-/* =========================================================
-   LOOP 7 SAME-URL DUPLICATE GUARD
-   Retains a five-minute reservation in this warm Node process.
-   The existing index.html localStorage cooldown covers same-origin
-   tabs in the same browser. This in-memory map is not a cross-instance
-   distributed lock on Vercel serverless.
-   ========================================================= */
-const LOOP7_DIRECT_URL_LOCK_TTL_MS = 5 * 60 * 1000;
-const LOOP7_DIRECT_URL_LOCKS_KEY = "__TRUTHLOOP_LOOP7_DIRECT_URL_LOCKS__";
-if (!(globalThis[LOOP7_DIRECT_URL_LOCKS_KEY] instanceof Map)) {
-  globalThis[LOOP7_DIRECT_URL_LOCKS_KEY] = new Map();
-}
-const LOOP7_DIRECT_URL_LOCKS = globalThis[LOOP7_DIRECT_URL_LOCKS_KEY];
-
-function canonicalizeLoop7LockUrl(value) {
-  const raw = String(value || "").trim();
-  if (!raw) return "";
-  try {
-    const url = new URL(raw);
-    url.hash = "";
-    url.hostname = url.hostname.toLowerCase();
-    url.searchParams.sort();
-    if (url.pathname.length > 1) {
-      url.pathname = url.pathname.replace(/\/+$/, "") || "/";
-    }
-    return url.toString().replace(/\/$/, url.pathname === "/" && !url.search ? "/" : "");
-  } catch (_) {
-    return raw.toLowerCase().replace(/\s+/g, "");
-  }
-}
-
-function reserveLoop7DirectUrl(urlValue) {
-  const canonicalUrl = canonicalizeLoop7LockUrl(urlValue);
-  if (!canonicalUrl) return { allowed: true, canonicalUrl: "", retryAfterSeconds: 0 };
-
-  const now = Date.now();
-  for (const [key, lock] of LOOP7_DIRECT_URL_LOCKS.entries()) {
-    if (!lock || Number(lock.expiresAt || 0) <= now) {
-      LOOP7_DIRECT_URL_LOCKS.delete(key);
-    }
-  }
-
-  const existing = LOOP7_DIRECT_URL_LOCKS.get(canonicalUrl);
-  if (existing && existing.expiresAt > now) {
-    return {
-      allowed: false,
-      canonicalUrl,
-      startedAt: existing.startedAt,
-      retryAfterSeconds: Math.max(1, Math.ceil((existing.expiresAt - now) / 1000))
-    };
-  }
-
-  LOOP7_DIRECT_URL_LOCKS.set(canonicalUrl, {
-    startedAt: now,
-    expiresAt: now + LOOP7_DIRECT_URL_LOCK_TTL_MS
-  });
-  return { allowed: true, canonicalUrl, retryAfterSeconds: 0 };
-}
 export default async function handler(req, res) {
 
   /* =========================
@@ -188,34 +129,6 @@ Use this report as the public-evidence foundation for this conversation. Ground 
     if (!Array.isArray(messages)) messages = [];
     if (!messages.length && !(loopLevel === 7 && reportMode === "direct" && profileLink)) {
       return res.status(400).json({ reply: "No input provided" });
-    }
-
-    // Reserve the URL before starting PCF / CEB / ECB or any provider request.
-    // The reservation intentionally remains active for the full five-minute TTL
-    // even if this request finishes early, preventing a second costly run.
-    if (loopLevel === 7 && profileLink) {
-      const urlReservation = reserveLoop7DirectUrl(profileLink);
-      if (!urlReservation.allowed) {
-        console.warn("LOOP7_DUPLICATE_URL_BLOCKED", JSON.stringify({
-          url: urlReservation.canonicalUrl,
-          retryAfterSeconds: urlReservation.retryAfterSeconds,
-          lockStartedAt: urlReservation.startedAt,
-          lockTtlMs: LOOP7_DIRECT_URL_LOCK_TTL_MS,
-          reportMode
-        }));
-        res.setHeader("Retry-After", String(urlReservation.retryAfterSeconds));
-        return res.status(429).json({
-          reply: `An investigation for this URL has already started. Please wait ${urlReservation.retryAfterSeconds} seconds before requesting the same URL again.`,
-          code: "LOOP7_DUPLICATE_URL",
-          retryAfterSeconds: urlReservation.retryAfterSeconds
-        });
-      }
-      console.info("LOOP7_URL_LOCK_ACQUIRED", JSON.stringify({
-        url: urlReservation.canonicalUrl,
-        lockTtlMs: LOOP7_DIRECT_URL_LOCK_TTL_MS,
-        reportMode,
-        lockScope: "current_warm_serverless_instance"
-      }));
     }
 
     lastUserMessage =
@@ -1297,12 +1210,11 @@ SOURCE TRACEABILITY — EVERY FINDING MUST BE CHECKABLE
 - Use ONLY SOURCE_XX IDs that actually exist in sourceRegistry and sourceCitationIndex. Never invent, renumber, merge, alter or guess a source ID, URL, title, published date or source type.
 - Every material public-evidence factual claim and every positive finding, contradiction, potential inconsistency, risk signal or validation finding in Sections 1–7 MUST carry an inline citation such as [SOURCE_01] using the exact ID from sourceCitationIndex.
 - Put the citation immediately after the specific sentence it supports. Do not place all citations only at the end of a section or in the Confidence Breakdown. Every factual paragraph in Sections 1–7 must contain one or more valid inline SOURCE IDs.
-
 - When a paragraph contains multiple distinct factual claims, cite each claim next to its own supporting evidence; a single citation at paragraph end is acceptable only when that exact source supports every claim in the paragraph.
 - Before returning the report, silently audit Sections 1–7: confirm that every factual finding has a valid citation, every cited ID exists in sourceCitationIndex, and every cited source's actual content supports the nearby claim. If support is unavailable, narrow the statement or label it NOT ESTABLISHED / INSUFFICIENT EVIDENCE; never invent a citation to fill a gap.
 - A source's published date is only the date stored in its explicit publishedDate field. Do not present fetchTimestamp, collectedAt, updatedAt, crawl time or an ambiguous generic timestamp as a publication date. If publishedDate is null, state that the publication date is unavailable.
 - Never fabricate a source date or infer a publication date from a URL, filename, copyright year or the date on which the website was fetched.
-- The cited source's actual content must directly support the nearby claim; a title, URL, metadata field, platform label or source existence alone is not proof of page content.
+- Put the citation immediately after the statement it supports. The cited source's actual content must directly support the nearby claim; a title, URL, metadata field, platform label or source existence alone is not proof of page content.
 - When comparing aligned evidence or a contradiction, cite every material record used in the comparison. For a contradiction, cite both the website-side claim and the supporting-source-side claim, not just one side.
 - A source ID may appear in multiple sections if the same record genuinely supports each cited finding. Never reuse an ID to support a claim that the source does not establish.
 - Keep source provenance explicit in the prose: official-website/company-published, LinkedIn, X, GitHub, other third-party, or independently published. Do not call a company-published claim independent validation. Use sourceCitationIndex to preserve the exact SOURCE ID next to the related observation.
@@ -2160,11 +2072,8 @@ try {
             model: settings.model,
             replyChars: providerOutput.length,
             durationMs: providerDurationMs,
-            normalized: !!normalizedData?.choices?.[0]?.message?.content,
-            nextProviderAttempt: false
+            normalized: !!normalizedData?.choices?.[0]?.message?.content
           }));
-          // First non-empty provider output wins. The loop exits here; lower-
-          // priority providers are never awaited after a valid report arrives.
           break;
         }
 
@@ -2593,45 +2502,6 @@ if (loopLevel === 7) {
     citationManifestCount: knownSourceIds.size,
     reportContainsInlineCitations: validCitationIds.length > 0
   }));
-
-  const citationAuditHeadings = [
-    "identity self representation",
-    "claims commitments intentions",
-    "actions demonstrated track record",
-    "capability execution evidence",
-    "independent validation relationships",
-    "consistency evolution over time",
-    "reliability accountability risk signals",
-    "overall pattern future readiness"
-  ];
-  const citationAuditLines = String(reply || "").split(/\r?\n/);
-  const normalizeCitationAuditHeading = value => String(value || "")
-    .replace(/^\s*(?:#{1,6}\s*)?/, "")
-    .replace(/^\s*(?:0?[1-8])\s*[.)\-:|–—]\s*/, "")
-    .replace(/[>*_`~]/g, "")
-    .replace(/[^a-z0-9]+/gi, " ")
-    .trim().toLowerCase();
-  const citationAuditStarts = citationAuditHeadings.map(heading =>
-    citationAuditLines.findIndex(line => {
-      const normalized = normalizeCitationAuditHeading(line);
-      return normalized.startsWith(heading) || normalized.startsWith(heading.replace(/^(?:identity|claims|actions|capability|independent|consistency|reliability|overall) /, ""));
-    })
-  );
-  const citationAuditBySection = citationAuditHeadings.map((heading, index) => {
-    const start = citationAuditStarts[index];
-    const laterStarts = citationAuditStarts.filter(value => value > start && value >= 0);
-    const end = laterStarts.length ? Math.min(...laterStarts) : citationAuditLines.length;
-    const sectionText = start >= 0 ? citationAuditLines.slice(start + 1, end).join("\n") : "";
-    const ids = [...new Set([...sectionText.matchAll(/\[?(SOURCE_\d{1,3})\]?/gi)]
-      .map(match => String(match[1] || "").toUpperCase())
-      .filter(id => knownSourceIds.has(id)))];
-    return { section: index + 1, heading, found: start >= 0, validSourceIds: ids, validSourceIdCount: ids.length };
-  });
-  console.log("LOOP7_SECTION_SOURCE_ID_AUDIT", JSON.stringify({
-    sectionsWithSourceIds: citationAuditBySection.filter(item => item.validSourceIdCount > 0).map(item => item.section),
-    sectionsMissingSourceIds: citationAuditBySection.filter(item => item.validSourceIdCount === 0).map(item => item.section),
-    bySection: citationAuditBySection
-  }));
 }
 
     /* =========================
@@ -2882,6 +2752,9 @@ let emotionalDriver = "unknown";
 let avoidanceStyle = "unknown";
 let hiddenAssumption = "unknown";
 
+/* =========================
+   PROFILE PARSE
+========================= */
 if (profileData) {
   try {
 
@@ -3248,16 +3121,6 @@ const finalPayload = {
   loopCompleted:
     loopLevel === 6 ? 6 : undefined
 };
-
-if (loopLevel === 7) {
-  console.info("LOOP7_REPORT_READY_FOR_INDEX", JSON.stringify({
-    provider: selectedLoop7Provider,
-    replyChars: String(finalPayload.reply || "").length,
-    transport: loop7StreamStarted ? "sse_final_event" : "json_response",
-    providerWaitFinished: true,
-    furtherProviderAttempts: false
-  }));
-}
 
 if (loop7StreamStarted) {
   const finalWriteAccepted = sendLoop7Progress({
