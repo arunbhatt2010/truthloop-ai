@@ -536,38 +536,119 @@ let investigationState = {
     ========================================== */
     wantsLoop7Progress = loopLevel === 7 && progress === true;
 
-    sendLoop7Progress = (payload = {}) => {
-      if (
-        !wantsLoop7Progress ||
-        !loop7StreamStarted ||
-        loop7ClientDisconnected ||
-        res.destroyed ||
-        res.writableEnded
-      ) return false;
+    /*
+     * Loop 7 SSE writes are serialized and drain-aware.
+     * Writable.write(false) means the frame was queued, but the writable
+     * buffer is full. Do not append more frames or end the response until the
+     * drain event has fired and all queued frames (especially the final report)
+     * have been flushed into the response stream.
+     */
+    let loop7PendingFrames = [];
+    let loop7WaitingForDrain = false;
+    let loop7EndRequested = false;
+    let loop7DrainHandler = null;
 
+    const finishLoop7ProgressStream = () => {
+      if (!loop7EndRequested || loop7WaitingForDrain || loop7PendingFrames.length) return;
+      if (!loop7StreamStarted) return;
       try {
-        // A successful write means Node accepted the frame into its response
-        // stream. It does not prove that the browser has received the frame.
-        const accepted = res.write(`data: ${JSON.stringify(payload)}\n\n`);
-        if (accepted === false) {
+        if (!res.writableEnded && !res.destroyed) res.end();
+      } catch (error) {
+        console.error("LOOP7_STREAM_END_FAILED", String(error?.message || error));
+      }
+      loop7StreamStarted = false;
+      console.info("LOOP7_STREAM_RESPONSE_ENDED", JSON.stringify({
+        pendingFrames: loop7PendingFrames.length,
+        streamWriteFailure: loop7StreamWriteFailure
+      }));
+      if (loop7DrainHandler && typeof res.removeListener === "function") {
+        res.removeListener("drain", loop7DrainHandler);
+      }
+      loop7DrainHandler = null;
+    };
+
+    const writeLoop7Frame = (frame, meta = {}) => {
+      if (!loop7StreamStarted || loop7ClientDisconnected || res.destroyed || res.writableEnded || loop7EndRequested) {
+        return false;
+      }
+      if (loop7WaitingForDrain || loop7PendingFrames.length) {
+        loop7PendingFrames.push({ frame, meta });
+        return true; // Accepted into the request-scoped queue; flushed on drain.
+      }
+      try {
+        const canContinue = res.write(frame);
+        if (!canContinue) {
+          loop7WaitingForDrain = true;
           console.warn("LOOP7_STREAM_BACKPRESSURE", JSON.stringify({
-            type: payload?.type || null,
-            phase: payload?.phase || null
+            type: meta.type || null,
+            phase: meta.phase || null,
+            queued: loop7PendingFrames.length
           }));
         }
-        return true;
+        return true; // write(false) still means this frame was accepted by Node.
       } catch (error) {
         loop7StreamWriteFailure = String(error?.message || error);
         loop7ClientDisconnected = true;
+        loop7PendingFrames = [];
         console.error("LOOP7_STREAM_WRITE_FAILED", JSON.stringify({
-          type: payload?.type || null,
-          phase: payload?.phase || null,
+          type: meta.type || null,
+          phase: meta.phase || null,
           error: loop7StreamWriteFailure
         }));
         if (loop7HeartbeatTimer) {
           clearInterval(loop7HeartbeatTimer);
           loop7HeartbeatTimer = null;
         }
+        return false;
+      }
+    };
+
+    const flushLoop7PendingFrames = () => {
+      if (loop7ClientDisconnected || res.destroyed || res.writableEnded) {
+        loop7PendingFrames = [];
+        loop7WaitingForDrain = false;
+        return;
+      }
+      loop7WaitingForDrain = false;
+      while (loop7PendingFrames.length) {
+        const item = loop7PendingFrames.shift();
+        try {
+          const canContinue = res.write(item.frame);
+          if (!canContinue) {
+            loop7WaitingForDrain = true;
+            console.warn("LOOP7_STREAM_BACKPRESSURE", JSON.stringify({
+              type: item.meta?.type || null,
+              phase: item.meta?.phase || null,
+              queued: loop7PendingFrames.length
+            }));
+            return;
+          }
+        } catch (error) {
+          loop7StreamWriteFailure = String(error?.message || error);
+          loop7ClientDisconnected = true;
+          loop7PendingFrames = [];
+          console.error("LOOP7_STREAM_WRITE_FAILED", JSON.stringify({
+            type: item.meta?.type || null,
+            phase: item.meta?.phase || null,
+            error: loop7StreamWriteFailure
+          }));
+          return;
+        }
+      }
+      finishLoop7ProgressStream();
+    };
+
+    sendLoop7Progress = (payload = {}) => {
+      if (!wantsLoop7Progress) return false;
+      try {
+        return writeLoop7Frame(`data: ${JSON.stringify(payload)}\n\n`, {
+          type: payload?.type || null,
+          phase: payload?.phase || null
+        });
+      } catch (error) {
+        loop7StreamWriteFailure = String(error?.message || error);
+        loop7ClientDisconnected = true;
+        console.error("LOOP7_STREAM_SERIALIZE_FAILED", loop7StreamWriteFailure);
         return false;
       }
     };
@@ -583,6 +664,17 @@ let investigationState = {
       loop7StreamStarted = true;
       loop7ClientDisconnected = false;
       loop7StreamWriteFailure = null;
+      loop7PendingFrames = [];
+      loop7WaitingForDrain = false;
+      loop7EndRequested = false;
+      loop7DrainHandler = () => {
+        console.info("LOOP7_STREAM_DRAINED", JSON.stringify({
+          pendingFrames: loop7PendingFrames.length,
+          endRequested: loop7EndRequested
+        }));
+        flushLoop7PendingFrames();
+      };
+      if (typeof res.on === "function") res.on("drain", loop7DrainHandler);
 
       // Long PCF/CEB fetches can legitimately take much longer than the normal
       // run. Without bytes on the SSE connection, mobile networks/proxies may
@@ -595,6 +687,10 @@ let investigationState = {
             writableEnded: !!res.writableEnded,
             destroyed: !!res.destroyed
           }));
+        }
+        if (loop7ClientDisconnected) {
+          loop7PendingFrames = [];
+          loop7WaitingForDrain = false;
         }
         if (loop7HeartbeatTimer) {
           clearInterval(loop7HeartbeatTimer);
@@ -613,15 +709,10 @@ let investigationState = {
           loop7HeartbeatTimer = null;
           return;
         }
-        try {
-          res.write(": tl-heartbeat\n\n");
-        } catch (error) {
-          loop7StreamWriteFailure = String(error?.message || error);
-          loop7ClientDisconnected = true;
-          console.error("LOOP7_STREAM_HEARTBEAT_FAILED", loop7StreamWriteFailure);
-          clearInterval(loop7HeartbeatTimer);
-          loop7HeartbeatTimer = null;
-        }
+        // Do not add heartbeat bytes to an already backpressured response.
+        // The active drain listener will resume queued report/progress frames.
+        if (loop7WaitingForDrain || loop7PendingFrames.length) return;
+        writeLoop7Frame(": tl-heartbeat\n\n", {type: "heartbeat", phase: "keepalive"});
       }, 12000);
       if (typeof loop7HeartbeatTimer?.unref === "function") loop7HeartbeatTimer.unref();
 
@@ -638,12 +729,9 @@ let investigationState = {
         loop7HeartbeatTimer = null;
       }
       if (!loop7StreamStarted) return;
-      try {
-        if (!res.writableEnded && !res.destroyed) res.end();
-      } catch (error) {
-        console.error("LOOP7_STREAM_END_FAILED", String(error?.message || error));
-      }
-      loop7StreamStarted = false;
+      // End only after Node emits drain and every queued SSE frame is flushed.
+      loop7EndRequested = true;
+      finishLoop7ProgressStream();
     };
 
     /* ==========================================
@@ -3133,7 +3221,9 @@ if (loop7StreamStarted) {
    JSON.stringify({
       final: true,
       replyChars: (finalPayload.reply || "").length,
-      serverWriteAccepted: finalWriteAccepted,
+      serverWriteQueued: finalWriteAccepted,
+      waitingForDrain: loop7WaitingForDrain,
+      pendingFrames: loop7PendingFrames.length,
       clientDisconnected: loop7ClientDisconnected,
       streamWriteFailure: loop7StreamWriteFailure
    })
