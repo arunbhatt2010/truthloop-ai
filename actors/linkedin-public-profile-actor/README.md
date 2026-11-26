@@ -1,52 +1,35 @@
-# TruthLoop LinkedIn Public Profile Actor — prototype v0.2.0
+# TruthLoop LinkedIn Public Profile Actor — v0.2.1
 
 Auth-free, cookie-free public-page collector. Node.js 18+; no additional npm dependencies.
+
+## What changed in v0.2.1
+
+- Keeps v0.2.0's expanded public HTML / JSON-LD extraction for profile, experience, education, skills, posts and articles.
+- Retains v0.1.2's public unauthenticated HTTP retrieval approach and its explicit URL validation, bounded response size, timeout, safe redirect handling, and clear restricted/failure results.
+- Extracts visible anchor text for public post/article links (v0.1.2/v0.2.0 only used `aria-label` or `title`, often leaving labels empty).
+- Handles JSON-LD image objects using either `url` or `contentUrl`.
+- Filters punctuation-only profile values so values such as `,,,,` are not treated as real headlines.
+- Uses bounded nearby HTML for post/article text; dates are emitted only when explicit `<time datetime>` or published-date metadata exists.
+- Reports link/post/article counts in `availability` for diagnostics.
+
+## Safety and limitations
+
+- No LinkedIn login, cookies, session reuse, CAPTCHA solving, proxy rotation, or access-control bypass.
+- A 429 response is returned as `restricted / rate_limited`; no automatic retry is performed. Wait and test later rather than repeatedly requesting the profile.
+- LinkedIn may return different public HTML by profile, geography, request volume, or time. A 200 response does not guarantee all fields are exposed.
+- Experience, education, skills, post text and dates are included only when explicitly present in the public response. Nearby post/article snippets may contain surrounding page context and must be treated as source excerpts, not verified post body text unless the excerpt clearly corresponds to the post.
+- No fields are inferred or fabricated.
 
 ## Run locally
 
 ```bash
-node actors/linkedin-public-profile-actor/cli.js https://www.linkedin.com/in/<public-profile>/
+node actors/linkedin-public-profile-actor/cli.js https://www.linkedin.com/in/public-profile/
 ```
 
-Or import `runLinkedInPublicProfileActor({ profileUrl })` from `index.js`.
+## GitHub Actions
 
-## v0.2.0 changes
+The existing workflow can continue to call `node actors/linkedin-public-profile-actor/cli.js "$PROFILE_URL"`. Ensure the repository has the v0.2.1 files committed before dispatching the workflow; the workflow runs the checked-out branch, not a ZIP on your device.
 
-- Removes invisible Unicode format characters (including U+2060 WORD JOINER) from profile URLs before validation. The Bill Gates test URL contained an encoded U+2060 at the end of the profile slug; the normalized URL is `https://www.linkedin.com/in/williamhgates/`.
-- Classifies HTTP 429 as `rate_limited`, 403 as `access_denied`, 401 as `authentication_required`, and 404 as `profile_not_found_or_hidden`.
-- Adds bounded diagnostics for response headers, Retry-After, and a short response preview.
-- Does not retry automatically and does not attempt to bypass rate limits, login walls, CAPTCHA, or access controls.
-- CLI exits non-zero for restricted/failed collection, while still printing JSON so the workflow can upload the diagnostic artifact.
+## Output
 
-## Output contract
-
-- `minimum`: core profile fields when present in the public response.
-- `maximum`: parsed profile metadata, visible page text, and any publicly exposed activity/article links.
-- `availability`: explicitly indicates which field groups were actually found.
-- `diagnostics`: bounded upstream response details when collection is restricted.
-- `source`: canonical URL and retrieval method.
-- `authenticationUsed` and `cookiesUsed` are always false.
-
-## Hard boundaries
-
-This prototype does not log in, use OAuth, cookies, credentials, session tokens, browser automation, CAPTCHA solving, or access-control bypasses. LinkedIn may return a login wall, challenge, 403, 429, or incomplete HTML. In that case the Actor reports restricted/failed/partial output; it does not pretend that missing data was collected. A 429 is an upstream rate-limit response, not a parser failure.
-
-The prototype extracts only data actually exposed in the unauthenticated public response. A field being unavailable is not evidence that the person lacks it.
-
-## Current scope
-
-Standalone prototype only. It is not wired into TruthLoop's production CEB/ECB or deployed as a Vercel endpoint. No existing payment, chat, PCF, CEB, or ECB files are modified.
-
-## Next validation
-
-Re-run once with a clean profile URL after a reasonable cooldown. If LinkedIn continues returning 429, stop repeated tests and record the public unauthenticated endpoint as unavailable for that test window. Validate URL normalization independently using a local/no-network test; do not interpret a normalized URL as a guarantee that LinkedIn will permit collection.
-
-
-## v0.2.0 extraction fields
-
-The result preserves the original profile, post, and article URLs. Posts and articles include
-`publishedDate` (ISO-8601 string or `null`) and a compatibility `date` field. Dates are
-populated only from explicit public `<time datetime>` or published-date metadata in the
-associated HTML block. Profile experience, education, and skills are extracted only when
-present in public JSON-LD. `page.visibleText` remains available (up to 30,000 characters).
-No missing field is fabricated; extraction quality must be validated across multiple profiles.
+The JSON includes `version`, `status`, `access`, `httpStatus`, `minimum`, `maximum`, `availability`, `limitations`, and `source`. Treat `restricted` and `failed` as non-collection outcomes, not empty profiles.
