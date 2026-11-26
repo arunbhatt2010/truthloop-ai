@@ -5189,8 +5189,10 @@ function selectPaywallFreeFinding(reportText){
   ];
   const parsed = parseLoop7ReportSections(reportText, sections);
 
-  // Only these sections may supply the free finding. The order is intentional:
-  // 05 → 06 → 07 → 03 → 04. Never fall back to an unrelated section.
+  // Only these sections may supply the free finding. Prefer substantive
+  // consistency, accountability, track-record and capability findings before
+  // an independent-validation gap, so the preview does not lead with absence
+  // of external records when the report contains stronger evidenced findings.
   const criteria = {
     4: /independent|corroborat|third[- ]party|not independently|self[- ]published|unverified|validation|relationship|partner|not found|supporting evidence/gi,
     5: /over time|historical|evolution|consistent|consistency|contradict|inconsisten|dated|timeline|shift|trend|not provided|no material/gi,
@@ -5198,7 +5200,7 @@ function selectPaywallFreeFinding(reportText){
     2: /action|track record|dated|contribution|release|delivered|published|milestone|evidence|not found/gi,
     3: /capability|execution|demonstrat|technical|implementation|deployment|architecture|operational|documented|evidence/gi
   };
-  const priority = [4,5,6,2,3];
+  const priority = [5,6,2,3,4];
   const countMatches = (text, regex) => (String(text || '').match(regex) || []).length;
   const isAhaCandidate = (body, sectionIndex) => {
     const text = String(body || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
