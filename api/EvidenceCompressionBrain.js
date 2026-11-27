@@ -48,10 +48,10 @@ const MAX_REDDIT_POSTS = 0;
 
 const PACKAGE_VERSION = "28.1";
 
-// Suppress all evidence streams originating from CEB's Apify scrapers
-// through 27 Nov 2026. PCF website and direct GitHub evidence remain enabled.
-const APIFY_SCRAPER_EVIDENCE_PAUSED = true;
-const APIFY_SCRAPERS_PAUSED_THROUGH = "2026-11-27";
+// Apify evidence pause lifted on 28 Nov 2026. Accept the existing CEB
+// LinkedIn, X and legacy website-scraper evidence streams as before.
+const APIFY_SCRAPER_EVIDENCE_PAUSED = false;
+const APIFY_SCRAPERS_PAUSED_THROUGH = null;
 
 /* ---------------------------------------------------------
    BASIC HELPERS
