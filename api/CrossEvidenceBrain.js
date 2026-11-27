@@ -39,12 +39,12 @@ const APIFY_MAX_TOTAL_CHARGE_USD = "0.05";
 const X_APIFY_ACTOR_ID = process.env.APIFY_X_ACTOR_ID || "simple.actor~x-profile-posts";
 const UNUSED_SIGNAL_MODEL = "unused";
 
-// Apify billing pause: suppress all CEB Apify scraper calls through 27 Nov 2026.
-// Re-enable manually after the billing cycle resets and the user approves.
-const APIFY_SCRAPERS_PAUSED_THROUGH = "2026-11-27";
-const ENABLE_CEB_APIFY_SCRAPERS = false;
-const ENABLE_LINKEDIN_APIFY = ENABLE_CEB_APIFY_SCRAPERS; // Paused through 27 Nov 2026.
-const ENABLE_CEB_WEBSITE_SCRAPER = false; // PCF owns website collection; CEB Apify website task remains disabled.
+// Apify billing pause lifted on 28 Nov 2026. Restore the existing
+// LinkedIn and X Actor routes without changing their limits or routing.
+const APIFY_SCRAPERS_PAUSED_THROUGH = null;
+const ENABLE_CEB_APIFY_SCRAPERS = true;
+const ENABLE_LINKEDIN_APIFY = ENABLE_CEB_APIFY_SCRAPERS;
+const ENABLE_CEB_WEBSITE_SCRAPER = false; // PCF owns website collection; keep the CEB website crawler disabled.
 
 const ENABLE_X = ENABLE_CEB_APIFY_SCRAPERS;
 const ENABLE_OTHER_SOCIAL = false;
@@ -4100,8 +4100,8 @@ console.log(
             "CEB_LINKEDIN_APIFY_DISABLED",
             JSON.stringify({
                 linkedinUrl,
-                reason: "TEMPORARILY_PAUSED_FOR_APIFY_BILLING",
-                resumeAfter: "2026-11-27",
+                reason: "APIFY_ACTOR_DISABLED",
+                resumeAfter: null,
                 action: "No LinkedIn Apify Actor call was made."
             })
         );
