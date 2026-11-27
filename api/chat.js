@@ -3123,17 +3123,64 @@ const finalPayload = {
 };
 
 if (loop7StreamStarted) {
+  // The final report can be substantially larger than ordinary progress events.
+  // Stop heartbeats before writing it so they cannot add more bytes to a
+  // backpressured final-response buffer.
+  if (loop7HeartbeatTimer) {
+    clearInterval(loop7HeartbeatTimer);
+    loop7HeartbeatTimer = null;
+  }
+
   const finalWriteAccepted = sendLoop7Progress({
     type: "final",
     final: true,
     ...finalPayload
   });
+
+  // res.write() returning false means the frame was queued, but the writable
+  // buffer is full. Do not immediately end the response: wait until Node emits
+  // `drain` (or the connection closes/errors) so the complete final SSE frame
+  // has left the application writable buffer before closing the stream.
+  const finalWriteBackpressured = !!res.writableNeedDrain;
+  let finalWriteDrainOutcome = "not_required";
+  if (finalWriteAccepted && finalWriteBackpressured && !res.destroyed && !res.writableEnded) {
+    finalWriteDrainOutcome = await new Promise(resolve => {
+      let settled = false;
+      const cleanup = () => {
+        res.removeListener("drain", onDrain);
+        res.removeListener("close", onClose);
+        res.removeListener("error", onError);
+      };
+      const settle = outcome => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve(outcome);
+      };
+      const onDrain = () => settle("drained");
+      const onClose = () => settle("closed_before_drain");
+      const onError = error => settle(`error:${String(error?.message || error || "unknown").slice(0,160)}`);
+
+      res.once("drain", onDrain);
+      res.once("close", onClose);
+      res.once("error", onError);
+
+      // Recheck after listeners are attached to cover a drain/close race.
+      if (!res.writableNeedDrain) settle("drained_before_wait");
+      else if (res.destroyed || res.writableEnded) settle("closed_before_drain");
+    });
+  } else if (!finalWriteAccepted) {
+    finalWriteDrainOutcome = "write_not_accepted";
+  }
+
   console.log(
    "LOOP7_FINAL_STREAM_SENT",
    JSON.stringify({
       final: true,
       replyChars: (finalPayload.reply || "").length,
       serverWriteAccepted: finalWriteAccepted,
+      serverWriteBackpressured: finalWriteBackpressured,
+      serverWriteDrainOutcome: finalWriteDrainOutcome,
       clientDisconnected: loop7ClientDisconnected,
       streamWriteFailure: loop7StreamWriteFailure
    })
