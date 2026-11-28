@@ -3,7 +3,7 @@
 const OWNER_EMAIL = "truthloop.in@gmail.com";
 const SENDER_EMAIL = "onboarding@resend.dev";
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
