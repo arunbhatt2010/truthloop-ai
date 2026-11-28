@@ -7855,8 +7855,7 @@ TRUTHLOOP_TEMP_ERUDA_DEBUGGER_END
 </script>
 
 <script>
-/* Feedback is optional and is sent to the existing GA4 property only.
-   Delegated handling also supports the Stage 1 form inserted by mountLoop7Bridge(). */
+/* Optional feedback is emailed through the existing Resend-backed Vercel endpoint. */
 (function(){
   function cleanFeedbackText(value){
     return String(value || "")
@@ -7865,23 +7864,42 @@ TRUTHLOOP_TEMP_ERUDA_DEBUGGER_END
       .replace(/\b(?:\+?\d[\d\s().-]{7,}\d)\b/g,"[phone]")
       .slice(0,500);
   }
-  document.addEventListener("submit",function(event){
+  document.addEventListener("submit",async function(event){
     var form=event.target && event.target.closest ? event.target.closest(".tl-feedback-form") : null;
     if(!form) return;
     event.preventDefault();
     var selected=form.querySelector('input[name="feedback_reason"]:checked');
     if(!selected) return;
-    var detail=cleanFeedbackText(form.querySelector('textarea[name="feedback_detail"]')?.value || "");
-    var stage=form.getAttribute("data-feedback-stage") || "unknown";
-    if(typeof window.gtag === "function"){
-      window.gtag("event","truthloop_feedback_submitted",{
-        feedback_stage:stage,
-        feedback_context:stage === "stage1" ? "before_report_generation" : "after_report_paywall",
-        feedback_reason:selected.value,
-        feedback_detail:detail
+    var button=form.querySelector('button[type="submit"]');
+    if(button){button.disabled=true;button.textContent="SENDING...";}
+    var stage=form.getAttribute("data-feedback-stage") || "";
+    try{
+      var response=await fetch("/api/paypal-diagnostic",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        credentials:"same-origin",
+        body:JSON.stringify({
+          type:"feedback",
+          stage:stage,
+          reason:selected.value,
+          detail:cleanFeedbackText(form.querySelector('textarea[name="feedback_detail"]')?.value || "")
+        })
       });
+      var result=await response.json().catch(function(){return {};});
+      if(!response.ok || result.sent!==true) throw new Error(result.error || "Email could not be sent");
+      form.innerHTML='<p role="status">Thank you. Your feedback has been sent.</p>';
+    }catch(error){
+      if(button){button.disabled=false;button.textContent="SEND FEEDBACK";}
+      var message=form.querySelector('[data-feedback-error]');
+      if(!message){
+        message=document.createElement("small");
+        message.setAttribute("data-feedback-error","true");
+        message.setAttribute("role","alert");
+        form.appendChild(message);
+      }
+      message.textContent="Sorry, feedback could not be sent. Please try again.";
+      console.warn("TRUTHLOOP_FEEDBACK_EMAIL_FAILED",error?.message || error);
     }
-    form.innerHTML='<p role="status">Thank you. Your feedback has been recorded.</p>';
   });
 })();
 </script>
