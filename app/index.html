@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>    
 <html lang="en">    
 <head>    
@@ -4749,6 +4748,22 @@ return `
         </div>
       </details>
     </section>
+    <section class="tl-feedback-card" id="tlStage1Feedback" aria-label="Optional feedback about starting an investigation">
+      <details>
+        <summary>Couldn't start an investigation? Tell us why <span aria-hidden="true">＋</span></summary>
+        <form class="tl-feedback-form" data-feedback-stage="stage1">
+          <p>What stopped you from generating your investigation report?</p>
+          <label><input type="radio" name="feedback_reason" value="Unclear what the investigation would reveal" required> I wasn't sure what the investigation would reveal</label>
+          <label><input type="radio" name="feedback_reason" value="Unsure which public URL to enter"> I wasn't sure which public URL to enter</label>
+          <label><input type="radio" name="feedback_reason" value="Not ready to investigate"> I was just exploring / not ready yet</label>
+          <label><input type="radio" name="feedback_reason" value="Technical issue"> Something didn't work</label>
+          <label><input type="radio" name="feedback_reason" value="Other"> Something else</label>
+          <textarea name="feedback_detail" rows="2" maxlength="500" placeholder="Optional: tell us more"></textarea>
+          <button type="submit">SEND FEEDBACK</button>
+          <small>Optional. Your answer helps us understand where the experience is unclear.</small>
+        </form>
+      </details>
+    </section>
   ` : ""}
   <div class="${directMode ? "tl-direct-disclaimer" : ""}" style="margin-top:9px;font-size:10px;line-height:1.45;color:#8491a6;">${directMode ? "Only accessible public evidence can be examined. No platform or source is guaranteed." : "TruthLoop analyzes only the public evidence you choose to provide."}</div>
 </div>`;
@@ -7840,7 +7855,8 @@ TRUTHLOOP_TEMP_ERUDA_DEBUGGER_END
 </script>
 
 <script>
-/* Feedback is optional and is sent to the existing GA4 property only. */
+/* Feedback is optional and is sent to the existing GA4 property only.
+   Delegated handling also supports the Stage 1 form inserted by mountLoop7Bridge(). */
 (function(){
   function cleanFeedbackText(value){
     return String(value || "")
@@ -7849,23 +7865,23 @@ TRUTHLOOP_TEMP_ERUDA_DEBUGGER_END
       .replace(/\b(?:\+?\d[\d\s().-]{7,}\d)\b/g,"[phone]")
       .slice(0,500);
   }
-  document.querySelectorAll(".tl-feedback-form").forEach(function(form){
-    form.addEventListener("submit",function(event){
-      event.preventDefault();
-      var selected=form.querySelector('input[name="feedback_reason"]:checked');
-      if(!selected) return;
-      var detail=cleanFeedbackText(form.querySelector('textarea[name="feedback_detail"]')?.value || "");
-      var stage=form.getAttribute("data-feedback-stage") || "unknown";
-      if(typeof window.gtag === "function"){
-        window.gtag("event","truthloop_feedback_submitted",{
-          feedback_stage:stage,
-          feedback_context:stage === "stage1" ? "before_report_generation" : "after_report_paywall",
-          feedback_reason:selected.value,
-          feedback_detail:detail
-        });
-      }
-      form.innerHTML='<p role="status">Thank you. Your feedback has been recorded.</p>';
-    });
+  document.addEventListener("submit",function(event){
+    var form=event.target && event.target.closest ? event.target.closest(".tl-feedback-form") : null;
+    if(!form) return;
+    event.preventDefault();
+    var selected=form.querySelector('input[name="feedback_reason"]:checked');
+    if(!selected) return;
+    var detail=cleanFeedbackText(form.querySelector('textarea[name="feedback_detail"]')?.value || "");
+    var stage=form.getAttribute("data-feedback-stage") || "unknown";
+    if(typeof window.gtag === "function"){
+      window.gtag("event","truthloop_feedback_submitted",{
+        feedback_stage:stage,
+        feedback_context:stage === "stage1" ? "before_report_generation" : "after_report_paywall",
+        feedback_reason:selected.value,
+        feedback_detail:detail
+      });
+    }
+    form.innerHTML='<p role="status">Thank you. Your feedback has been recorded.</p>';
   });
 })();
 </script>
